@@ -38,7 +38,7 @@ export default defineConfig({
       },
     },
     watch: isWatchMode ? {} : undefined,
+    sourcemap: isWatchMode,
   },
 });
-
 
