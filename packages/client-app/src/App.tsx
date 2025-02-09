@@ -13,6 +13,7 @@ function App() {
           ]}
           isHalf
           hideLabels
+          timestamp={new Date().toISOString()}
         />
       </SortableCard>
 
@@ -23,6 +24,7 @@ function App() {
             { label: 'Completed', value: 15, color: '#407abc' },
             { label: 'Seat', value: 25, color: '#50c1c2' },
           ]}
+          timestamp={new Date().toISOString()}
         />
       </SortableCard>
     </Sortable>

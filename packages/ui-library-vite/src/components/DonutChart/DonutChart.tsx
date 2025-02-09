@@ -15,6 +15,7 @@ const DonutChart = ({
   isHalf,
   hideLabels,
   title = '',
+  timestamp,
 }: {
   data: {
     label: string;
@@ -24,6 +25,7 @@ const DonutChart = ({
   isHalf?: boolean;
   hideLabels?: boolean;
   title?: string;
+  timestamp?: string;
 }) => {
   const { parentRef, width, height } = useParentSize({
     debounceTime: 150,
@@ -224,7 +226,7 @@ const DonutChart = ({
         </div>
       )}
 
-      <TimeStamp date={new Date().toISOString()} />
+      <TimeStamp date={timestamp} />
     </div>
   );
 };
