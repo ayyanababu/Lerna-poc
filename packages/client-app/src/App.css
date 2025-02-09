@@ -1,0 +1,11 @@
+body {
+  background-color: #ecf6ff;
+  padding: 8px;
+}
+
+.my-cards {
+ .card-body {
+    height: 400px;
+    width: 100%;
+  }
+}

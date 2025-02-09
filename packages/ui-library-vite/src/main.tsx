@@ -1,6 +1,6 @@
-import { Button } from "./components/Button/Button";
+import { DonutChart } from './components/DonutChart/DonutChart';
+import { Sortable } from './components/Sortable/Sortable';
+import { SortableCard } from './components/SortableCard/SortableCard';
+import './main.css';
 
-
-export {
-  Button
-};
+export { DonutChart, Sortable, SortableCard };

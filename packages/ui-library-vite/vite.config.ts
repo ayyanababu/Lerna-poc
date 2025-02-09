@@ -6,12 +6,12 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [
-    react(),    
-    dts({ 
+    react(),
+    dts({
       entryRoot: resolve(__dirname, 'src'),
       outputDir: resolve(__dirname, 'dist/types'),
       insertTypesEntry: true,
@@ -29,11 +29,11 @@ export default defineConfig({
         globals: {
           'react-dom/server': 'ReactDOMServer',
           'react-dom/client': 'ReactDOM',
-          react: 'React'
-        }
-      }
-    }
-  }
+          react: 'React',
+        },
+      },
+    },
+  },
 });
 
 

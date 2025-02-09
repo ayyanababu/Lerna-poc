@@ -1,0 +1,27 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 8px;
+  background-color: white;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #bfc6ca1f;
+
+  & .card-header {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+
+    & .drag-handle {
+      display: flex;
+      cursor: pointer;
+      margin-left: auto;
+      font-size: 24px;
+    }
+  }
+
+  & .card-body {
+    display: flex;
+  }
+}

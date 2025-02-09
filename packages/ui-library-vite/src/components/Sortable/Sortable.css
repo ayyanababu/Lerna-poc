@@ -1,0 +1,14 @@
+.sortable {
+  gap: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.sortable-ghost {
+  background-color: #8fc5ff;
+  border-radius: 8px;
+
+  * {
+    opacity: 0;
+  }
+}
