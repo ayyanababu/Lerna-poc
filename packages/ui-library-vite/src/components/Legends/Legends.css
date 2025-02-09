@@ -4,4 +4,33 @@
   width: 100%;
   flex-wrap: wrap;
   gap: 8px;
+
+  & .legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: auto;
+    cursor: pointer;
+    user-select: none;
+
+    & .legend-dot {
+      margin-right: 7px;
+      margin-top: 2px;
+      margin-bottom: auto;
+      border-radius: 20px;
+      width: 12px;
+      height: 12px;
+    }
+
+    & .legend-label-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      align-items: flex-start;
+    }
+
+    & h5, h3 {
+      margin: 0;
+      font-weight: normal;
+    }
+  }
 }

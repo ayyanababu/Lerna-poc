@@ -62,14 +62,7 @@ const DonutChart = ({
   });
 
   return (
-    <div
-      style={{
-        position: 'relative',
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-      }}>
+    <div className="donut-chart">
       <Title title={title} />
 
       {/* Legend */}
@@ -81,15 +74,7 @@ const DonutChart = ({
         setHoveredArc={setHoveredArc}
       />
 
-      <div
-        style={{
-          position: 'relative',
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          flex: '1 1 100%',
-        }}
-        ref={parentRef}>
+      <div className="donut-chart-container" ref={parentRef}>
         <svg width={width} height={height}>
           <Group top={height / (isHalf ? 1.5 : 2)} left={width / 2}>
             <Pie
@@ -147,11 +132,10 @@ const DonutChart = ({
                         setHoveredArc(null);
                       }}
                       style={{
-                        cursor: 'pointer',
                         opacity: isHovered ? 1 : 0.5,
                         scale: hoveredArc === arc.data.label ? 1.1 : 1,
-                        transition: 'all 0.250s ease-in-out',
-                      }}>
+                      }}
+                      className="cursor-pointer transition-all">
                       <path
                         d={arcGenerator(arc)}
                         fill={colorScale(arc.data.label)}
@@ -162,17 +146,15 @@ const DonutChart = ({
                             hoveredArc === arc.data.label
                               ? 'saturate(150%)'
                               : 'saturate(100%)',
-                          transition: 'all 0.250s ease-in-out',
                         }}
+                        className="transition-all"
                       />
                       {hoveredArc === arc.data.label && (
                         <path
                           d={shadowArcGenerator(arc)}
                           fill={colorScale(arc.data.label)}
                           opacity={0.2}
-                          style={{
-                            transition: 'all 0.250s ease-in-out',
-                          }}
+                          className="transition-all"
                         />
                       )}
                       {!hideLabels && (

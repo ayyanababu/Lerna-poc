@@ -29,13 +29,6 @@ export function Legends({
               return (
                 <div
                   key={index}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginRight: 'auto',
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                  }}
                   onClick={() => {
                     setHideIndex((prev) =>
                       prev.includes(index)
@@ -49,29 +42,17 @@ export function Legends({
                   }}
                   onMouseLeave={() => {
                     setHoveredArc(null);
-                  }}>
+                  }}
+                  className="legend-item">
                   <div
                     style={{
-                      width: 12,
-                      height: 12,
                       // @ts-expect-error TODO
                       backgroundColor: (colorScale(label) as string) || '#fff',
-                      marginRight: 7,
-                      marginTop: '2px',
-                      marginBottom: 'auto',
-                      borderRadius: '20px',
-                    }}></div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '2px',
-                      alignItems: 'flex-start',
-                    }}>
+                    }}
+                    className="legend-dot"></div>
+                  <div className="legend-label-container">
                     <h5
                       style={{
-                        margin: 0,
-                        fontWeight: 'normal',
                         textDecoration: hideIndex.includes(index)
                           ? 'strike-through'
                           : 'none',
@@ -79,13 +60,7 @@ export function Legends({
                       {label.datum}
                     </h5>
                     {data?.[label.index]?.value && (
-                      <h3
-                        style={{
-                          margin: 0,
-                          fontWeight: 'normal',
-                        }}>
-                        {data?.[label?.index]?.value}
-                      </h3>
+                      <h3>{data?.[label?.index]?.value}</h3>
                     )}
                   </div>
                 </div>
