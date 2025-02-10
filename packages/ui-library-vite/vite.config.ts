@@ -37,8 +37,12 @@ export default defineConfig({
         },
       },
     },
-    watch: isWatchMode ? {} : undefined,
+    watch: {
+      include: ['src/**/*'],
+      sigint: false,
+    },
     sourcemap: isWatchMode,
+    minify: !isWatchMode,
   },
 });
 

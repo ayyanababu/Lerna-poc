@@ -4,8 +4,11 @@ body {
 }
 
 .my-cards {
+  max-width: 1280px;
+  margin: 0 auto;
+
  .card-body {
-    height: 400px;
+    height: 350px;
     width: 100%;
   }
 }

@@ -8,13 +8,13 @@ export function Legends({
   data,
   hideIndex,
   setHideIndex,
-  setHoveredArc,
+  setHovered,
 }: {
   colorScale: ReturnType<typeof scaleOrdinal<string, string>>;
   data: { label: string; value: number; color: string }[];
   hideIndex: number[];
   setHideIndex: React.Dispatch<SetStateAction<number[]>>;
-  setHoveredArc: React.Dispatch<SetStateAction<string | null | undefined>>;
+  setHovered: React.Dispatch<SetStateAction<string | null | undefined>>;
 }) {
   return (
     <div className="legends">
@@ -38,10 +38,10 @@ export function Legends({
                   }}
                   tabIndex={1}
                   onMouseOver={() => {
-                    setHoveredArc(label.text);
+                    setHovered(label.text);
                   }}
                   onMouseLeave={() => {
-                    setHoveredArc(null);
+                    setHovered(null);
                   }}
                   className="legend-item">
                   <div
