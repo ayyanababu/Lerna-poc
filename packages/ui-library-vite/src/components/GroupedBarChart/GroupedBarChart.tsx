@@ -41,7 +41,7 @@ const GroupedBarChart = ({
     key: string;
     value: number;
   }>();
-  const [hoveredArc, setHoveredArc] = useState<string | null>();
+  const [, setHoveredArc] = useState<string | null>();
 
   const margin = { top: 40, right: 20, bottom: 40, left: 40 };
   const xMax = width - margin.left - margin.right;
@@ -110,10 +110,12 @@ const GroupedBarChart = ({
                         key={`bar-${bar.key}-${bar.index}`}
                         onMouseEnter={(event) => {
                           showTooltip({
+                            // @ts-expect-error TODO: fix this
                             tooltipData: bar,
                             tooltipLeft: event.clientX,
                             tooltipTop: event.clientY,
                           });
+                          // @ts-expect-error TODO: fix this
                           setHoveredArc(bar.data.label);
                         }}
                         onMouseLeave={() => {
@@ -135,7 +137,11 @@ const GroupedBarChart = ({
                         )}
                         {JSON.stringify(bar, null, 2)}
                         {JSON.stringify(barGroups, null, 2)}
-                        <text>{data?.[index]?.data?.[bar.key]}</text>
+                        <text
+                          x={bar.x + BAR_WIDTH * idx}
+                          y={yMax - data?.[index]?.data?.[bar.key]}>
+                          {data?.[index]?.data?.[bar.key]}
+                        </text>
                       </g>
                     ))}
                   </Group>
