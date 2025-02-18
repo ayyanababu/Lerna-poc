@@ -3,8 +3,7 @@ import {
   GroupedBarChart,
   Sortable,
   SortableCard,
-} from '@myorg/ui-library-vite';
-import '@myorg/ui-library-vite/style.css';
+} from '@my-org/ui-library';
 import './App.css';
 
 function App() {

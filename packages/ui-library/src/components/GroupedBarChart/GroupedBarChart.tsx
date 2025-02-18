@@ -3,10 +3,10 @@ import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { BarGroup } from '@visx/shape';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { TimeStamp } from '../TimeStamp/TimeStamp';
 import { Title } from '../Title/Title';
-import './GroupedBarChart.css';
+// import './GroupedBarChart.css';
 
 const BAR_WIDTH = 20;
 

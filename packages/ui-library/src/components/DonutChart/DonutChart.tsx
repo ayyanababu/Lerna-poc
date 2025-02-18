@@ -1,14 +1,15 @@
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleOrdinal } from '@visx/scale';
 import { Pie } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { arc as d3Arc, PieArcDatum } from 'd3-shape';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Legends } from '../Legends/Legends';
 import { TimeStamp } from '../TimeStamp/TimeStamp';
 import { Title } from '../Title/Title';
-import './DonutChart.css';
 
 const DonutChart = ({
   data,
@@ -62,7 +63,16 @@ const DonutChart = ({
   });
 
   return (
-    <div className="donut-chart">
+    <Box
+      className="donut-chart"
+      sx={{
+        position: 'relative',
+        height: '100%',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <Title title={title} />
 
       {/* Legend */}
@@ -74,7 +84,17 @@ const DonutChart = ({
         setHovered={setHoveredArc}
       />
 
-      <div className="donut-chart-container" ref={parentRef}>
+      <Box
+        className="donut-chart-container"
+        ref={parentRef}
+        sx={{
+          position: 'relative',
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          flex: '1 1 100%',
+        }}
+      >
         <svg width={width} height={height}>
           <Group top={height / (isHalf ? 1.5 : 2)} left={width / 2}>
             <Pie
@@ -85,7 +105,8 @@ const DonutChart = ({
               padAngle={padAngle}
               pieSortValues={(a, b) => a - b}
               startAngle={isHalf ? -Math.PI / 2 : 0}
-              endAngle={isHalf ? Math.PI / 2 : 360}>
+              endAngle={isHalf ? Math.PI / 2 : 360}
+            >
               {(pie) =>
                 pie.arcs.map((arc, index) => {
                   const [centroidX, centroidY] = pie.path.centroid(arc);
@@ -135,7 +156,8 @@ const DonutChart = ({
                         opacity: isHovered ? 1 : 0.5,
                         scale: hoveredArc === arc.data.label ? 1.1 : 1,
                       }}
-                      className="cursor-pointer transition-all">
+                      className="cursor-pointer transition-all"
+                    >
                       <path
                         d={arcGenerator(arc)}
                         fill={colorScale(arc.data.label)}
@@ -167,7 +189,8 @@ const DonutChart = ({
                           textAnchor="middle"
                           fontWeight={
                             hoveredArc === arc.data.label ? 'bold' : 'normal'
-                          }>
+                          }
+                        >
                           {arc.data.label}
                         </text>
                       )}
@@ -178,11 +201,11 @@ const DonutChart = ({
             </Pie>
           </Group>
         </svg>
-      </div>
+      </Box>
 
       {tooltipOpen && tooltipData && (
-        <div
-          style={{
+        <Box
+          sx={{
             position: 'fixed',
             top: tooltipTop,
             left: tooltipLeft,
@@ -198,18 +221,19 @@ const DonutChart = ({
             transform: 'translate(-50%, -100%)',
             whiteSpace: 'nowrap',
             transition: 'all 0.250s ease-in-out',
-          }}>
-          <div style={{ marginBottom: '5px', textAlign: 'center' }}>
+          }}
+        >
+          <Typography sx={{ marginBottom: '5px', textAlign: 'center' }}>
             {tooltipData.label}
-          </div>
-          <div style={{ fontSize: '14px', fontWeight: 'bold' }}>
+          </Typography>
+          <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>
             {tooltipData.value}
-          </div>
-        </div>
+          </Typography>
+        </Box>
       )}
 
       <TimeStamp date={timestamp} />
-    </div>
+    </Box>
   );
 };
 
