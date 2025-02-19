@@ -1,15 +1,12 @@
-import { Box, Typography } from '@mui/material';
 import { AxisBottom, AxisLeft } from '@visx/axis';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { Bar } from '@visx/shape';
-import { Tooltip } from '@visx/tooltip';
+import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import { default as React, useMemo, useState } from 'react';
-import { Legends } from '../Legends/Legends';
-import { TimeStamp } from '../TimeStamp/TimeStamp';
-import { Title } from '../Title/Title';
+import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
 
 interface GroupedBarChartProps {
   width: number;
@@ -23,17 +20,6 @@ interface GroupedBarChartProps {
   colors?: string[];
   title?: string;
   timestamp?: string;
-}
-
-interface TooltipData {
-  label: string;
-  data: {
-    future: number;
-    options: number;
-    forwards: number;
-    fixedIncome: number;
-    others: number;
-  };
 }
 
 const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
@@ -65,11 +51,14 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
     }));
   }, [groupKeys, colors, data]);
 
-  // Tooltip State
-  const [tooltipOpen, setTooltipOpen] = useState(false);
-  const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
-  const [tooltipLeft, setTooltipLeft] = useState<number | null>(null);
-  const [tooltipTop, setTooltipTop] = useState<number | null>(null);
+  const {
+    showTooltip,
+    hideTooltip,
+    tooltipData,
+    tooltipLeft,
+    tooltipTop,
+    tooltipOpen,
+  } = useTooltip<TooltipData>();
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
 
@@ -147,166 +136,101 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
     [groupKeys, colors],
   );
 
-  const handleMouseOver = (
-    event: React.MouseEvent<SVGRectElement>,
-    dataPoint: TooltipData,
-    groupKey: string,
-  ) => {
-    console.log(dataPoint, 'handleMouseOver');
-    setTooltipOpen(true);
-    setTooltipData(dataPoint);
-    setTooltipLeft(event.clientX);
-    setTooltipTop(event.clientY);
-    setHoveredGroupKey(groupKey);
-  };
-
-  const handleMouseOut = () => {
-    setTooltipOpen(false);
-    setTooltipData(null);
-    setTooltipLeft(null);
-    setTooltipTop(null);
-    setHoveredGroupKey(null);
-  };
-
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-      }}>
-      <Title title={title} />
-
-      {/* Legend */}
-      <Legends
-        colorScale={groupColorScale}
-        data={legendData}
-        hideIndex={hideIndex}
-        setHideIndex={setHideIndex}
-        setHovered={setHoveredGroupKey}
-      />
-
-      <Box
-        
-        ref={parentRef}
-        sx={{
-          position: 'relative',
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          flex: '1 1 100%',
-        }}>
-        <svg width={width} height={height}>
-          <Group
-            top={margin.top}
-            left={margin.left}
-            style={{
-              transition: 'all 0.250s ease-in-out',
-            }}>
-            {/* Y-Axis */}
-            {hideIndex.length !== groupKeys.length && (
-              <AxisLeft
-                scale={valueScale}
-                tickFormat={(value) => `${value}`}
-                numTicks={5}
-              />
-            )}
-
-            {/* X-Axis */}
-            <AxisBottom
-              scale={categoryScale}
-              top={innerHeight}
-              tickFormat={(value) =>
-                hideIndex.length !== groupKeys.length ? `${value}` : ``
-              }
-              hideTicks={hideIndex.length === groupKeys.length}
+    <ChartWrapper
+      ref={parentRef}
+      title={title}
+      timestamp={timestamp}
+      legendData={legendData}
+      colorScale={groupColorScale}
+      hideIndex={hideIndex}
+      setHideIndex={setHideIndex}
+      setHovered={setHoveredGroupKey}
+      tooltipOpen={tooltipOpen}
+      tooltipTop={tooltipTop}
+      tooltipLeft={tooltipLeft}
+      tooltipData={tooltipData}>
+      <svg width={width} height={height}>
+        <Group
+          top={margin.top}
+          left={margin.left}
+          style={{
+            transition: 'all 0.250s ease-in-out',
+          }}>
+          {/* Y-Axis */}
+          {hideIndex.length !== groupKeys.length && (
+            <AxisLeft
+              scale={valueScale}
+              tickFormat={(value) => `${value}`}
+              numTicks={5}
             />
+          )}
 
-            {/* Bars */}
-            {filteredData.map((categoryData, index) => {
-              const category = String(categoryData.label); // Ensure category is string
-              const categoryX = categoryScale(category) || 0; // Fallback to 0 if undefined category
-              return groupKeys.map((groupKey, groupIndex) => {
-                const value = Number(categoryData.data?.[groupKey]); // Ensure value is a number
-                if (isNaN(value)) return null; // Skip if value is not a number
+          {/* X-Axis */}
+          <AxisBottom
+            scale={categoryScale}
+            top={innerHeight}
+            tickFormat={(value) =>
+              hideIndex.length !== groupKeys.length ? `${value}` : ``
+            }
+            hideTicks={hideIndex.length === groupKeys.length}
+          />
 
-                const barX = categoryX + (groupScale(groupKey) || 0); // Fallback to 0 if undefined groupKey
-                const barWidth = groupScale.bandwidth();
-                const barHeight = innerHeight - valueScale(value);
-                const barY = valueScale(value);
-                const isHoveredGroup =
-                  hoveredGroupKey && hoveredGroupKey === groupKey;
-                const barOpacity = hoveredGroupKey && !isHoveredGroup ? 0.3 : 1;
-                const barFill = hideIndex.includes(groupIndex)
-                  ? '#eee'
-                  : groupColorScale(groupKey);
+          {/* Bars */}
+          {filteredData.map((categoryData, index) => {
+            const category = String(categoryData.label); // Ensure category is string
+            const categoryX = categoryScale(category) || 0; // Fallback to 0 if undefined category
+            return groupKeys.map((groupKey, groupIndex) => {
+              const value = Number(categoryData.data?.[groupKey]); // Ensure value is a number
+              if (isNaN(value)) return null; // Skip if value is not a number
 
-                return (
-                  <Bar
-                    key={`${category}-${groupKey}-${index}-${groupIndex}`}
-                    x={barX}
-                    y={barY}
-                    width={barWidth}
-                    height={barHeight}
-                    fill={barFill}
-                    opacity={barOpacity}
-                    rx={'5'}
-                    onMouseMove={(event) =>
-                      handleMouseOver(event, categoryData, groupKey)
-                    }
-                    onMouseLeave={handleMouseOut}
-                    style={{
-                      transition: 'all 250ms ease-in-out',
-                    }}
-                  />
-                );
-              });
-            })}
-          </Group>
-        </svg>
-      </Box>
+              const barX = categoryX + (groupScale(groupKey) || 0); // Fallback to 0 if undefined groupKey
+              const barWidth = groupScale.bandwidth();
+              const barHeight = innerHeight - valueScale(value);
+              const barY = valueScale(value);
+              const isHoveredGroup =
+                hoveredGroupKey && hoveredGroupKey === groupKey;
+              const barOpacity = hoveredGroupKey && !isHoveredGroup ? 0.3 : 1;
+              const barFill = hideIndex.includes(groupIndex)
+                ? '#eee'
+                : groupColorScale(groupKey);
 
-      {tooltipOpen &&
-        tooltipData &&
-        tooltipTop !== null &&
-        tooltipLeft !== null && (
-          <Tooltip
-            top={tooltipTop}
-            left={tooltipLeft}
-            style={{
-              position: 'fixed',
-              backgroundColor: 'white',
-              color: '#333',
-              padding: '10px',
-              borderRadius: '6px',
-              boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
-              border: '1px solid #ddd',
-              fontSize: '12px',
-              fontWeight: 'bold',
-              pointerEvents: 'none',
-              transform: 'translate(-50%, -100%)',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.250s ease-in-out',
-            }}>
-            <Typography sx={{ marginBottom: '5px', textAlign: 'center' }}>
-              {capitalize(lowerCase(hoveredGroupKey))}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: '14px',
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}>
-              {tooltipData?.data?.[hoveredGroupKey]}
-            </Typography>
-          </Tooltip>
-        )}
-
-      <TimeStamp date={timestamp} />
-    </Box>
+              return (
+                <Bar
+                  key={`${category}-${groupKey}-${index}-${groupIndex}`}
+                  x={barX}
+                  y={barY}
+                  width={barWidth}
+                  height={barHeight}
+                  fill={barFill}
+                  opacity={barOpacity}
+                  rx={'5'}
+                  onMouseMove={(event) => {
+                    showTooltip({
+                      tooltipData: {
+                        label: capitalize(lowerCase(groupKey)),
+                        value,
+                        color: barFill,
+                      },
+                      tooltipLeft: event.clientX,
+                      tooltipTop: event.clientY,
+                    });
+                    setHoveredGroupKey(groupKey);
+                  }}
+                  onMouseLeave={() => {
+                    hideTooltip();
+                    setHoveredGroupKey(null);
+                  }}
+                  style={{
+                    transition: 'all 250ms ease-in-out',
+                  }}
+                />
+              );
+            });
+          })}
+        </Group>
+      </svg>
+    </ChartWrapper>
   );
 };
 

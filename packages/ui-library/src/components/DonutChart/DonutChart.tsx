@@ -1,5 +1,3 @@
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleOrdinal } from '@visx/scale';
@@ -7,13 +5,11 @@ import { Pie } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { arc as d3Arc, PieArcDatum } from 'd3-shape';
 import React, { useMemo, useState } from 'react';
-import { Legends } from '../Legends/Legends';
-import { TimeStamp } from '../TimeStamp/TimeStamp';
-import { Title } from '../Title/Title';
+import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
 
 const DonutChart = ({
   data,
-  type = "full",
+  type = 'full',
   hideLabels,
   title = '',
   timestamp,
@@ -23,7 +19,7 @@ const DonutChart = ({
     value: number;
     color: string;
   }[];
-  type?: "full" | "semi";
+  type?: 'full' | 'semi';
   hideLabels?: boolean;
   title?: string;
   timestamp?: string;
@@ -38,15 +34,11 @@ const DonutChart = ({
     tooltipLeft,
     tooltipTop,
     tooltipOpen,
-  } = useTooltip<{
-    label: string;
-    value: number;
-    color: string;
-  }>();
+  } = useTooltip<TooltipData>();
   const [hoveredArc, setHoveredArc] = useState<string | null>();
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const radius = useMemo(
-    () => Math.min(width, height) / (type === "semi" ? 2 : 2.5),
+    () => Math.min(width, height) / (type === 'semi' ? 2 : 2.5),
     [type, width, height],
   );
   const innerRadius = useMemo(() => radius * 0.6, [radius]);
@@ -63,34 +55,20 @@ const DonutChart = ({
   });
 
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-      }}>
-      <Title title={title} />
-
-      {/* Legend */}
-      <Legends
-        colorScale={colorScale}
-        data={data}
-        hideIndex={hideIndex}
-        setHideIndex={setHideIndex}
-        setHovered={setHoveredArc}
-      />
-
-      <Box
-        ref={parentRef}
-        sx={{
-          position: 'relative',
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          flex: '1 1 100%',
-        }}>
+    <ChartWrapper
+    ref={parentRef}
+      title={title}
+      timestamp={timestamp}
+      legendData={data}
+      colorScale={colorScale}
+      hideIndex={hideIndex}
+      setHideIndex={setHideIndex}
+      setHovered={setHoveredArc}
+      tooltipOpen={tooltipOpen}
+      tooltipTop={tooltipTop}
+      tooltipLeft={tooltipLeft}
+      tooltipData={tooltipData}>
+   
         <svg width={width} height={height}>
           <Group top={height / (type ? 1.5 : 2)} left={width / 2}>
             <Pie
@@ -193,39 +171,8 @@ const DonutChart = ({
             </Pie>
           </Group>
         </svg>
-      </Box>
-
-      {tooltipOpen && tooltipData && (
-        <Box
-          sx={{
-            position: 'fixed',
-            top: tooltipTop,
-            left: tooltipLeft,
-            backgroundColor: 'white',
-            color: '#333',
-            padding: '10px',
-            borderRadius: '6px',
-            boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
-            border: '1px solid #ddd',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            pointerEvents: 'none',
-            transform: 'translate(-50%, -100%)',
-            whiteSpace: 'nowrap',
-            transition: 'all 0.250s ease-in-out',
-          }}>
-          <Typography sx={{ marginBottom: '5px', textAlign: 'center' }}>
-            {tooltipData.label}
-          </Typography>
-          <Typography
-            sx={{ fontSize: '14px', fontWeight: 'bold', textAlign: 'center' }}>
-            {tooltipData.value}
-          </Typography>
-        </Box>
-      )}
-
-      <TimeStamp date={timestamp} />
-    </Box>
+      
+    </ChartWrapper>
   );
 };
 

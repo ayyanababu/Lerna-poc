@@ -58,7 +58,7 @@ export function Legends({
                     setHovered(null);
                   }}
                   sx={{
-                    gap: '10px',
+                    gap: '12px',
                     display: 'flex',
                     alignItems: 'center',
                     marginRight: 'auto',
@@ -80,7 +80,7 @@ export function Legends({
                     sx={{
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '5px',
+                      gap: '4px',
                       alignItems: 'flex-start',
                     }}>
                     <Typography
@@ -96,7 +96,7 @@ export function Legends({
                     </Typography>
                     {data?.[label.index]?.value && (
                       <Typography
-                        variant="body2"
+                        variant="h6"
                         sx={{
                           margin: 0,
                           fontWeight: 700,
