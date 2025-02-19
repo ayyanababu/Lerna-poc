@@ -2,6 +2,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { LegendOrdinal } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
+import { capitalize, lowerCase } from 'lodash-es';
 import React, { SetStateAction } from 'react';
 
 export function Legends({
@@ -10,25 +11,28 @@ export function Legends({
   hideIndex,
   setHideIndex,
   setHovered,
+  direction = 'row',
 }: {
   colorScale: ReturnType<typeof scaleOrdinal<string, string>>;
   data: { label: string; value: number; color: string }[];
   hideIndex: number[];
   setHideIndex: React.Dispatch<SetStateAction<number[]>>;
   setHovered: React.Dispatch<SetStateAction<string | null | undefined>>;
+  direction?: 'row' | 'column';
 }) {
   return (
     <Box
-      className="legends"
       sx={{
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: direction,
         width: '100%',
         flexWrap: 'wrap',
         gap: 1,
-      }}
-    >
-      <LegendOrdinal scale={colorScale} direction="row" labelMargin="0 0 0 0">
+      }}>
+      <LegendOrdinal
+        scale={colorScale}
+        direction={direction}
+        labelMargin="0 0 0 0">
         {(labels) => (
           <>
             {labels.map((label, index) => {
@@ -53,47 +57,50 @@ export function Legends({
                   onMouseLeave={() => {
                     setHovered(null);
                   }}
-                  className="legend-item"
                   sx={{
+                    gap: '10px',
                     display: 'flex',
                     alignItems: 'center',
                     marginRight: 'auto',
                     cursor: 'pointer',
                     userSelect: 'none',
-                  }}
-                >
+                  }}>
                   <Box
                     sx={{
                       // @ts-ignore
                       backgroundColor: (colorScale(label) as string) || '#fff',
-                      marginRight: '7px', // Keep pixel value for fine control if needed
-                      marginTop: '2px', // Keep pixel value for fine control if needed
+                      marginTop: '4px',
                       marginBottom: 'auto',
                       borderRadius: '20px',
-                      width: '12px', // Keep pixel value for fine control if needed
-                      height: '12px', // Keep pixel value for fine control if needed
+                      width: '12px',
+                      height: '12px',
                     }}
-                    className="legend-dot"
                   />
-                  <Box className="legend-label-container" sx={{ display: 'flex', flexDirection: 'column', gap: 0.25, alignItems: 'flex-start' }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '5px',
+                      alignItems: 'flex-start',
+                    }}>
                     <Typography
                       variant="body2"
                       sx={{
                         margin: 0,
-                        fontWeight: 'normal',
+                        fontWeight: 200,
                         textDecoration: hideIndex.includes(index)
                           ? 'line-through'
                           : 'none',
-                        fontSize: '0.75rem', // Roughly half of h5 default
-                      }}
-                    >
-                      {label.datum}
+                      }}>
+                      {capitalize(lowerCase(label.datum))}
                     </Typography>
                     {data?.[label.index]?.value && (
                       <Typography
                         variant="body2"
-                        sx={{ margin: 0, fontWeight: 'normal', fontSize: '1.5rem' }} // Roughly half of h3 default
-                      >
+                        sx={{
+                          margin: 0,
+                          fontWeight: 700,
+                        }}>
                         {data?.[label?.index]?.value}
                       </Typography>
                     )}

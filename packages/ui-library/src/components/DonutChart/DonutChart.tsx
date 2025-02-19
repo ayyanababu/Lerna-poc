@@ -64,15 +64,13 @@ const DonutChart = ({
 
   return (
     <Box
-      className="donut-chart"
       sx={{
         position: 'relative',
         height: '100%',
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-      }}
-    >
+      }}>
       <Title title={title} />
 
       {/* Legend */}
@@ -85,7 +83,6 @@ const DonutChart = ({
       />
 
       <Box
-        className="donut-chart-container"
         ref={parentRef}
         sx={{
           position: 'relative',
@@ -93,8 +90,7 @@ const DonutChart = ({
           width: '100%',
           display: 'flex',
           flex: '1 1 100%',
-        }}
-      >
+        }}>
         <svg width={width} height={height}>
           <Group top={height / (type ? 1.5 : 2)} left={width / 2}>
             <Pie
@@ -105,8 +101,7 @@ const DonutChart = ({
               padAngle={padAngle}
               pieSortValues={(a, b) => a - b}
               startAngle={type ? -Math.PI / 2 : 0}
-              endAngle={type ? Math.PI / 2 : 360}
-            >
+              endAngle={type ? Math.PI / 2 : 360}>
               {(pie) =>
                 pie.arcs.map((arc, index) => {
                   const [centroidX, centroidY] = pie.path.centroid(arc);
@@ -155,9 +150,9 @@ const DonutChart = ({
                       style={{
                         opacity: isHovered ? 1 : 0.5,
                         scale: hoveredArc === arc.data.label ? 1.1 : 1,
-                      }}
-                      className="cursor-pointer transition-all"
-                    >
+                        cursor: 'pointer',
+                        transition: 'all 250ms ease-in-out',
+                      }}>
                       <path
                         d={arcGenerator(arc)}
                         fill={colorScale(arc.data.label)}
@@ -169,14 +164,12 @@ const DonutChart = ({
                               ? 'saturate(150%)'
                               : 'saturate(100%)',
                         }}
-                        className="transition-all"
                       />
                       {hoveredArc === arc.data.label && (
                         <path
                           d={shadowArcGenerator(arc)}
                           fill={colorScale(arc.data.label)}
                           opacity={0.2}
-                          className="transition-all"
                         />
                       )}
                       {!hideLabels && (
@@ -189,8 +182,7 @@ const DonutChart = ({
                           textAnchor="middle"
                           fontWeight={
                             hoveredArc === arc.data.label ? 'bold' : 'normal'
-                          }
-                        >
+                          }>
                           {arc.data.label}
                         </text>
                       )}
@@ -221,12 +213,12 @@ const DonutChart = ({
             transform: 'translate(-50%, -100%)',
             whiteSpace: 'nowrap',
             transition: 'all 0.250s ease-in-out',
-          }}
-        >
+          }}>
           <Typography sx={{ marginBottom: '5px', textAlign: 'center' }}>
             {tooltipData.label}
           </Typography>
-          <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>
+          <Typography
+            sx={{ fontSize: '14px', fontWeight: 'bold', textAlign: 'center' }}>
             {tooltipData.value}
           </Typography>
         </Box>

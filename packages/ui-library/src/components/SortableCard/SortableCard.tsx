@@ -7,7 +7,7 @@ import { Title } from '../Title/Title';
 
 export const SortableCard = forwardRef<
   HTMLDivElement,
-  { children: ReactNode; title?: string, height: number, width: number }
+  { children: ReactNode; title?: string, height: number | string, width: number | string }
 >(({ children, title, height, width }, ref) => {
   return (
     <Card

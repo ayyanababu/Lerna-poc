@@ -5,7 +5,7 @@ import React from 'react';
 export function Title({ title }: { title?: string }) {
   if (!title) return null;
   return (
-    <Typography variant="h6" gutterBottom style={{ fontSize: '0.875rem' }}>
+    <Typography variant="subtitle1" gutterBottom fontWeight={'bold'}>
       {title}
     </Typography>
   );
