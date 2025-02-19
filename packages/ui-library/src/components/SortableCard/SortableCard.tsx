@@ -7,8 +7,8 @@ import { Title } from '../Title/Title';
 
 export const SortableCard = forwardRef<
   HTMLDivElement,
-  { children: ReactNode; title?: string }
->(({ children, title }, ref) => {
+  { children: ReactNode; title?: string, height: number, width: number }
+>(({ children, title, height, width }, ref) => {
   return (
     <Card
       ref={ref}
@@ -45,7 +45,7 @@ export const SortableCard = forwardRef<
         </Box>
       </Box>
 
-      <CardContent sx={{ display: 'flex', padding: '8px', height: 800, width: 200 }}>{children}</CardContent>
+      <CardContent sx={{ display: 'flex', padding: '8px', height, width }}>{children}</CardContent>
     </Card>
   );
 });

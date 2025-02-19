@@ -9,7 +9,7 @@ import './App.css';
 function App() {
   return (
     <Sortable className="my-cards">
-      <SortableCard title="Trade Capture">
+      <SortableCard title="Trade Capture" height={400} width={400}>
         <DonutChart
           data={[
             { label: 'Successful Trades', value: 85, color: '#fed8cc' },
@@ -21,7 +21,7 @@ function App() {
         />
       </SortableCard>
 
-      <SortableCard title="Trade Notification">
+      <SortableCard title="Trade Notification" height={400} width={400}>
         <DonutChart
           data={[
             { label: 'Scheduled', value: 60, color: '#9bc5ef' },
@@ -32,7 +32,7 @@ function App() {
         />
       </SortableCard>
 
-      <SortableCard title="Trade Notification">
+      <SortableCard title="Trade Notification" height={400} width={400}>
         <GroupedBarChart
           data={[
             {
