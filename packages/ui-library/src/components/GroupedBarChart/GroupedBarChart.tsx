@@ -1,184 +1,138 @@
+import { AxisBottom, AxisLeft } from '@visx/axis';
 import { Group } from '@visx/group';
-import { useParentSize } from '@visx/responsive';
-import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
-import { BarGroup } from '@visx/shape';
-import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
-import React, { useMemo, useState } from 'react';
-import { TimeStamp } from '../TimeStamp/TimeStamp';
-import { Title } from '../Title/Title';
-// import './GroupedBarChart.css';
+import { scaleBand, scaleLinear } from '@visx/scale';
+import { Bar } from '@visx/shape';
+import { Text } from '@visx/text';
+import React from 'react';
 
-const BAR_WIDTH = 20;
+interface GroupedBarChartProps {
+  width: number;
+  height: number;
+  data: DataPoint[];
+  groupKeys: string[]; // Keys for the groups within each category
+  categoryKey: string; // Key for the category
+  margin?: { top: number; right: number; bottom: number; left: number };
+  colors?: string[]; // Optional colors for each group
+}
 
-const GroupedBarChart = ({
+interface DataPoint {
+  [key: string]: string | number; // Flexible data structure
+}
+
+const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
+  width,
+  height,
   data,
-  colors,
-  title = '',
-  timestamp,
-}: {
-  data: {
-    label: string;
-    data: {
-      [key: string]: number;
-    };
-  }[];
-  colors: {
-    [key: string]: string;
-  };
-  title?: string;
-  timestamp?: string;
+  groupKeys,
+  categoryKey,
+  margin = { top: 20, right: 30, bottom: 30, left: 40 },
+  colors = ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3', '#a6d854', '#ffd92f'], // Default color palette
 }) => {
-  const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
-  const {
-    showTooltip,
-    hideTooltip,
-    tooltipData,
-    tooltipLeft,
-    tooltipTop,
-    tooltipOpen,
-  } = useTooltip<{
-    label: string;
-    key: string;
-    value: number;
-  }>();
-  const [, setHoveredArc] = useState<string | null>();
+  if (!data || data.length === 0) {
+    return <div>No data to display.</div>;
+  }
 
-  const margin = { top: 40, right: 20, bottom: 40, left: 40 };
-  const xMax = width - margin.left - margin.right;
-  const yMax = height - margin.top - margin.bottom;
+  const innerWidth = width - margin.left - margin.right;
+  const innerHeight = height - margin.top - margin.bottom;
 
-  // Extract keys dynamically from the first data object
-  const keys = Object.keys(data[0]?.data || {});
-
-  // X Scale for categories
-  const xScale = useMemo(
+  // Scales
+  const categoryScale = React.useMemo(
     () =>
-      scaleBand({
-        range: [0, xMax],
-        round: true,
-        domain: data.map((d) => d.label),
-        padding: 0.2,
+      scaleBand<string>({
+        domain: data.map((d) => String(d[categoryKey])), // Ensure categoryKey is treated as string
+        range: [0, innerWidth],
+        padding: 0.2, // Space between category groups
       }),
-    [xMax, data],
+    [data, innerWidth, categoryKey]
   );
 
-  // Y Scale for values
-  const yScale = useMemo(
+  const groupScale = React.useMemo(
     () =>
-      scaleLinear({
-        range: [yMax, 0],
-        round: true,
-        domain: [0, Math.max(...data.flatMap((d) => Object.values(d.data)))],
+      scaleBand<string>({
+        domain: groupKeys,
+        range: [0, categoryScale.bandwidth()], // Each group takes a part of category band
+        padding: 0.1, // Space between bars within a group
       }),
-    [yMax, data],
+    [groupKeys, categoryScale]
   );
 
-  // Color scale using provided colors
-  const colorScale = scaleOrdinal<string, string>({
-    domain: keys,
-    range: keys.map((key) => colors[key] || '#ccc'), // Default gray if missing
-  });
+  const maxValue = React.useMemo(
+    () =>
+      Math.max(
+        0,
+        ...data.reduce((maxValues, categoryData) => {
+          groupKeys.forEach((groupKey) => {
+            const value = Number(categoryData[groupKey]); // Ensure values are numbers
+            if (!isNaN(value)) {
+              maxValues.push(value);
+            }
+          });
+          return maxValues;
+        }, [] as number[])
+      ),
+    [data, groupKeys]
+  );
 
-  // Accessor function
-  const getLabel = (d: { label: string }) => {
-    console.log(d);
-    return d.label;
-  };
+  const valueScale = React.useMemo(
+    () =>
+      scaleLinear<number>({
+        domain: [0, maxValue * 1.2], // Add some padding to the top of the chart
+        range: [innerHeight, 0],
+      }),
+    [innerHeight, maxValue]
+  );
 
   return (
-    <div className="grouped-bar-chart">
-      <Title title={title} />
-      <div className="grouped-bar-chart-container" ref={parentRef}>
-        <svg width={width} height={height}>
-          <Group top={margin.top} left={margin.left}>
-            <BarGroup
-              data={data}
-              keys={keys}
-              height={yMax}
-              x0={getLabel}
-              x0Scale={xScale}
-              x1Scale={scaleBand({ domain: keys, padding: 0.1 })}
-              yScale={yScale}
-              color={colorScale}>
-              {(barGroups) =>
-                barGroups.map((barGroup, index) => (
-                  <Group
-                    key={`bar-group-${barGroup.index}-${barGroup.x0}`}
-                    left={barGroup.x0}>
-                    {barGroup.bars.map((bar, idx) => (
-                      <g
-                        key={`bar-${bar.key}-${bar.index}`}
-                        onMouseEnter={(event) => {
-                          showTooltip({
-                            // @ts-expect-error TODO: fix this
-                            tooltipData: bar,
-                            tooltipLeft: event.clientX,
-                            tooltipTop: event.clientY,
-                          });
-                          // @ts-expect-error TODO: fix this
-                          setHoveredArc(bar.data.label);
-                        }}
-                        onMouseLeave={() => {
-                          hideTooltip();
-                          setHoveredArc(null);
-                        }}>
-                        <rect
-                          x={bar.x + BAR_WIDTH * idx}
-                          y={yMax - data?.[index]?.data?.[bar.key]}
-                          width={BAR_WIDTH}
-                          height={data?.[index]?.data?.[bar.key]}
-                          fill={bar.color}
-                          rx={BAR_WIDTH / 7}
-                        />
-                        {JSON.stringify(
-                          data?.[index]?.data?.[bar.key],
-                          null,
-                          2,
-                        )}
-                        {JSON.stringify(bar, null, 2)}
-                        {JSON.stringify(barGroups, null, 2)}
-                        <text
-                          x={bar.x + BAR_WIDTH * idx}
-                          y={yMax - data?.[index]?.data?.[bar.key]}>
-                          {data?.[index]?.data?.[bar.key]}
-                        </text>
-                      </g>
-                    ))}
-                  </Group>
-                ))
-              }
-            </BarGroup>
-          </Group>
-        </svg>
-        {tooltipOpen && tooltipData && (
-          <TooltipWithBounds
-            top={tooltipTop}
-            left={tooltipLeft}
-            style={{
-              backgroundColor: 'white',
-              color: '#333',
-              padding: '10px',
-              borderRadius: '6px',
-              boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
-              border: '1px solid #ddd',
-              fontSize: '12px',
-              fontWeight: 'bold',
-              pointerEvents: 'none',
-              transform: 'translate(-50%, -100%)',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.250s ease-in-out',
-            }}>
-            <div style={{ marginBottom: '5px', textAlign: 'center' }}>
-              {tooltipData.label}
-            </div>
-            <div style={{ fontSize: '14px', fontWeight: 'bold' }}>
-              {tooltipData.key}: {tooltipData.value}
-            </div>
-          </TooltipWithBounds>
-        )}
-      </div>
-      <TimeStamp date={timestamp} />
-    </div>
+    <svg width={width} height={height}>
+      <Group top={margin.top} left={margin.left}>
+        {/* Y-Axis */}
+        <AxisLeft scale={valueScale} tickFormat={(value) => `${value}`} numTicks={5} />
+
+        {/* X-Axis */}
+        <AxisBottom
+          scale={categoryScale}
+          top={innerHeight}
+          tickFormat={(value) => `${value}`}
+        />
+
+        {/* Bars */}
+        {data.map((dataPoint, index) => {
+          const category = String(dataPoint[categoryKey]); // Ensure category is string
+          const categoryX = categoryScale(category) || 0; // Fallback to 0 if undefined category
+          return groupKeys.map((groupKey, groupIndex) => {
+            const value = Number(dataPoint[groupKey]); // Ensure value is a number
+            if (isNaN(value)) return null; // Skip if value is not a number
+
+            const barX = categoryX + (groupScale(groupKey) || 0); // Fallback to 0 if undefined groupKey
+            const barWidth = groupScale.bandwidth();
+            const barHeight = innerHeight - valueScale(value);
+            const barY = valueScale(value);
+
+            return (
+              <Bar
+                key={`${category}-${groupKey}-${index}-${groupIndex}`}
+                x={barX}
+                y={barY}
+                width={barWidth}
+                height={barHeight}
+                fill={colors[groupIndex % colors.length]} // Cycle through colors
+              />
+            );
+          });
+        })}
+
+        {/* Chart Title (Optional) */}
+        <Text
+          x={innerWidth / 2}
+          y={-margin.top / 2}
+          textAnchor="middle"
+          fontSize={16}
+          fontWeight={600}
+        >
+          Grouped Bar Chart
+        </Text>
+      </Group>
+    </svg>
   );
 };
 

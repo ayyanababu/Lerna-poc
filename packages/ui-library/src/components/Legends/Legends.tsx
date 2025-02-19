@@ -64,6 +64,7 @@ export function Legends({
                 >
                   <Box
                     sx={{
+                      // @ts-ignore
                       backgroundColor: (colorScale(label) as string) || '#fff',
                       marginRight: '7px', // Keep pixel value for fine control if needed
                       marginTop: '2px', // Keep pixel value for fine control if needed

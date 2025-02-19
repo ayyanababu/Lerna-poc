@@ -13,7 +13,7 @@ import { Title } from '../Title/Title';
 
 const DonutChart = ({
   data,
-  isHalf,
+  type = "full",
   hideLabels,
   title = '',
   timestamp,
@@ -23,7 +23,7 @@ const DonutChart = ({
     value: number;
     color: string;
   }[];
-  isHalf?: boolean;
+  type?: "full" | "semi";
   hideLabels?: boolean;
   title?: string;
   timestamp?: string;
@@ -46,8 +46,8 @@ const DonutChart = ({
   const [hoveredArc, setHoveredArc] = useState<string | null>();
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const radius = useMemo(
-    () => Math.min(width, height) / (isHalf ? 2 : 2.5),
-    [isHalf, width, height],
+    () => Math.min(width, height) / (type === "semi" ? 2 : 2.5),
+    [type, width, height],
   );
   const innerRadius = useMemo(() => radius * 0.6, [radius]);
   const cornerRadius = 6;
@@ -96,7 +96,7 @@ const DonutChart = ({
         }}
       >
         <svg width={width} height={height}>
-          <Group top={height / (isHalf ? 1.5 : 2)} left={width / 2}>
+          <Group top={height / (type ? 1.5 : 2)} left={width / 2}>
             <Pie
               data={filteredData}
               pieValue={(d) => d.value}
@@ -104,8 +104,8 @@ const DonutChart = ({
               innerRadius={innerRadius}
               padAngle={padAngle}
               pieSortValues={(a, b) => a - b}
-              startAngle={isHalf ? -Math.PI / 2 : 0}
-              endAngle={isHalf ? Math.PI / 2 : 360}
+              startAngle={type ? -Math.PI / 2 : 0}
+              endAngle={type ? Math.PI / 2 : 360}
             >
               {(pie) =>
                 pie.arcs.map((arc, index) => {

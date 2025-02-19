@@ -6,6 +6,23 @@ import {
 } from '@my-org/ui-library';
 import './App.css';
 
+interface DataPoint {
+  [key: string]: string | number; // Flexible data structure
+}
+interface MyDataItem extends DataPoint {
+  category: string;
+  group1: number;
+  group2: number;
+  group3: number;
+}
+
+const myData: MyDataItem[] = [
+  { category: 'A', group1: 25, group2: 40, group3: 15 },
+  { category: 'B', group1: 30, group2: 25, group3: 35 },
+  { category: 'C', group1: 15, group2: 50, group3: 20 },
+  { category: 'D', group1: 40, group2: 35, group3: 10 },
+];
+
 function App() {
   return (
     <Sortable className="my-cards">
@@ -15,7 +32,7 @@ function App() {
             { label: 'Successful Trades', value: 85, color: '#fed8cc' },
             { label: 'Failed Trades', value: 15, color: '#f9804e' },
           ]}
-          isHalf
+          type="semi"
           hideLabels
           timestamp={new Date().toISOString()}
         />
@@ -34,46 +51,11 @@ function App() {
 
       <SortableCard title="Trade Notification" height={400} width={400}>
         <GroupedBarChart
-          data={[
-            {
-              label: '20-1-2025',
-              data: {
-                future: 45,
-                options: 20,
-                forwards: 20,
-                fixedIncome: 1200,
-                others: 123,
-              },
-            },
-            {
-              label: '20-2-2025',
-              data: {
-                future: 43,
-                options: 22,
-                forwards: 78,
-                fixedIncome: 12,
-                others: 32,
-              },
-            },
-            {
-              label: '20-3-2025',
-              data: {
-                future: 8,
-                options: 42,
-                forwards: 0,
-                fixedIncome: 87,
-                others: 78,
-              },
-            },
-          ]}
-          timestamp={new Date().toISOString()}
-          colors={{
-            future: '#9bc5ef',
-            options: '#50c1c2',
-            forwards: '#fad176',
-            fixedIncome: '#407abc',
-            others: '#93a3bc',
-          }}
+          width={600}
+          height={400}
+          data={myData}
+          groupKeys={['group1', 'group2', 'group3']}
+          categoryKey="category"
         />
       </SortableCard>
     </Sortable>
