@@ -14,7 +14,7 @@ const DonutChart = ({
   hideLabels,
   title = '',
   timestamp,
-  titleProps
+  titleProps,
 }: {
   data: {
     label: string;
@@ -73,7 +73,7 @@ const DonutChart = ({
       tooltipData={tooltipData}
       titleProps={titleProps}>
       <svg width={width} height={height}>
-        <Group top={height / (type ? 1.5 : 2)} left={width / 2}>
+        <Group top={height / (type === 'semi' ? 1.5 : 2)} left={width / 2}>
           <Pie
             data={filteredData}
             pieValue={(d) => d.value}
@@ -81,8 +81,8 @@ const DonutChart = ({
             innerRadius={innerRadius}
             padAngle={padAngle}
             pieSortValues={(a, b) => a - b}
-            startAngle={type ? -Math.PI / 2 : 0}
-            endAngle={type ? Math.PI / 2 : 360}>
+            startAngle={type === 'semi' ? -Math.PI / 2 : 0}
+            endAngle={type === 'semi' ? Math.PI / 2 : 360}>
             {(pie) =>
               pie.arcs.map((arc, index) => {
                 const [centroidX, centroidY] = pie.path.centroid(arc);
