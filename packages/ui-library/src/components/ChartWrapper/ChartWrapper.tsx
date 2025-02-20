@@ -25,6 +25,7 @@ interface ChartWrapperProps {
   tooltipTop?: number | null;
   tooltipLeft?: number | null;
   tooltipData?: TooltipData;
+  titleProps?: Parameters<typeof Title>[0];
 }
 
 export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
@@ -42,6 +43,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
       tooltipTop,
       tooltipLeft,
       tooltipData,
+      titleProps,
     },
     ref,
   ) => {
@@ -55,7 +57,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
           flexDirection: 'column',
           gap: '10px',
         }}>
-        <Title title={title} />
+        <Title title={title} {...titleProps} />
 
         {/* Legend */}
         {legendData && colorScale && setHideIndex && setHovered && (

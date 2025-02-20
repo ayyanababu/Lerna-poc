@@ -7,10 +7,9 @@ import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import { default as React, useMemo, useState } from 'react';
 import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
+import { Title } from '../Title/Title';
 
 interface GroupedBarChartProps {
-  width: number;
-  height: number;
   data: {
     label: string;
     data: { [key: string]: number };
@@ -20,6 +19,7 @@ interface GroupedBarChartProps {
   colors?: string[];
   title?: string;
   timestamp?: string;
+  titleProps?: Parameters<typeof Title>[0];
 }
 
 const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
@@ -29,6 +29,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
   colors = ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3', '#a6d854', '#ffd92f'],
   title,
   timestamp,
+  titleProps,
 }) => {
   if (!data || data.length === 0) {
     return <div>No data to display.</div>;
@@ -149,7 +150,8 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
       tooltipOpen={tooltipOpen}
       tooltipTop={tooltipTop}
       tooltipLeft={tooltipLeft}
-      tooltipData={tooltipData}>
+      tooltipData={tooltipData}
+      titleProps={titleProps}>
       <svg width={width} height={height}>
         <Group
           top={margin.top}
