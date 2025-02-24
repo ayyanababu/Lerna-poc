@@ -6,8 +6,11 @@ import { Bar } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import { default as React, useMemo, useState } from 'react';
+import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
-import { Title } from '../Title/Title';
+import { LegendsProps } from '../Legends/Legends';
+import { TitleProps } from '../Title/Title';
+import { TooltipProps } from '../Tooltip/Tooltip';
 
 interface GroupedBarChartProps {
   data: {
@@ -16,24 +19,30 @@ interface GroupedBarChartProps {
   }[];
   groupKeys: string[];
   margin?: { top: number; right: number; bottom: number; left: number };
-  colors?: string[];
   title?: string;
   timestamp?: string;
-  titleProps?: Parameters<typeof Title>[0];
+  titleProps?: TitleProps;
+  legendsProps?: LegendsProps;
+  tooltipProps?: TooltipProps;
+  isLoading?: boolean;
 }
 
 const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
   data,
   groupKeys,
   margin = { top: 20, right: 30, bottom: 30, left: 40 },
-  colors = ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3', '#a6d854', '#ffd92f'],
   title,
   timestamp,
   titleProps,
+  legendsProps,
+  tooltipProps,
+  isLoading,
 }) => {
   if (!data || data.length === 0) {
     return <div>No data to display.</div>;
   }
+
+  const { theme } = useTheme();
 
   const { parentRef, width, height } = useParentSize({
     debounceTime: 150,
@@ -48,9 +57,8 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
         (total, categoryData) => total + Number(categoryData.data[key]),
         0,
       ),
-      color: colors[index] || '#000',
     }));
-  }, [groupKeys, colors, data]);
+  }, [groupKeys, data]);
 
   const {
     showTooltip,
@@ -132,9 +140,9 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
     () =>
       scaleOrdinal<string, string>({
         domain: groupKeys,
-        range: colors.slice(0, groupKeys.length), // Use colors based on group keys
+        range: theme.colors.categorical,
       }),
-    [groupKeys, colors],
+    [groupKeys, theme.colors.categorical],
   );
 
   return (
@@ -142,17 +150,27 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
       ref={parentRef}
       title={title}
       timestamp={timestamp}
-      legendData={legendData}
-      colorScale={groupColorScale}
-      hideIndex={hideIndex}
-      setHideIndex={setHideIndex}
-      setHovered={setHoveredGroupKey}
-      tooltipOpen={tooltipOpen}
-      tooltipTop={tooltipTop}
-      tooltipLeft={tooltipLeft}
-      tooltipData={tooltipData}
-      titleProps={titleProps}>
-      <svg width={width} height={height}>
+      titleProps={titleProps}
+      legendsProps={{
+        data: legendData,
+        colorScale: groupColorScale,
+        hideIndex,
+        setHideIndex,
+        setHovered: setHoveredGroupKey,
+        isLoading,
+        ...legendsProps,
+      }}
+      tooltipProps={{
+        data: tooltipData,
+        top: tooltipTop,
+        left: tooltipLeft,
+        isVisible: tooltipOpen,
+        ...tooltipProps,
+      }}>
+      <svg
+        width={width}
+        height={height}
+        className={`${isLoading ? 'shimmer' : ''}`}>
         <Group
           top={margin.top}
           left={margin.left}
@@ -212,7 +230,6 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
                       tooltipData: {
                         label: capitalize(lowerCase(groupKey)),
                         value,
-                        color: barFill,
                       },
                       tooltipLeft: event.clientX,
                       tooltipTop: event.clientY,

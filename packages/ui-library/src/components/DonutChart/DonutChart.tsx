@@ -1,3 +1,4 @@
+import { TooltipProps } from '@mui/material';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleOrdinal } from '@visx/scale';
@@ -5,8 +6,22 @@ import { Pie } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { arc as d3Arc, PieArcDatum } from 'd3-shape';
 import React, { useMemo, useState } from 'react';
+import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
-import { Title } from '../Title/Title';
+import { LegendData, LegendsProps } from '../Legends/Legends';
+import { TitleProps } from '../Title/Title';
+
+interface DonutChartProps {
+  data: LegendData;
+  type?: 'full' | 'semi';
+  hideLabels?: boolean;
+  title?: string;
+  timestamp?: string;
+  titleProps?: TitleProps;
+  legendsProps?: LegendsProps;
+  tooltipProps?: TooltipProps;
+  isLoading?: boolean;
+}
 
 const DonutChart = ({
   data,
@@ -15,21 +30,16 @@ const DonutChart = ({
   title = '',
   timestamp,
   titleProps,
-}: {
-  data: {
-    label: string;
-    value: number;
-    color: string;
-  }[];
-  type?: 'full' | 'semi';
-  hideLabels?: boolean;
-  title?: string;
-  timestamp?: string;
-  titleProps?: Parameters<typeof Title>[0];
-}) => {
+  legendsProps,
+  tooltipProps,
+  isLoading,
+}: DonutChartProps) => {
   const { parentRef, width, height } = useParentSize({
     debounceTime: 150,
   });
+
+  const { theme } = useTheme();
+
   const {
     showTooltip,
     hideTooltip,
@@ -54,7 +64,7 @@ const DonutChart = ({
 
   const colorScale = scaleOrdinal<string, string>({
     domain: data.map((d) => d.label),
-    range: data.map((d) => d.color),
+    range: theme.colors.categorical,
   });
 
   return (
@@ -62,17 +72,27 @@ const DonutChart = ({
       ref={parentRef}
       title={title}
       timestamp={timestamp}
-      legendData={data}
-      colorScale={colorScale}
-      hideIndex={hideIndex}
-      setHideIndex={setHideIndex}
-      setHovered={setHoveredArc}
-      tooltipOpen={tooltipOpen}
-      tooltipTop={tooltipTop}
-      tooltipLeft={tooltipLeft}
-      tooltipData={tooltipData}
-      titleProps={titleProps}>
-      <svg width={width} height={height}>
+      titleProps={titleProps}
+      legendsProps={{
+        data,
+        colorScale,
+        hideIndex,
+        setHideIndex,
+        setHovered: setHoveredArc,
+        isLoading,
+        ...legendsProps,
+      }}
+      tooltipProps={{
+        data: tooltipData,
+        top: tooltipTop,
+        left: tooltipLeft,
+        isVisible: tooltipOpen,
+        ...tooltipProps,
+      }}>
+      <svg
+        width={width}
+        height={height}
+        className={`${isLoading ? 'shimmer' : ''}`}>
         <Group top={height / (type === 'semi' ? 1.5 : 2)} left={width / 2}>
           <Pie
             data={filteredData}
@@ -97,7 +117,6 @@ const DonutChart = ({
                   d: PieArcDatum<{
                     label: string;
                     value: number;
-                    color: string;
                   }>,
                 ) => string;
 
@@ -108,7 +127,6 @@ const DonutChart = ({
                   d: PieArcDatum<{
                     label: string;
                     value: number;
-                    color: string;
                   }>,
                 ) => string;
 

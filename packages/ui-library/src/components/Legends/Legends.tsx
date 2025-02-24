@@ -5,6 +5,19 @@ import { scaleOrdinal } from '@visx/scale';
 import { capitalize, lowerCase } from 'lodash-es';
 import React, { SetStateAction } from 'react';
 
+export type LegendData = { label: string; value: number }[];
+
+export interface LegendsProps {
+  colorScale: ReturnType<typeof scaleOrdinal<string, string>>;
+  data: LegendData;
+  hideIndex: number[];
+  setHideIndex: React.Dispatch<SetStateAction<number[]>>;
+  setHovered: React.Dispatch<SetStateAction<string | null | undefined>>;
+  direction?: 'row' | 'column';
+  onClick?: (data: LegendData, legend: string, index: number) => void;
+  isLoading?: boolean;
+}
+
 export function Legends({
   colorScale,
   data,
@@ -12,14 +25,13 @@ export function Legends({
   setHideIndex,
   setHovered,
   direction = 'row',
-}: {
-  colorScale: ReturnType<typeof scaleOrdinal<string, string>>;
-  data: { label: string; value: number; color: string }[];
-  hideIndex: number[];
-  setHideIndex: React.Dispatch<SetStateAction<number[]>>;
-  setHovered: React.Dispatch<SetStateAction<string | null | undefined>>;
-  direction?: 'row' | 'column';
-}) {
+  onClick = (data, legend, index) => {
+    console.log(data, legend, index);
+  },
+  isLoading = false,
+}: LegendsProps) {
+  if (!data || !colorScale || !setHideIndex || !setHovered) return null;
+
   return (
     <Box
       sx={{
@@ -49,6 +61,10 @@ export function Legends({
                         ? prev.filter((idx) => idx !== index)
                         : [...prev, index],
                     );
+
+                    if (onClick) {
+                      onClick(data, label.text, index);
+                    }
                   }}
                   tabIndex={1}
                   onMouseOver={() => {
@@ -64,11 +80,12 @@ export function Legends({
                     marginRight: 'auto',
                     cursor: 'pointer',
                     userSelect: 'none',
-                  }}>
+                  }}
+                  className={`${isLoading ? 'shimmer' : ''}`}>
                   <Box
                     sx={{
                       // @ts-ignore
-                      backgroundColor: (colorScale(label) as string) || '#fff',
+                      backgroundColor: label.value || '#fff',
                       marginTop: '4px',
                       marginBottom: 'auto',
                       borderRadius: '20px',
