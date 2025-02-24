@@ -11,6 +11,7 @@ import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
 import { LegendsProps } from '../Legends/Legends';
 import { TitleProps } from '../Title/Title';
 import { TooltipProps } from '../Tooltip/Tooltip';
+import { mockGroupedBarChartData } from './mockdata';
 
 interface GroupedBarChartProps {
   data: {
@@ -28,8 +29,8 @@ interface GroupedBarChartProps {
 }
 
 const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
-  data,
-  groupKeys,
+  data: _data,
+  groupKeys: _groupKeys,
   margin = { top: 20, right: 30, bottom: 30, left: 40 },
   title,
   timestamp,
@@ -38,7 +39,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
   tooltipProps,
   isLoading,
 }) => {
-  if (!data || data.length === 0) {
+  if (!_data || _data.length === 0) {
     return <div>No data to display.</div>;
   }
 
@@ -49,6 +50,19 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
   });
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
+
+  const { data, groupKeys } = useMemo<{
+    data: { label: string; data: { [key: string]: number } }[];
+    groupKeys: string[];
+  }>(() => {
+    if (!isLoading)
+      return {
+        data: _data,
+        groupKeys: _groupKeys,
+      };
+
+    return mockGroupedBarChartData;
+  }, [isLoading, _data, _groupKeys]);
 
   const legendData = useMemo(() => {
     return groupKeys.map((key, index) => ({
@@ -145,6 +159,12 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
     [groupKeys, theme.colors.categorical],
   );
 
+  // Create a unique ID for our gradient
+  const shimmerGradientId = useMemo(
+    () => `shimmer-gradient-${Math.random().toString(36).substring(2, 9)}`,
+    [],
+  );
+
   return (
     <ChartWrapper
       ref={parentRef}
@@ -165,13 +185,41 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
         data: tooltipData,
         top: tooltipTop,
         left: tooltipLeft,
-        isVisible: tooltipOpen,
+        isVisible: !isLoading && tooltipOpen,
         ...tooltipProps,
       }}>
-      <svg
-        width={width}
-        height={height}
-        className={`${isLoading ? 'shimmer' : ''}`}>
+      <svg width={width} height={height}>
+        {/* Define the shimmer gradient effect for SVG with colors matching the CSS */}
+        <defs>
+          <linearGradient
+            id={shimmerGradientId}
+            x1="-100%"
+            y1="0"
+            x2="100%"
+            y2="0"
+            gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="rgba(0, 0, 0, 0.1)" />
+            <stop offset="25%" stopColor="rgba(0, 0, 0, 0.1)" />
+            <stop offset="50%" stopColor="rgba(0, 0, 0, 0.2)" />
+            <stop offset="75%" stopColor="rgba(0, 0, 0, 0.1)" />
+            <stop offset="100%" stopColor="rgba(0, 0, 0, 0.1)" />
+            <animate
+              attributeName="x1"
+              from="-200%"
+              to="200%"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="x2"
+              from="-100%"
+              to="300%"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </linearGradient>
+        </defs>
+
         <Group
           top={margin.top}
           left={margin.left}
@@ -183,6 +231,16 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
             <AxisLeft
               scale={valueScale}
               tickFormat={(value) => `${value}`}
+              tickComponent={({ formattedValue, ...tickProps }) => (
+                <text
+                  {...tickProps}
+                  className={`${isLoading ? 'shimmer' : ''}`}
+                  fill={
+                    isLoading ? `url(#${shimmerGradientId})` : 'currentColor'
+                  }>
+                  {formattedValue}
+                </text>
+              )}
               numTicks={5}
             />
           )}
@@ -194,6 +252,16 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
             tickFormat={(value) =>
               hideIndex.length !== groupKeys.length ? `${value}` : ``
             }
+            tickComponent={({ formattedValue, ...tickProps }) => (
+              <text
+                {...tickProps}
+                className={`${isLoading ? 'shimmer' : ''}`}
+                style={{
+                  opacity: isLoading ? 0 : 1,
+                }}>
+                {formattedValue}
+              </text>
+            )}
             hideTicks={hideIndex.length === groupKeys.length}
           />
 
@@ -212,39 +280,49 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
               const isHoveredGroup =
                 hoveredGroupKey && hoveredGroupKey === groupKey;
               const barOpacity = hoveredGroupKey && !isHoveredGroup ? 0.3 : 1;
-              const barFill = hideIndex.includes(groupIndex)
-                ? '#eee'
-                : groupColorScale(groupKey);
 
+              // Determine the fill based on loading state
+              const barFill = isLoading
+                ? `url(#${shimmerGradientId})`
+                : hideIndex.includes(groupIndex)
+                  ? '#eee'
+                  : groupColorScale(groupKey);
+
+              // Create wrapper group for each bar to apply rx for rounded corners
               return (
-                <Bar
-                  key={`${category}-${groupKey}-${index}-${groupIndex}`}
-                  x={barX}
-                  y={barY}
-                  width={barWidth}
-                  height={barHeight}
-                  fill={barFill}
-                  opacity={barOpacity}
-                  rx={'5'}
-                  onMouseMove={(event) => {
-                    showTooltip({
-                      tooltipData: {
-                        label: capitalize(lowerCase(groupKey)),
-                        value,
-                      },
-                      tooltipLeft: event.clientX,
-                      tooltipTop: event.clientY,
-                    });
-                    setHoveredGroupKey(groupKey);
-                  }}
-                  onMouseLeave={() => {
-                    hideTooltip();
-                    setHoveredGroupKey(null);
-                  }}
-                  style={{
-                    transition: 'all 250ms ease-in-out',
-                  }}
-                />
+                <g key={`${category}-${groupKey}-${index}-${groupIndex}`}>
+                  <Bar
+                    x={barX}
+                    y={barY}
+                    width={barWidth}
+                    height={barHeight}
+                    fill={barFill}
+                    opacity={barOpacity}
+                    rx={5}
+                    onMouseMove={(event) => {
+                      if (!isLoading) {
+                        showTooltip({
+                          tooltipData: {
+                            label: capitalize(lowerCase(groupKey)),
+                            value,
+                          },
+                          tooltipLeft: event.clientX,
+                          tooltipTop: event.clientY,
+                        });
+                        setHoveredGroupKey(groupKey);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (!isLoading) {
+                        hideTooltip();
+                        setHoveredGroupKey(null);
+                      }
+                    }}
+                    style={{
+                      transition: 'all 250ms ease-in-out',
+                    }}
+                  />
+                </g>
               );
             });
           })}

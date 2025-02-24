@@ -10,6 +10,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
 import { LegendData, LegendsProps } from '../Legends/Legends';
 import { TitleProps } from '../Title/Title';
+import { mockFullDonutData, mockSemiDonutData } from './mockdata';
 
 interface DonutChartProps {
   data: LegendData;
@@ -24,7 +25,7 @@ interface DonutChartProps {
 }
 
 const DonutChart = ({
-  data,
+  data: _data,
   type = 'full',
   hideLabels,
   title = '',
@@ -58,6 +59,12 @@ const DonutChart = ({
   const cornerRadius = 6;
   const padAngle = 0;
 
+  const data = useMemo(() => {
+    if (!isLoading) return _data;
+    if (type === 'semi') return mockSemiDonutData;
+    return mockFullDonutData;
+  }, [isLoading, _data, type]);
+
   const filteredData = useMemo(() => {
     return data.filter((_, i) => !hideIndex.includes(i));
   }, [hideIndex, data]);
@@ -66,6 +73,12 @@ const DonutChart = ({
     domain: data.map((d) => d.label),
     range: theme.colors.categorical,
   });
+
+  // Create a unique ID for our gradient
+  const shimmerGradientId = useMemo(
+    () => `shimmer-gradient-${Math.random().toString(36).substring(2, 9)}`,
+    [],
+  );
 
   return (
     <ChartWrapper
@@ -87,13 +100,41 @@ const DonutChart = ({
         data: tooltipData,
         top: tooltipTop,
         left: tooltipLeft,
-        isVisible: tooltipOpen,
+        isVisible: !isLoading && tooltipOpen,
         ...tooltipProps,
       }}>
-      <svg
-        width={width}
-        height={height}
-        className={`${isLoading ? 'shimmer' : ''}`}>
+      <svg width={width} height={height}>
+        {/* Define the shimmer gradient effect for SVG with colors matching the CSS */}
+        <defs>
+          <linearGradient
+            id={shimmerGradientId}
+            x1="-100%"
+            y1="0"
+            x2="100%"
+            y2="0"
+            gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="rgba(0, 0, 0, 0.1)" />
+            <stop offset="25%" stopColor="rgba(0, 0, 0, 0.1)" />
+            <stop offset="50%" stopColor="rgba(0, 0, 0, 0.2)" />
+            <stop offset="75%" stopColor="rgba(0, 0, 0, 0.1)" />
+            <stop offset="100%" stopColor="rgba(0, 0, 0, 0.1)" />
+            <animate
+              attributeName="x1"
+              from="-200%"
+              to="200%"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="x2"
+              from="-100%"
+              to="300%"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </linearGradient>
+        </defs>
+
         <Group top={height / (type === 'semi' ? 1.5 : 2)} left={width / 2}>
           <Pie
             data={filteredData}
@@ -154,7 +195,11 @@ const DonutChart = ({
                     }}>
                     <path
                       d={arcGenerator(arc)}
-                      fill={colorScale(arc.data.label)}
+                      fill={
+                        isLoading
+                          ? `url(#${shimmerGradientId})`
+                          : colorScale(arc.data.label)
+                      }
                       stroke={'white'}
                       strokeWidth={2}
                       style={{
@@ -171,7 +216,7 @@ const DonutChart = ({
                         opacity={0.2}
                       />
                     )}
-                    {!hideLabels && (
+                    {!isLoading && !hideLabels && (
                       <text
                         x={centroidX}
                         y={centroidY}
