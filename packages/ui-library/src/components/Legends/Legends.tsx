@@ -85,8 +85,7 @@ export function Legends({
                     opacity:
                       hovered && !hovered?.includes(label.text) ? 0.5 : 1,
                     transition: 'all 0.3s ease',
-                  }}
-                  className={`${isLoading ? 'shimmer' : ''}`}>
+                  }}>
                   <Box
                     sx={{
                       // @ts-ignore
@@ -97,6 +96,7 @@ export function Legends({
                       width: '12px',
                       height: '12px',
                     }}
+                    className={`${isLoading ? 'shimmer' : ''}`}
                   />
                   <Box
                     sx={{
@@ -113,8 +113,11 @@ export function Legends({
                         textDecoration: hideIndex.includes(index)
                           ? 'line-through'
                           : 'none',
-                      }}>
-                      {capitalize(lowerCase(label.datum))}
+                      }}
+                      className={`${isLoading ? 'shimmer' : ''}`}>
+                      {isLoading
+                        ? `${'loading'.repeat(1)}`
+                        : capitalize(lowerCase(label.datum))}
                     </Typography>
                     {data?.[label.index]?.value && (
                       <Typography
@@ -122,8 +125,11 @@ export function Legends({
                         sx={{
                           margin: 0,
                           fontWeight: 700,
-                        }}>
-                        {data?.[label?.index]?.value}
+                        }}
+                        className={`${isLoading ? 'shimmer' : ''}`}>
+                        {isLoading
+                          ? `${'loading'.repeat(2)}`
+                          : data?.[label?.index]?.value}
                       </Typography>
                     )}
                   </Box>

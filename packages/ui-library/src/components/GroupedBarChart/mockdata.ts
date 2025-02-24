@@ -6,8 +6,6 @@ export const mockGroupedBarChartData = {
         future: 25,
         options: 40,
         forwards: 15,
-        fixedIncome: 12,
-        others: 32,
       },
     },
     {
@@ -16,8 +14,6 @@ export const mockGroupedBarChartData = {
         future: 30,
         options: 1,
         forwards: 12,
-        fixedIncome: 12,
-        others: 32,
       },
     },
     {
@@ -26,8 +22,6 @@ export const mockGroupedBarChartData = {
         future: 15,
         options: 50,
         forwards: 1,
-        fixedIncome: 12,
-        others: 32,
       },
     },
     {
@@ -36,10 +30,8 @@ export const mockGroupedBarChartData = {
         future: 40,
         options: 35,
         forwards: 10,
-        fixedIncome: 12,
-        others: 32,
       },
     },
   ],
-  groupKeys: ['future', 'options', 'forwards', 'fixedIncome', 'others'],
+  groupKeys: ['future', 'options', 'forwards'],
 };
