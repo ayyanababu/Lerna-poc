@@ -78,6 +78,7 @@ const DonutChart = ({
         colorScale,
         hideIndex,
         setHideIndex,
+        hovered: hoveredArc,
         setHovered: setHoveredArc,
         isLoading,
         ...legendsProps,

@@ -12,6 +12,7 @@ export interface LegendsProps {
   data: LegendData;
   hideIndex: number[];
   setHideIndex: React.Dispatch<SetStateAction<number[]>>;
+  hovered: string | null | undefined;
   setHovered: React.Dispatch<SetStateAction<string | null | undefined>>;
   direction?: 'row' | 'column';
   onClick?: (data: LegendData, legend: string, index: number) => void;
@@ -23,6 +24,7 @@ export function Legends({
   data,
   hideIndex,
   setHideIndex,
+  hovered,
   setHovered,
   direction = 'row',
   onClick = (data, legend, index) => {
@@ -80,6 +82,9 @@ export function Legends({
                     marginRight: 'auto',
                     cursor: 'pointer',
                     userSelect: 'none',
+                    opacity:
+                      hovered && !hovered?.includes(label.text) ? 0.5 : 1,
+                    transition: 'all 0.3s ease',
                   }}
                   className={`${isLoading ? 'shimmer' : ''}`}>
                   <Box

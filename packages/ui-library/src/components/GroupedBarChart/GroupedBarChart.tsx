@@ -156,6 +156,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
         colorScale: groupColorScale,
         hideIndex,
         setHideIndex,
+        hovered: hoveredGroupKey,
         setHovered: setHoveredGroupKey,
         isLoading,
         ...legendsProps,
