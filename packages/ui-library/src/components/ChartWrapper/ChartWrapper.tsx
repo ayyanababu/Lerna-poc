@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import React, { forwardRef, ReactNode, useEffect, useRef } from 'react';
 import { Legends, LegendsProps } from '../Legends/Legends';
-import { TimeStamp } from '../TimeStamp/TimeStamp';
+import { Timestamp, TimestampProps } from '../Timestamp/Timestamp';
 import { Title, TitleProps } from '../Title/Title';
 import { Tooltip, TooltipProps } from '../Tooltip/Tooltip';
 
@@ -13,15 +13,15 @@ export interface TooltipData {
 interface ChartWrapperProps {
   children: ReactNode;
   title?: string;
-  timestamp?: string;
   titleProps?: TitleProps;
   legendsProps?: LegendsProps;
   tooltipProps?: TooltipProps;
+  timestampProps?: TimestampProps;
 }
 
 export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
   (
-    { children, title, timestamp, titleProps, legendsProps, tooltipProps },
+    { children, title, titleProps, legendsProps, tooltipProps, timestampProps },
     ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -82,7 +82,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
 
             <Tooltip {...tooltipProps} />
 
-            <TimeStamp date={timestamp} />
+            <Timestamp {...timestampProps} />
           </>
         ) : (
           <p> Cannot Render the chart under this size</p>

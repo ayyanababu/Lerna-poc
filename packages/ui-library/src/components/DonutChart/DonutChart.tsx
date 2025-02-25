@@ -79,7 +79,6 @@ const DonutChart = ({
     <ChartWrapper
       ref={parentRef}
       title={title}
-      timestamp={timestamp}
       titleProps={titleProps}
       legendsProps={{
         data,
@@ -97,7 +96,8 @@ const DonutChart = ({
         left: tooltipLeft,
         isVisible: !isLoading && tooltipOpen,
         ...tooltipProps,
-      }}>
+      }}
+      timestampProps={{ timestamp, isLoading }}>
       <svg width={width} height={height}>
         <SvgShimmer />
 

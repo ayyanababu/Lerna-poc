@@ -10,10 +10,10 @@ import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
 import { LegendsProps } from '../Legends/Legends';
 import { shimmerClassName } from '../Shimmer/Shimmer';
+import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TitleProps } from '../Title/Title';
 import { TooltipProps } from '../Tooltip/Tooltip';
 import { mockGroupedBarChartData } from './mockdata';
-import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 
 interface GroupedBarChartProps {
   data: {
@@ -165,7 +165,6 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
     <ChartWrapper
       ref={parentRef}
       title={title}
-      timestamp={timestamp}
       titleProps={titleProps}
       legendsProps={{
         data: legendData,
@@ -183,7 +182,8 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
         left: tooltipLeft,
         isVisible: !isLoading && tooltipOpen,
         ...tooltipProps,
-      }}>
+      }}
+      timestampProps={{ timestamp, isLoading }}>
       <svg width={width} height={height}>
         <SvgShimmer />
 
