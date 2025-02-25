@@ -9,9 +9,11 @@ import { default as React, useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
 import { LegendsProps } from '../Legends/Legends';
+import { shimmerClassName } from '../Shimmer/Shimmer';
 import { TitleProps } from '../Title/Title';
 import { TooltipProps } from '../Tooltip/Tooltip';
 import { mockGroupedBarChartData } from './mockdata';
+import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 
 interface GroupedBarChartProps {
   data: {
@@ -159,12 +161,6 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
     [groupKeys, theme.colors.categorical],
   );
 
-  // Create a unique ID for our gradient
-  const shimmerGradientId = useMemo(
-    () => `shimmer-gradient-${Math.random().toString(36).substring(2, 9)}`,
-    [],
-  );
-
   return (
     <ChartWrapper
       ref={parentRef}
@@ -189,36 +185,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
         ...tooltipProps,
       }}>
       <svg width={width} height={height}>
-        {/* Define the shimmer gradient effect for SVG with colors matching the CSS */}
-        <defs>
-          <linearGradient
-            id={shimmerGradientId}
-            x1="-100%"
-            y1="0"
-            x2="100%"
-            y2="0"
-            gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="rgba(0, 0, 0, 0.1)" />
-            <stop offset="25%" stopColor="rgba(0, 0, 0, 0.1)" />
-            <stop offset="50%" stopColor="rgba(0, 0, 0, 0.2)" />
-            <stop offset="75%" stopColor="rgba(0, 0, 0, 0.1)" />
-            <stop offset="100%" stopColor="rgba(0, 0, 0, 0.1)" />
-            <animate
-              attributeName="x1"
-              from="-200%"
-              to="200%"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="x2"
-              from="-100%"
-              to="300%"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </linearGradient>
-        </defs>
+        <SvgShimmer />
 
         <Group
           top={margin.top}
@@ -234,7 +201,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
               tickComponent={({ formattedValue, ...tickProps }) => (
                 <text
                   {...tickProps}
-                  className={`${isLoading ? 'shimmer' : ''}`}
+                  className={`${isLoading ? shimmerClassName : ''}`}
                   fill={
                     isLoading ? `url(#${shimmerGradientId})` : 'currentColor'
                   }>
@@ -255,7 +222,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
             tickComponent={({ formattedValue, ...tickProps }) => (
               <text
                 {...tickProps}
-                className={`${isLoading ? 'shimmer' : ''}`}
+                className={`${isLoading ? shimmerClassName : ''}`}
                 style={{
                   opacity: isLoading ? 0 : 1,
                 }}>

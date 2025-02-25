@@ -1,5 +1,6 @@
 import React, { createContext, useMemo } from 'react';
 import { Theme, defaultDarkTheme, defaultLightTheme } from '../constants/theme';
+import { Shimmer } from '../components/Shimmer/Shimmer';
 
 type ThemeContextType = {
   theme: Theme;
@@ -39,42 +40,7 @@ export const ThemeProvider: React.FC<{
   return (
     <ThemeContext.Provider
       value={{ theme: mergedTheme, activeMode, setActiveMode }}>
-      <style>
-        {`
-          @keyframes shimmer {
-            0% {
-              background-position: 200% 0;
-            }
-            100% {
-              background-position: -200% 0;
-            }
-          }
-
-          .shimmer {
-            animation: shimmer 2s linear infinite;
-            background: linear-gradient(
-              90deg,
-              rgba(0, 0, 0, 0.1) 25%,
-              rgba(0, 0, 0, 0.2) 50%,
-              rgba(0, 0, 0, 0.1) 75%
-            );
-            background-size: 200% 100%;
-            position: relative;
-            contain: content;
-            border-radius: 8px;
-            color: transparent !important;
-            width: fit-content;
-          }
-
-          .shimmer * {
-            color: transparent !important;
-            pointer-events: none !important;
-            opacity: 0 !important;
-            border-color: transparent !important;
-            background-color: transparent !important;
-          }
-        `}
-      </style>
+      <Shimmer />
       {children}
     </ThemeContext.Provider>
   );

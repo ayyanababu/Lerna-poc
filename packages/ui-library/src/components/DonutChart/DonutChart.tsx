@@ -9,6 +9,7 @@ import React, { useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
 import { LegendData, LegendsProps } from '../Legends/Legends';
+import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TitleProps } from '../Title/Title';
 import { mockFullDonutData, mockSemiDonutData } from './mockdata';
 
@@ -74,12 +75,6 @@ const DonutChart = ({
     range: theme.colors.categorical,
   });
 
-  // Create a unique ID for our gradient
-  const shimmerGradientId = useMemo(
-    () => `shimmer-gradient-${Math.random().toString(36).substring(2, 9)}`,
-    [],
-  );
-
   return (
     <ChartWrapper
       ref={parentRef}
@@ -104,36 +99,7 @@ const DonutChart = ({
         ...tooltipProps,
       }}>
       <svg width={width} height={height}>
-        {/* Define the shimmer gradient effect for SVG with colors matching the CSS */}
-        <defs>
-          <linearGradient
-            id={shimmerGradientId}
-            x1="-100%"
-            y1="0"
-            x2="100%"
-            y2="0"
-            gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="rgba(0, 0, 0, 0.1)" />
-            <stop offset="25%" stopColor="rgba(0, 0, 0, 0.1)" />
-            <stop offset="50%" stopColor="rgba(0, 0, 0, 0.2)" />
-            <stop offset="75%" stopColor="rgba(0, 0, 0, 0.1)" />
-            <stop offset="100%" stopColor="rgba(0, 0, 0, 0.1)" />
-            <animate
-              attributeName="x1"
-              from="-200%"
-              to="200%"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="x2"
-              from="-100%"
-              to="300%"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </linearGradient>
-        </defs>
+        <SvgShimmer />
 
         <Group top={height / (type === 'semi' ? 1.5 : 2)} left={width / 2}>
           <Pie

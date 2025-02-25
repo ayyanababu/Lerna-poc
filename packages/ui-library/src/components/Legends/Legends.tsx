@@ -4,6 +4,7 @@ import { LegendOrdinal } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
 import { capitalize, lowerCase } from 'lodash-es';
 import React, { SetStateAction } from 'react';
+import { shimmerClassName } from '../Shimmer/Shimmer';
 
 export type LegendData = { label: string; value: number }[];
 
@@ -96,7 +97,7 @@ export function Legends({
                       width: '12px',
                       height: '12px',
                     }}
-                    className={`${isLoading ? 'shimmer' : ''}`}
+                    className={`${isLoading ? shimmerClassName : ''}`}
                   />
                   <Box
                     sx={{
@@ -114,7 +115,7 @@ export function Legends({
                           ? 'line-through'
                           : 'none',
                       }}
-                      className={`${isLoading ? 'shimmer' : ''}`}>
+                      className={`${isLoading ? shimmerClassName : ''}`}>
                       {isLoading
                         ? `${'loading'.repeat(1)}`
                         : capitalize(lowerCase(label.datum))}
@@ -126,7 +127,7 @@ export function Legends({
                           margin: 0,
                           fontWeight: 700,
                         }}
-                        className={`${isLoading ? 'shimmer' : ''}`}>
+                        className={`${isLoading ? shimmerClassName : ''}`}>
                         {isLoading
                           ? `${'loading'.repeat(2)}`
                           : data?.[label?.index]?.value}
