@@ -8,53 +8,11 @@ import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import { default as React, useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
-import { LegendsProps } from '../Legends/Legends';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
-import { TitleProps } from '../Title/Title';
-import { TooltipProps } from '../Tooltip/Tooltip';
 import { mockGroupedBarChartData } from './mockdata';
+import { BarProps, DataPoint, GroupedBarChartProps } from './types';
 
-// Types
-export type ChartType = 'grouped' | 'stacked';
-
-export interface DataPoint {
-  label: string;
-  data: Record<string, number>;
-}
-
-export interface GroupedBarChartProps {
-  data: DataPoint[];
-  groupKeys: string[];
-  type?: ChartType;
-  margin?: {
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-  };
-  title?: string;
-  timestamp?: string;
-  titleProps?: TitleProps;
-  legendsProps?: LegendsProps;
-  tooltipProps?: TooltipProps;
-  isLoading?: boolean;
-}
-
-interface BarProps {
-  key?: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fill: string;
-  opacity: number;
-  rx: number;
-  value: number;
-  label: string;
-  onMouseMove: (event: React.MouseEvent) => void;
-  onMouseLeave: () => void;
-}
 
 const DEFAULT_MARGIN = { top: 20, right: 30, bottom: 30, left: 40 };
 const DEFAULT_BAR_RADIUS = 5;
