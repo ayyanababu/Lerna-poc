@@ -4,6 +4,7 @@ import { LegendOrdinal } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
 import { capitalize, lowerCase } from 'lodash-es';
 import React, { SetStateAction } from 'react';
+import { useTheme } from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 
 export type LegendData = { label: string; value: number }[];
@@ -33,6 +34,8 @@ export function Legends({
   },
   isLoading = false,
 }: LegendsProps) {
+  const { theme } = useTheme();
+
   if (!data || !colorScale || !setHideIndex || !setHovered) return null;
 
   return (
@@ -110,10 +113,11 @@ export function Legends({
                       variant="body2"
                       sx={{
                         margin: 0,
-                        fontWeight: 200,
+                        fontWeight: 400,
                         textDecoration: hideIndex.includes(index)
                           ? 'line-through'
                           : 'none',
+                        color: theme.colors.common.text,
                       }}
                       className={`${isLoading ? shimmerClassName : ''}`}>
                       {isLoading
@@ -126,6 +130,7 @@ export function Legends({
                         sx={{
                           margin: 0,
                           fontWeight: 700,
+                          color: theme.colors.common.text,
                         }}
                         className={`${isLoading ? shimmerClassName : ''}`}>
                         {isLoading

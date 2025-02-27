@@ -11,8 +11,8 @@ import { ChartWrapper } from '../ChartWrapper/ChartWrapper';
 import { LegendData, LegendsProps } from '../Legends/Legends';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TitleProps } from '../Title/Title';
-import { mockFullDonutData, mockSemiDonutData } from './mockdata';
 import { TooltipData } from '../Tooltip/Tooltip';
+import { mockFullDonutData, mockSemiDonutData } from './mockdata';
 
 interface DonutChartProps {
   data: LegendData;
@@ -73,7 +73,7 @@ const DonutChart = ({
 
   const colorScale = scaleOrdinal<string, string>({
     domain: data.map((d) => d.label),
-    range: theme.colors.categorical,
+    range: theme.colors.charts.donutChart,
   });
 
   return (
@@ -167,7 +167,7 @@ const DonutChart = ({
                           ? `url(#${shimmerGradientId})`
                           : colorScale(arc.data.label)
                       }
-                      stroke={'white'}
+                      stroke={theme.colors.common.border}
                       strokeWidth={2}
                       style={{
                         filter:
@@ -188,12 +188,13 @@ const DonutChart = ({
                         x={centroidX}
                         y={centroidY}
                         dy=".33em"
-                        fill="white"
+                        fill={theme.colors.common.text}
                         fontSize={10}
                         textAnchor="middle"
                         fontWeight={
                           hoveredArc === arc.data.label ? 'bold' : 'normal'
-                        }>
+                        }
+                        fontFamily={theme.typography.fontFamily}>
                         {arc.data.label}
                       </text>
                     )}

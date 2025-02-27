@@ -3,34 +3,39 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import React, { forwardRef, ReactNode } from 'react';
 import { RxDragHandleDots2 } from 'react-icons/rx';
+import { useTheme } from '../../hooks/useTheme';
 import { Title } from '../Title/Title';
 
 export const SortableCard = forwardRef<
   HTMLDivElement,
-  { children: ReactNode; title?: string, height: number | string, width: number | string }
+  {
+    children: ReactNode;
+    title?: string;
+    height: number | string;
+    width: number | string;
+  }
 >(({ children, title, height, width }, ref) => {
+  const { theme } = useTheme();
   return (
     <Card
       ref={ref}
       sx={{
+        backgroundColor: theme.colors.common.background,
         display: 'flex',
         flexDirection: 'column',
         gap: 1,
         borderRadius: '8px',
         padding: 1,
-        backgroundColor: 'white',
         boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.05)',
-        border: '1px solid #bfc6ca1f',
-      }}
-    >
+        border: `1px solid ${theme.colors.common.border}`,
+      }}>
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'row',
           gap: 1,
-          padding: '8px'
-        }}
-      >
+          padding: '8px',
+        }}>
         <Title title={title} />
         <Box
           sx={{
@@ -39,13 +44,15 @@ export const SortableCard = forwardRef<
             marginLeft: 'auto',
             fontSize: '24px',
           }}
-          className="drag-handle"
-        >
+          color={theme.colors.common.text}
+          className="drag-handle">
           <RxDragHandleDots2 />
         </Box>
       </Box>
 
-      <CardContent sx={{ display: 'flex', padding: '8px', height, width }}>{children}</CardContent>
+      <CardContent sx={{ display: 'flex', padding: '8px', height, width }}>
+        {children}
+      </CardContent>
     </Card>
   );
 });

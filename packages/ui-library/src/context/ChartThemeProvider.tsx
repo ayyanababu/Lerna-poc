@@ -1,6 +1,7 @@
-import React, { createContext, useMemo } from 'react';
-import { Theme, defaultDarkTheme, defaultLightTheme } from '../constants/theme';
+import React, { createContext, useId, useMemo } from 'react';
 import { Shimmer } from '../components/Shimmer/Shimmer';
+import { Theme, defaultDarkTheme, defaultLightTheme } from '../constants/theme';
+import { FontFamilyImport } from '../styles/FontFamilyImport';
 
 type ThemeContextType = {
   theme: Theme;
@@ -17,11 +18,12 @@ export const ThemeContext = createContext<ThemeContextType>({
   setActiveMode: () => {},
 });
 
-export const ThemeProvider: React.FC<{
+export const ChartThemeProvider: React.FC<{
   themeMode?: ThemeMode;
   themeOverrides?: Partial<Theme>;
   children: React.ReactNode;
 }> = ({ themeMode = 'light', themeOverrides, children }) => {
+  const uniqueId = useId();
   const [activeMode, setActiveMode] = React.useState<ThemeMode>(themeMode);
 
   const baseTheme = useMemo(
@@ -31,8 +33,26 @@ export const ThemeProvider: React.FC<{
 
   const mergedTheme = useMemo(
     () => ({
-      colors: { ...baseTheme.colors, ...themeOverrides?.colors },
-      typography: { ...baseTheme.typography, ...themeOverrides?.typography },
+      colors: {
+        common: {
+          ...baseTheme.colors.common,
+          ...themeOverrides?.colors?.common,
+        },
+        charts: {
+          ...baseTheme.colors.charts,
+          ...themeOverrides?.colors?.charts,
+          barChart:
+            themeOverrides?.colors?.charts?.barChart ||
+            baseTheme.colors.charts.barChart,
+          donutChart:
+            themeOverrides?.colors?.charts?.donutChart ||
+            baseTheme.colors.charts.donutChart,
+        },
+      },
+      typography: {
+        ...baseTheme.typography,
+        ...themeOverrides?.typography,
+      },
     }),
     [baseTheme, themeOverrides],
   );
@@ -41,6 +61,7 @@ export const ThemeProvider: React.FC<{
     <ThemeContext.Provider
       value={{ theme: mergedTheme, activeMode, setActiveMode }}>
       <Shimmer />
+      <FontFamilyImport uniqueId={uniqueId} />
       {children}
     </ThemeContext.Provider>
   );

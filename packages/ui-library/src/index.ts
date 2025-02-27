@@ -3,15 +3,15 @@ import { GroupedBarChart } from './components/GroupedBarChart/GroupedBarChart';
 import { SortableComponent } from './components/Sortable/Sortable';
 import { SortableCard } from './components/SortableCard/SortableCard';
 import { ThemeSwitch } from './components/ThemeSwitch/ThemeSwitch';
-import { ThemeProvider } from './context/ThemeContext';
+import { ChartThemeProvider } from './context/ChartThemeProvider';
 // import './main.css';
 
 export {
+  ChartThemeProvider,
   DonutChart,
   GroupedBarChart,
   SortableComponent as Sortable,
   SortableCard,
-  ThemeProvider,
   ThemeSwitch,
 };
 

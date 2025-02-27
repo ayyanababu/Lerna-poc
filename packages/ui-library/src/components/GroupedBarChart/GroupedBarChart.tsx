@@ -10,10 +10,9 @@ import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper/ChartWrapper';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
+import { TooltipData } from '../Tooltip/Tooltip';
 import { mockGroupedBarChartData } from './mockdata';
 import { BarProps, DataPoint, GroupedBarChartProps } from './types';
-import { TooltipData } from '../Tooltip/Tooltip';
-
 
 const DEFAULT_MARGIN = { top: 20, right: 30, bottom: 30, left: 40 };
 const DEFAULT_BAR_RADIUS = 5;
@@ -187,9 +186,9 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
     () =>
       scaleOrdinal<string, string>({
         domain: groupKeys,
-        range: theme.colors.categorical,
+        range: theme.colors.charts.barChart,
       }),
-    [groupKeys, theme.colors.categorical],
+    [groupKeys, theme.colors.charts.barChart],
   );
 
   // Helper function to create bars
@@ -372,7 +371,10 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
                   className={`${isLoading ? shimmerClassName : ''}`}
                   fill={
                     isLoading ? `url(#${shimmerGradientId})` : 'currentColor'
-                  }>
+                  }
+                  style={{
+                    color: theme.colors.common.text,
+                  }}>
                   {formattedValue}
                 </text>
               )}
@@ -391,7 +393,11 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
               <text
                 {...tickProps}
                 className={`${isLoading ? shimmerClassName : ''}`}
-                style={{ opacity: isLoading ? 0 : 1 }}>
+                fill="currentColor"
+                style={{
+                  opacity: isLoading ? 0 : 1,
+                  color: theme.colors.common.text,
+                }}>
                 {formattedValue}
               </text>
             )}

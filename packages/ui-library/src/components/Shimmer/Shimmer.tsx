@@ -1,8 +1,11 @@
 import React from 'react';
+import { useTheme } from '../../hooks/useTheme';
 
 export const shimmerClassName = `my-lib-shimmer-${Math.random().toString(36).substring(2, 9)}`;
 
 export const Shimmer = () => {
+  const { theme } = useTheme();
+
   return (
     <>
       <style>
@@ -20,9 +23,9 @@ export const Shimmer = () => {
             animation: shimmer 2s linear infinite;
             background: linear-gradient(
               90deg,
-              rgba(0, 0, 0, 0.1) 25%,
-              rgba(0, 0, 0, 0.2) 50%,
-              rgba(0, 0, 0, 0.1) 75%
+              ${theme.colors.common.text}22 25%,
+              ${theme.colors.common.text}44 50%,
+              ${theme.colors.common.text}22 75%
             );
             background-size: 200% 100%;
             position: relative;

@@ -1,15 +1,16 @@
 import {
+  ChartThemeProvider,
   DonutChart,
   GroupedBarChart,
   Sortable,
   SortableCard,
-  ThemeProvider,
 } from '@my-org/ui-library';
 import { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [activeMode, setActiveMode] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
     setTimeout(() => {
@@ -18,8 +19,11 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider themeMode="dark">
-      {/* <ThemeSwitch></ThemeSwitch> */}
+    <ChartThemeProvider themeMode={activeMode}>
+      <>
+        <button onClick={() => setActiveMode('light')}>Light</button>
+        <button onClick={() => setActiveMode('dark')}>Dark</button>
+      </>
       <Sortable className="my-cards">
         <SortableCard title="Trade Capture" height={400} width={'auto'}>
           <DonutChart
@@ -163,7 +167,7 @@ function App() {
           />
         </SortableCard>
       </Sortable>
-    </ThemeProvider>
+    </ChartThemeProvider>
   );
 }
 
