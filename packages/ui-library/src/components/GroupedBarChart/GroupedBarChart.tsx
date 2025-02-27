@@ -7,11 +7,12 @@ import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import { default as React, useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
-import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
+import { ChartWrapper } from '../ChartWrapper/ChartWrapper';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { mockGroupedBarChartData } from './mockdata';
 import { BarProps, DataPoint, GroupedBarChartProps } from './types';
+import { TooltipData } from '../Tooltip/Tooltip';
 
 
 const DEFAULT_MARGIN = { top: 20, right: 30, bottom: 30, left: 40 };

@@ -7,11 +7,12 @@ import { useTooltip } from '@visx/tooltip';
 import { arc as d3Arc, PieArcDatum } from 'd3-shape';
 import React, { useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
-import { ChartWrapper, TooltipData } from '../ChartWrapper/ChartWrapper';
+import { ChartWrapper } from '../ChartWrapper/ChartWrapper';
 import { LegendData, LegendsProps } from '../Legends/Legends';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TitleProps } from '../Title/Title';
 import { mockFullDonutData, mockSemiDonutData } from './mockdata';
+import { TooltipData } from '../Tooltip/Tooltip';
 
 interface DonutChartProps {
   data: LegendData;
