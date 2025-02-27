@@ -192,9 +192,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
   );
 
   // Helper function to create bars
-  const renderBar = (props: BarProps) => (
-    <Bar {...props} style={{ transition: 'all 250ms ease-in-out' }} />
-  );
+  const renderBar = (props: BarProps) => <Bar {...props} />;
 
   // Handler for mouse events
   const handleMouseMove =
@@ -356,10 +354,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
       <svg width={width} height={height}>
         <SvgShimmer />
 
-        <Group
-          top={margin.top}
-          left={margin.left}
-          style={{ transition: 'all 0.250s ease-in-out' }}>
+        <Group top={margin.top} left={margin.left}>
           {/* Y-Axis */}
           {hideIndex.length !== groupKeys.length && (
             <AxisLeft
