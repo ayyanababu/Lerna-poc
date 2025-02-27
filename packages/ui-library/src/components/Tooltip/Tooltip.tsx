@@ -1,8 +1,11 @@
 import { Typography } from '@mui/material';
 import { Tooltip as VisxTooltip } from '@visx/tooltip';
 import React from 'react';
-import { TooltipData } from '../ChartWrapper/ChartWrapper';
 
+export interface TooltipData {
+  label: string;
+  value: number;
+}
 export interface TooltipProps {
   top: number;
   left: number;

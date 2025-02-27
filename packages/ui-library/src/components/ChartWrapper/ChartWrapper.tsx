@@ -5,10 +5,6 @@ import { Timestamp, TimestampProps } from '../Timestamp/Timestamp';
 import { Title, TitleProps } from '../Title/Title';
 import { Tooltip, TooltipProps } from '../Tooltip/Tooltip';
 
-export interface TooltipData {
-  label: string;
-  value: number;
-}
 
 interface ChartWrapperProps {
   children: ReactNode;
