@@ -10,7 +10,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper/ChartWrapper';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
-import { TooltipData } from '../Tooltip/Tooltip';
+import { TooltipData } from '../Tooltip/types';
 import { mockGroupedBarChartData } from './mockdata';
 import { BarProps, DataPoint, GroupedBarChartProps } from './types';
 

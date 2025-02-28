@@ -8,7 +8,7 @@ import React, { useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper/ChartWrapper';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
-import { TooltipData } from '../Tooltip/Tooltip';
+import { TooltipData } from '../Tooltip/types';
 import { mockFullDonutData, mockSemiDonutData } from './mockdata';
 import { DonutChartProps } from './types';
 

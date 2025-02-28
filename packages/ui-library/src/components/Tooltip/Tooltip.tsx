@@ -1,4 +1,4 @@
-import { TooltipProps, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { Tooltip as VisxTooltip } from '@visx/tooltip';
 import React from 'react';
 import { TooltipProps } from './types';

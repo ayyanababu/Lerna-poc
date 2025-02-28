@@ -1,6 +1,6 @@
-import { LegendData, LegendsProps } from '../Legends/Legends';
-import { TitleProps } from '../Title/Title';
-import { TooltipProps } from '../Tooltip/Tooltip';
+import { LegendData, LegendsProps } from '../Legends/types';
+import { TitleProps } from '../Title/types';
+import { TooltipProps } from '../Tooltip/types';
 
 export interface DonutData extends LegendData {}
 
