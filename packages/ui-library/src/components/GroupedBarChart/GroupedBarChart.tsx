@@ -30,10 +30,12 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
   margin = DEFAULT_MARGIN,
   title,
   timestamp,
+  colors = [],
+  isLoading,
+
   titleProps,
   legendsProps,
   tooltipProps,
-  isLoading,
 }) => {
   if (!_data || _data.length === 0) {
     return <div>No data to display.</div>;
@@ -186,7 +188,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
     () =>
       scaleOrdinal<string, string>({
         domain: groupKeys,
-        range: theme.colors.charts.barChart,
+        range: colors?.length ? colors : theme.colors.charts.barChart,
       }),
     [groupKeys, theme.colors.charts.barChart],
   );

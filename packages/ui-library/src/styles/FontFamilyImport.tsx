@@ -1,9 +1,6 @@
 import React from 'react';
 import { useTheme } from '../hooks/useTheme';
-
-interface FontFamilyImportProps {
-  uniqueId: string;
-}
+import { FontFamilyImportProps } from './types';
 
 export const FontFamilyImport: React.FC<FontFamilyImportProps> = ({
   uniqueId = '',

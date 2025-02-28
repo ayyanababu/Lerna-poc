@@ -1,10 +1,9 @@
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
+import { TitleProps } from './types';
 
-export interface TitleProps extends React.ComponentProps<typeof Typography> {
-  title?: string;
-}
+
 
 export function Title({ title, ...props }: TitleProps) {
   const { theme } = useTheme();

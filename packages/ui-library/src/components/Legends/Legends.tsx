@@ -1,25 +1,11 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { LegendOrdinal } from '@visx/legend';
-import { scaleOrdinal } from '@visx/scale';
 import { capitalize, lowerCase } from 'lodash-es';
-import React, { SetStateAction } from 'react';
+import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
-
-export type LegendData = { label: string; value: number }[];
-
-export interface LegendsProps {
-  colorScale: ReturnType<typeof scaleOrdinal<string, string>>;
-  data: LegendData;
-  hideIndex: number[];
-  setHideIndex: React.Dispatch<SetStateAction<number[]>>;
-  hovered: string | null | undefined;
-  setHovered: React.Dispatch<SetStateAction<string | null | undefined>>;
-  direction?: 'row' | 'column';
-  onClick?: (data: LegendData, legend: string, index: number) => void;
-  isLoading?: boolean;
-}
+import { LegendsProps } from './types';
 
 export function Legends({
   colorScale,
@@ -29,9 +15,7 @@ export function Legends({
   hovered,
   setHovered,
   direction = 'row',
-  onClick = (data, legend, index) => {
-    console.log(data, legend, index);
-  },
+  onClick = () => {},
   isLoading = false,
 }: LegendsProps) {
   const { theme } = useTheme();

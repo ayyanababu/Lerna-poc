@@ -1,19 +1,11 @@
 import { Box } from '@mui/material';
-import React, { forwardRef, ReactNode, useEffect, useRef } from 'react';
-import { Legends, LegendsProps } from '../Legends/Legends';
-import { Timestamp, TimestampProps } from '../Timestamp/Timestamp';
-import { Title, TitleProps } from '../Title/Title';
-import { Tooltip, TooltipProps } from '../Tooltip/Tooltip';
+import React, { forwardRef, useEffect, useRef } from 'react';
+import { Legends } from '../Legends/Legends';
+import { Timestamp } from '../Timestamp/Timestamp';
+import { Title } from '../Title/Title';
+import { Tooltip } from '../Tooltip/Tooltip';
+import { ChartWrapperProps } from './types';
 
-
-interface ChartWrapperProps {
-  children: ReactNode;
-  title?: string;
-  titleProps?: TitleProps;
-  legendsProps?: LegendsProps;
-  tooltipProps?: TooltipProps;
-  timestampProps?: TimestampProps;
-}
 
 export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
   (

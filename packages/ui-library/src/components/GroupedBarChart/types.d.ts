@@ -1,3 +1,7 @@
+import { LegendsProps } from '../Legends/Legends';
+import { TitleProps } from '../Title/Title';
+import { TooltipProps } from '../Tooltip/Tooltip';
+
 export type ChartType = 'grouped' | 'stacked';
 
 export interface DataPoint {
@@ -17,10 +21,12 @@ export interface GroupedBarChartProps {
   };
   title?: string;
   timestamp?: string;
+  isLoading?: boolean;
+  colors?: string[];
+
   titleProps?: TitleProps;
   legendsProps?: LegendsProps;
   tooltipProps?: TooltipProps;
-  isLoading?: boolean;
 }
 
 export interface BarProps {

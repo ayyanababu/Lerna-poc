@@ -1,4 +1,3 @@
-import { TooltipProps } from '@mui/material';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleOrdinal } from '@visx/scale';
@@ -8,23 +7,10 @@ import { arc as d3Arc, PieArcDatum } from 'd3-shape';
 import React, { useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper/ChartWrapper';
-import { LegendData, LegendsProps } from '../Legends/Legends';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
-import { TitleProps } from '../Title/Title';
 import { TooltipData } from '../Tooltip/Tooltip';
 import { mockFullDonutData, mockSemiDonutData } from './mockdata';
-
-interface DonutChartProps {
-  data: LegendData;
-  type?: 'full' | 'semi';
-  hideLabels?: boolean;
-  title?: string;
-  timestamp?: string;
-  titleProps?: TitleProps;
-  legendsProps?: LegendsProps;
-  tooltipProps?: TooltipProps;
-  isLoading?: boolean;
-}
+import { DonutChartProps } from './types';
 
 const DonutChart = ({
   data: _data,
@@ -32,10 +18,12 @@ const DonutChart = ({
   hideLabels,
   title = '',
   timestamp,
+  colors = [],
+  isLoading,
+
   titleProps,
   legendsProps,
   tooltipProps,
-  isLoading,
 }: DonutChartProps) => {
   const { parentRef, width, height } = useParentSize({
     debounceTime: 150,
@@ -73,7 +61,7 @@ const DonutChart = ({
 
   const colorScale = scaleOrdinal<string, string>({
     domain: data.map((d) => d.label),
-    range: theme.colors.charts.donutChart,
+    range: colors?.length ? colors : theme.colors.charts.donutChart,
   });
 
   return (

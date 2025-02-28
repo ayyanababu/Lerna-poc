@@ -1,17 +1,15 @@
 import { Box } from '@mui/material';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Sortable from 'sortablejs';
+import { SortableProps } from './types';
 
-export function SortableComponent({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+export const SortableComponent = ({ children, className }: SortableProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<{ id: number }[]>([]);
-  const childrenArray = useMemo(() => React.Children.toArray(children), [children]);
+  const childrenArray = useMemo(
+    () => React.Children.toArray(children),
+    [children],
+  );
 
   useEffect(() => {
     setState(childrenArray.map((_, index) => ({ id: index })));
@@ -27,8 +25,10 @@ export function SortableComponent({
       delay: 2,
       onUpdate: (event) => {
         const nodes = Array.from(containerRef.current?.children || []);
-        const newIds = nodes.map(node => parseInt(node.getAttribute('data-id') || '0'));
-        setState(newIds.map(id => ({ id })));
+        const newIds = nodes.map((node) =>
+          parseInt(node.getAttribute('data-id') || '0'),
+        );
+        setState(newIds.map((id) => ({ id })));
       },
     });
 
@@ -50,8 +50,7 @@ export function SortableComponent({
             opacity: 0,
           },
         },
-      }}
-    >
+      }}>
       {state.map((item) => (
         <div key={item.id} data-id={item.id}>
           {childrenArray[item.id]}
@@ -59,4 +58,4 @@ export function SortableComponent({
       ))}
     </Box>
   );
-}
+};

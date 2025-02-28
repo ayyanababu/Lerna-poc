@@ -1,15 +1,10 @@
 import React, { createContext, useId, useMemo } from 'react';
 import { Shimmer } from '../components/Shimmer/Shimmer';
-import { Theme, defaultDarkTheme, defaultLightTheme } from '../constants/theme';
+import { defaultDarkTheme, defaultLightTheme } from '../constants/theme';
+import { Theme } from '../constants/types';
 import { FontFamilyImport } from '../styles/FontFamilyImport';
+import { ThemeContextType, ThemeMode } from './types';
 
-type ThemeContextType = {
-  theme: Theme;
-
-  activeMode: ThemeMode;
-  setActiveMode: React.Dispatch<React.SetStateAction<ThemeMode>>;
-};
-type ThemeMode = 'light' | 'dark';
 
 export const ThemeContext = createContext<ThemeContextType>({
   theme: defaultLightTheme,

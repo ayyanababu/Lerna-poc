@@ -1,11 +1,7 @@
 import Typography from '@mui/material/Typography';
 import React, { FC } from 'react';
 import { shimmerClassName } from '../Shimmer/Shimmer';
-
-export interface TimestampProps {
-  timestamp?: string;
-  isLoading?: boolean;
-}
+import { TimestampProps } from './types';
 
 export const Timestamp: FC<TimestampProps> = ({
   timestamp,
