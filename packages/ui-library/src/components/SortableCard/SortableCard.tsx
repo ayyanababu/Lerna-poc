@@ -37,6 +37,9 @@ export const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
               cursor: 'pointer',
               marginLeft: 'auto',
               fontSize: '24px',
+              '&:active': {
+                cursor: 'grabbing',
+              },
             }}
             color={theme.colors.common.text}
             className="drag-handle">
