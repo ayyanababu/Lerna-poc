@@ -1,10 +1,16 @@
-import React, { createContext, useId, useMemo } from 'react';
-import { Shimmer } from '../components/Shimmer/Shimmer';
-import { defaultDarkTheme, defaultLightTheme } from '../constants/theme';
-import { Theme } from '../constants/types';
-import { FontFamilyImport } from '../styles/FontFamilyImport';
-import { ThemeContextType, ThemeMode } from './types';
+import React, { createContext, useMemo } from 'react';
 
+import { Shimmer } from '../components/Shimmer/Shimmer';
+import { defaultDarkTheme, defaultLightTheme } from '../theme/theme';
+import { Theme } from '../theme/types';
+
+type ThemeContextType = {
+  theme: Theme;
+
+  activeMode: ThemeMode;
+  setActiveMode: React.Dispatch<React.SetStateAction<ThemeMode>>;
+};
+type ThemeMode = 'light' | 'dark';
 
 export const ThemeContext = createContext<ThemeContextType>({
   theme: defaultLightTheme,
@@ -18,7 +24,6 @@ export const ChartThemeProvider: React.FC<{
   themeOverrides?: Partial<Theme>;
   children: React.ReactNode;
 }> = ({ themeMode = 'light', themeOverrides, children }) => {
-  const uniqueId = useId();
   const [activeMode, setActiveMode] = React.useState<ThemeMode>(themeMode);
 
   const baseTheme = useMemo(
@@ -52,11 +57,14 @@ export const ChartThemeProvider: React.FC<{
     [baseTheme, themeOverrides],
   );
 
+  const contextValue = useMemo(
+    () => ({ theme: mergedTheme, activeMode, setActiveMode }),
+    [mergedTheme, activeMode, setActiveMode],
+  );
+
   return (
-    <ThemeContext.Provider
-      value={{ theme: mergedTheme, activeMode, setActiveMode }}>
+    <ThemeContext.Provider value={contextValue}>
       <Shimmer />
-      <FontFamilyImport uniqueId={uniqueId} />
       {children}
     </ThemeContext.Provider>
   );

@@ -6,7 +6,7 @@ import { useTooltip } from '@visx/tooltip';
 import { arc as d3Arc, PieArcDatum } from 'd3-shape';
 import React, { useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
-import { ChartWrapper } from '../ChartWrapper/ChartWrapper';
+import { ChartWrapper } from '../ChartWrapper';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
 import { mockFullDonutData, mockSemiDonutData } from './mockdata';

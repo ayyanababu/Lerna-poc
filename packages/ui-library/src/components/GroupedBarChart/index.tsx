@@ -7,7 +7,7 @@ import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import { default as React, useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
-import { ChartWrapper } from '../ChartWrapper/ChartWrapper';
+import { ChartWrapper } from '../ChartWrapper';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';

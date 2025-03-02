@@ -1,11 +1,16 @@
 import { Box } from '@mui/material';
+import { scaleOrdinal } from '@visx/scale';
 import React, { forwardRef, useEffect, useRef } from 'react';
-import { Legends } from '../Legends/Legends';
-import { Timestamp } from '../Timestamp/Timestamp';
-import { Title } from '../Title/Title';
-import { Tooltip } from '../Tooltip/Tooltip';
+import { Legends } from '../Legends';
+import { Timestamp } from '../Timestamp';
+import { Title } from '../Title';
+import { Tooltip } from '../Tooltip';
 import { ChartWrapperProps } from './types';
 
+const defaultColorScale = scaleOrdinal<string, string>({
+  domain: ['default'],
+  range: ['#000000'], // Default color (black)
+});
 
 export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
   (
@@ -14,6 +19,10 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [canRender, setCanRender] = React.useState(true);
+
+    const { colorScale = defaultColorScale, data: legendData } =
+      legendsProps || {};
+    const { data: toolTipData } = tooltipProps || {};
 
     useEffect(() => {
       const checkCanRender = () => {
@@ -54,7 +63,11 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
           <>
             <Title title={title} {...titleProps} />
 
-            <Legends {...legendsProps} />
+            <Legends
+              {...legendsProps}
+              colorScale={colorScale}
+              data={legendData}
+            />
 
             <Box
               ref={ref}
@@ -68,7 +81,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
               {children}
             </Box>
 
-            <Tooltip {...tooltipProps} />
+            {toolTipData && <Tooltip {...tooltipProps} data={toolTipData} />}
 
             <Timestamp {...timestampProps} />
           </>

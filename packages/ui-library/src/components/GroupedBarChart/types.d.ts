@@ -1,6 +1,6 @@
-import { LegendsProps } from '../Legends/Legends';
-import { TitleProps } from '../Title/Title';
-import { TooltipProps } from '../Tooltip/Tooltip';
+import { LegendsProps } from '../Legends';
+import { TitleProps } from '../Title';
+import { TooltipProps } from '../Tooltip';
 
 export type ChartType = 'grouped' | 'stacked';
 

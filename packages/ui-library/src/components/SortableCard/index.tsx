@@ -4,7 +4,7 @@ import CardContent from '@mui/material/CardContent';
 import React, { forwardRef } from 'react';
 import { RxDragHandleDots2 } from 'react-icons/rx';
 import { useTheme } from '../../hooks/useTheme';
-import { Title } from '../Title/Title';
+import { Title } from '../Title';
 import { SortableCardProps } from './types';
 
 export const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(

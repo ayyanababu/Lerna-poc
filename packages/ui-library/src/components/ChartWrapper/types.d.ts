@@ -1,7 +1,7 @@
-import { LegendsProps } from '../Legends/Legends';
-import { TimestampProps } from '../Timestamp/Timestamp';
-import { TitleProps } from '../Title/Title';
-import { TooltipProps } from '../Tooltip/Tooltip';
+import { LegendsProps } from '../Legends';
+import { TimestampProps } from '../Timestamp';
+import { TitleProps } from '../Title';
+import { TooltipProps } from '../Tooltip';
 
 export interface ChartWrapperProps {
   children: ReactNode;
