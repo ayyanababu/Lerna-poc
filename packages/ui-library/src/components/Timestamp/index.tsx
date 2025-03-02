@@ -18,8 +18,10 @@ export const Timestamp: FC<TimestampProps> = ({
         marginBottom: '10px',
         color: '#aaa',
       }}
-      className={isLoading ? shimmerClassName : ''}>
-      Last Update:{' '}
+      className={isLoading ? shimmerClassName : ''}
+    >
+      Last Update:
+      {' '}
       {new Date(timestamp).toLocaleString('en-US', { timeZone: 'UTC' })}
     </Typography>
   );

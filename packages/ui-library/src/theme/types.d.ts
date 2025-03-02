@@ -5,9 +5,29 @@ export interface Theme {
       text: string;
       border: string;
     };
+    axis: {
+      line: string;
+      label: string;
+      grid: string;
+    };
+    tooltip: {
+      background: string;
+      text: string;
+      border: string;
+    };
+    legend: {
+      text: string;
+      background: string;
+    };
     charts: {
-      barChart: string[];
-      donutChart: string[];
+      bar: string[];
+      stackedBar: string[];
+      line: string[];
+      area: string[];
+      treemap: string[];
+      donut: string[];
+      pie: string[];
+      scatter: string[];
     };
   };
   typography: {
@@ -16,6 +36,11 @@ export interface Theme {
       small: string;
       medium: string;
       large: string;
+    };
+    fontWeight: {
+      light: number;
+      regular: number;
+      bold: number;
     };
   };
 }

@@ -1,8 +1,11 @@
-import { LegendData, LegendsProps } from '../Legends/types';
+import { LegendData } from '../Legends/types';
 import { TitleProps } from '../Title/types';
-import { TooltipProps } from '../Tooltip/types';
 
 export interface DonutData extends LegendData {}
+
+export interface DonutLegendsProps extends OmittedLegendsProps {}
+
+export interface DonutTooltipProps extends OmittedTooltipProps {}
 
 export interface DonutChartProps {
   data: DonutData;
@@ -14,6 +17,6 @@ export interface DonutChartProps {
   isLoading?: boolean;
 
   titleProps?: TitleProps;
-  legendsProps?: LegendsProps;
-  tooltipProps?: TooltipProps;
+  legendsProps?: DonutLegendsProps;
+  tooltipProps?: DonutTooltipProps;
 }

@@ -87,7 +87,7 @@ describe('DonutChart', () => {
   });
 
   test('renders with loading state', () => {
-    render(<DonutChart data={testData} isLoading={true} />);
+    render(<DonutChart data={testData} isLoading />);
     expect(screen.getByTestId('chart-wrapper')).toBeInTheDocument();
     expect(screen.getByTestId('svg-shimmer')).toBeInTheDocument();
   });
@@ -121,7 +121,7 @@ describe('DonutChart', () => {
   });
 
   test('renders with hidden labels', () => {
-    render(<DonutChart data={testData} hideLabels={true} />);
+    render(<DonutChart data={testData} hideLabels />);
     expect(screen.getByTestId('chart-wrapper')).toBeInTheDocument();
   });
 
@@ -146,35 +146,15 @@ describe('DonutChart', () => {
     );
   });
 
-  test('handles custom legends props', () => {
-    const legendsProps = { position: 'bottom' };
-    render(<DonutChart data={testData} legendsProps={legendsProps} />);
-    expect(screen.getByTestId('chart-wrapper')).toBeInTheDocument();
-    expect(screen.getByTestId('chart-wrapper')).toHaveAttribute(
-      'legendsProps',
-      expect.stringContaining('bottom'),
-    );
-  });
-
-  test('handles custom tooltip props', () => {
-    const tooltipProps = { className: 'custom-tooltip' };
-    render(<DonutChart data={testData} tooltipProps={tooltipProps} />);
-    expect(screen.getByTestId('chart-wrapper')).toBeInTheDocument();
-    expect(screen.getByTestId('chart-wrapper')).toHaveAttribute(
-      'tooltipProps',
-      expect.stringContaining('custom-tooltip'),
-    );
-  });
-
   test('uses mockFullDonutData when isLoading is true and type is full', () => {
-    render(<DonutChart data={testData} isLoading={true} />);
+    render(<DonutChart data={testData} isLoading />);
     const chartWrapper = screen.getByTestId('chart-wrapper');
     // Just check that the legendsProps contains some data, without stringifying
     expect(chartWrapper).toHaveAttribute('legendsProps');
   });
 
   test('uses mockSemiDonutData when isLoading is true and type is semi', () => {
-    render(<DonutChart data={testData} isLoading={true} type="semi" />);
+    render(<DonutChart data={testData} isLoading type="semi" />);
     const chartWrapper = screen.getByTestId('chart-wrapper');
     // Just check that the legendsProps contains some data, without stringifying
     expect(chartWrapper).toHaveAttribute('legendsProps');

@@ -31,7 +31,9 @@ jest.mock('../Tooltip', () => ({
 jest.mock('../Timestamp', () => ({
   Timestamp: ({ timestamp, ...props }: any) => (
     <span data-testid="timestamp" {...props}>
-      Last Update: {timestamp}
+      Last Update:
+      {' '}
+      {timestamp}
     </span>
   ),
 }));
@@ -68,8 +70,7 @@ describe('ChartWrapper', () => {
     });
 
     // Setup ResizeObserver
-    window.ResizeObserver =
-      mockResizeObserver as unknown as typeof ResizeObserver;
+    window.ResizeObserver = mockResizeObserver as unknown as typeof ResizeObserver;
   });
 
   // Reset mocks after each test

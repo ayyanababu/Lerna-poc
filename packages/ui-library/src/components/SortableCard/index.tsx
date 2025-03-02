@@ -8,7 +8,9 @@ import { Title } from '../Title';
 import { SortableCardProps } from './types.d';
 
 export const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
-  ({ children, title, height, width }, ref) => {
+  ({
+    children, title, height, width,
+  }, ref) => {
     const { theme } = useTheme();
     return (
       <Card
@@ -22,14 +24,16 @@ export const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
           padding: 1,
           boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.05)',
           border: `1px solid ${theme.colors.common.border}`,
-        }}>
+        }}
+      >
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'row',
             gap: 1,
             padding: '8px',
-          }}>
+          }}
+        >
           <Title title={title} />
           <Box
             sx={{
@@ -42,12 +46,16 @@ export const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
               },
             }}
             color={theme.colors.common.text}
-            className="drag-handle">
+            className="drag-handle"
+          >
             <RxDragHandleDots2 />
           </Box>
         </Box>
 
-        <CardContent sx={{ display: 'flex', padding: '8px', height, width }}>
+        <CardContent sx={{
+          display: 'flex', padding: '8px', height, width,
+        }}
+        >
           {children}
         </CardContent>
       </Card>

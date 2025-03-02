@@ -14,12 +14,14 @@ export const FontFamilyImport: React.FC<FontFamilyImportProps> = ({
         href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap"
         rel="stylesheet"
       />
-      <style>{`
+      <style>
+        {`
         ${uniqueId} * {
           font-family: 'Roboto', 'Open Sans', sans-serif;
           color: ${theme.colors.common.text};
         }
-      `}</style>
+      `}
+      </style>
     </>
   );
 };

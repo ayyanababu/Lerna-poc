@@ -14,7 +14,9 @@ import { TooltipData } from '../Tooltip/types';
 import { mockGroupedBarChartData } from './mockdata';
 import { BarProps, DataPoint, GroupedBarChartProps } from './types.d';
 
-const DEFAULT_MARGIN = { top: 20, right: 30, bottom: 30, left: 40 };
+const DEFAULT_MARGIN = {
+  top: 20, right: 30, bottom: 30, left: 40,
+};
 const DEFAULT_BAR_RADIUS = 5;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
@@ -23,7 +25,7 @@ const SCALE_PADDING = 1.2;
 /**
  * GroupedBarChart component that renders either grouped or stacked bar charts
  */
-const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
+export const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
   data: _data,
   groupKeys: _groupKeys,
   type = 'grouped',
@@ -63,44 +65,36 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
   const { data, groupKeys } = useMemo<{
     data: DataPoint[];
     groupKeys: string[];
-  }>(() => {
-    return isLoading
-      ? mockGroupedBarChartData
-      : { data: _data, groupKeys: _groupKeys };
-  }, [isLoading, _data, _groupKeys]);
+  }>(() => (isLoading
+    ? mockGroupedBarChartData
+    : { data: _data, groupKeys: _groupKeys }), [isLoading, _data, _groupKeys]);
 
   // Filter data based on hidden groups
-  const filteredData = useMemo(() => {
-    return data.map((categoryData) => {
-      const d = cloneDeep(categoryData);
+  const filteredData = useMemo(() => data.map((categoryData) => {
+    const d = cloneDeep(categoryData);
 
-      if (hideIndex.length > 0) {
-        groupKeys.forEach((groupKey, index) => {
-          if (hideIndex.includes(index) && d.data) {
-            delete d.data[groupKey];
-          }
-        });
-      }
+    if (hideIndex.length > 0) {
+      groupKeys.forEach((groupKey, index) => {
+        if (hideIndex.includes(index) && d.data) {
+          delete d.data[groupKey];
+        }
+      });
+    }
 
-      return d;
-    });
-  }, [data, hideIndex, groupKeys]);
+    return d;
+  }), [data, hideIndex, groupKeys]);
 
   // Prepare legend data
-  const legendData = useMemo(() => {
-    return groupKeys.map((key) => ({
-      label: capitalize(lowerCase(key)),
-      value: data.reduce(
-        (total, categoryData) => total + Number(categoryData.data[key] || 0),
-        0,
-      ),
-    }));
-  }, [groupKeys, data]);
+  const legendData = useMemo(() => groupKeys.map((key) => ({
+    label: capitalize(lowerCase(key)),
+    value: data.reduce(
+      (total, categoryData) => total + Number(categoryData.data[key] || 0),
+      0,
+    ),
+  })), [groupKeys, data]);
 
   // Get active keys (not hidden)
-  const activeKeys = useMemo(() => {
-    return groupKeys.filter((_, index) => !hideIndex.includes(index));
-  }, [groupKeys, hideIndex]);
+  const activeKeys = useMemo(() => groupKeys.filter((_, index) => !hideIndex.includes(index)), [groupKeys, hideIndex]);
 
   // Generate stacked data if chart type is stacked
   const stackedData = useMemo(() => {
@@ -131,11 +125,9 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
       // For stacked charts, sum all values in each category
       return Math.max(
         0,
-        ...filteredData.map((d) =>
-          Object.entries(d.data)
-            .filter(([key]) => activeKeys.includes(key))
-            .reduce((sum, [_, value]) => sum + Number(value || 0), 0),
-        ),
+        ...filteredData.map((d) => Object.entries(d.data)
+          .filter(([key]) => activeKeys.includes(key))
+          .reduce((sum, [_, value]) => sum + Number(value || 0), 0)),
       );
     }
 
@@ -156,61 +148,56 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
 
   // Create scales
   const categoryScale = useMemo(
-    () =>
-      scaleBand<string>({
-        domain: filteredData.map((d) => String(d.label)),
-        range: [0, innerWidth],
-        padding: 0.2,
-      }),
+    () => scaleBand<string>({
+      domain: filteredData.map((d) => String(d.label)),
+      range: [0, innerWidth],
+      padding: 0.2,
+    }),
     [filteredData, innerWidth],
   );
 
   const groupScale = useMemo(
-    () =>
-      scaleBand<string>({
-        domain: activeKeys,
-        range: [0, categoryScale.bandwidth()],
-        padding: 0.1,
-      }),
+    () => scaleBand<string>({
+      domain: activeKeys,
+      range: [0, categoryScale.bandwidth()],
+      padding: 0.1,
+    }),
     [activeKeys, categoryScale],
   );
 
   const valueScale = useMemo(
-    () =>
-      scaleLinear<number>({
-        domain: [0, maxValue * SCALE_PADDING],
-        range: [innerHeight, 0],
-      }),
+    () => scaleLinear<number>({
+      domain: [0, maxValue * SCALE_PADDING],
+      range: [innerHeight, 0],
+    }),
     [innerHeight, maxValue],
   );
 
   const groupColorScale = useMemo(
-    () =>
-      scaleOrdinal<string, string>({
-        domain: groupKeys,
-        range: colors?.length ? colors : theme.colors.charts.barChart,
-      }),
-    [groupKeys, theme.colors.charts.barChart],
+    () => scaleOrdinal<string, string>({
+      domain: groupKeys,
+      range: colors?.length ? colors : theme.colors.charts.bar,
+    }),
+    [groupKeys, theme.colors.charts.bar],
   );
 
   // Helper function to create bars
   const renderBar = (props: BarProps) => <Bar {...props} />;
 
   // Handler for mouse events
-  const handleMouseMove =
-    (groupKey: string, value: number) => (event: React.MouseEvent) => {
-      if (!isLoading) {
-        showTooltip({
-          tooltipData: {
-            label: capitalize(lowerCase(groupKey)),
-            value,
-          },
-          tooltipLeft: event.clientX,
-          tooltipTop: event.clientY,
-        });
-        setHoveredGroupKey(groupKey);
-      }
-    };
+  const handleMouseMove = (groupKey: string, value: number) => (event: React.MouseEvent) => {
+    if (!isLoading) {
+      showTooltip({
+        tooltipData: {
+          label: capitalize(lowerCase(groupKey)),
+          value,
+        },
+        tooltipLeft: event.clientX,
+        tooltipTop: event.clientY,
+      });
+      setHoveredGroupKey(groupKey);
+    }
+  };
 
   const handleMouseLeave = () => {
     if (!isLoading) {
@@ -249,10 +236,9 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
         if (!value) return null;
 
         const isHoveredGroup = hoveredGroupKey === groupKey;
-        const barOpacity =
-          hoveredGroupKey && !isHoveredGroup
-            ? REDUCED_OPACITY
-            : DEFAULT_OPACITY;
+        const barOpacity = hoveredGroupKey && !isHoveredGroup
+          ? REDUCED_OPACITY
+          : DEFAULT_OPACITY;
 
         return renderBar({
           key: `stacked-${category}-${groupKey}`,
@@ -282,53 +268,50 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
   };
 
   // Render grouped bars
-  const renderGroupedBars = () => {
-    return filteredData.map((categoryData, index) => {
-      const category = String(categoryData.label);
-      const categoryX = categoryScale(category) || 0;
+  const renderGroupedBars = () => filteredData.map((categoryData, index) => {
+    const category = String(categoryData.label);
+    const categoryX = categoryScale(category) || 0;
 
-      return groupKeys.map((groupKey, groupIndex) => {
-        const value = Number(categoryData.data?.[groupKey]);
-        if (isNaN(value)) return null;
+    return groupKeys.map((groupKey, groupIndex) => {
+      const value = Number(categoryData.data?.[groupKey]);
+      if (isNaN(value)) return null;
 
-        const barX = categoryX + (groupScale(groupKey) || 0);
-        const barWidth = groupScale.bandwidth();
-        const barHeight = innerHeight - valueScale(value);
-        const barY = valueScale(value);
+      const barX = categoryX + (groupScale(groupKey) || 0);
+      const barWidth = groupScale.bandwidth();
+      const barHeight = innerHeight - valueScale(value);
+      const barY = valueScale(value);
 
-        const isHoveredGroup = hoveredGroupKey === groupKey;
-        const barOpacity =
-          hoveredGroupKey && !isHoveredGroup
-            ? REDUCED_OPACITY
-            : DEFAULT_OPACITY;
+      const isHoveredGroup = hoveredGroupKey === groupKey;
+      const barOpacity = hoveredGroupKey && !isHoveredGroup
+        ? REDUCED_OPACITY
+        : DEFAULT_OPACITY;
 
-        const barFill = isLoading
-          ? `url(#${shimmerGradientId})`
-          : hideIndex.includes(groupIndex)
-            ? '#eee'
-            : groupColorScale(groupKey);
+      const barFill = isLoading
+        ? `url(#${shimmerGradientId})`
+        : hideIndex.includes(groupIndex)
+          ? '#eee'
+          : groupColorScale(groupKey);
 
-        return (
-          <g key={`${category}-${groupKey}-${index}-${groupIndex}`}>
-            {renderBar({
-              key: `grouped-${category}-${groupKey}`,
-              x: barX,
-              y: barY,
-              width: barWidth,
-              height: barHeight,
-              fill: barFill,
-              opacity: barOpacity,
-              rx: DEFAULT_BAR_RADIUS,
-              value,
-              label: groupKey,
-              onMouseMove: handleMouseMove(groupKey, value),
-              onMouseLeave: handleMouseLeave,
-            })}
-          </g>
-        );
-      });
+      return (
+        <g key={`${category}-${groupKey}-${index}-${groupIndex}`}>
+          {renderBar({
+            key: `grouped-${category}-${groupKey}`,
+            x: barX,
+            y: barY,
+            width: barWidth,
+            height: barHeight,
+            fill: barFill,
+            opacity: barOpacity,
+            rx: DEFAULT_BAR_RADIUS,
+            value,
+            label: groupKey,
+            onMouseMove: handleMouseMove(groupKey, value),
+            onMouseLeave: handleMouseLeave,
+          })}
+        </g>
+      );
     });
-  };
+  });
 
   return (
     <ChartWrapper
@@ -352,7 +335,8 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
         isVisible: !isLoading && tooltipOpen,
         ...tooltipProps,
       }}
-      timestampProps={{ timestamp, isLoading }}>
+      timestampProps={{ timestamp, isLoading }}
+    >
       <svg width={width} height={height}>
         <SvgShimmer />
 
@@ -362,16 +346,25 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
             <AxisLeft
               scale={valueScale}
               tickFormat={(value) => `${value}`}
+              stroke={theme.colors.axis.line}
+              tickStroke={theme.colors.axis.line}
+              tickLabelProps={{
+                fill: theme.colors.axis.label,
+                fontSize: theme.typography.fontSize.small,
+                textAnchor: 'end',
+                dy: '0.33em',
+              }}
               tickComponent={({ formattedValue, ...tickProps }) => (
                 <text
                   {...tickProps}
                   className={`${isLoading ? shimmerClassName : ''}`}
                   fill={
-                    isLoading ? `url(#${shimmerGradientId})` : 'currentColor'
+                    isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label
                   }
                   style={{
-                    color: theme.colors.common.text,
-                  }}>
+                    fontSize: theme.typography.fontSize.small,
+                  }}
+                >
                   {formattedValue}
                 </text>
               )}
@@ -379,22 +372,46 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
             />
           )}
 
+          {/* Grid Lines */}
+          <g>
+            {valueScale.ticks(5).map((tick) => (
+              <line
+                key={tick}
+                x1={0}
+                x2={innerWidth}
+                y1={valueScale(tick)}
+                y2={valueScale(tick)}
+                stroke={theme.colors.axis.grid}
+                strokeDasharray="2,2"
+                opacity={0.3}
+              />
+            ))}
+          </g>
+
           {/* X-Axis */}
           <AxisBottom
             scale={categoryScale}
             top={innerHeight}
-            tickFormat={(value) =>
-              hideIndex.length !== groupKeys.length ? `${value}` : ``
-            }
+            stroke={theme.colors.axis.line}
+            tickStroke={theme.colors.axis.line}
+            tickFormat={(value) => (hideIndex.length !== groupKeys.length ? `${value}` : '')}
+            tickLabelProps={{
+              fill: theme.colors.axis.label,
+              fontSize: theme.typography.fontSize.small,
+              textAnchor: 'middle',
+              dy: '0.33em',
+            }}
             tickComponent={({ formattedValue, ...tickProps }) => (
               <text
                 {...tickProps}
                 className={`${isLoading ? shimmerClassName : ''}`}
-                fill="currentColor"
+                fill={
+                  isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label
+                }
                 style={{
-                  opacity: isLoading ? 0 : 1,
-                  color: theme.colors.common.text,
-                }}>
+                  fontSize: theme.typography.fontSize.small,
+                }}
+              >
                 {formattedValue}
               </text>
             )}
@@ -408,5 +425,3 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
     </ChartWrapper>
   );
 };
-
-export { GroupedBarChart };

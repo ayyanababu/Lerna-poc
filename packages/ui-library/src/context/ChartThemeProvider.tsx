@@ -16,7 +16,7 @@ export const ThemeContext = createContext<ThemeContextType>({
   theme: defaultLightTheme,
 
   activeMode: 'light',
-  setActiveMode: () => {},
+  setActiveMode: () => { },
 });
 
 export const ChartThemeProvider: React.FC<{
@@ -38,20 +38,42 @@ export const ChartThemeProvider: React.FC<{
           ...baseTheme.colors.common,
           ...themeOverrides?.colors?.common,
         },
+        axis: {
+          ...baseTheme.colors.axis,
+          ...themeOverrides?.colors?.axis,
+        },
+        tooltip: {
+          ...baseTheme.colors.tooltip,
+          ...themeOverrides?.colors?.tooltip,
+        },
+        legend: {
+          ...baseTheme.colors.legend,
+          ...themeOverrides?.colors?.legend,
+        },
         charts: {
           ...baseTheme.colors.charts,
           ...themeOverrides?.colors?.charts,
-          barChart:
-            themeOverrides?.colors?.charts?.barChart ||
-            baseTheme.colors.charts.barChart,
-          donutChart:
-            themeOverrides?.colors?.charts?.donutChart ||
-            baseTheme.colors.charts.donutChart,
+          bar: themeOverrides?.colors?.charts?.bar || baseTheme.colors.charts.bar,
+          stackedBar: themeOverrides?.colors?.charts?.stackedBar || baseTheme.colors.charts.stackedBar,
+          line: themeOverrides?.colors?.charts?.line || baseTheme.colors.charts.line,
+          area: themeOverrides?.colors?.charts?.area || baseTheme.colors.charts.area,
+          treemap: themeOverrides?.colors?.charts?.treemap || baseTheme.colors.charts.treemap,
+          donut: themeOverrides?.colors?.charts?.donut || baseTheme.colors.charts.donut,
+          pie: themeOverrides?.colors?.charts?.pie || baseTheme.colors.charts.pie,
+          scatter: themeOverrides?.colors?.charts?.scatter || baseTheme.colors.charts.scatter,
         },
       },
       typography: {
         ...baseTheme.typography,
         ...themeOverrides?.typography,
+        fontSize: {
+          ...baseTheme.typography.fontSize,
+          ...themeOverrides?.typography?.fontSize,
+        },
+        fontWeight: {
+          ...baseTheme.typography.fontWeight,
+          ...themeOverrides?.typography?.fontWeight,
+        },
       },
     }),
     [baseTheme, themeOverrides],

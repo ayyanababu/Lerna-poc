@@ -14,14 +14,15 @@ const defaultColorScale = scaleOrdinal<string, string>({
 
 export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
   (
-    { children, title, titleProps, legendsProps, tooltipProps, timestampProps },
+    {
+      children, title, titleProps, legendsProps, tooltipProps, timestampProps,
+    },
     ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [canRender, setCanRender] = React.useState(true);
 
-    const { colorScale = defaultColorScale, data: legendData } =
-      legendsProps || {};
+    const { colorScale = defaultColorScale, data: legendData } = legendsProps || {};
     const { data: toolTipData } = tooltipProps || {};
 
     useEffect(() => {
@@ -33,8 +34,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
         }
         const isParentElementAvailable = !!parentElement;
         const parentRect = parentElement?.getBoundingClientRect();
-        const isParentSizeValid =
-          parentRect?.width > 200 && parentRect?.height > 200;
+        const isParentSizeValid = parentRect?.width > 200 && parentRect?.height > 200;
 
         setCanRender(isParentElementAvailable && isParentSizeValid);
       };
@@ -58,7 +58,8 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
           flexDirection: 'column',
           gap: '10px',
         }}
-        ref={containerRef}>
+        ref={containerRef}
+      >
         {canRender ? (
           <>
             <Title title={title} {...titleProps} />
@@ -77,7 +78,8 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                 width: '100%',
                 display: 'flex',
                 flex: '1 1 100%',
-              }}>
+              }}
+            >
               {children}
             </Box>
 

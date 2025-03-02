@@ -3,13 +3,12 @@ import { useTheme } from '../../hooks/useTheme';
 
 export const shimmerClassName = `my-lib-shimmer-${Math.random().toString(36).substring(2, 9)}`;
 
-export const Shimmer = () => {
+export function Shimmer() {
   const { theme } = useTheme();
 
   return (
-    <>
-      <style>
-        {`
+    <style>
+      {`
           @keyframes shimmer {
             0% {
               background-position: 200% 0;
@@ -43,7 +42,6 @@ export const Shimmer = () => {
             background-color: transparent !important;
           }
         `}
-      </style>
-    </>
+    </style>
   );
-};
+}

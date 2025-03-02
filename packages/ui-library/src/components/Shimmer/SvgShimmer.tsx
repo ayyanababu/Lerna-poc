@@ -14,7 +14,8 @@ export default function SvgShimmer() {
         y1="0"
         x2="100%"
         y2="0"
-        gradientUnits="userSpaceOnUse">
+        gradientUnits="userSpaceOnUse"
+      >
         <stop offset="25%" stopColor={`${theme.colors.common.text}22`} />
         <stop offset="50%" stopColor={`${theme.colors.common.text}44`} />
         <stop offset="75%" stopColor={`${theme.colors.common.text}22`} />

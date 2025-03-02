@@ -3,8 +3,6 @@ import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { TitleProps } from './types.d';
 
-
-
 export function Title({ title, ...props }: TitleProps) {
   const { theme } = useTheme();
 
@@ -13,9 +11,10 @@ export function Title({ title, ...props }: TitleProps) {
     <Typography
       variant="subtitle1"
       gutterBottom
-      fontWeight={'bold'}
+      fontWeight="bold"
       color={theme.colors.common.text}
-      {...props}>
+      {...props}
+    >
       {title}
     </Typography>
   );
