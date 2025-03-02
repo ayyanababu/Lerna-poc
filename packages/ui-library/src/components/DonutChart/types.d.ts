@@ -1,3 +1,7 @@
+import {
+  OmittedLegendsProps,
+  OmittedTooltipProps,
+} from '../ChartWrapper/types';
 import { LegendData } from '../Legends/types';
 import { TitleProps } from '../Title/types';
 
