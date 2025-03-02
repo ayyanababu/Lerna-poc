@@ -5,7 +5,7 @@ import { capitalize, lowerCase } from 'lodash-es';
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
-import { LegendsProps } from './types';
+import { LegendsProps } from './types.d';
 
 export function Legends({
   colorScale,
@@ -15,7 +15,7 @@ export function Legends({
   hovered,
   setHovered,
   direction = 'row',
-  onClick = () => {},
+  onClick = () => { },
   isLoading = false,
 }: LegendsProps) {
   const { theme } = useTheme();

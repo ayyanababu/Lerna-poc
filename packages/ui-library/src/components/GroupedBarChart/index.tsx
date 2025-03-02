@@ -12,7 +12,7 @@ import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
 import { mockGroupedBarChartData } from './mockdata';
-import { BarProps, DataPoint, GroupedBarChartProps } from './types';
+import { BarProps, DataPoint, GroupedBarChartProps } from './types.d';
 
 const DEFAULT_MARGIN = { top: 20, right: 30, bottom: 30, left: 40 };
 const DEFAULT_BAR_RADIUS = 5;

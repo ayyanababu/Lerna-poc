@@ -1,7 +1,7 @@
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
-import { TitleProps } from './types';
+import { TitleProps } from './types.d';
 
 
 

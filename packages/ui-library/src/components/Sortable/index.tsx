@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Sortable from 'sortablejs';
-import { SortableProps } from './types';
+import { SortableProps } from './types.d';
 
 export const SortableComponent = ({ children, className }: SortableProps) => {
   const containerRef = useRef<HTMLDivElement>(null);

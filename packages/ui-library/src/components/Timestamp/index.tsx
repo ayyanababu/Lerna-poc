@@ -1,7 +1,7 @@
 import Typography from '@mui/material/Typography';
 import React, { FC } from 'react';
 import { shimmerClassName } from '../Shimmer/Shimmer';
-import { TimestampProps } from './types';
+import { TimestampProps } from './types.d';
 
 export const Timestamp: FC<TimestampProps> = ({
   timestamp,

@@ -10,7 +10,7 @@ import { ChartWrapper } from '../ChartWrapper';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
 import { mockFullDonutData, mockSemiDonutData } from './mockdata';
-import { DonutChartProps } from './types';
+import { DonutChartProps } from './types.d';
 
 const DonutChart = ({
   data: _data,
@@ -111,21 +111,21 @@ const DonutChart = ({
                   .outerRadius(radius)
                   .cornerRadius(cornerRadius)
                   .padAngle(padAngle) as unknown as (
-                  d: PieArcDatum<{
-                    label: string;
-                    value: number;
-                  }>,
-                ) => string;
+                    d: PieArcDatum<{
+                      label: string;
+                      value: number;
+                    }>,
+                  ) => string;
 
                 const shadowArcGenerator = d3Arc()
                   .innerRadius(innerRadius * 1.7)
                   .outerRadius(isHovered ? radius + 10 : radius + 15)
                   .cornerRadius(cornerRadius) as unknown as (
-                  d: PieArcDatum<{
-                    label: string;
-                    value: number;
-                  }>,
-                ) => string;
+                    d: PieArcDatum<{
+                      label: string;
+                      value: number;
+                    }>,
+                  ) => string;
 
                 return (
                   <g
@@ -156,7 +156,7 @@ const DonutChart = ({
                         isLoading
                           ? `url(#${shimmerGradientId})`
                           : // @ts-ignore
-                            arc.data?.color || colorScale(arc.data.label)
+                          arc.data?.color || colorScale(arc.data.label)
                       }
                       stroke={theme.colors.common.border}
                       strokeWidth={2}

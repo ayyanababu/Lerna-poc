@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import { Tooltip as VisxTooltip } from '@visx/tooltip';
 import React from 'react';
-import { TooltipProps } from './types';
+import { TooltipProps } from './types.d';
 
 export function Tooltip({ top, left, data, isVisible = true }: TooltipProps) {
   if (!isVisible) return null;
