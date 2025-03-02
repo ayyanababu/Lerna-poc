@@ -77,7 +77,8 @@ export function Legends({
                   <Box
                     sx={{
                       // @ts-ignore
-                      backgroundColor: label.value || '#fff',
+                      backgroundColor:
+                        data?.[index]?.color || label.value || '#fff',
                       marginTop: '4px',
                       marginBottom: 'auto',
                       borderRadius: '20px',

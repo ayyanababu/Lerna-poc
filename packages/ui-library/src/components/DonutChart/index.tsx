@@ -130,7 +130,9 @@ const DonutChart = ({
                 return (
                   <g
                     key={`arc-${index}`}
-                    onMouseEnter={(event) => {
+                    onMouseEnter={(
+                      event: React.MouseEvent<SVGGElement, MouseEvent>,
+                    ) => {
                       showTooltip({
                         tooltipData: arc.data,
                         tooltipLeft: event.clientX,
@@ -153,7 +155,8 @@ const DonutChart = ({
                       fill={
                         isLoading
                           ? `url(#${shimmerGradientId})`
-                          : colorScale(arc.data.label)
+                          : // @ts-ignore
+                            arc.data?.color || colorScale(arc.data.label)
                       }
                       stroke={theme.colors.common.border}
                       strokeWidth={2}

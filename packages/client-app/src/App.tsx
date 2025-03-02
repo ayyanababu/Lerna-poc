@@ -24,11 +24,12 @@ function App() {
         <button onClick={() => setActiveMode('light')}>Light</button>
         <button onClick={() => setActiveMode('dark')}>Dark</button>
       </>
+      <div style={{ height: '100vh', width: '100vw' }}></div>
       <Sortable className="my-cards">
         <SortableCard title="Trade Capture" height={400} width={'auto'}>
           <DonutChart
             data={[
-              { label: 'Successful Trades', value: 85 },
+              { label: 'Successful Trades', value: 85, color: 'orange' },
               { label: 'Failed Trades', value: 15 },
             ]}
             type="semi"

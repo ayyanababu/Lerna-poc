@@ -1,7 +1,7 @@
 import { scaleOrdinal } from '@visx/scale';
 import React from 'react';
 
-export type LegendData = { label: string; value: number }[];
+export type LegendData = { label: string; value: number; color?: string }[];
 
 export interface LegendsProps {
   colorScale: ReturnType<typeof scaleOrdinal<string, string>>;
