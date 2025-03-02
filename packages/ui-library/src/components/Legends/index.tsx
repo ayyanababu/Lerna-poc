@@ -15,6 +15,7 @@ export function Legends({
   hovered,
   setHovered,
   direction = 'row',
+  position = 'top',
   onClick = () => {},
   isLoading = false,
   doStrike = false,
@@ -23,21 +24,56 @@ export function Legends({
 
   if (!data || !colorScale || !setHideIndex || !setHovered) return null;
 
+  const getFlexDirection = () => {
+    if (position === 'left' || position === 'right') return 'column';
+    return direction;
+  };
+
+  const getPosition = () => {
+    switch (position) {
+      case 'left':
+        return {
+          position: 'absolute',
+          left: 0,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          maxWidth: '150px',
+        };
+      case 'right':
+        return {
+          position: 'absolute',
+          right: 0,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          maxWidth: '150px',
+        };
+      case 'bottom':
+        return {
+          marginTop: 'auto',
+        };
+      default: // top
+        return {
+          marginBottom: 'auto',
+        };
+    }
+  };
+
   return (
     <Box
       sx={{
         display: 'flex',
-        flexDirection: direction,
-        width: '100%',
+        flexDirection: getFlexDirection(),
         flexWrap: 'wrap',
         gap: 1,
         backgroundColor: theme.colors.legend.background,
         padding: '8px',
         borderRadius: '4px',
+        flex: '1 1 100%',
+        ...getPosition(),
       }}>
       <LegendOrdinal
         scale={colorScale}
-        direction={direction}
+        direction={getFlexDirection()}
         labelMargin="0 0 0 0">
         {(labels) => (
           <>

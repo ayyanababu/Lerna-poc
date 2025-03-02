@@ -154,8 +154,7 @@ function DonutChart({
                     fill={
                       isLoading
                         ? `url(#${shimmerGradientId})`
-                        : // @ts-ignore
-                          arc.data?.color || colorScale(arc.data.label)
+                        : arc.data?.color || colorScale(arc.data.label)
                     }
                     stroke={theme.colors.common.border}
                     strokeWidth={2}

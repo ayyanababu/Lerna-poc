@@ -112,7 +112,7 @@ export const defaultDarkTheme: Theme = {
       border: '#45556b',
     },
     legend: {
-      text: '#475569',
+      text: '#f1f5f9',
       background: '#0f172a',
     },
     charts: {

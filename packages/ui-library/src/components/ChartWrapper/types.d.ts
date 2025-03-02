@@ -1,7 +1,8 @@
-import { LegendsProps } from '../Legends';
-import { TimestampProps } from '../Timestamp';
-import { TitleProps } from '../Title';
-import { TooltipProps } from '../Tooltip';
+import { ReactNode } from 'react';
+import { LegendsProps } from '../Legends/types.d';
+import { TimestampProps } from '../Timestamp/types.d';
+import { TitleProps } from '../Title/types.d';
+import { TooltipProps } from '../Tooltip/types.d';
 
 export interface OmittedLegendsProps
   extends Omit<
@@ -13,12 +14,10 @@ export interface OmittedLegendsProps
     | 'hovered'
     | 'setHovered'
     | 'isLoading'
-  > {}
+  > { }
 
 export interface OmittedTooltipProps
-  extends Omit<TooltipProps, 'data' | 'top' | 'left' | 'isVisible'> {}
-
-
+  extends Omit<TooltipProps, 'data' | 'top' | 'left' | 'isVisible'> { }
 
 export interface ChartWrapperProps {
   children: ReactNode;

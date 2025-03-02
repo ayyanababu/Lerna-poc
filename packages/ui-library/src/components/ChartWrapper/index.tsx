@@ -22,7 +22,11 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const [canRender, setCanRender] = React.useState(true);
 
-    const { colorScale = defaultColorScale, data: legendData } = legendsProps || {};
+    const {
+      colorScale = defaultColorScale,
+      data: legendData,
+      position = 'top',
+    } = legendsProps || {};
     const { data: toolTipData } = tooltipProps || {};
 
     useEffect(() => {
@@ -48,24 +52,29 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
       };
     }, []);
 
-    return (
-      <Box
-        sx={{
-          position: 'relative',
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-        }}
-        ref={containerRef}
-      >
-        {canRender ? (
-          <>
-            <Title title={title} {...titleProps} />
+    const renderContent = React.useCallback(
+      () => (
+        <>
+          <Title title={title} {...titleProps} />
 
+          <Box
+            sx={{
+              position: 'relative',
+              display: 'flex',
+              flex: '1 1 auto',
+              minHeight: 0,
+              gap: '20px',
+              ...(position === 'left' || position === 'right'
+                ? {
+                    flexDirection: position === 'left' ? 'row' : 'row-reverse',
+                  }
+                : {
+                    flexDirection: 'column',
+                  }),
+            }}>
             <Legends
               {...legendsProps}
+              position={position}
               colorScale={colorScale}
               data={legendData}
             />
@@ -78,15 +87,45 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                 width: '100%',
                 display: 'flex',
                 flex: '1 1 100%',
-              }}
-            >
+                minHeight: 0,
+              }}>
               {children}
             </Box>
+          </Box>
 
-            {toolTipData && <Tooltip {...tooltipProps} data={toolTipData} />}
+          {toolTipData && <Tooltip {...tooltipProps} data={toolTipData} />}
 
-            <Timestamp {...timestampProps} />
-          </>
+          <Timestamp {...timestampProps} />
+        </>
+      ),
+      [
+        title,
+        titleProps,
+        legendsProps,
+        tooltipProps,
+        timestampProps,
+        position,
+        colorScale,
+        legendData,
+        toolTipData,
+        children,
+        ref,
+      ],
+    );
+
+    return (
+      <Box
+        sx={{
+          position: 'relative',
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+        }}
+        ref={containerRef}>
+        {canRender ? (
+          renderContent()
         ) : (
           <p> Cannot Render the chart under this size</p>
         )}

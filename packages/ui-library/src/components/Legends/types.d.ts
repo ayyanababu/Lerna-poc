@@ -3,6 +3,8 @@ import React from 'react';
 
 export type LegendData = { label: string; value: number; color?: string }[];
 
+export type LegendPosition = 'top' | 'bottom' | 'left' | 'right';
+
 export interface LegendsProps {
   colorScale: ReturnType<typeof scaleOrdinal<string, string>>;
   data: LegendData;
@@ -11,6 +13,7 @@ export interface LegendsProps {
   hovered: string | null | undefined;
   setHovered: React.Dispatch<SetStateAction<string | null | undefined>>;
   direction?: 'row' | 'column';
+  position?: LegendPosition;
   onClick?: (data: LegendData, legend: string, index: number) => void;
   isLoading?: boolean;
   doStrike?: boolean;

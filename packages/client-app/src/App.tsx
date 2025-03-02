@@ -29,7 +29,7 @@ function App() {
           <DonutChart
             data={[
               { label: 'Successful Trades', value: 85, color: 'orange' },
-              { label: 'Failed Trades', value: 15, color: '#50c1c2' }
+              { label: 'Failed Trades', value: 15, color: '#50c1c2' },
             ]}
             type="semi"
             hideLabels
@@ -38,19 +38,17 @@ function App() {
             colors={['orange', '#50c1c2']}
             isLoading={isLoading}
             titleProps={{
-              variant: "h6",
-              gutterBottom: true
+              variant: 'h6',
+              gutterBottom: true,
             }}
             legendsProps={{
-              direction: "row",
+              position: 'right',
               onClick: (data, legend, index) => {
                 console.log(`Clicked ${legend} at index ${index}`, data);
               },
-              doStrike: true
+              doStrike: true,
             }}
-            tooltipProps={{
-
-            }}
+            tooltipProps={{}}
           />
         </SortableCard>
 
@@ -59,7 +57,7 @@ function App() {
             data={[
               { label: 'Scheduled', value: 60, color: '#9bc5ef' },
               { label: 'Completed', value: 15, color: '#50c1c2' },
-              { label: 'Seat', value: 25, color: '#fad176' }
+              { label: 'Seat', value: 25, color: '#fad176' },
             ]}
             type="full"
             hideLabels={false}
@@ -68,15 +66,15 @@ function App() {
             colors={['#9bc5ef', '#50c1c2', '#fad176']}
             isLoading={isLoading}
             titleProps={{
-              variant: "subtitle1",
-              align: "center"
+              variant: 'subtitle1',
+              align: 'center',
             }}
             legendsProps={{
-              direction: "column",
+              position: 'left',
               onClick: (data, legend, index) => {
                 console.log(`Clicked ${legend} at index ${index}`, data);
               },
-              doStrike: true
+              doStrike: true,
             }}
             tooltipProps={{}}
           />
@@ -142,15 +140,15 @@ function App() {
             colors={['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc']}
             isLoading={isLoading}
             titleProps={{
-              variant: "h6",
-              align: "left"
+              variant: 'h6',
+              align: 'left',
             }}
             legendsProps={{
-              direction: "row",
+              direction: 'row',
               onClick: (data, legend, index) => {
                 console.log(`Clicked ${legend} at index ${index}`, data);
               },
-              doStrike: true
+              doStrike: true,
             }}
             tooltipProps={{}}
           />
@@ -216,15 +214,15 @@ function App() {
             colors={['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc']}
             isLoading={isLoading}
             titleProps={{
-              variant: "h6",
-              align: "left"
+              variant: 'h6',
+              align: 'left',
             }}
             legendsProps={{
-              direction: "row",
+              direction: 'row',
               onClick: (data, legend, index) => {
                 console.log(`Clicked ${legend} at index ${index}`, data);
               },
-              doStrike: true
+              doStrike: true,
             }}
             tooltipProps={{}}
           />
