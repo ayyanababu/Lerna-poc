@@ -42,7 +42,7 @@ export function SortableComponent({ children, className }: SortableProps) {
       sx={{
         gap: '16px',
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
+        gridTemplateColumns: '1fr 1fr 1fr',
         '& .sortable-ghost': {
           backgroundColor: '#8fc5ff',
           borderRadius: '8px',
@@ -50,8 +50,7 @@ export function SortableComponent({ children, className }: SortableProps) {
             opacity: 0,
           },
         },
-      }}
-    >
+      }}>
       {state.map((item) => (
         <div key={item.id} data-id={item.id}>
           {childrenArray[item.id]}

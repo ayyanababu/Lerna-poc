@@ -70,7 +70,7 @@ function App() {
               align: 'center',
             }}
             legendsProps={{
-              position: 'left',
+              position: 'top',
               onClick: (data, legend, index) => {
                 console.log(`Clicked ${legend} at index ${index}`, data);
               },

@@ -1,8 +1,8 @@
 import {
   ChartThemeProvider,
+  DonutChart,
   Sortable,
   SortableCard,
-  DonutChart,
 } from '@my-org/ui-library';
 import { useEffect, useState } from 'react';
 
@@ -40,7 +40,7 @@ function App2() {
               gutterBottom: true,
             }}
             legendsProps={{
-              position: 'right',
+              position: 'top',
               onClick: (data, legend, index) => {
                 console.log(`Clicked ${legend} at index ${index}`, data);
               },
@@ -68,7 +68,115 @@ function App2() {
               align: 'center',
             }}
             legendsProps={{
-              position: 'left',
+              position: 'top',
+              onClick: (data, legend, index) => {
+                console.log(`Clicked ${legend} at index ${index}`, data);
+              },
+              doStrike: true,
+            }}
+            tooltipProps={{}}
+          />
+        </SortableCard>
+        <SortableCard title="Trade Capture" height={400} width={'auto'}>
+          <DonutChart
+            data={[
+              { label: 'Successful Trades', value: 85, color: 'orange' },
+              { label: 'Failed Trades', value: 15, color: '#50c1c2' },
+            ]}
+            type="semi"
+            hideLabels
+            title="Trade Success Rate"
+            timestamp={new Date().toISOString()}
+            colors={['orange', '#50c1c2']}
+            isLoading={isLoading}
+            titleProps={{
+              variant: 'h6',
+              gutterBottom: true,
+            }}
+            legendsProps={{
+              position: 'top',
+              onClick: (data, legend, index) => {
+                console.log(`Clicked ${legend} at index ${index}`, data);
+              },
+              doStrike: true,
+            }}
+            tooltipProps={{}}
+          />
+        </SortableCard>
+
+        <SortableCard title="Trade Notification" height={400} width={'auto'}>
+          <DonutChart
+            data={[
+              { label: 'Scheduled', value: 60, color: '#9bc5ef' },
+              { label: 'Completed', value: 15, color: '#50c1c2' },
+              { label: 'Seat', value: 25, color: '#fad176' },
+            ]}
+            type="full"
+            hideLabels={false}
+            title="Trade Status Distribution"
+            timestamp={new Date().toISOString()}
+            colors={['#9bc5ef', '#50c1c2', '#fad176']}
+            isLoading={isLoading}
+            titleProps={{
+              variant: 'subtitle1',
+              align: 'center',
+            }}
+            legendsProps={{
+              position: 'top',
+              onClick: (data, legend, index) => {
+                console.log(`Clicked ${legend} at index ${index}`, data);
+              },
+              doStrike: true,
+            }}
+            tooltipProps={{}}
+          />
+        </SortableCard>
+        <SortableCard title="Trade Capture" height={400} width={'auto'}>
+          <DonutChart
+            data={[
+              { label: 'Successful Trades', value: 85, color: 'orange' },
+              { label: 'Failed Trades', value: 15, color: '#50c1c2' },
+            ]}
+            type="semi"
+            hideLabels
+            title="Trade Success Rate"
+            timestamp={new Date().toISOString()}
+            colors={['orange', '#50c1c2']}
+            isLoading={isLoading}
+            titleProps={{
+              variant: 'h6',
+              gutterBottom: true,
+            }}
+            legendsProps={{
+              position: 'top',
+              onClick: (data, legend, index) => {
+                console.log(`Clicked ${legend} at index ${index}`, data);
+              },
+              doStrike: true,
+            }}
+            tooltipProps={{}}
+          />
+        </SortableCard>
+
+        <SortableCard title="Trade Notification" height={400} width={'auto'}>
+          <DonutChart
+            data={[
+              { label: 'Scheduled', value: 60, color: '#9bc5ef' },
+              { label: 'Completed', value: 15, color: '#50c1c2' },
+              { label: 'Seat', value: 25, color: '#fad176' },
+            ]}
+            type="full"
+            hideLabels={false}
+            title="Trade Status Distribution"
+            timestamp={new Date().toISOString()}
+            colors={['#9bc5ef', '#50c1c2', '#fad176']}
+            isLoading={isLoading}
+            titleProps={{
+              variant: 'subtitle1',
+              align: 'center',
+            }}
+            legendsProps={{
+              position: 'top',
               onClick: (data, legend, index) => {
                 console.log(`Clicked ${legend} at index ${index}`, data);
               },
