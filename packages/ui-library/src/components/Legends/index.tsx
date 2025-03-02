@@ -26,7 +26,7 @@ export function Legends({
 
   const getFlexDirection = () => {
     if (position === 'left' || position === 'right') return 'column';
-    return direction;
+    return 'row';
   };
 
   const getPosition = () => {
@@ -48,13 +48,9 @@ export function Legends({
           maxWidth: '150px',
         };
       case 'bottom':
-        return {
-          marginTop: 'auto',
-        };
+        return {};
       default: // top
-        return {
-          marginBottom: 'auto',
-        };
+        return {};
     }
   };
 
@@ -64,11 +60,9 @@ export function Legends({
         display: 'flex',
         flexDirection: getFlexDirection(),
         flexWrap: 'wrap',
-        gap: 1,
+        gap: '12px',
         backgroundColor: theme.colors.legend.background,
-        padding: '8px',
         borderRadius: '4px',
-        flex: '1 1 100%',
         ...getPosition(),
       }}>
       <LegendOrdinal
@@ -107,7 +101,6 @@ export function Legends({
                     gap: '12px',
                     display: 'flex',
                     alignItems: 'center',
-                    marginRight: 'auto',
                     cursor: 'pointer',
                     userSelect: 'none',
                     opacity:
@@ -130,7 +123,7 @@ export function Legends({
                     sx={{
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '4px',
+                      gap: '8px',
                       alignItems: 'flex-start',
                     }}>
                     <Typography

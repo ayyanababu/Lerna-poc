@@ -42,7 +42,7 @@ function App() {
               gutterBottom: true,
             }}
             legendsProps={{
-              position: 'right',
+              position: 'top',
               onClick: (data, legend, index) => {
                 console.log(`Clicked ${legend} at index ${index}`, data);
               },
