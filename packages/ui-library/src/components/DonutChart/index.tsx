@@ -148,47 +148,45 @@ function DonutChart({
                     scale: hoveredArc === arc.data.label ? 1.1 : 1,
                     cursor: 'pointer',
                     transition: 'all 250ms ease-in-out',
-                  }}
-                >
+                  }}>
                   <path
                     d={arcGenerator(arc)}
                     fill={
-                        isLoading
-                          ? `url(#${shimmerGradientId})`
-                          : // @ts-ignore
+                      isLoading
+                        ? `url(#${shimmerGradientId})`
+                        : // @ts-ignore
                           arc.data?.color || colorScale(arc.data.label)
-                      }
+                    }
                     stroke={theme.colors.common.border}
                     strokeWidth={2}
                     style={{
                       filter:
-                          hoveredArc === arc.data.label
-                            ? 'saturate(150%)'
-                            : 'saturate(100%)',
+                        hoveredArc === arc.data.label
+                          ? 'saturate(150%)'
+                          : 'saturate(100%)',
                     }}
                   />
                   {hoveredArc === arc.data.label && (
-                  <path
-                    d={shadowArcGenerator(arc)}
-                    fill={colorScale(arc.data.label)}
-                    opacity={0.2}
-                  />
+                    <path
+                      d={shadowArcGenerator(arc)}
+                      fill={arc.data?.color || colorScale(arc.data.label)}
+                      opacity={0.2}
+                    />
                   )}
                   {!isLoading && !hideLabels && (
-                  <text
-                    x={centroidX}
-                    y={centroidY}
-                    dy=".33em"
-                    fill={theme.colors.common.text}
-                    fontSize={10}
-                    textAnchor="middle"
-                    fontWeight={
-                          hoveredArc === arc.data.label ? 'bold' : 'normal'
-                        }
-                    fontFamily={theme.typography.fontFamily}
-                  >
-                    {arc.data.label}
-                  </text>
+                    <text
+                      x={centroidX}
+                      y={centroidY}
+                      dy=".33em"
+                      fill={theme.colors.common.text}
+                      fontSize={10}
+                      textAnchor="middle"
+                      fontWeight={
+                        hoveredArc === arc.data.label ? 'bold' : 'normal'
+                      }
+                      fontFamily={theme.typography.fontFamily}>
+                      {arc.data.label}
+                    </text>
                   )}
                 </g>
               );

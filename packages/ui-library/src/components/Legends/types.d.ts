@@ -13,4 +13,5 @@ export interface LegendsProps {
   direction?: 'row' | 'column';
   onClick?: (data: LegendData, legend: string, index: number) => void;
   isLoading?: boolean;
+  doStrike?: boolean;
 }

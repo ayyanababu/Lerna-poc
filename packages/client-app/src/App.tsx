@@ -46,6 +46,7 @@ function App() {
               { label: 'Seat', value: 25 },
             ]}
             timestamp={new Date().toISOString()}
+            hideLabels
             isLoading={isLoading}
           />
         </SortableCard>

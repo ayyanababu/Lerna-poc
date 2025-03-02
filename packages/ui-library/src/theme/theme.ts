@@ -18,7 +18,7 @@ export const defaultLightTheme: Theme = {
       border: '#e2e8f0',
     },
     legend: {
-      text: '#64748b',
+      text: '#475569',
       background: '#ffffff',
     },
     charts: {
@@ -112,8 +112,8 @@ export const defaultDarkTheme: Theme = {
       border: '#45556b',
     },
     legend: {
-      text: '#94a3b8',
-      background: '#1e293b',
+      text: '#475569',
+      background: '#0f172a',
     },
     charts: {
       bar: [
