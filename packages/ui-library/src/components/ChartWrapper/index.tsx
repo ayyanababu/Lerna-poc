@@ -5,7 +5,7 @@ import { Legends } from '../Legends';
 import { Timestamp } from '../Timestamp';
 import { Title } from '../Title';
 import { Tooltip } from '../Tooltip';
-import { ChartWrapperProps } from './types.d';
+import { ChartWrapperProps } from './types';
 
 const defaultColorScale = scaleOrdinal<string, string>({
   domain: ['default'],

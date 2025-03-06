@@ -7,10 +7,8 @@ import { useTheme } from '../../hooks/useTheme';
 import { Title } from '../Title';
 import { SortableCardProps } from './types.d';
 
-export const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
-  ({
-    children, title, height, width,
-  }, ref) => {
+const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
+  ({ children, title, height, width }, ref) => {
     const { theme } = useTheme();
     return (
       <Card
@@ -52,9 +50,13 @@ export const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
           </Box>
         </Box>
 
-        <CardContent sx={{
-          display: 'flex', padding: '8px', height, width,
-        }}
+        <CardContent
+          sx={{
+            display: 'flex',
+            padding: '8px',
+            height,
+            width,
+          }}
         >
           {children}
         </CardContent>
@@ -62,3 +64,6 @@ export const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
     );
   },
 );
+
+
+export default SortableCard;

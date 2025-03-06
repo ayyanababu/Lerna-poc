@@ -1,5 +1,5 @@
 import { scaleOrdinal } from '@visx/scale';
-import React from 'react';
+import React, { SetStateAction } from 'react';
 
 export type LegendData = { label: string; value: number; color?: string }[];
 

@@ -5,13 +5,10 @@ import React, {
 import Sortable from 'sortablejs';
 import { SortableProps } from './types.d';
 
-export function SortableComponent({ children, className }: SortableProps) {
+export default function SortableComponent({ children, className }: SortableProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<{ id: number }[]>([]);
-  const childrenArray = useMemo(
-    () => React.Children.toArray(children),
-    [children],
-  );
+  const childrenArray = useMemo(() => React.Children.toArray(children), [children]);
 
   useEffect(() => {
     setState(childrenArray.map((_, index) => ({ id: index })));
@@ -50,7 +47,8 @@ export function SortableComponent({ children, className }: SortableProps) {
             opacity: 0,
           },
         },
-      }}>
+      }}
+    >
       {state.map((item) => (
         <div key={item.id} data-id={item.id}>
           {childrenArray[item.id]}

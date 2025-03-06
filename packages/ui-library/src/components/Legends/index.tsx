@@ -5,7 +5,7 @@ import { capitalize, lowerCase } from 'lodash-es';
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
-import { LegendsProps } from './types.d';
+import { LegendsProps } from './types';
 
 export function Legends({
   colorScale,

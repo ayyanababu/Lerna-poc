@@ -1,4 +1,4 @@
-import { DonutData } from './types.d';
+import { DonutData } from './types';
 
 export const mockFullDonutData: DonutData = [
   { label: 'Loading A', value: 400 },

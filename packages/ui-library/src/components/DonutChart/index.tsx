@@ -3,14 +3,14 @@ import { useParentSize } from '@visx/responsive';
 import { scaleOrdinal } from '@visx/scale';
 import { Pie } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
-import { arc as d3Arc, PieArcDatum } from 'd3-shape';
+import { arc as d3Arc } from 'd3-shape';
 import React, { useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
 import { mockFullDonutData, mockSemiDonutData } from './mockdata';
-import { DonutChartProps } from './types.d';
+import { DonutChartProps } from './types';
 
 function DonutChart({
   data: _data,
@@ -31,19 +31,13 @@ function DonutChart({
 
   const { theme } = useTheme();
 
-  const {
-    showTooltip,
-    hideTooltip,
-    tooltipData,
-    tooltipLeft,
-    tooltipTop,
-    tooltipOpen,
-  } = useTooltip<TooltipData>();
+  const { showTooltip, hideTooltip, tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
+    useTooltip<TooltipData>();
   const [hoveredArc, setHoveredArc] = useState<string | null>();
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const radius = useMemo(
     () => Math.min(width, height) / (type === 'semi' ? 2 : 2.5),
-    [type, width, height],
+    [type, width, height]
   );
   const innerRadius = useMemo(() => radius * 0.6, [radius]);
   const cornerRadius = 6;
@@ -55,7 +49,10 @@ function DonutChart({
     return mockFullDonutData;
   }, [isLoading, _data, type]);
 
-  const filteredData = useMemo(() => data.filter((_, i) => !hideIndex.includes(i)), [hideIndex, data]);
+  const filteredData = useMemo(
+    () => data.filter((_, i) => !hideIndex.includes(i)),
+    [hideIndex, data]
+  );
 
   const colorScale = scaleOrdinal<string, string>({
     domain: data.map((d) => d.label),
@@ -87,7 +84,7 @@ function DonutChart({
       timestampProps={{ timestamp, isLoading }}
     >
       <svg width={width} height={height}>
-        <SvgShimmer />
+        {isLoading && <SvgShimmer />}
 
         <Group top={height / (type === 'semi' ? 1.5 : 2)} left={width / 2}>
           <Pie
@@ -100,96 +97,83 @@ function DonutChart({
             startAngle={type === 'semi' ? -Math.PI / 2 : 0}
             endAngle={type === 'semi' ? Math.PI / 2 : 360}
           >
-            {(pie) => pie.arcs.map((arc, index) => {
-              const [centroidX, centroidY] = pie.path.centroid(arc);
+            {(pie) =>
+              pie.arcs.map((arc, index) => {
+                const [centroidX, centroidY] = pie.path.centroid(arc);
 
-              const isHovered = hoveredArc === arc.data.label || !hoveredArc;
+                const isHovered = hoveredArc === arc.data.label || !hoveredArc;
 
-              const arcGenerator = d3Arc()
-                .innerRadius(innerRadius)
-                .outerRadius(radius)
-                .cornerRadius(cornerRadius)
-                .padAngle(padAngle) as unknown as (
-                    d: PieArcDatum<{
-                      label: string;
-                      value: number;
-                    }>,
-                  ) => string;
+                const arcGenerator = d3Arc()
+                  .innerRadius(innerRadius)
+                  .outerRadius(radius)
+                  .cornerRadius(cornerRadius)
+                  .padAngle(padAngle);
 
-              const shadowArcGenerator = d3Arc()
-                .innerRadius(innerRadius * 1.7)
-                .outerRadius(isHovered ? radius + 10 : radius + 15)
-                .cornerRadius(cornerRadius) as unknown as (
-                    d: PieArcDatum<{
-                      label: string;
-                      value: number;
-                    }>,
-                  ) => string;
+                const shadowArcGenerator = d3Arc()
+                  .innerRadius(innerRadius * 1.7)
+                  .outerRadius(isHovered ? radius + 10 : radius + 15)
+                  .cornerRadius(cornerRadius);
 
-              return (
-                <g
-                  key={`arc-${index}`}
-                  onMouseEnter={(
-                    event: React.MouseEvent<SVGGElement, MouseEvent>,
-                  ) => {
-                    showTooltip({
-                      tooltipData: arc.data,
-                      tooltipLeft: event.clientX,
-                      tooltipTop: event.clientY,
-                    });
-                    setHoveredArc(arc.data.label);
-                  }}
-                  onMouseLeave={() => {
-                    hideTooltip();
-                    setHoveredArc(null);
-                  }}
-                  style={{
-                    opacity: isHovered ? 1 : 0.5,
-                    scale: hoveredArc === arc.data.label ? 1.1 : 1,
-                    cursor: 'pointer',
-                    transition: 'all 250ms ease-in-out',
-                  }}>
-                  <path
-                    d={arcGenerator(arc)}
-                    fill={
-                      isLoading
-                        ? `url(#${shimmerGradientId})`
-                        : arc.data?.color || colorScale(arc.data.label)
-                    }
-                    stroke={theme.colors.common.border}
-                    strokeWidth={2}
-                    style={{
-                      filter:
-                        hoveredArc === arc.data.label
-                          ? 'saturate(150%)'
-                          : 'saturate(100%)',
+                return (
+                  <g
+                    key={`arc-${arc.data.label}`}
+                    onMouseEnter={(event: React.MouseEvent<SVGGElement, MouseEvent>) => {
+                      showTooltip({
+                        tooltipData: arc.data,
+                        tooltipLeft: event.clientX,
+                        tooltipTop: event.clientY,
+                      });
+                      setHoveredArc(arc.data.label);
                     }}
-                  />
-                  {hoveredArc === arc.data.label && (
+                    onMouseLeave={() => {
+                      hideTooltip();
+                      setHoveredArc(null);
+                    }}
+                    style={{
+                      opacity: isHovered ? 1 : 0.5,
+                      scale: hoveredArc === arc.data.label ? 1.1 : 1,
+                      cursor: 'pointer',
+                      transition: 'all 250ms ease-in-out',
+                    }}
+                  >
                     <path
-                      d={shadowArcGenerator(arc)}
-                      fill={arc.data?.color || colorScale(arc.data.label)}
-                      opacity={0.2}
-                    />
-                  )}
-                  {!isLoading && !hideLabels && (
-                    <text
-                      x={centroidX}
-                      y={centroidY}
-                      dy=".33em"
-                      fill={theme.colors.common.text}
-                      fontSize={10}
-                      textAnchor="middle"
-                      fontWeight={
-                        hoveredArc === arc.data.label ? 'bold' : 'normal'
+                      d={arcGenerator(arc)}
+                      fill={
+                        isLoading
+                          ? `url(#${shimmerGradientId})`
+                          : arc.data?.color || colorScale(arc.data.label)
                       }
-                      fontFamily={theme.typography.fontFamily}>
-                      {arc.data.label}
-                    </text>
-                  )}
-                </g>
-              );
-            })}
+                      stroke={theme.colors.common.border}
+                      strokeWidth={2}
+                      style={{
+                        filter: hoveredArc === arc.data.label ? 'saturate(150%)' : 'saturate(100%)',
+                      }}
+                    />
+                    {hoveredArc === arc.data.label && (
+                      <path
+                        d={shadowArcGenerator(arc)}
+                        fill={arc.data?.color || colorScale(arc.data.label)}
+                        opacity={0.2}
+                      />
+                    )}
+                    {!isLoading && !hideLabels && (
+                      <text
+                        x={centroidX}
+                        y={centroidY}
+                        dy=".33em"
+                        fill={theme.colors.common.text}
+                        fontSize={10}
+                        textAnchor="middle"
+                        fontWeight={hoveredArc === arc.data.label ? 'bold' : 'normal'}
+                        fontFamily={theme.typography.fontFamily}
+                      >
+                        {arc.data.label}
+                      </text>
+                    )}
+                  </g>
+                );
+              })
+            }
           </Pie>
         </Group>
       </svg>
@@ -197,4 +181,4 @@ function DonutChart({
   );
 }
 
-export { DonutChart };
+export default DonutChart;
