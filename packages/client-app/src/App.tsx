@@ -1,9 +1,12 @@
 import {
   ChartThemeProvider,
   DonutChart,
-  GroupedBarChart,
+  HorizontalBarChart,
+  HorizontalGroupedBarChart,
   Sortable,
   SortableCard,
+  VerticalBarChart,
+  VerticalGroupedBarChart
 } from '@my-org/ui-library';
 import { useEffect, useState } from 'react';
 import './App.css';
@@ -25,6 +28,7 @@ function App() {
         <button onClick={() => setActiveMode('dark')}>Dark</button>
       </>
       <Sortable className="my-cards">
+        {/* Original Donut Chart examples */}
         <SortableCard title="Trade Capture" height={400} width={'auto'}>
           <DonutChart
             data={[
@@ -80,8 +84,62 @@ function App() {
           />
         </SortableCard>
 
-        <SortableCard title="Trade Notification" height={400} width={'auto'}>
-          <GroupedBarChart
+        {/* VerticalBarChart example */}
+        <SortableCard title="Monthly Performance" height={400} width={'auto'}>
+          <VerticalBarChart
+            data={[
+              { label: 'Jan', value: 45, color: '#9bc5ef' },
+              { label: 'Feb', value: 60, color: '#50c1c2' },
+              { label: 'Mar', value: 35, color: '#fad176' },
+              { label: 'Apr', value: 70, color: '#407abc' },
+              { label: 'May', value: 55, color: '#93a3bc' },
+              { label: 'Jun', value: 40, color: 'orange' },
+            ]}
+            title="Monthly Trade Volume"
+            timestamp={new Date().toISOString()}
+            isLoading={isLoading}
+            titleProps={{
+              variant: 'h6',
+              align: 'left',
+            }}
+            legendsProps={{
+              position: 'top',
+              direction: 'row',
+              doStrike: true,
+            }}
+            tooltipProps={{}}
+          />
+        </SortableCard>
+
+        {/* HorizontalBarChart example */}
+        <SortableCard title="Product Performance" height={400} width={'auto'}>
+          <HorizontalBarChart
+            data={[
+              { label: 'Product A', value: 75, color: '#9bc5ef' },
+              { label: 'Product B', value: 45, color: '#50c1c2' },
+              { label: 'Product C', value: 90, color: '#fad176' },
+              { label: 'Product D', value: 30, color: '#407abc' },
+              { label: 'Product E', value: 60, color: '#93a3bc' },
+            ]}
+            title="Product Sales Distribution"
+            timestamp={new Date().toISOString()}
+            isLoading={isLoading}
+            titleProps={{
+              variant: 'h6',
+              align: 'left',
+            }}
+            legendsProps={{
+              position: 'top',
+              direction: 'row',
+              doStrike: true,
+            }}
+            tooltipProps={{}}
+          />
+        </SortableCard>
+
+        {/* Original GroupedBarChart examples (now using VerticalGroupedBarChart) */}
+        <SortableCard title="Quarterly Trade Distribution" height={400} width={'auto'}>
+          <VerticalGroupedBarChart
             width={600}
             height={200}
             data={[
@@ -154,8 +212,9 @@ function App() {
           />
         </SortableCard>
 
-        <SortableCard title="Trade Notification" height={400} width={'auto'}>
-          <GroupedBarChart
+        {/* VerticalGroupedBarChart with stacked type */}
+        <SortableCard title="Regional Trade Distribution" height={400} width={'auto'}>
+          <VerticalGroupedBarChart
             width={600}
             height={200}
             type="stacked"
@@ -212,6 +271,136 @@ function App() {
             title="Regional Trade Distribution (Stacked)"
             timestamp={new Date().toISOString()}
             colors={['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc']}
+            isLoading={isLoading}
+            titleProps={{
+              variant: 'h6',
+              align: 'left',
+            }}
+            legendsProps={{
+              direction: 'row',
+              onClick: (data, legend, index) => {
+                console.log(`Clicked ${legend} at index ${index}`, data);
+              },
+              doStrike: true,
+            }}
+            tooltipProps={{}}
+          />
+        </SortableCard>
+
+        {/* HorizontalGroupedBarChart with grouped type */}
+        <SortableCard title="Department Performance" height={400} width={'auto'}>
+          <HorizontalGroupedBarChart
+            width={600}
+            height={200}
+            type="grouped"
+            data={[
+              {
+                label: 'Sales',
+                data: {
+                  q1: 45,
+                  q2: 60,
+                  q3: 38,
+                  q4: 72,
+                },
+              },
+              {
+                label: 'Marketing',
+                data: {
+                  q1: 35,
+                  q2: 42,
+                  q3: 53,
+                  q4: 48,
+                },
+              },
+              {
+                label: 'Operations',
+                data: {
+                  q1: 52,
+                  q2: 48,
+                  q3: 45,
+                  q4: 60,
+                },
+              },
+              {
+                label: 'Finance',
+                data: {
+                  q1: 30,
+                  q2: 32,
+                  q3: 36,
+                  q4: 40,
+                },
+              },
+            ]}
+            groupKeys={['q1', 'q2', 'q3', 'q4']}
+            margin={{ top: 20, right: 50, bottom: 30, left: 120 }}
+            title="Quarterly Department Performance"
+            timestamp={new Date().toISOString()}
+            colors={['#9bc5ef', '#50c1c2', '#fad176', '#407abc']}
+            isLoading={isLoading}
+            titleProps={{
+              variant: 'h6',
+              align: 'left',
+            }}
+            legendsProps={{
+              direction: 'row',
+              onClick: (data, legend, index) => {
+                console.log(`Clicked ${legend} at index ${index}`, data);
+              },
+              doStrike: true,
+            }}
+            tooltipProps={{}}
+          />
+        </SortableCard>
+
+        {/* HorizontalGroupedBarChart with stacked type */}
+        <SortableCard title="Budget Allocation" height={400} width={'auto'}>
+          <HorizontalGroupedBarChart
+            width={600}
+            height={200}
+            type="stacked"
+            data={[
+              {
+                label: 'Team Alpha',
+                data: {
+                  payroll: 45000,
+                  equipment: 12000,
+                  software: 8000,
+                  travel: 5000,
+                },
+              },
+              {
+                label: 'Team Beta',
+                data: {
+                  payroll: 38000,
+                  equipment: 10000,
+                  software: 12000,
+                  travel: 7000,
+                },
+              },
+              {
+                label: 'Team Gamma',
+                data: {
+                  payroll: 51000,
+                  equipment: 15000,
+                  software: 6000,
+                  travel: 8000,
+                },
+              },
+              {
+                label: 'Team Delta',
+                data: {
+                  payroll: 42000,
+                  equipment: 13000,
+                  software: 9000,
+                  travel: 4000,
+                },
+              },
+            ]}
+            groupKeys={['payroll', 'equipment', 'software', 'travel']}
+            margin={{ top: 20, right: 50, bottom: 30, left: 120 }}
+            title="Budget Allocation by Team (Stacked)"
+            timestamp={new Date().toISOString()}
+            colors={['#9bc5ef', '#50c1c2', '#fad176', '#407abc']}
             isLoading={isLoading}
             titleProps={{
               variant: 'h6',
