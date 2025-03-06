@@ -5,7 +5,7 @@ import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { Bar, stack } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
-import { default as React, useMemo, useState } from 'react';
+import { default as React, useCallback, useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
 import { mockGroupedBarChartData } from '../GroupedBarChart/mockdata';
@@ -175,7 +175,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
             scaleBand<string>({
                 domain: filteredData.map((d) => String(d.label)),
                 range: [0, innerWidth],
-                padding: 0.2,
+                padding: 0.4, // Increased padding for thinner bars
             }),
         [filteredData, innerWidth],
     );
@@ -185,7 +185,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
             scaleBand<string>({
                 domain: activeKeys,
                 range: [0, categoryScale.bandwidth()],
-                padding: 0.1,
+                padding: 0.3, // Increased padding for thinner bars
             }),
         [activeKeys, categoryScale],
     );
@@ -233,16 +233,8 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         }
     };
 
-    // Render bars based on chart type
-    const renderBars = () => {
-        if (type === 'stacked' && stackedData) {
-            return renderStackedBars();
-        }
-        return renderGroupedBars();
-    };
-
     // Render stacked bars
-    const renderStackedBars = () => {
+    const renderStackedBars = useCallback(() => {
         if (!stackedData) return null;
 
         return filteredData.map((categoryData, categoryIndex) => {
@@ -281,10 +273,10 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                 });
             });
         });
-    };
+    }, [stackedData, filteredData, categoryScale, valueScale, groupColorScale, activeKeys, hoveredGroupKey, isLoading]);
 
     // Render grouped bars
-    const renderGroupedBars = () =>
+    const renderGroupedBars = useCallback(() =>
         filteredData.map((categoryData, index) => {
             const category = String(categoryData.label);
             const categoryX = categoryScale(category) || 0;
@@ -326,7 +318,15 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                     </g>
                 );
             });
-        });
+        }), [filteredData, categoryScale, groupScale, valueScale, innerHeight, groupColorScale, hideIndex, hoveredGroupKey, isLoading]);
+
+    // Render bars based on chart type
+    const renderBars = useCallback(() => {
+        if (type === 'stacked' && stackedData) {
+            return renderStackedBars();
+        }
+        return renderGroupedBars();
+    }, [type, stackedData, renderStackedBars, renderGroupedBars]);
 
     return (
         <ChartWrapper
@@ -353,7 +353,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
             timestampProps={{ timestamp, isLoading }}
         >
             <svg width={width} height={height}>
-                <SvgShimmer />
+                {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
                     {/* Y-Axis */}

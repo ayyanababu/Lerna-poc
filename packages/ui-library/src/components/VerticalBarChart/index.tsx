@@ -10,6 +10,7 @@ import { ChartWrapper } from '../ChartWrapper';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
+import { mockVerticalBarChartData } from './mockdata';
 import { DataPoint, VerticalBarChartProps } from './types';
 
 const DEFAULT_MARGIN = {
@@ -53,9 +54,9 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     const { showTooltip, hideTooltip, tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
         useTooltip<TooltipData>();
 
-    // Use the provided data, or empty array if loading
+    // Use the provided data, or mock data if loading
     const data = useMemo<DataPoint[]>(
-        () => (isLoading ? [] : _data),
+        () => (isLoading ? mockVerticalBarChartData : _data),
         [isLoading, _data],
     );
 
@@ -76,7 +77,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             scaleBand<string>({
                 domain: filteredData.map((d) => String(d.label)),
                 range: [0, innerWidth],
-                padding: 0.4,
+                padding: 0.6, // Increased padding for thinner bars
                 round: true,
             }),
         [filteredData, innerWidth],
@@ -156,7 +157,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             timestampProps={{ timestamp, isLoading }}
         >
             <svg width={width} height={height}>
-                <SvgShimmer />
+                {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
                     {/* Y-Axis */}

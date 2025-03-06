@@ -10,6 +10,7 @@ import { ChartWrapper } from '../ChartWrapper';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
+import { mockHorizontalBarChartData } from './mockdata';
 import { DataPoint, HorizontalBarChartProps } from './types';
 
 const DEFAULT_MARGIN = {
@@ -53,9 +54,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     const { showTooltip, hideTooltip, tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
         useTooltip<TooltipData>();
 
-    // Use the provided data, or empty array if loading
+    // Use the provided data, or mock data if loading
     const data = useMemo<DataPoint[]>(
-        () => (isLoading ? [] : _data),
+        () => (isLoading ? mockHorizontalBarChartData : _data),
         [isLoading, _data],
     );
 
@@ -77,7 +78,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             scaleBand<string>({
                 domain: filteredData.map((d) => String(d.label)),
                 range: [0, innerHeight],
-                padding: 0.4,
+                padding: 0.6, // Increased padding for thinner bars
                 round: true,
             }),
         [filteredData, innerHeight],
@@ -157,7 +158,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             timestampProps={{ timestamp, isLoading }}
         >
             <svg width={width} height={height}>
-                <SvgShimmer />
+                {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
                     {/* Y-Axis (labels) */}

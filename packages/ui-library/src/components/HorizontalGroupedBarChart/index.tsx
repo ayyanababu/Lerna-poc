@@ -175,7 +175,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
             scaleBand<string>({
                 domain: filteredData.map((d) => String(d.label)),
                 range: [0, innerHeight],
-                padding: 0.2,
+                padding: 0.4, // Increased padding for thinner bars
             }),
         [filteredData, innerHeight],
     );
@@ -185,7 +185,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
             scaleBand<string>({
                 domain: activeKeys,
                 range: [0, categoryScale.bandwidth()],
-                padding: 0.1,
+                padding: 0.3, // Increased padding for thinner bars
             }),
         [activeKeys, categoryScale],
     );
@@ -354,7 +354,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
             timestampProps={{ timestamp, isLoading }}
         >
             <svg width={width} height={height}>
-                <SvgShimmer />
+                {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
                     {/* Y-Axis (categories) */}
