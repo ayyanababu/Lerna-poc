@@ -1,12 +1,11 @@
 import { Typography } from '@mui/material';
+import { withBoundingRects } from '@visx/bounds';
 import { Tooltip as VisxTooltip } from '@visx/tooltip';
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { TooltipProps } from './types.d';
 
-export function Tooltip({
-  top, left, data, isVisible = true,
-}: TooltipProps) {
+function Tooltip({ top, left, data, isVisible = true }: TooltipProps) {
   const { theme } = useTheme();
 
   if (!isVisible) return null;
@@ -54,3 +53,5 @@ export function Tooltip({
     </VisxTooltip>
   );
 }
+
+export default withBoundingRects(Tooltip);

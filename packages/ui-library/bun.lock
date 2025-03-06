@@ -9,6 +9,7 @@
         "@mui/styled-engine-sc": "^6.4.3",
         "@types/lodash-es": "^4.17.12",
         "@visx/axis": "^3.12.0",
+        "@visx/bounds": "^3.12.0",
         "@visx/event": "^3.12.0",
         "@visx/grid": "^3.12.0",
         "@visx/group": "^3.12.0",

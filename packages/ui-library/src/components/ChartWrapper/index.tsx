@@ -4,7 +4,7 @@ import React, { forwardRef, useEffect, useRef } from 'react';
 import { Legends } from '../Legends';
 import { Timestamp } from '../Timestamp';
 import { Title } from '../Title';
-import { Tooltip } from '../Tooltip';
+import Tooltip from '../Tooltip';
 import { ChartWrapperProps } from './types';
 
 const defaultColorScale = scaleOrdinal<string, string>({

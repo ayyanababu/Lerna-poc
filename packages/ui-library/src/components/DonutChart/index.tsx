@@ -107,12 +107,12 @@ function DonutChart({
                   .innerRadius(innerRadius)
                   .outerRadius(radius)
                   .cornerRadius(cornerRadius)
-                  .padAngle(padAngle);
+                  .padAngle(padAngle) as unknown as (d: typeof arc) => string;
 
                 const shadowArcGenerator = d3Arc()
                   .innerRadius(innerRadius * 1.7)
                   .outerRadius(isHovered ? radius + 10 : radius + 15)
-                  .cornerRadius(cornerRadius);
+                  .cornerRadius(cornerRadius) as unknown as (d: typeof arc) => string;
 
                 return (
                   <g
