@@ -1,7 +1,7 @@
 import { AxisBottom, AxisLeft } from '@visx/axis';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
-import { scaleBand, scaleLinear } from '@visx/scale';
+import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { Bar } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import React, { useMemo, useState } from 'react';
@@ -133,6 +133,20 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         }
     };
 
+    // Hide axis labels when loading
+    const renderAxisLabel = (formattedValue: string, tickProps: any, isLoading: boolean, theme: any) => (
+        <text
+            {...tickProps}
+            className={`${isLoading ? shimmerClassName : ''}`}
+            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+            style={{
+                fontSize: theme.typography.fontSize.small,
+            }}
+        >
+            {isLoading ? '' : formattedValue}
+        </text>
+    );
+
     return (
         <ChartWrapper
             ref={parentRef}
@@ -140,7 +154,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             titleProps={titleProps}
             legendsProps={{
                 data: legendData,
-                colorScale: (_, index) => colorScale(index),
+                colorScale: scaleOrdinal({
+                    domain: legendData.map(d => d.label),
+                    range: filteredData.map((_, i) => colorScale(i))
+                }),
                 hideIndex,
                 setHideIndex,
                 hovered: hoveredBar !== null ? legendData[hoveredBar]?.label : null,
@@ -173,20 +190,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                             dy: '0.33em',
                             dx: -8,
                         }}
-                        tickComponent={({ formattedValue, ...tickProps }) => (
-                            <text
-                                {...tickProps}
-                                className={`${isLoading ? shimmerClassName : ''}`}
-                                fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-                                style={{
-                                    fontSize: theme.typography.fontSize.small,
-                                }}
-                            >
-                                {formattedValue}
-                            </text>
-                        )}
+                        tickFormat={(value) => (isLoading ? '' : `${value}`)}
                         hideAxisLine
                         hideTicks={!showTicks}
+                        tickComponent={({ formattedValue, ...tickProps }) =>
+                            renderAxisLabel(formattedValue, tickProps, isLoading, theme)
+                        }
                     />
 
                     {/* X-Axis (values) */}
@@ -200,20 +209,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                             fontSize: theme.typography.fontSize.small,
                             textAnchor: 'middle',
                         }}
-                        tickComponent={({ formattedValue, ...tickProps }) => (
-                            <text
-                                {...tickProps}
-                                className={`${isLoading ? shimmerClassName : ''}`}
-                                fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-                                style={{
-                                    fontSize: theme.typography.fontSize.small,
-                                }}
-                            >
-                                {formattedValue}
-                            </text>
-                        )}
+                        tickFormat={(value) => (isLoading ? '' : `${value}`)}
                         numTicks={5}
                         hideTicks={!showTicks}
+                        tickComponent={({ formattedValue, ...tickProps }) =>
+                            renderAxisLabel(formattedValue, tickProps, isLoading, theme)
+                        }
                     />
 
                     {/* Grid Lines */}

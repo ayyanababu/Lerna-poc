@@ -8,7 +8,6 @@ import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import { default as React, useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
-import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
 import { mockGroupedBarChartData } from './mockdata';
@@ -352,7 +351,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
           {hideIndex.length !== groupKeys.length && (
             <AxisLeft
               scale={valueScale}
-              tickFormat={(value) => `${value}`}
+              tickFormat={(value) => (isLoading ? '' : `${value}`)}
               stroke={theme.colors.axis.line}
               tickStroke={theme.colors.axis.line}
               tickLabelProps={{
@@ -361,18 +360,6 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
                 textAnchor: 'end',
                 dy: '0.33em',
               }}
-              tickComponent={({ formattedValue, ...tickProps }) => (
-                <text
-                  {...tickProps}
-                  className={`${isLoading ? shimmerClassName : ''}`}
-                  fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-                  style={{
-                    fontSize: theme.typography.fontSize.small,
-                  }}
-                >
-                  {formattedValue}
-                </text>
-              )}
               numTicks={5}
             />
           )}
@@ -399,25 +386,13 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
             top={innerHeight}
             stroke={theme.colors.axis.line}
             tickStroke={theme.colors.axis.line}
-            tickFormat={(value) => (hideIndex.length !== groupKeys.length ? `${value}` : '')}
+            tickFormat={(value) => (isLoading ? '' : hideIndex.length !== groupKeys.length ? `${value}` : '')}
             tickLabelProps={{
               fill: theme.colors.axis.label,
               fontSize: theme.typography.fontSize.small,
               textAnchor: 'middle',
               dy: '0.33em',
             }}
-            tickComponent={({ formattedValue, ...tickProps }) => (
-              <text
-                {...tickProps}
-                className={`${isLoading ? shimmerClassName : ''}`}
-                fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-                style={{
-                  fontSize: theme.typography.fontSize.small,
-                }}
-              >
-                {formattedValue}
-              </text>
-            )}
             hideTicks={hideIndex.length === groupKeys.length}
           />
 

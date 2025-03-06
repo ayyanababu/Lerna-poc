@@ -328,6 +328,20 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         return renderGroupedBars();
     }, [type, stackedData, renderStackedBars, renderGroupedBars]);
 
+    // Hide axis labels when loading
+    const renderAxisLabel = (formattedValue: string, tickProps: any, isLoading: boolean, theme: any) => (
+        <text
+            {...tickProps}
+            className={`${isLoading ? shimmerClassName : ''}`}
+            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+            style={{
+                fontSize: theme.typography.fontSize.small,
+            }}
+        >
+            {isLoading ? '' : formattedValue}
+        </text>
+    );
+
     return (
         <ChartWrapper
             ref={parentRef}
@@ -369,18 +383,9 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                                 textAnchor: 'end',
                                 dy: '0.33em',
                             }}
-                            tickComponent={({ formattedValue, ...tickProps }) => (
-                                <text
-                                    {...tickProps}
-                                    className={`${isLoading ? shimmerClassName : ''}`}
-                                    fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-                                    style={{
-                                        fontSize: theme.typography.fontSize.small,
-                                    }}
-                                >
-                                    {formattedValue}
-                                </text>
-                            )}
+                            tickComponent={({ formattedValue, ...tickProps }) =>
+                                renderAxisLabel(formattedValue, tickProps, isLoading, theme)
+                            }
                             numTicks={5}
                             hideTicks={!showTicks}
                         />
@@ -415,18 +420,9 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                             textAnchor: 'middle',
                             dy: '0.33em',
                         }}
-                        tickComponent={({ formattedValue, ...tickProps }) => (
-                            <text
-                                {...tickProps}
-                                className={`${isLoading ? shimmerClassName : ''}`}
-                                fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-                                style={{
-                                    fontSize: theme.typography.fontSize.small,
-                                }}
-                            >
-                                {formattedValue}
-                            </text>
-                        )}
+                        tickComponent={({ formattedValue, ...tickProps }) =>
+                            renderAxisLabel(formattedValue, tickProps, isLoading, theme)
+                        }
                         hideTicks={hideIndex.length === groupKeys.length || !showTicks}
                     />
 

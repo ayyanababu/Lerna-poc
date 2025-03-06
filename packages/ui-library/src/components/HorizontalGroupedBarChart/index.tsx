@@ -234,6 +234,20 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
         }
     };
 
+    // Hide axis labels when loading
+    const renderAxisLabel = (formattedValue: string, tickProps: any, isLoading: boolean, theme: any) => (
+        <text
+            {...tickProps}
+            className={`${isLoading ? shimmerClassName : ''}`}
+            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+            style={{
+                fontSize: theme.typography.fontSize.small,
+            }}
+        >
+            {isLoading ? '' : formattedValue}
+        </text>
+    );
+
     // Render bars based on chart type
     const renderBars = () => {
         if (type === 'stacked' && stackedData) {
@@ -370,18 +384,9 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
                                 dy: '0.33em',
                                 dx: -8,
                             }}
-                            tickComponent={({ formattedValue, ...tickProps }) => (
-                                <text
-                                    {...tickProps}
-                                    className={`${isLoading ? shimmerClassName : ''}`}
-                                    fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-                                    style={{
-                                        fontSize: theme.typography.fontSize.small,
-                                    }}
-                                >
-                                    {formattedValue}
-                                </text>
-                            )}
+                            tickComponent={({ formattedValue, ...tickProps }) =>
+                                renderAxisLabel(formattedValue, tickProps, isLoading, theme)
+                            }
                             hideAxisLine
                             hideTicks={!showTicks}
                         />
@@ -399,18 +404,9 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
                             fontSize: theme.typography.fontSize.small,
                             textAnchor: 'middle',
                         }}
-                        tickComponent={({ formattedValue, ...tickProps }) => (
-                            <text
-                                {...tickProps}
-                                className={`${isLoading ? shimmerClassName : ''}`}
-                                fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-                                style={{
-                                    fontSize: theme.typography.fontSize.small,
-                                }}
-                            >
-                                {formattedValue}
-                            </text>
-                        )}
+                        tickComponent={({ formattedValue, ...tickProps }) =>
+                            renderAxisLabel(formattedValue, tickProps, isLoading, theme)
+                        }
                         hideTicks={hideIndex.length === groupKeys.length || !showTicks}
                         numTicks={5}
                     />
