@@ -128,8 +128,9 @@ function App() {
           <SortableCard title="Monthly Performance" height={400} width={'auto'}>
             <VerticalBarChart
               data={[
-                ...Array.from({ length: 6 }, (_, index) => ({
+                ...Array.from({ length: 3 }, (_, index) => ({
                   label: `label ${index + 1}`,
+                  // label: `labelasd fasdf asdf asdf asdf asdf ${index + 1}`,
                   value: Math.floor(Math.random() * 100),
                 })),
               ]}

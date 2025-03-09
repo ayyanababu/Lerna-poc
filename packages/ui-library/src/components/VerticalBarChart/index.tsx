@@ -49,7 +49,7 @@ const getXAxisLabelDisplay = (
   const optimalLabelCount = Math.max(8, Math.floor(innerWidth / 60));
 
   // Always show first and last labels, then distribute the rest evenly
-  if (labels.length > optimalLabelCount) {
+  if (labels.length > optimalLabelCount || labels.join("").length >= innerWidth - 225) {
     // Create array to hold indices of labels to show
     const indicesToShow = [0, labels.length - 1]; // Always include first and last
 
@@ -197,7 +197,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         return getXAxisLabelDisplay(
             innerWidth,
             filteredData.map(d => String(d.label)),
-            theme.typography.fontSize.small
+            parseInt(`${theme.typography.fontSize.small || 12}`)
         );
     }, [width, filteredData, theme.typography.fontSize.small, initialMargin]);
 
