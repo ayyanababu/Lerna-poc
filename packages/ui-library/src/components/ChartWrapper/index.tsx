@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 import { scaleOrdinal } from '@visx/scale';
 import React, { forwardRef, useEffect, useRef } from 'react';
+import { Legends } from '../Legends';
 import { Timestamp } from '../Timestamp';
 import { Title } from '../Title';
 import Tooltip from '../Tooltip';
@@ -65,19 +66,19 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
               gap: '20px',
               ...(position === 'left' || position === 'right'
                 ? {
-                    flexDirection: position === 'left' ? 'row' : 'row-reverse',
-                  }
+                  flexDirection: position === 'left' ? 'row' : 'row-reverse',
+                }
                 : {
-                    flexDirection: 'column',
-                  }),
+                  flexDirection: 'column',
+                }),
             }}
           >
-            {/* <Legends
+            <Legends
               {...legendsProps}
               position={position}
               colorScale={colorScale}
               data={legendData}
-            /> */}
+            />
 
             <Box
               ref={ref}

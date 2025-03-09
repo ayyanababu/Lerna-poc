@@ -28,7 +28,7 @@ function App() {
         <button onClick={() => setActiveMode('dark')}>Dark</button>
       </>
 
-      <div
+      {/* <div
         style={{
           width: '100%',
           display: 'flex',
@@ -58,13 +58,13 @@ function App() {
             }}
             legendsProps={{
               position: 'top',
-              direction: 'row',
+            
               doStrike: true,
             }}
             tooltipProps={{}}
           />
         </div>
-      </div>
+      </div> */}
 
       {(
         <Sortable className="my-cards">
@@ -144,7 +144,6 @@ function App() {
               }}
               legendsProps={{
                 position: 'top',
-                direction: 'row',
                 doStrike: true,
               }}
               tooltipProps={{}}
@@ -170,7 +169,6 @@ function App() {
               }}
               legendsProps={{
                 position: 'top',
-                direction: 'row',
                 doStrike: true,
               }}
               tooltipProps={{}}
@@ -244,7 +242,6 @@ function App() {
                 align: 'left',
               }}
               legendsProps={{
-                direction: 'row',
                 onClick: (data, legend, index) => {
                   console.log(`Clicked ${legend} at index ${index}`, data);
                 },
@@ -322,7 +319,6 @@ function App() {
                 align: 'left',
               }}
               legendsProps={{
-                direction: 'row',
                 onClick: (data, legend, index) => {
                   console.log(`Clicked ${legend} at index ${index}`, data);
                 },
@@ -390,7 +386,6 @@ function App() {
                 align: 'left',
               }}
               legendsProps={{
-                direction: 'row',
                 onClick: (data, legend, index) => {
                   console.log(`Clicked ${legend} at index ${index}`, data);
                 },
@@ -455,7 +450,6 @@ function App() {
                 align: 'left',
               }}
               legendsProps={{
-                direction: 'row',
                 onClick: (data, legend, index) => {
                   console.log(`Clicked ${legend} at index ${index}`, data);
                 },

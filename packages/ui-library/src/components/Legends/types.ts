@@ -12,7 +12,6 @@ export interface LegendsProps {
   setHideIndex: React.Dispatch<SetStateAction<number[]>>;
   hovered: string | null | undefined;
   setHovered: React.Dispatch<SetStateAction<string | null | undefined>>;
-  direction?: 'row' | 'column';
   position?: LegendPosition;
   onClick?: (data: LegendData, legend: string, index: number) => void;
   isLoading?: boolean;

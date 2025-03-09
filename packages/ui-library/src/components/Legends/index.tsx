@@ -14,7 +14,6 @@ export function Legends({
   setHideIndex,
   hovered,
   setHovered,
-  direction = 'row',
   position = 'top',
   onClick = () => { },
   isLoading = false,
