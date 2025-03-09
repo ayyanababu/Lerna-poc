@@ -6,23 +6,11 @@ import { DataPoint } from './types';
  */
 export const mockVerticalBarChartData: DataPoint[] = [
     {
-        label: 'Category A',
+        label: 'A',
         value: 65,
     },
     {
-        label: 'Category B',
+        label: 'B',
         value: 45,
-    },
-    {
-        label: 'Category C',
-        value: 80,
-    },
-    {
-        label: 'Category D',
-        value: 35,
-    },
-    {
-        label: 'Category E',
-        value: 60,
-    },
+    }
 ];

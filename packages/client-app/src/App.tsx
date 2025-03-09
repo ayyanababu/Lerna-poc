@@ -58,7 +58,7 @@ function App() {
             }}
             legendsProps={{
               position: 'top',
-            
+
               doStrike: true,
             }}
             tooltipProps={{}}
@@ -128,12 +128,10 @@ function App() {
           <SortableCard title="Monthly Performance" height={400} width={'auto'}>
             <VerticalBarChart
               data={[
-                { label: 'Jan', value: 45, },
-                { label: 'Feb', value: 60, },
-                { label: 'Mar', value: 35, },
-                { label: 'Apr', value: 70, },
-                { label: 'May', value: 55, },
-                { label: 'Jun', value: 40, },
+                ...Array.from({ length: 6 }, (_, index) => ({
+                  label: `label ${index + 1}`,
+                  value: Math.floor(Math.random() * 100),
+                })),
               ]}
               title="Monthly Trade Volume"
               timestamp={new Date().toISOString()}
@@ -145,6 +143,7 @@ function App() {
               legendsProps={{
                 position: 'top',
                 doStrike: true,
+                isVisible: false,
               }}
               tooltipProps={{}}
             />
@@ -154,11 +153,11 @@ function App() {
           <SortableCard title="Product Performance" height={400} width={'auto'}>
             <HorizontalBarChart
               data={[
-                { label: 'Product A', value: 75, },
-                { label: 'Product B', value: 45, },
-                { label: 'Product C', value: 90, },
-                { label: 'Product D', value: 30, },
-                { label: 'Product E', value: 60, },
+                // Array of 30 values with 30 labels
+                ...Array.from({ length: 30 }, (_, index) => ({
+                  label: `Product ${index + 6}`,
+                  value: Math.floor(Math.random() * 100),
+                })),
               ]}
               title="Product Sales Distribution"
               timestamp={new Date().toISOString()}
@@ -170,6 +169,7 @@ function App() {
               legendsProps={{
                 position: 'top',
                 doStrike: true,
+                isVisible: false,
               }}
               tooltipProps={{}}
             />
