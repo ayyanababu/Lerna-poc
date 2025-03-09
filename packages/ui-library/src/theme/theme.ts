@@ -8,9 +8,9 @@ export const defaultLightTheme: Theme = {
       border: 'transparent',
     },
     axis: {
-      line: '#94a3b8',
+      line: '#94a3bb',
       label: '#64748b',
-      grid: '#94a3b8',
+      grid: '#94a3bb',
     },
     tooltip: {
       background: '#ffffff',
@@ -102,9 +102,9 @@ export const defaultDarkTheme: Theme = {
       border: '#45556b',
     },
     axis: {
-      line: '#64748b',
+      line: '#94a3bb',
       label: '#94a3b8',
-      grid: '#334155',
+      grid: '#94a3bb',
     },
     tooltip: {
       background: '#1e293b',

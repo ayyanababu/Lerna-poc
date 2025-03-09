@@ -16,13 +16,14 @@ export function Legends({
   setHovered,
   direction = 'row',
   position = 'top',
-  onClick = () => {},
+  onClick = () => { },
   isLoading = false,
   doStrike = false,
+  isVisible = true
 }: LegendsProps) {
   const { theme } = useTheme();
 
-  if (!data || !colorScale || !setHideIndex || !setHovered) return null;
+  if (!data || !colorScale || !setHideIndex || !setHovered || !isVisible) return null;
 
   const getFlexDirection = () => {
     if (position === 'left' || position === 'right') return 'column';

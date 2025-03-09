@@ -17,4 +17,5 @@ export interface LegendsProps {
   onClick?: (data: LegendData, legend: string, index: number) => void;
   isLoading?: boolean;
   doStrike?: boolean;
+  isVisible?: boolean;
 }
