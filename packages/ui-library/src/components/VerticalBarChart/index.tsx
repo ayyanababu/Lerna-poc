@@ -39,7 +39,8 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     tooltipProps,
     showTicks = false,
     showGrid = true,
-    showYAxis = false
+    showYAxis = false,
+    barProps
 }) => {
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
@@ -250,6 +251,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
                         return (
                             <Bar
+                                {...barProps}
                                 key={`bar-${d.label}-${index}`}
                                 x={barX}
                                 y={barY}

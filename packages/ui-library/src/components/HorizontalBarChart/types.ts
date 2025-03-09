@@ -1,3 +1,4 @@
+import { Bar } from '@visx/shape';
 import { CSSProperties } from 'react';
 import { LegendsProps } from '../Legends/types';
 import { TimestampProps } from '../Timestamp/types';
@@ -93,4 +94,9 @@ export interface HorizontalBarChartProps {
      * @default false
      */
     showXAxis?: boolean;
+
+    /**
+     * barProps
+     */
+    barProps?: Parameters<typeof Bar>[0];
 }

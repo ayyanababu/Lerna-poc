@@ -40,6 +40,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     showTicks = false,
     showGrid = true,
     showXAxis = false,
+    barProps
 }) => {
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
@@ -260,6 +261,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                                 rx={DEFAULT_BAR_RADIUS}
                                 onMouseMove={handleBarMouseMove(value, index)}
                                 onMouseLeave={handleBarMouseLeave}
+                                {...barProps}
                             />
                         );
                     })}
