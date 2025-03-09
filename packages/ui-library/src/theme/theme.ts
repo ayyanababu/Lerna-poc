@@ -10,7 +10,7 @@ export const defaultLightTheme: Theme = {
     axis: {
       line: '#94a3b8',
       label: '#64748b',
-      grid: '#e2e8f0',
+      grid: '#94a3b8',
     },
     tooltip: {
       background: '#ffffff',

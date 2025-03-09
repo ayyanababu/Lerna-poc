@@ -38,6 +38,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     legendsProps,
     tooltipProps,
     showTicks = false,
+    showGrid = true,
 }) => {
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
@@ -218,20 +219,22 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                     />
 
                     {/* Grid Lines */}
-                    <g>
-                        {xScale.ticks(5).map((tick) => (
-                            <line
-                                key={tick}
-                                y1={0}
-                                y2={innerHeight}
-                                x1={xScale(tick)}
-                                x2={xScale(tick)}
-                                stroke={theme.colors.axis.grid}
-                                strokeDasharray="2,2"
-                                opacity={0.3}
-                            />
-                        ))}
-                    </g>
+                    {showGrid && (
+                        <g>
+                            {xScale.ticks(5).map((tick) => (
+                                <line
+                                    key={tick}
+                                    y1={0}
+                                    y2={innerHeight}
+                                    x1={xScale(tick)}
+                                    x2={xScale(tick)}
+                                    stroke={theme.colors.axis.grid}
+                                    strokeDasharray="2,2"
+                                    opacity={0.5}
+                                />
+                            ))}
+                        </g>
+                    )}
 
                     {/* Bars */}
                     {filteredData.map((d, index) => {

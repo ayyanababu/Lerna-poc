@@ -66,7 +66,7 @@ function App() {
         </div>
       </div>
 
-      {false && (
+      {(
         <Sortable className="my-cards">
           {/* Original Donut Chart examples */}
           <SortableCard title="Trade Capture" height={400} width={'auto'}>

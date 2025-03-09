@@ -81,4 +81,10 @@ export interface HorizontalBarChartProps {
      * @default false
      */
     showTicks?: boolean;
+
+    /**
+     * Show grid lines
+     * @default true
+     */
+    showGrid?: boolean;
 }

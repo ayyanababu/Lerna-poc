@@ -38,6 +38,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     legendsProps,
     tooltipProps,
     showTicks = false,
+    showGrid = true
 }) => {
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
@@ -197,20 +198,22 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                     />
 
                     {/* Grid Lines */}
-                    <g>
-                        {yScale.ticks(5).map((tick) => (
-                            <line
-                                key={tick}
-                                x1={0}
-                                x2={innerWidth}
-                                y1={yScale(tick)}
-                                y2={yScale(tick)}
-                                stroke={theme.colors.axis.grid}
-                                strokeDasharray="2,2"
-                                opacity={0.3}
-                            />
-                        ))}
-                    </g>
+                    {showGrid && (
+                        <g>
+                            {yScale.ticks(5).map((tick) => (
+                                <line
+                                    key={tick}
+                                    x1={0}
+                                    x2={innerWidth}
+                                    y1={yScale(tick)}
+                                    y2={yScale(tick)}
+                                    stroke={theme.colors.axis.grid}
+                                    strokeDasharray="2,2"
+                                    opacity={0.5}
+                                />
+                            ))}
+                        </g>
+                    )}
 
                     {/* X-Axis */}
                     <AxisBottom
