@@ -8,10 +8,10 @@ import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import { default as React, useCallback, useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
-import { mockGroupedBarChartData } from '../GroupedBarChart/mockdata';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
+import { mockVerticalGroupedBarChartData } from './mockdata';
 import { DataPoint, VerticalGroupedBarChartProps } from './types';
 
 interface BarProps {
@@ -78,7 +78,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         data: DataPoint[];
         groupKeys: string[];
     }>(
-        () => (isLoading ? mockGroupedBarChartData : { data: _data, groupKeys: _groupKeys }),
+        () => (isLoading ? mockVerticalGroupedBarChartData : { data: _data, groupKeys: _groupKeys }),
         [isLoading, _data, _groupKeys],
     );
 
