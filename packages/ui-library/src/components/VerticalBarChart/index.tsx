@@ -38,7 +38,8 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     legendsProps,
     tooltipProps,
     showTicks = false,
-    showGrid = true
+    showGrid = true,
+    showYAxis = false
 }) => {
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
@@ -195,6 +196,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                         }
                         numTicks={5}
                         hideTicks={!showTicks}
+                        hideAxisLine={!showYAxis}
                     />
 
                     {/* Grid Lines */}

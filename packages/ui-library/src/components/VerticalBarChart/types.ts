@@ -87,4 +87,10 @@ export interface VerticalBarChartProps {
      * @default true
      */
     showGrid?: boolean;
+
+    /**
+     * Show Y axis
+     * @default false
+     */
+    showYAxis?: boolean;
 }

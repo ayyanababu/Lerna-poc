@@ -39,6 +39,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     tooltipProps,
     showTicks = false,
     showGrid = true,
+    showXAxis = false,
 }) => {
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
@@ -189,10 +190,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                             fontSize: theme.typography.fontSize.small,
                             textAnchor: 'end',
                             dy: '0.33em',
-                            dx: -8,
                         }}
                         tickFormat={(value) => (isLoading ? '' : `${value}`)}
-                        hideAxisLine
                         hideTicks={!showTicks}
                         tickComponent={({ formattedValue, ...tickProps }) =>
                             renderAxisLabel(formattedValue, tickProps, isLoading, theme)
@@ -213,6 +212,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                         tickFormat={(value) => (isLoading ? '' : `${value}`)}
                         numTicks={5}
                         hideTicks={!showTicks}
+                        hideAxisLine={!showXAxis}
                         tickComponent={({ formattedValue, ...tickProps }) =>
                             renderAxisLabel(formattedValue, tickProps, isLoading, theme)
                         }

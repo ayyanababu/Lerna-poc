@@ -87,4 +87,10 @@ export interface HorizontalBarChartProps {
      * @default true
      */
     showGrid?: boolean;
+
+    /**
+     * Show x-axis
+     * @default false
+     */
+    showXAxis?: boolean;
 }
