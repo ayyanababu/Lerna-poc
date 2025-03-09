@@ -128,12 +128,12 @@ function App() {
           <SortableCard title="Monthly Performance" height={400} width={'auto'}>
             <VerticalBarChart
               data={[
-                { label: 'Jan', value: 45, color: '#9bc5ef' },
-                { label: 'Feb', value: 60, color: '#50c1c2' },
-                { label: 'Mar', value: 35, color: '#fad176' },
-                { label: 'Apr', value: 70, color: '#407abc' },
-                { label: 'May', value: 55, color: '#93a3bc' },
-                { label: 'Jun', value: 40, color: 'orange' },
+                { label: 'Jan', value: 45, },
+                { label: 'Feb', value: 60, },
+                { label: 'Mar', value: 35, },
+                { label: 'Apr', value: 70, },
+                { label: 'May', value: 55, },
+                { label: 'Jun', value: 40, },
               ]}
               title="Monthly Trade Volume"
               timestamp={new Date().toISOString()}
@@ -154,11 +154,11 @@ function App() {
           <SortableCard title="Product Performance" height={400} width={'auto'}>
             <HorizontalBarChart
               data={[
-                { label: 'Product A', value: 75, color: '#9bc5ef' },
-                { label: 'Product B', value: 45, color: '#50c1c2' },
-                { label: 'Product C', value: 90, color: '#fad176' },
-                { label: 'Product D', value: 30, color: '#407abc' },
-                { label: 'Product E', value: 60, color: '#93a3bc' },
+                { label: 'Product A', value: 75, },
+                { label: 'Product B', value: 45, },
+                { label: 'Product C', value: 90, },
+                { label: 'Product D', value: 30, },
+                { label: 'Product E', value: 60, },
               ]}
               title="Product Sales Distribution"
               timestamp={new Date().toISOString()}

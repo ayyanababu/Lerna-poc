@@ -24,12 +24,6 @@ export const defaultLightTheme: Theme = {
     charts: {
       bar: [
         '#9bc5ef',
-        '#50c1c2',
-        '#fad176',
-        '#407abc',
-        '#93a3bc',
-        '#f9804e',
-        '#fed8cc',
       ],
       stackedBar: [
         '#9bc5ef',
@@ -118,12 +112,6 @@ export const defaultDarkTheme: Theme = {
     charts: {
       bar: [
         '#9bc5ef',
-        '#50c1c2',
-        '#fad176',
-        '#407abc',
-        '#93a3bc',
-        '#f9804e',
-        '#fed8cc',
       ],
       stackedBar: [
         '#9bc5ef',
