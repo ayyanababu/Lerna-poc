@@ -18,7 +18,7 @@ function App() {
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false);
-    }, 5000);
+    }, 0);
   }, []);
 
   return (
@@ -128,10 +128,10 @@ function App() {
           <SortableCard title="Monthly Performance" height={400} width={'auto'}>
             <VerticalBarChart
               data={[
-                ...Array.from({ length: 3 }, (_, index) => ({
-                  label: `label ${index + 1}`,
-                  // label: `labelasd fasdf asdf asdf asdf asdf ${index + 1}`,
-                  value: Math.floor(Math.random() * 100),
+                ...Array.from({ length: 60}, (_, index) => ({
+                  // label: `label ${index + 1}`,
+                  label: `${index + 1} labelasd fasdf asdf asdf asdf asdf `,
+                  value: Math.floor(Math.random() * 100) +20,
                 })),
               ]}
               title="Monthly Trade Volume"
