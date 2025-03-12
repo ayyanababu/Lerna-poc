@@ -1,10 +1,11 @@
+import React, { useMemo, useState } from 'react';
 import { AxisBottom, AxisLeft } from '@visx/axis';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { Bar } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
-import React, { useMemo, useState } from 'react';
+
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
 import { shimmerClassName } from '../Shimmer/Shimmer';
@@ -12,6 +13,7 @@ import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
 import { mockVerticalBarChartData } from './mockdata';
 import { DataPoint, VerticalBarChartProps } from './types';
+
 
 const DEFAULT_MARGIN = {
     top: 20,
@@ -29,8 +31,7 @@ const SCALE_PADDING = 1.2;
  */
 const getXAxisLabelDisplay = (
   innerWidth: number,
-  labels: string[],
-  fontSize: number = 12
+  labels: string[]
 ) => {
   // Handle special cases
   if (labels.length <= 1) {
@@ -45,7 +46,6 @@ const getXAxisLabelDisplay = (
     };
   }
 
-  // Increase the number of labels shown - more aggressive approach
   const optimalLabelCount = Math.max(2, Math.floor(innerWidth / 15));
 
   // Always show first and last labels, then distribute the rest evenly
@@ -152,7 +152,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     title,
     timestamp,
     colors = [],
-    isLoading,
+    isLoading = false,
     titleProps,
     legendsProps,
     tooltipProps,
@@ -161,10 +161,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     showYAxis = false,
     barProps
 }) => {
-    if (!_data || _data.length === 0) {
-        return <div>No data to display.</div>;
-    }
-
+   
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
 
@@ -184,7 +181,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     );
 
     // Get label display settings based on chart width and number of labels
-    const { tickValues, formatLabel, rotate, angle, verticalAnchor, textAnchor, extraBottomMargin } = useMemo(() => {
+    const { tickValues, formatLabel, rotate, angle, textAnchor, extraBottomMargin } = useMemo(() => {
         // Default values in case innerWidth is not available yet
         if (!width) {
             return {
@@ -201,10 +198,9 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         const innerWidth = width - initialMargin.left - initialMargin.right;
         return getXAxisLabelDisplay(
             innerWidth,
-            filteredData.map(d => String(d.label)),
-            parseInt(`${theme.typography.fontSize.small || 12}`)
+            filteredData.map(d => String(d.label))
         );
-    }, [width, filteredData, theme.typography.fontSize.small, initialMargin]);
+    }, [width, filteredData, initialMargin]);
 
     // Dynamically adjust the margin based on label requirements
     const margin = useMemo(() => ({
@@ -219,9 +215,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         useTooltip<TooltipData>();
 
     // Calculate the maximum value for the y-axis scale
-    const maxValue = useMemo(() => {
-        return Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) * SCALE_PADDING;
-    }, [filteredData]);
+    const maxValue = useMemo(() => Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) * SCALE_PADDING, [filteredData]);
 
     // Create scales
     const xScale = useMemo(
@@ -285,16 +279,16 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     };
 
     // Hide axis labels when loading
-    const renderAxisLabel = (formattedValue: string, tickProps: any, isLoading: boolean, theme: any) => (
+    const renderAxisLabel = (formattedValue: string | undefined , tickProps: any, isChartLoading: boolean) => (
         <text
             {...tickProps}
-            className={`${isLoading ? shimmerClassName : ''}`}
-            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+            className={`${isChartLoading ? shimmerClassName : ''}`}
+            fill={isChartLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
             style={{
-                fontSize: theme.typography.fontSize.small,
+                fontSize: '12px',
             }}
         >
-            {isLoading ? '' : formattedValue}
+            {isChartLoading ? '' : formattedValue}
         </text>
     );
 
@@ -321,6 +315,11 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         
         return positions;
     }, [tickValues, filteredData, innerWidth]);
+
+    if (!_data || _data.length === 0) {
+        return <div>No data to display.</div>;
+    }
+
 
     return (
         <ChartWrapper
@@ -361,12 +360,12 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                         tickStroke={theme.colors.axis.line}
                         tickLabelProps={{
                             fill: theme.colors.axis.label,
-                            fontSize: theme.typography.fontSize.small,
+                            fontSize: '12px',
                             textAnchor: 'end',
                             dy: '0.33em',
                         }}
                         tickComponent={({ formattedValue, ...tickProps }) =>
-                            renderAxisLabel(formattedValue, tickProps, isLoading, theme)
+                            renderAxisLabel(formattedValue, tickProps, isLoading)
                         }
                         numTicks={5}
                         hideTicks={!showTicks}
@@ -397,13 +396,13 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                         top={innerHeight}
                         stroke={theme.colors.axis.line}
                         tickStroke={theme.colors.axis.line}
-                        tickValues={tickValues}
+                        tickValues={tickValues || undefined}
                         tickLabelProps={() => ({
                             fill: theme.colors.axis.label,
-                            fontSize: theme.typography.fontSize.small,
+                            fontSize: '12px'
                         })}
                         tickComponent={({ formattedValue, ...tickProps }) => {
-                            const label = isLoading ? '' : formatLabel(formattedValue);
+                            const label = isLoading ? '' : formatLabel(formattedValue ?? '');
                             
                             // Get position for evenly spaced labels if available
                             let xPosition = tickProps.x;
@@ -428,7 +427,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                                             className={isLoading ? shimmerClassName : ''}
                                             fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
                                             style={{
-                                                fontSize: theme.typography.fontSize.small,
+                                                fontSize: '12px',
                                             }}
                                             textAnchor={textAnchor}
                                             transform={`rotate(${angle})`}
@@ -448,7 +447,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                                         className={`${isLoading ? shimmerClassName : ''}`}
                                         fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
                                         style={{
-                                            fontSize: theme.typography.fontSize.small,
+                                            fontSize: '12px',
                                         }}
                                         textAnchor="middle"
                                         dy="0.71em"
@@ -464,7 +463,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                     {/* Bars */}
                     {filteredData.map((d, index) => {
                         const value = Number(d.value);
-                        if (isNaN(value)) return null;
+                        if (Number.isNaN(value)) return null;
 
                         const barWidth = xScale.bandwidth();
                         const barHeight = innerHeight - yScale(value);
@@ -476,7 +475,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                         return (
                             <Bar
                                 {...barProps}
-                                key={`bar-${d.label}-${index}`}
+                                key={`bar-${d.label}`}
                                 x={barX}
                                 y={barY}
                                 width={barWidth}
@@ -495,5 +494,4 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     );
 };
 
-export default VerticalBarChart;
-
+export { VerticalBarChart };
