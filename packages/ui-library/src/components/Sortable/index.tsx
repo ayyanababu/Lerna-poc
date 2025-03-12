@@ -39,7 +39,7 @@ export default function SortableComponent({ children, className }: SortableProps
       sx={{
         gap: '16px',
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr 1fr',
+        gridTemplateColumns: '1fr ',
         '& .sortable-ghost': {
           backgroundColor: '#8fc5ff',
           borderRadius: '8px',

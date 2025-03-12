@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
 import { AxisBottom, AxisLeft } from '@visx/axis';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { Bar } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
+import React, { useMemo, useState } from 'react';
 
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
@@ -49,7 +49,9 @@ const getXAxisLabelDisplay = (
   const optimalLabelCount = Math.max(2, Math.floor(innerWidth / 15));
 
   // Always show first and last labels, then distribute the rest evenly
-  if (labels.length > optimalLabelCount || labels.join("").length >= innerWidth - 225) {
+  const averageCharWidth = 7; // estimated width per character (adjust as needed)
+  const totalLabelWidth = labels.join("").length * averageCharWidth;
+  if (labels.length > optimalLabelCount || totalLabelWidth >= innerWidth) {
     let indicesToShow = [];
     if (labels.length > optimalLabelCount) {
         // Create array to hold indices of labels to show
@@ -100,7 +102,14 @@ const getXAxisLabelDisplay = (
   if (labels.length <= optimalLabelCount) {
     return {
       tickValues: null, // Show all ticks
-      formatLabel: (label: string) => label,
+      formatLabel: (label: string) => {
+        if (typeof label !== 'string') return label;
+        // Allow longer labels
+        if (label.length > 12) {
+          return `${label.substring(0, 12)}...`;
+        }
+        return label;
+      },
       rotate: false,
       angle: 0,
       verticalAnchor: "middle",
@@ -413,16 +422,12 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                                 if (evenPosition !== undefined) {
                                     xPosition = evenPosition;
                                 }
-                            } else {
-                                // Calculate center of the current bar when showing all labels
-                                const barWidth = xScale.bandwidth();
-                                xPosition = tickProps.x + barWidth / 2;
                             }
 
                             // For rotated labels, use a g element to handle rotation properly
                             if (rotate) {
                                 return (
-                                    <g transform={`translate(${xPosition},${tickProps.y})`}>
+                                    <g transform={`translate(${tickValues?.length !== data.length ? xPosition : tickProps.x},${tickProps.y})`}>
                                         <text
                                             className={isLoading ? shimmerClassName : ''}
                                             fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
@@ -442,7 +447,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
                             // For non-rotated labels, position with even spacing
                             return (
-                                <g transform={`translate(${xPosition},${tickProps.y})`}>
+                                <g transform={`translate(${tickProps.x},${tickProps.y})`}>
                                     <text
                                         className={`${isLoading ? shimmerClassName : ''}`}
                                         fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
@@ -494,4 +499,4 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     );
 };
 
-export { VerticalBarChart };
+export default VerticalBarChart;
