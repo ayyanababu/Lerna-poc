@@ -143,10 +143,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             className={`${isLoading ? shimmerClassName : ''}`}
             fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
             style={{
-                fontSize: theme.typography.fontSize.small,
+            fontSize: theme.typography.fontSize.small,
             }}
         >
-            {isLoading ? '' : formattedValue}
+            {isLoading ? '' : (typeof formattedValue === 'string' && formattedValue.length > 12 ? `${formattedValue.substring(0, 12)}...` : formattedValue)}
         </text>
     );
 
