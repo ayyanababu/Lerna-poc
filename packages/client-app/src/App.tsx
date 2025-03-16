@@ -125,12 +125,12 @@ function App() {
           </SortableCard>
 
           {/* VerticalBarChart example */}
-          <SortableCard title="Monthly Performance" height={400} width={800}>
+          <SortableCard title="Monthly Performance" height={400} width={1000}>
             <VerticalBarChart
               data={[
-                ...Array.from({ length: 6 }, (_, index) => ({
+                ...Array.from({ length: 100 }, (_, index) => ({
                   // label: `label ${index + 1}`,
-                  label: `${index + 1} January `,
+                  label: `${index + 1} January sadf asdf asdf asdf asdfasdf asd asdf asf  `,
                   value: Math.floor(Math.random() * 100) +20,
                 })),
               ]}
@@ -156,7 +156,7 @@ function App() {
               data={[
                 // Array of 30 values with 30 labels
                 ...Array.from({ length: 100 }, (_, index) => ({
-                  label: `${index + 6} Product asdfasdf asdf asdf asdf as`,
+                  label: `${index + 6} Product`,
                   value: Math.floor(Math.random() * 100),
                 })),
               ]}

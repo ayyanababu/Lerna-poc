@@ -1,19 +1,19 @@
-import { AxisBottom, AxisLeft } from '@visx/axis';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
-import { Bar } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import React, { useMemo, useState } from 'react';
 
 import { useTheme } from '../../hooks/useTheme';
+import Bar from '../Bar';
 import { ChartWrapper } from '../ChartWrapper';
-import { shimmerClassName } from '../Shimmer/Shimmer';
-import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
+import Grid from '../Grid';
+import SvgShimmer from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
+import XAxis from '../XAxis';
+import YAxis from '../YAxis';
 import { mockVerticalBarChartData } from './mockdata';
 import { DataPoint, VerticalBarChartProps } from './types';
-
 
 const DEFAULT_MARGIN = {
     top: 20,
@@ -40,7 +40,6 @@ const getXAxisLabelDisplay = (
       formatLabel: (label: string) => label,
       rotate: false,
       angle: 0,
-      verticalAnchor: "middle",
       textAnchor: "middle",
       extraBottomMargin: 15
     };
@@ -92,7 +91,6 @@ const getXAxisLabelDisplay = (
       },
       rotate: true,
       angle: -45,
-      verticalAnchor: "start",
       textAnchor: "end",
       extraBottomMargin: 35 // Add extra margin for rotated labels
     };
@@ -112,7 +110,6 @@ const getXAxisLabelDisplay = (
       },
       rotate: false,
       angle: 0,
-      verticalAnchor: "middle",
       textAnchor: "middle",
       extraBottomMargin: 15
     };
@@ -146,7 +143,6 @@ const getXAxisLabelDisplay = (
     },
     rotate: true,
     angle: -30,
-    verticalAnchor: "start",
     textAnchor: "end",
     extraBottomMargin: 30 // Add extra margin for rotated labels
   };
@@ -198,7 +194,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 formatLabel: (label: string) => label,
                 rotate: false,
                 angle: 0,
-                verticalAnchor: "middle",
                 textAnchor: "middle",
                 extraBottomMargin: 0
             };
@@ -287,20 +282,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         }
     };
 
-    // Hide axis labels when loading
-    const renderAxisLabel = (formattedValue: string | undefined , tickProps: any, isChartLoading: boolean) => (
-        <text
-            {...tickProps}
-            className={`${isChartLoading ? shimmerClassName : ''}`}
-            fill={isChartLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-            style={{
-                fontSize: '12px',
-            }}
-        >
-            {isChartLoading ? '' : formattedValue}
-        </text>
-    );
-
     // Calculate positions for evenly spaced labels
     const getEvenlySpacedXPositions = useMemo(() => {
         if (!tickValues || !filteredData.length) return null;
@@ -328,7 +309,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
     }
-
 
     return (
         <ChartWrapper
@@ -362,107 +342,39 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
                 <Group top={margin.top} left={margin.left}>
                     {/* Y-Axis */}
-                    <AxisLeft
+                    <YAxis
                         scale={yScale}
-                        tickFormat={(value) => (isLoading ? '' : `${value}`)}
-                        stroke={theme.colors.axis.line}
-                        tickStroke={theme.colors.axis.line}
-                        tickLabelProps={{
-                            fill: theme.colors.axis.label,
-                            fontSize: '12px',
-                            textAnchor: 'end',
-                            dy: '0.33em',
-                        }}
-                        tickComponent={({ formattedValue, ...tickProps }) =>
-                            renderAxisLabel(formattedValue, tickProps, isLoading)
-                        }
+                        theme={theme}
+                        isLoading={isLoading}
+                        showTicks={showTicks}
+                        showAxisLine={showYAxis}
                         numTicks={5}
-                        hideTicks={!showTicks}
-                        hideAxisLine={!showYAxis}
+                        tickFormat={(value) => `${value}`}
                     />
 
                     {/* Grid Lines */}
                     {showGrid && (
-                        <g>
-                            {yScale.ticks(5).map((tick) => (
-                                <line
-                                    key={tick}
-                                    x1={0}
-                                    x2={innerWidth}
-                                    y1={yScale(tick)}
-                                    y2={yScale(tick)}
-                                    stroke={theme.colors.axis.grid}
-                                    strokeDasharray="2,2"
-                                    opacity={0.5}
-                                />
-                            ))}
-                        </g>
+                        <Grid
+                            width={innerWidth}
+                            yScale={yScale}
+                            theme={theme}
+                            numTicks={5}
+                        />
                     )}
 
                     {/* X-Axis with evenly spaced labels */}
-                    <AxisBottom
+                    <XAxis
                         scale={xScale}
                         top={innerHeight}
-                        stroke={theme.colors.axis.line}
-                        tickStroke={theme.colors.axis.line}
+                        theme={theme}
+                        isLoading={isLoading}
+                        showTicks={showTicks}
                         tickValues={tickValues || undefined}
-                        tickLabelProps={() => ({
-                            fill: theme.colors.axis.label,
-                            fontSize: '12px'
-                        })}
-                        tickComponent={({ formattedValue, ...tickProps }) => {
-                            const label = isLoading ? '' : formatLabel(formattedValue ?? '');
-                            
-                            // Get position for evenly spaced labels if available
-                            let xPosition = tickProps.x;
-                            
-                            // Use even spacing if we're using a subset of labels
-                            if (getEvenlySpacedXPositions && tickValues) {
-                                const evenPosition = getEvenlySpacedXPositions.get(formattedValue);
-                                if (evenPosition !== undefined) {
-                                    xPosition = evenPosition;
-                                }
-                            }
-
-                            // For rotated labels, use a g element to handle rotation properly
-                            if (rotate) {
-                                return (
-                                    <g transform={`translate(${tickValues?.length !== data.length ? xPosition : tickProps.x},${tickProps.y})`}>
-                                        <text
-                                            className={isLoading ? shimmerClassName : ''}
-                                            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-                                            style={{
-                                                fontSize: '12px',
-                                            }}
-                                            textAnchor={textAnchor}
-                                            transform={`rotate(${angle})`}
-                                            dy="0.5em"
-                                            dx="0.32em"
-                                        >
-                                            {label}
-                                        </text>
-                                    </g>
-                                );
-                            }
-
-                            // For non-rotated labels, position with even spacing
-                            return (
-                                <g transform={`translate(${tickProps.x},${tickProps.y})`}>
-                                    <text
-                                        className={`${isLoading ? shimmerClassName : ''}`}
-                                        fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-                                        style={{
-                                            fontSize: '12px',
-                                        }}
-                                        textAnchor="middle"
-                                        dy="0.71em"
-                                    >
-                                        {label}
-                                    </text>
-                                </g>
-                            );
-                        }}
-                        hideTicks={!showTicks}
+                        formatLabel={formatLabel}
+                        rotate={rotate}
+                        angle={angle}
+                        textAnchor={textAnchor}
+                        evenPositionsMap={getEvenlySpacedXPositions}
                     />
 
                     {/* Bars */}
@@ -479,17 +391,18 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
                         return (
                             <Bar
-                                {...barProps}
                                 key={`bar-${d.label}`}
                                 x={barX}
                                 y={barY}
                                 width={barWidth}
                                 height={barHeight}
-                                fill={isLoading ? `url(#${shimmerGradientId})` : d.color || colorScale(index)}
+                                fill={d.color || colorScale(index)}
+                                isLoading={isLoading}
                                 opacity={barOpacity}
                                 rx={DEFAULT_BAR_RADIUS}
                                 onMouseMove={handleBarMouseMove(value, index)}
                                 onMouseLeave={handleBarMouseLeave}
+                                additionalProps={barProps}
                             />
                         );
                     })}

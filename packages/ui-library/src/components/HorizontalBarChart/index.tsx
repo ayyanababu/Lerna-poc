@@ -1,15 +1,16 @@
-import { AxisBottom, AxisLeft } from '@visx/axis';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
-import { Bar } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import React, { useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
+import Bar from '../Bar';
 import { ChartWrapper } from '../ChartWrapper';
-import { shimmerClassName } from '../Shimmer/Shimmer';
-import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
+import Grid from '../Grid';
+import SvgShimmer from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
+import XAxis from '../XAxis';
+import YAxis from '../YAxis';
 import { mockHorizontalBarChartData } from './mockdata';
 import { DataPoint, HorizontalBarChartProps } from './types';
 
@@ -136,20 +137,6 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         }
     };
 
-    // Hide axis labels when loading
-    const renderAxisLabel = (formattedValue: string, tickProps: any, isLoading: boolean, theme: any) => (
-        <text
-            {...tickProps}
-            className={`${isLoading ? shimmerClassName : ''}`}
-            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-            style={{
-            fontSize: theme.typography.fontSize.small,
-            }}
-        >
-            {isLoading ? '' : (typeof formattedValue === 'string' && formattedValue.length > 12 ? `${formattedValue.substring(0, 12)}...` : formattedValue)}
-        </text>
-    );
-
     return (
         <ChartWrapper
             ref={parentRef}
@@ -182,59 +169,36 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
                 <Group top={margin.top} left={margin.left}>
                     {/* Y-Axis (labels) */}
-                    <AxisLeft
+                    <YAxis
                         scale={yScale}
-                        stroke={theme.colors.axis.line}
-                        tickStroke={theme.colors.axis.line}
-                        tickLabelProps={{
-                            fill: theme.colors.axis.label,
-                            fontSize: theme.typography.fontSize.small,
-                            textAnchor: 'end',
-                            dy: '0.33em',
-                        }}
-                        tickFormat={(value) => (isLoading ? '' : `${value}`)}
-                        hideTicks={!showTicks}
-                        tickComponent={({ formattedValue, ...tickProps }) =>
-                            renderAxisLabel(formattedValue, tickProps, isLoading, theme)
-                        }
+                        theme={theme}
+                        isLoading={isLoading}
+                        showTicks={showTicks}
+                        tickFormat={(value) => `${value}`}
                     />
 
                     {/* X-Axis (values) */}
-                    <AxisBottom
+                    <XAxis
                         scale={xScale}
                         top={innerHeight}
-                        stroke={theme.colors.axis.line}
-                        tickStroke={theme.colors.axis.line}
-                        tickLabelProps={{
-                            fill: theme.colors.axis.label,
-                            fontSize: theme.typography.fontSize.small,
-                            textAnchor: 'middle',
-                        }}
-                        tickFormat={(value) => (isLoading ? '' : `${value}`)}
+                        theme={theme}
+                        isLoading={isLoading}
+                        showTicks={showTicks}
+                        showAxisLine={showXAxis}
                         numTicks={5}
-                        hideTicks={!showTicks}
-                        hideAxisLine={!showXAxis}
-                        tickComponent={({ formattedValue, ...tickProps }) =>
-                            renderAxisLabel(formattedValue, tickProps, isLoading, theme)
-                        }
+                        tickFormat={(value) => `${value}`}
                     />
 
                     {/* Grid Lines */}
                     {showGrid && (
-                        <g>
-                            {xScale.ticks(5).map((tick) => (
-                                <line
-                                    key={tick}
-                                    y1={0}
-                                    y2={innerHeight}
-                                    x1={xScale(tick)}
-                                    x2={xScale(tick)}
-                                    stroke={theme.colors.axis.grid}
-                                    strokeDasharray="2,2"
-                                    opacity={0.5}
-                                />
-                            ))}
-                        </g>
+                        <Grid
+                            height={innerHeight}
+                            xScale={xScale}
+                            theme={theme}
+                            showHorizontal={false}
+                            showVertical={true}
+                            numTicks={5}
+                        />
                     )}
 
                     {/* Bars */}
@@ -256,12 +220,13 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                                 y={barY}
                                 width={barWidth}
                                 height={barHeight}
-                                fill={isLoading ? `url(#${shimmerGradientId})` : d.color || colorScale(index)}
+                                fill={d.color || colorScale(index)}
+                                isLoading={isLoading}
                                 opacity={barOpacity}
                                 rx={DEFAULT_BAR_RADIUS}
                                 onMouseMove={handleBarMouseMove(value, index)}
                                 onMouseLeave={handleBarMouseLeave}
-                                {...barProps}
+                                additionalProps={barProps}
                             />
                         );
                     })}
