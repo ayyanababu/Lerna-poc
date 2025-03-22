@@ -322,12 +322,6 @@ function App() {
                                 'fixedIncome',
                                 'others',
                             ]}
-                            margin={{
-                                top: 20,
-                                right: 30,
-                                bottom: 30,
-                                left: 40,
-                            }}
                             title="Regional Trade Distribution (Stacked)"
                             timestamp={new Date().toISOString()}
                             colors={[
@@ -469,12 +463,6 @@ function App() {
                                 'software',
                                 'travel',
                             ]}
-                            margin={{
-                                top: 20,
-                                right: 50,
-                                bottom: 30,
-                                left: 120,
-                            }}
                             title="Budget Allocation by Team (Stacked)"
                             timestamp={new Date().toISOString()}
                             colors={[

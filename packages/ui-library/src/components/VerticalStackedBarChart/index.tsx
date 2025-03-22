@@ -8,7 +8,6 @@ import { default as React, useCallback, useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
 import Grid from '../Grid';
-import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
 import XAxis from '../XAxis';
@@ -34,8 +33,8 @@ interface BarProps {
 const DEFAULT_MARGIN = {
     top: 20,
     right: 30,
-    bottom: 30,
-    left: 40,
+    bottom: 100,
+    left: 50,
 };
 const DEFAULT_BAR_RADIUS = 5;
 const DEFAULT_OPACITY = 1;
@@ -226,8 +225,6 @@ const VerticalStackedBarChart: React.FC<VerticalStackedBarChartProps> = ({
 
     // Render stacked bars
     const renderStackedBars = useCallback(() => {
-        if (!stackedData) return null;
-
         return filteredData.map((categoryData, categoryIndex) => {
             const category = String(categoryData.label);
             const barX = xScale(category) || 0;
@@ -280,25 +277,6 @@ const VerticalStackedBarChart: React.FC<VerticalStackedBarChartProps> = ({
     const renderBars = useCallback(() => {
         return renderStackedBars();
     }, [stackedData, renderStackedBars]);
-
-    // Hide axis labels when loading
-    const renderAxisLabel = (
-        formattedValue: string,
-        tickProps: any,
-        isLoading: boolean,
-        theme: any,
-    ) => (
-        <text
-            {...tickProps}
-            className={`${isLoading ? shimmerClassName : ''}`}
-            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-            style={{
-                fontSize: theme.typography.fontSize.small,
-            }}
-        >
-            {isLoading ? '' : formattedValue}
-        </text>
-    );
 
     return (
         <ChartWrapper
