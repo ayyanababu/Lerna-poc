@@ -8,6 +8,7 @@ import {
     SortableCard,
     VerticalBarChart,
     VerticalGroupedBarChart,
+    VerticalStackedBarChart,
 } from '@my-org/ui-library';
 import { useEffect, useState } from 'react';
 import './App.css';
@@ -222,46 +223,26 @@ function App() {
                             width={600}
                             height={200}
                             data={[
-                                {
-                                    label: 'Q1 2024',
+                                ...new Array(100).fill(0).map((_, index) => ({
+                                    label: `Q${index + 1} 2024`,
                                     data: {
-                                        future: 25,
-                                        options: 40,
-                                        forwards: 15,
-                                        fixedIncome: 12,
-                                        others: 32,
+                                        future:
+                                            Math.floor(Math.random() * 100) +
+                                            20,
+                                        options:
+                                            Math.floor(Math.random() * 100) +
+                                            20,
+                                        forwards:
+                                            Math.floor(Math.random() * 100) +
+                                            20,
+                                        fixedIncome:
+                                            Math.floor(Math.random() * 100) +
+                                            20,
+                                        others:
+                                            Math.floor(Math.random() * 100) +
+                                            20,
                                     },
-                                },
-                                {
-                                    label: 'Q2 2024',
-                                    data: {
-                                        future: 30,
-                                        options: 1,
-                                        forwards: 12,
-                                        fixedIncome: 12,
-                                        others: 32,
-                                    },
-                                },
-                                {
-                                    label: 'Q3 2024',
-                                    data: {
-                                        future: 15,
-                                        options: 50,
-                                        forwards: 1,
-                                        fixedIncome: 12,
-                                        others: 32,
-                                    },
-                                },
-                                {
-                                    label: 'Q4 2024',
-                                    data: {
-                                        future: 40,
-                                        options: 35,
-                                        forwards: 10,
-                                        fixedIncome: 12,
-                                        others: 32,
-                                    },
-                                },
+                                })),
                             ]}
                             groupKeys={[
                                 'future',
@@ -304,56 +285,35 @@ function App() {
                         />
                     </SortableCard>
 
-                    {/* VerticalGroupedBarChart with stacked type */}
+                    {/* VerticalStackedBarChart with stacked type */}
                     <SortableCard
-                        title="Regional Trade Distribution"
+                        title="VerticalStackedBarChart"
                         height={400}
                         width={'auto'}>
-                        <VerticalGroupedBarChart
+                        <VerticalStackedBarChart
                             width={600}
                             height={200}
-                            type="stacked"
                             data={[
-                                {
-                                    label: 'Region A',
+                                ...new Array(100).fill(0).map((_, index) => ({
+                                    label: `Region ${index + 1}`,
                                     data: {
-                                        future: 25,
-                                        options: 40,
-                                        forwards: 15,
-                                        fixedIncome: 12,
-                                        others: 32,
+                                        future:
+                                            Math.floor(Math.random() * 100) +
+                                            20,
+                                        options:
+                                            Math.floor(Math.random() * 100) +
+                                            20,
+                                        forwards:
+                                            Math.floor(Math.random() * 100) +
+                                            20,
+                                        fixedIncome:
+                                            Math.floor(Math.random() * 100) +
+                                            20,
+                                        others:
+                                            Math.floor(Math.random() * 100) +
+                                            20,
                                     },
-                                },
-                                {
-                                    label: 'Region B',
-                                    data: {
-                                        future: 30,
-                                        options: 1,
-                                        forwards: 12,
-                                        fixedIncome: 12,
-                                        others: 32,
-                                    },
-                                },
-                                {
-                                    label: 'Region C',
-                                    data: {
-                                        future: 15,
-                                        options: 50,
-                                        forwards: 1,
-                                        fixedIncome: 12,
-                                        others: 32,
-                                    },
-                                },
-                                {
-                                    label: 'Region D',
-                                    data: {
-                                        future: 40,
-                                        options: 35,
-                                        forwards: 10,
-                                        fixedIncome: 12,
-                                        others: 32,
-                                    },
-                                },
+                                })),
                             ]}
                             groupKeys={[
                                 'future',

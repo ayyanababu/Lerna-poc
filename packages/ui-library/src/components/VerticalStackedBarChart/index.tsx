@@ -4,18 +4,17 @@ import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { Bar, stack } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
-import { default as React, useMemo, useState } from 'react';
+import { default as React, useCallback, useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
 import Grid from '../Grid';
-import { HorizontalGroupedBarChartProps } from '../HorizontalGroupedBarChart/types';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
-import { mockVerticalGroupedBarChartData } from '../VerticalGroupedBarChart/mockdata';
 import XAxis from '../XAxis';
 import YAxis from '../YAxis';
-import { DataPoint } from './types';
+import { mockVerticalStackedBarChartData } from './mockdata';
+import { DataPoint, VerticalStackedBarChartProps } from './types';
 
 interface BarProps {
     key: string;
@@ -34,9 +33,9 @@ interface BarProps {
 
 const DEFAULT_MARGIN = {
     top: 20,
-    right: 50,
+    right: 30,
     bottom: 30,
-    left: 120,
+    left: 40,
 };
 const DEFAULT_BAR_RADIUS = 5;
 const DEFAULT_OPACITY = 1;
@@ -44,9 +43,9 @@ const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
 
 /**
- * HorizontalStackedBarChart component that renders either grouped or stacked bar charts horizontally
+ * VerticalStackedBarChart component that renders either grouped or stacked bar charts vertically
  */
-const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
+const VerticalStackedBarChart: React.FC<VerticalStackedBarChartProps> = ({
     data: _data,
     groupKeys: _groupKeys,
     margin = DEFAULT_MARGIN,
@@ -58,7 +57,11 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     legendsProps,
     tooltipProps,
     showTicks = false,
+    yAxisProps,
+    xAxisProps,
+    showYAxis = true,
     showGrid = true,
+    showXAxis = true,
 }) => {
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
@@ -82,7 +85,7 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
         groupKeys: string[];
     }>(
         () =>
-            isLoading ? mockVerticalGroupedBarChartData : { data: _data, groupKeys: _groupKeys },
+            isLoading ? mockVerticalStackedBarChartData : { data: _data, groupKeys: _groupKeys },
         [isLoading, _data, _groupKeys],
     );
 
@@ -145,9 +148,8 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
         }
     }, [activeKeys, filteredData]);
 
-    // Calculate max value for x-axis scale
+    // Calculate max value for y-axis scale
     const maxValue = useMemo(() => {
-        // For stacked charts, sum all values in each category
         return Math.max(
             0,
             ...filteredData.map((d) =>
@@ -158,35 +160,34 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
         );
     }, [filteredData, activeKeys]);
 
-    // Create scales for horizontal orientation
-    const categoryScale = useMemo(
+    // Create scales
+    const xScale = useMemo(
         () =>
             scaleBand<string>({
                 domain: filteredData.map((d) => String(d.label)),
-                range: [0, innerHeight],
+                range: [0, innerWidth],
                 padding: 0.4, // Increased padding for thinner bars
             }),
-        [filteredData, innerHeight],
+        [filteredData, innerWidth],
     );
 
     const groupScale = useMemo(
         () =>
             scaleBand<string>({
                 domain: activeKeys,
-                range: [0, categoryScale.bandwidth()],
+                range: [0, xScale.bandwidth()],
                 padding: 0.3, // Increased padding for thinner bars
             }),
-        [activeKeys, categoryScale],
+        [activeKeys, xScale],
     );
 
-    const xScale = useMemo(
+    const yScale = useMemo(
         () =>
             scaleLinear<number>({
                 domain: [0, maxValue * SCALE_PADDING],
-                range: [0, innerWidth],
-                nice: true,
+                range: [innerHeight, 0],
             }),
-        [innerWidth, maxValue],
+        [innerHeight, maxValue],
     );
 
     const groupColorScale = useMemo(
@@ -223,44 +224,24 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
         }
     };
 
-    // Hide axis labels when loading
-    const renderAxisLabel = (
-        formattedValue: string,
-        tickProps: any,
-        isLoading: boolean,
-        theme: any,
-    ) => (
-        <text
-            {...tickProps}
-            className={`${isLoading ? shimmerClassName : ''}`}
-            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-            style={{
-                fontSize: theme.typography.fontSize.small,
-            }}
-        >
-            {isLoading ? '' : formattedValue}
-        </text>
-    );
+    // Render stacked bars
+    const renderStackedBars = useCallback(() => {
+        if (!stackedData) return null;
 
-    // Render bars based on chart type
-    const renderBars = () => renderStackedBars();
-
-    // Render stacked bars (horizontal)
-    const renderStackedBars = () => {
         return filteredData.map((categoryData, categoryIndex) => {
             const category = String(categoryData.label);
-            const barY = categoryScale(category) || 0;
-            const barHeight = categoryScale.bandwidth();
+            const barX = xScale(category) || 0;
+            const barWidth = xScale.bandwidth();
 
             return activeKeys.map((groupKey, groupIndex) => {
                 // Find the corresponding stack data
                 const seriesData = stackedData.find((s) => s.key === groupKey);
                 if (!seriesData || !seriesData[categoryIndex]) return null;
 
-                const [x0, x1] = seriesData[categoryIndex];
-                const barWidth = xScale(x1) - xScale(x0);
-                const barX = xScale(x0);
-                const value = x1 - x0;
+                const [y0, y1] = seriesData[categoryIndex];
+                const barHeight = yScale(y0) - yScale(y1);
+                const barY = yScale(y1);
+                const value = y1 - y0;
 
                 if (!value) return null;
 
@@ -284,7 +265,40 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
                 });
             });
         });
-    };
+    }, [
+        stackedData,
+        filteredData,
+        xScale,
+        yScale,
+        groupColorScale,
+        activeKeys,
+        hoveredGroupKey,
+        isLoading,
+    ]);
+
+    // Render bars based on chart type
+    const renderBars = useCallback(() => {
+        return renderStackedBars();
+    }, [stackedData, renderStackedBars]);
+
+    // Hide axis labels when loading
+    const renderAxisLabel = (
+        formattedValue: string,
+        tickProps: any,
+        isLoading: boolean,
+        theme: any,
+    ) => (
+        <text
+            {...tickProps}
+            className={`${isLoading ? shimmerClassName : ''}`}
+            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+            style={{
+                fontSize: theme.typography.fontSize.small,
+            }}
+        >
+            {isLoading ? '' : formattedValue}
+        </text>
+    );
 
     return (
         <ChartWrapper
@@ -314,35 +328,31 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
                 {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
+                    {/* Y-Axis */}
                     <YAxis
-                        scale={categoryScale}
-                        tickStroke={theme.colors.axis.line}
-                        tickComponent={({ formattedValue, ...tickProps }) =>
-                            renderAxisLabel(formattedValue, tickProps, isLoading, theme)
-                        }
-                        hideAxisLine
-                        numTicks={innerHeight / 20}
-                        hideTicks={!showTicks}
-                    />
-
-                    {/* X-Axis (values) */}
-                    <XAxis
-                        scale={xScale}
-                        top={innerHeight}
-                        hideTicks={hideIndex.length === groupKeys.length || !showTicks}
-                        numTicks={5}
+                        scale={yScale}
+                        isLoading={isLoading}
+                        showTicks={showTicks}
+                        showAxisLine={showYAxis}
+                        availableHeight={innerHeight}
+                        {...yAxisProps}
                     />
 
                     {/* Grid Lines */}
-                    {showGrid && (
-                        <Grid
-                            height={innerHeight}
-                            xScale={xScale}
-                            showHorizontal={false}
-                            showVertical={true}
-                            numTicks={5}
-                        />
-                    )}
+                    {showGrid && <Grid width={innerWidth} yScale={yScale} numTicks={5} />}
+
+                    {/* X-Axis with auto-rotating labels */}
+                    <XAxis
+                        scale={xScale}
+                        top={innerHeight}
+                        isLoading={isLoading}
+                        showTicks={showTicks}
+                        showAxisLine={showXAxis}
+                        labels={filteredData.map((d) => String(d.label))}
+                        availableWidth={innerWidth}
+                        autoRotate
+                        {...xAxisProps}
+                    />
 
                     {/* Bars */}
                     {renderBars()}
@@ -352,4 +362,4 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     );
 };
 
-export default HorizontalStackedBarChart;
+export default VerticalStackedBarChart;

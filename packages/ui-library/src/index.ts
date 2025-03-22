@@ -6,6 +6,7 @@ import SortableComponent from './components/Sortable';
 import SortableCard from './components/SortableCard';
 import VerticalBarChart from './components/VerticalBarChart';
 import VerticalGroupedBarChart from './components/VerticalGroupedBarChart';
+import VerticalStackedBarChart from './components/VerticalStackedBarChart';
 import ChartThemeProvider from './context/ChartThemeProvider';
 
 export {
@@ -18,5 +19,6 @@ export {
     SortableCard,
     VerticalBarChart,
     VerticalGroupedBarChart,
+    VerticalStackedBarChart,
 };
 
