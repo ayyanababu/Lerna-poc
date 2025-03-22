@@ -1,13 +1,13 @@
 import { WithBoundingRectsProps } from '@visx/bounds';
 
 export interface TooltipData {
-  label: string;
-  value: number;
+    label: string;
+    value: number;
 }
 
 export interface TooltipProps extends WithBoundingRectsProps {
-  top: number;
-  left: number;
-  data: TooltipData;
-  isVisible?: boolean;
+    top: number;
+    left: number;
+    data: TooltipData;
+    isVisible?: boolean;
 }

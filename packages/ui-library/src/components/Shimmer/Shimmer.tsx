@@ -1,14 +1,14 @@
 import React from 'react';
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 
 export const shimmerClassName = `my-lib-shimmer-${Math.random().toString(36).substring(7)}`;
 
 export function Shimmer() {
-  const { theme } = useTheme();
+    const { theme } = useTheme();
 
-  return (
-    <style>
-      {`
+    return (
+        <style>
+            {`
           @keyframes shimmer {
             0% {
               background-position: 200% 0;
@@ -42,6 +42,6 @@ export function Shimmer() {
             background-color: transparent !important;
           }
         `}
-    </style>
-  );
+        </style>
+    );
 }

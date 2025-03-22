@@ -5,8 +5,8 @@ import { Bar, stack } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import React, { useCallback, useMemo, useState } from 'react';
-import { useTheme } from '../../hooks/useTheme';
-import { ChartWrapper } from '../ChartWrapper';
+import useTheme from '../../hooks/useTheme';
+import ChartWrapper from '../ChartWrapper';
 import Grid from '../Grid';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
@@ -36,7 +36,6 @@ const DEFAULT_MARGIN = {
     bottom: 100,
     left: 50,
 };
-const DEFAULT_BAR_RADIUS = 5;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
@@ -56,7 +55,7 @@ interface BarProps {
     onMouseLeave: () => void;
 }
 
-const VerticalStackedBarChart: React.FC<VerticalStackedBarChartProps> = ({
+function VerticalStackedBarChart({
     data: _data,
     groupKeys: _groupKeys,
     margin = DEFAULT_MARGIN,
@@ -73,11 +72,7 @@ const VerticalStackedBarChart: React.FC<VerticalStackedBarChartProps> = ({
     showYAxis = true,
     showGrid = true,
     showXAxis = true,
-}) => {
-    if (!_data || _data.length === 0) {
-        return <div>No data to display.</div>;
-    }
-
+}: VerticalStackedBarChartProps) {
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
     const innerWidth = width - margin.left - margin.right;
@@ -131,7 +126,7 @@ const VerticalStackedBarChart: React.FC<VerticalStackedBarChartProps> = ({
     const stackedData = useMemo(() => {
         try {
             const prepared = filteredData.map((item) => {
-                const result: Record<string, any> = { label: item.label };
+                const result: Record<string, number | string> = { label: item.label };
                 activeKeys.forEach((key) => {
                     result[key] = Number(item.data[key]) || 0;
                 });
@@ -188,26 +183,29 @@ const VerticalStackedBarChart: React.FC<VerticalStackedBarChartProps> = ({
 
     const renderBar = (props: BarProps) => <Bar {...props} />;
 
-    const handleMouseMove = (groupKey: string, value: number) => (event: React.MouseEvent) => {
-        if (!isLoading) {
-            showTooltip({
-                tooltipData: {
-                    label: capitalize(lowerCase(groupKey)),
-                    value,
-                },
-                tooltipLeft: event.clientX,
-                tooltipTop: event.clientY,
-            });
-            setHoveredGroupKey(groupKey);
-        }
-    };
+    const handleMouseMove = useCallback(
+        (groupKey: string, value: number) => (event: React.MouseEvent) => {
+            if (!isLoading) {
+                showTooltip({
+                    tooltipData: {
+                        label: capitalize(lowerCase(groupKey)),
+                        value,
+                    },
+                    tooltipLeft: event.clientX,
+                    tooltipTop: event.clientY,
+                });
+                setHoveredGroupKey(groupKey);
+            }
+        },
+        [isLoading, showTooltip, setHoveredGroupKey],
+    );
 
-    const handleMouseLeave = () => {
+    const handleMouseLeave = useCallback(() => {
         if (!isLoading) {
             hideTooltip();
             setHoveredGroupKey(null);
         }
-    };
+    }, [isLoading, hideTooltip, setHoveredGroupKey]);
 
     const renderStackedBars = useCallback(
         () =>
@@ -253,19 +251,24 @@ const VerticalStackedBarChart: React.FC<VerticalStackedBarChartProps> = ({
                 });
             }),
         [
-            stackedData,
             filteredData,
             xScale,
-            yScale,
-            groupColorScale,
             activeKeys,
+            stackedData,
+            yScale,
             hoveredGroupKey,
             isLoading,
+            groupColorScale,
+            handleMouseMove,
+            handleMouseLeave,
         ],
     );
 
     const renderBars = useCallback(() => renderStackedBars(), [renderStackedBars]);
 
+    if (!_data || _data.length === 0) {
+        return <div>No data to display.</div>;
+    }
     return (
         <ChartWrapper
             ref={parentRef}
@@ -322,6 +325,6 @@ const VerticalStackedBarChart: React.FC<VerticalStackedBarChartProps> = ({
             </svg>
         </ChartWrapper>
     );
-};
+}
 
 export default VerticalStackedBarChart;

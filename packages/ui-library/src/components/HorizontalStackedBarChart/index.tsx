@@ -4,9 +4,9 @@ import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { Bar, stack } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
-import { default as React, useMemo, useState } from 'react';
-import { useTheme } from '../../hooks/useTheme';
-import { ChartWrapper } from '../ChartWrapper';
+import React, { useMemo, useState } from 'react';
+import useTheme from '../../hooks/useTheme';
+import ChartWrapper from '../ChartWrapper';
 import Grid from '../Grid';
 import { HorizontalGroupedBarChartProps } from '../HorizontalGroupedBarChart/types';
 import { shimmerClassName } from '../Shimmer/Shimmer';
@@ -38,7 +38,6 @@ const DEFAULT_MARGIN = {
     bottom: 30,
     left: 120,
 };
-const DEFAULT_BAR_RADIUS = 5;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
@@ -60,10 +59,6 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     showTicks = false,
     showGrid = true,
 }) => {
-    if (!_data || _data.length === 0) {
-        return <div>No data to display.</div>;
-    }
-
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
     const innerWidth = width - margin.left - margin.right;
@@ -129,7 +124,7 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
         try {
             // Convert data to the format expected by stack generator
             const prepared = filteredData.map((item) => {
-                const result: Record<string, any> = { label: item.label };
+                const result: Record<string, number | string> = { label: item.label };
                 activeKeys.forEach((key) => {
                     result[key] = Number(item.data[key]) || 0;
                 });
@@ -146,17 +141,19 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     }, [activeKeys, filteredData]);
 
     // Calculate max value for x-axis scale
-    const maxValue = useMemo(() => {
-        // For stacked charts, sum all values in each category
-        return Math.max(
-            0,
-            ...filteredData.map((d) =>
-                Object.entries(d.data)
-                    .filter(([key]) => activeKeys.includes(key))
-                    .reduce((sum, [_, value]) => sum + Number(value || 0), 0),
+    const maxValue = useMemo(
+        () =>
+            // For stacked charts, sum all values in each category
+            Math.max(
+                0,
+                ...filteredData.map((d) =>
+                    Object.entries(d.data)
+                        .filter(([key]) => activeKeys.includes(key))
+                        .reduce((sum, [_, value]) => sum + Number(value || 0), 0),
+                ),
             ),
-        );
-    }, [filteredData, activeKeys]);
+        [filteredData, activeKeys],
+    );
 
     // Create scales for horizontal orientation
     const categoryScale = useMemo(
@@ -167,16 +164,6 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
                 padding: 0.4, // Increased padding for thinner bars
             }),
         [filteredData, innerHeight],
-    );
-
-    const groupScale = useMemo(
-        () =>
-            scaleBand<string>({
-                domain: activeKeys,
-                range: [0, categoryScale.bandwidth()],
-                padding: 0.3, // Increased padding for thinner bars
-            }),
-        [activeKeys, categoryScale],
     );
 
     const xScale = useMemo(
@@ -224,12 +211,7 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     };
 
     // Hide axis labels when loading
-    const renderAxisLabel = (
-        formattedValue: string,
-        tickProps: any,
-        isLoading: boolean,
-        theme: any,
-    ) => (
+    const renderAxisLabel = (formattedValue: string, tickProps: React.SVGProps<SVGTextElement>) => (
         <text
             {...tickProps}
             className={`${isLoading ? shimmerClassName : ''}`}
@@ -242,17 +224,14 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
         </text>
     );
 
-    // Render bars based on chart type
-    const renderBars = () => renderStackedBars();
-
     // Render stacked bars (horizontal)
-    const renderStackedBars = () => {
-        return filteredData.map((categoryData, categoryIndex) => {
+    const renderStackedBars = () =>
+        filteredData.map((categoryData, categoryIndex) => {
             const category = String(categoryData.label);
             const barY = categoryScale(category) || 0;
             const barHeight = categoryScale.bandwidth();
 
-            return activeKeys.map((groupKey, groupIndex) => {
+            return activeKeys.map((groupKey) => {
                 // Find the corresponding stack data
                 const seriesData = stackedData.find((s) => s.key === groupKey);
                 if (!seriesData || !seriesData[categoryIndex]) return null;
@@ -284,7 +263,13 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
                 });
             });
         });
-    };
+
+    // Render bars based on chart type
+    const renderBars = () => renderStackedBars();
+
+    if (!_data || _data.length === 0) {
+        return <div>No data to display.</div>;
+    }
 
     return (
         <ChartWrapper
@@ -318,7 +303,7 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
                         scale={categoryScale}
                         tickStroke={theme.colors.axis.line}
                         tickComponent={({ formattedValue, ...tickProps }) =>
-                            renderAxisLabel(formattedValue, tickProps, isLoading, theme)
+                            renderAxisLabel(formattedValue, tickProps)
                         }
                         hideAxisLine
                         numTicks={innerHeight / 20}
@@ -339,7 +324,7 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
                             height={innerHeight}
                             xScale={xScale}
                             showHorizontal={false}
-                            showVertical={true}
+                            showVertical
                             numTicks={5}
                         />
                     )}

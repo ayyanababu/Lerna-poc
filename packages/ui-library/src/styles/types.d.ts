@@ -1,3 +1,3 @@
 export interface FontFamilyImportProps {
-  uniqueId: string;
+    uniqueId: string;
 }

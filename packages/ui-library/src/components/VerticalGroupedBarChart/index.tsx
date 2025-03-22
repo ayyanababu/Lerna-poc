@@ -5,9 +5,9 @@ import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { Bar, stack } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
-import { default as React, useCallback, useMemo, useState } from 'react';
-import { useTheme } from '../../hooks/useTheme';
-import { ChartWrapper } from '../ChartWrapper';
+import React, { useCallback, useMemo, useState } from 'react';
+import useTheme from '../../hooks/useTheme';
+import ChartWrapper from '../ChartWrapper';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
@@ -57,10 +57,6 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     tooltipProps,
     showTicks = false,
 }) => {
-    if (!_data || _data.length === 0) {
-        return <div>No data to display.</div>;
-    }
-
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
     const innerWidth = width - margin.left - margin.right;
@@ -78,7 +74,8 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         data: DataPoint[];
         groupKeys: string[];
     }>(
-        () => (isLoading ? mockVerticalGroupedBarChartData : { data: _data, groupKeys: _groupKeys }),
+        () =>
+            isLoading ? mockVerticalGroupedBarChartData : { data: _data, groupKeys: _groupKeys },
         [isLoading, _data, _groupKeys],
     );
 
@@ -106,7 +103,10 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         () =>
             groupKeys.map((key) => ({
                 label: capitalize(lowerCase(key)),
-                value: data.reduce((total, categoryData) => total + Number(categoryData.data[key] || 0), 0),
+                value: data.reduce(
+                    (total, categoryData) => total + Number(categoryData.data[key] || 0),
+                    0,
+                ),
             })),
         [groupKeys, data],
     );
@@ -160,7 +160,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
             ...filteredData.reduce((values, categoryData) => {
                 activeKeys.forEach((key) => {
                     const value = Number(categoryData.data?.[key]);
-                    if (!isNaN(value)) {
+                    if (!Number.isNaN(value)) {
                         values.push(value);
                     }
                 });
@@ -212,26 +212,29 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     const renderBar = (props: BarProps) => <Bar {...props} />;
 
     // Handler for mouse events
-    const handleMouseMove = (groupKey: string, value: number) => (event: React.MouseEvent) => {
-        if (!isLoading) {
-            showTooltip({
-                tooltipData: {
-                    label: capitalize(lowerCase(groupKey)),
-                    value,
-                },
-                tooltipLeft: event.clientX,
-                tooltipTop: event.clientY,
-            });
-            setHoveredGroupKey(groupKey);
-        }
-    };
+    const handleMouseMove = useCallback(
+        (groupKey: string, value: number) => (event: React.MouseEvent) => {
+            if (!isLoading) {
+                showTooltip({
+                    tooltipData: {
+                        label: capitalize(lowerCase(groupKey)),
+                        value,
+                    },
+                    tooltipLeft: event.clientX,
+                    tooltipTop: event.clientY,
+                });
+                setHoveredGroupKey(groupKey);
+            }
+        },
+        [isLoading, showTooltip],
+    );
 
-    const handleMouseLeave = () => {
+    const handleMouseLeave = useCallback(() => {
         if (!isLoading) {
             hideTooltip();
             setHoveredGroupKey(null);
         }
-    };
+    }, [isLoading, hideTooltip]);
 
     // Render stacked bars
     const renderStackedBars = useCallback(() => {
@@ -242,7 +245,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
             const barX = categoryScale(category) || 0;
             const barWidth = categoryScale.bandwidth();
 
-            return activeKeys.map((groupKey, groupIndex) => {
+            return activeKeys.map((groupKey) => {
                 // Find the corresponding stack data
                 const seriesData = stackedData.find((s) => s.key === groupKey);
                 if (!seriesData || !seriesData[categoryIndex]) return null;
@@ -255,7 +258,8 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                 if (!value) return null;
 
                 const isHoveredGroup = hoveredGroupKey === groupKey;
-                const barOpacity = hoveredGroupKey && !isHoveredGroup ? REDUCED_OPACITY : DEFAULT_OPACITY;
+                const barOpacity =
+                    hoveredGroupKey && !isHoveredGroup ? REDUCED_OPACITY : DEFAULT_OPACITY;
 
                 return renderBar({
                     key: `stacked-${category}-${groupKey}`,
@@ -273,52 +277,81 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                 });
             });
         });
-    }, [stackedData, filteredData, categoryScale, valueScale, groupColorScale, activeKeys, hoveredGroupKey, isLoading]);
+    }, [
+        stackedData,
+        filteredData,
+        categoryScale,
+        activeKeys,
+        valueScale,
+        hoveredGroupKey,
+        isLoading,
+        groupColorScale,
+        handleMouseMove,
+        handleMouseLeave,
+    ]);
 
     // Render grouped bars
-    const renderGroupedBars = useCallback(() =>
-        filteredData.map((categoryData, index) => {
-            const category = String(categoryData.label);
-            const categoryX = categoryScale(category) || 0;
+    const renderGroupedBars = useCallback(
+        () =>
+            filteredData.map((categoryData) => {
+                const category = String(categoryData.label);
+                const categoryX = categoryScale(category) || 0;
 
-            return groupKeys.map((groupKey, groupIndex) => {
-                const value = Number(categoryData.data?.[groupKey]);
-                if (isNaN(value)) return null;
+                return groupKeys.map((groupKey, groupIndex) => {
+                    const value = Number(categoryData.data?.[groupKey]);
+                    if (Number.isNaN(value)) return null;
 
-                const barX = categoryX + (groupScale(groupKey) || 0);
-                const barWidth = groupScale.bandwidth();
-                const barHeight = innerHeight - valueScale(value);
-                const barY = valueScale(value);
+                    const barX = categoryX + (groupScale(groupKey) || 0);
+                    const barWidth = groupScale.bandwidth();
+                    const barHeight = innerHeight - valueScale(value);
+                    const barY = valueScale(value);
 
-                const isHoveredGroup = hoveredGroupKey === groupKey;
-                const barOpacity = hoveredGroupKey && !isHoveredGroup ? REDUCED_OPACITY : DEFAULT_OPACITY;
+                    const isHoveredGroup = hoveredGroupKey === groupKey;
+                    const barOpacity =
+                        hoveredGroupKey && !isHoveredGroup ? REDUCED_OPACITY : DEFAULT_OPACITY;
 
-                const barFill = isLoading
-                    ? `url(#${shimmerGradientId})`
-                    : hideIndex.includes(groupIndex)
-                        ? '#eee'
-                        : groupColorScale(groupKey);
+                    const getBarFill = () => {
+                        if (isLoading) return `url(#${shimmerGradientId})`;
+                        if (hideIndex.includes(groupIndex)) return '#eee';
+                        return groupColorScale(groupKey);
+                    };
+                    const barFill = getBarFill();
 
-                return (
-                    <g key={`${category}-${groupKey}-${index}-${groupIndex}`}>
-                        {renderBar({
-                            key: `grouped-${category}-${groupKey}`,
-                            x: barX,
-                            y: barY,
-                            width: barWidth,
-                            height: barHeight,
-                            fill: barFill,
-                            opacity: barOpacity,
-                            rx: DEFAULT_BAR_RADIUS,
-                            value,
-                            label: groupKey,
-                            onMouseMove: handleMouseMove(groupKey, value),
-                            onMouseLeave: handleMouseLeave,
-                        })}
-                    </g>
-                );
-            });
-        }), [filteredData, categoryScale, groupScale, valueScale, innerHeight, groupColorScale, hideIndex, hoveredGroupKey, isLoading]);
+                    return (
+                        <g key={`${category}-${groupKey}`}>
+                            {renderBar({
+                                key: `grouped-${category}-${groupKey}`,
+                                x: barX,
+                                y: barY,
+                                width: barWidth,
+                                height: barHeight,
+                                fill: barFill,
+                                opacity: barOpacity,
+                                rx: DEFAULT_BAR_RADIUS,
+                                value,
+                                label: groupKey,
+                                onMouseMove: handleMouseMove(groupKey, value),
+                                onMouseLeave: handleMouseLeave,
+                            })}
+                        </g>
+                    );
+                });
+            }),
+        [
+            filteredData,
+            categoryScale,
+            groupKeys,
+            groupScale,
+            innerHeight,
+            valueScale,
+            hoveredGroupKey,
+            isLoading,
+            hideIndex,
+            groupColorScale,
+            handleMouseMove,
+            handleMouseLeave,
+        ],
+    );
 
     // Render bars based on chart type
     const renderBars = useCallback(() => {
@@ -329,7 +362,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     }, [type, stackedData, renderStackedBars, renderGroupedBars]);
 
     // Hide axis labels when loading
-    const renderAxisLabel = (formattedValue: string, tickProps: any, isLoading: boolean, theme: any) => (
+    const renderAxisLabel = (formattedValue: string, tickProps: React.SVGProps<SVGTextElement>) => (
         <text
             {...tickProps}
             className={`${isLoading ? shimmerClassName : ''}`}
@@ -341,6 +374,10 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
             {isLoading ? '' : formattedValue}
         </text>
     );
+
+    if (!_data || _data.length === 0) {
+        return <div>No data to display.</div>;
+    }
 
     return (
         <ChartWrapper
@@ -384,7 +421,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                                 dy: '0.33em',
                             }}
                             tickComponent={({ formattedValue, ...tickProps }) =>
-                                renderAxisLabel(formattedValue, tickProps, isLoading, theme)
+                                renderAxisLabel(formattedValue, tickProps)
                             }
                             numTicks={5}
                             hideTicks={!showTicks}
@@ -413,7 +450,9 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                         top={innerHeight}
                         stroke={theme.colors.axis.line}
                         tickStroke={theme.colors.axis.line}
-                        tickFormat={(value) => (hideIndex.length !== groupKeys.length ? `${value}` : '')}
+                        tickFormat={(value) =>
+                            hideIndex.length !== groupKeys.length ? `${value}` : ''
+                        }
                         tickLabelProps={{
                             fill: theme.colors.axis.label,
                             fontSize: theme.typography.fontSize.small,
@@ -421,7 +460,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                             dy: '0.33em',
                         }}
                         tickComponent={({ formattedValue, ...tickProps }) =>
-                            renderAxisLabel(formattedValue, tickProps, isLoading, theme)
+                            renderAxisLabel(formattedValue, tickProps)
                         }
                         hideTicks={hideIndex.length === groupKeys.length || !showTicks}
                     />

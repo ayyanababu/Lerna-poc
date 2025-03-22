@@ -3,15 +3,15 @@ import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { useTooltip } from '@visx/tooltip';
 import React, { useMemo, useState } from 'react';
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import Bar from '../Bar';
-import { ChartWrapper } from '../ChartWrapper';
+import ChartWrapper from '../ChartWrapper';
 import Grid from '../Grid';
 import SvgShimmer from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
 import XAxis from '../XAxis';
 import YAxis from '../YAxis';
-import { mockHorizontalBarChartData } from './mockdata';
+import mockHorizontalBarChartData from './mockdata';
 import { DataPoint, HorizontalBarChartProps } from './types';
 
 const DEFAULT_MARGIN = {
@@ -45,10 +45,6 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     showXAxis = false,
     barProps,
 }) => {
-    if (!_data || _data.length === 0) {
-        return <div>No data to display.</div>;
-    }
-
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
     const innerWidth = width - margin.left - margin.right;
@@ -73,9 +69,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     );
 
     // Calculate the maximum value for the x-axis scale
-    const maxValue = useMemo(() => {
-        return Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) * SCALE_PADDING;
-    }, [filteredData]);
+    const maxValue = useMemo(
+        () => Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) * SCALE_PADDING,
+        [filteredData],
+    );
 
     // Create scales
     // For horizontal bars, yScale uses band and xScale uses linear
@@ -133,6 +130,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         }
     };
 
+    if (!_data || _data.length === 0) {
+        return <div>No data to display.</div>;
+    }
     return (
         <ChartWrapper
             ref={parentRef}
@@ -193,7 +193,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                             height={innerHeight}
                             xScale={xScale}
                             showHorizontal={false}
-                            showVertical={true}
+                            showVertical
                             numTicks={5}
                         />
                     )}
@@ -201,7 +201,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                     {/* Bars */}
                     {filteredData.map((d, index) => {
                         const value = Number(d.value);
-                        if (isNaN(value)) return null;
+                        if (Number.isNaN(value)) return null;
 
                         const barWidth = xScale(value);
                         const barHeight = yScale.bandwidth();
@@ -213,7 +213,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
                         return (
                             <Bar
-                                key={`bar-${d.label}-${index}`}
+                                key={`bar-${d.label}`}
                                 x={barX}
                                 y={barY}
                                 width={barWidth}

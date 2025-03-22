@@ -1,6 +1,6 @@
 import { AxisLeft } from '@visx/axis';
 import React from 'react';
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { YAxisProps } from './types';
@@ -16,12 +16,14 @@ function YAxis({
     isLoading = false,
     hideAllTicks = false,
     textAnchor = 'end',
-    availableHeight,
     ...props
 }: YAxisProps) {
     const { theme } = useTheme();
     // Render axis label with loading state handling
-    const renderAxisLabel = (formattedValue: string | undefined, tickProps: any) => (
+    const renderAxisLabel = (
+        formattedValue: string | undefined,
+        tickProps: React.SVGProps<SVGTextElement>,
+    ) => (
         <text
             {...tickProps}
             className={`${isLoading ? shimmerClassName : ''}`}
@@ -48,10 +50,10 @@ function YAxis({
             scale={scale}
             stroke={theme.colors.axis.line}
             tickStroke={theme.colors.axis.line}
-            tickLabelProps={(value, index, values) => ({
+            tickLabelProps={() => ({
                 fill: theme.colors.axis.label,
                 fontSize: theme.typography.fontSize.small,
-                textAnchor: textAnchor,
+                textAnchor,
                 dy: '0.33em',
             })}
             hideAxisLine={!showAxisLine}
