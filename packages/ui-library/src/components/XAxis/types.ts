@@ -25,7 +25,7 @@ export interface XAxisProps extends AxisBottomProps {
     /**
      * Map of even positions for labels
      */
-    evenPositionsMap?: Map<any, number>;
+    evenPositionsMap?: Map<string, number>;
 
     /**
      * Width available for the axis (for auto-rotation calculation)
@@ -41,4 +41,9 @@ export interface XAxisProps extends AxisBottomProps {
      * The labels to display (used for auto-rotation calculation)
      */
     labels?: string[];
+
+    /**
+     * Whether the axis is visible
+     */
+    isVisible?: boolean;
 }

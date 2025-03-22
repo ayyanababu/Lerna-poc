@@ -343,7 +343,8 @@ function App() {
                                         data,
                                     );
                                 },
-                                doStrike: true,
+                                doStrike: false,
+                                position: 'bottom',
                             }}
                             tooltipProps={{}}
                         />

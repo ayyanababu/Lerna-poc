@@ -4,20 +4,18 @@ import { TimestampProps } from '../Timestamp/types';
 import { TitleProps } from '../Title/types';
 import { TooltipProps } from '../Tooltip/types';
 
-export interface OmittedLegendsProps
-  extends Omit<
+export type OmittedLegendsProps = Omit<
     LegendsProps,
     'data' | 'colorScale' | 'hideIndex' | 'setHideIndex' | 'hovered' | 'setHovered' | 'isLoading'
-  > {}
+>;
 
-export interface OmittedTooltipProps
-  extends Omit<TooltipProps, 'data' | 'top' | 'left' | 'isVisible'> {}
+export type OmittedTooltipProps = Omit<TooltipProps, 'data' | 'top' | 'left' | 'isVisible'>;
 
 export interface ChartWrapperProps {
-  children: ReactNode;
-  title?: string;
-  titleProps?: TitleProps;
-  legendsProps?: LegendsProps;
-  tooltipProps?: TooltipProps;
-  timestampProps?: TimestampProps;
+    children: ReactNode;
+    title?: string;
+    titleProps?: TitleProps;
+    legendsProps?: LegendsProps;
+    tooltipProps?: TooltipProps;
+    timestampProps?: TimestampProps;
 }

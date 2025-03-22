@@ -1,5 +1,6 @@
-import { Bar } from '@visx/shape';
 import { CSSProperties } from 'react';
+import { CustomBarProps } from '../CustomBar/types';
+import { GridProps } from '../Grid/types';
 import { LegendsProps } from '../Legends/types';
 import { TimestampProps } from '../Timestamp/types';
 import { TitleProps } from '../Title/types';
@@ -8,113 +9,118 @@ import { XAxisProps } from '../XAxis/types';
 import { YAxisProps } from '../YAxis/types';
 
 export interface DataPoint {
-  label: string;
-  value: number;
-  color?: string;
+    label: string;
+    value: number;
+    color?: string;
 }
 
 export interface VerticalBarChartProps {
-  /**
-   * Data for the chart
-   */
-  data: DataPoint[];
+    /**
+     * Data for the chart
+     */
+    data: DataPoint[];
 
-  /**
-   * Chart title
-   */
-  title?: string;
+    /**
+     * Chart title
+     */
+    title?: string;
 
-  /**
-   * Chart timestamp
-   */
-  timestamp?: string;
+    /**
+     * Chart timestamp
+     */
+    timestamp?: string;
 
-  /**
-   * Margin around the chart
-   */
-  margin?: { top: number; right: number; bottom: number; left: number };
+    /**
+     * Margin around the chart
+     */
+    margin?: { top: number; right: number; bottom: number; left: number };
 
-  /**
-   * Width of the chart
-   */
-  width?: number;
+    /**
+     * Width of the chart
+     */
+    width?: number;
 
-  /**
-   * Height of the chart
-   */
-  height?: number;
+    /**
+     * Height of the chart
+     */
+    height?: number;
 
-  /**
-   * Custom colors for the chart
-   */
-  colors?: string[];
+    /**
+     * Custom colors for the chart
+     */
+    colors?: string[];
 
-  /**
-   * Loading state
-   */
-  isLoading?: boolean;
+    /**
+     * Loading state
+     */
+    isLoading?: boolean;
 
-  /**
-   * Title props
-   */
-  titleProps?: TitleProps;
+    /**
+     * Title props
+     */
+    titleProps?: TitleProps;
 
-  /**
-   * Legend props
-   */
-  legendsProps?: Partial<LegendsProps>;
+    /**
+     * Legend props
+     */
+    legendsProps?: Partial<LegendsProps>;
 
-  /**
-   * Tooltip props
-   */
-  tooltipProps?: Partial<TooltipProps>;
+    /**
+     * Tooltip props
+     */
+    tooltipProps?: Partial<TooltipProps>;
 
-  /**
-   * X axis props
-   */
-  xAxisProps?: Partial<XAxisProps>;
+    /**
+     * X axis props
+     */
+    xAxisProps?: Partial<XAxisProps>;
 
-  /**
-   * Y axis props
-   */
-  yAxisProps?: Partial<YAxisProps>;
+    /**
+     * Y axis props
+     */
+    yAxisProps?: Partial<YAxisProps>;
 
-  /**
-   * Timestamp props
-   */
-  timestampProps?: Partial<TimestampProps>;
+    /**
+     * Grid props
+     */
+    gridProps?: GridProps;
 
-  /**
-   * Chart container style
-   */
-  style?: CSSProperties;
+    /**
+     * Timestamp props
+     */
+    timestampProps?: Partial<TimestampProps>;
 
-  /**
-   * Show ticks on axes
-   * @default false
-   */
-  showTicks?: boolean;
+    /**
+     * Chart container style
+     */
+    style?: CSSProperties;
 
-  /**
-   * Show grid lines
-   * @default true
-   */
-  showGrid?: boolean;
+    /**
+     * Show ticks on axes
+     * @default false
+     */
+    showTicks?: boolean;
 
-  /**
-   * Show Y axis
-   * @default false
-   */
-  showYAxis?: boolean;
+    /**
+     * Show grid lines
+     * @default true
+     */
+    showGrid?: boolean;
 
-  /**
-   * Show X axis
-   * @default true
-   */
-  showXAxis?: boolean;
+    /**
+     * Show Y axis
+     * @default false
+     */
+    showYAxis?: boolean;
 
-  /**
-   * barProps
-   */
-  barProps?: Parameters<typeof Bar>[0];
+    /**
+     * Show X axis
+     * @default true
+     */
+    showXAxis?: boolean;
+
+    /**
+     * barProps
+     */
+    barProps?: CustomBarProps;
 }

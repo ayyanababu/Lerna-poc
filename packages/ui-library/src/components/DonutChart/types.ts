@@ -1,26 +1,23 @@
-import {
-  OmittedLegendsProps,
-  OmittedTooltipProps,
-} from '../ChartWrapper/types';
+import { OmittedLegendsProps, OmittedTooltipProps } from '../ChartWrapper/types';
 import { LegendData } from '../Legends/types';
 import { TitleProps } from '../Title/types';
 
-export interface DonutData extends LegendData {}
+export type DonutData = LegendData;
 
-export interface DonutLegendsProps extends OmittedLegendsProps {}
+export type DonutLegendsProps = OmittedLegendsProps;
 
-export interface DonutTooltipProps extends OmittedTooltipProps {}
+export type DonutTooltipProps = OmittedTooltipProps;
 
 export interface DonutChartProps {
-  data: DonutData;
-  type?: 'full' | 'semi';
-  hideLabels?: boolean;
-  title?: string;
-  timestamp?: string;
-  colors?: string[];
-  isLoading?: boolean;
+    data: DonutData;
+    type?: 'full' | 'semi';
+    hideLabels?: boolean;
+    title?: string;
+    timestamp?: string;
+    colors?: string[];
+    isLoading?: boolean;
 
-  titleProps?: TitleProps;
-  legendsProps?: DonutLegendsProps;
-  tooltipProps?: DonutTooltipProps;
+    titleProps?: TitleProps;
+    legendsProps?: DonutLegendsProps;
+    tooltipProps?: DonutTooltipProps;
 }

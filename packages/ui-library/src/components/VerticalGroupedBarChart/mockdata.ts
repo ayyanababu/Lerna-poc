@@ -14,43 +14,43 @@ export const mockVerticalGroupedBarChartData: {
             data: {
                 series1: 45,
                 series2: 30,
-                series3: 15
-            }
+                series3: 15,
+            },
         },
         {
             label: 'Feb',
             data: {
                 series1: 60,
                 series2: 40,
-                series3: 25
-            }
+                series3: 25,
+            },
         },
         {
             label: 'Mar',
             data: {
                 series1: 35,
                 series2: 50,
-                series3: 20
-            }
+                series3: 20,
+            },
         },
         {
             label: 'Apr',
             data: {
                 series1: 75,
                 series2: 45,
-                series3: 30
-            }
+                series3: 30,
+            },
         },
         {
             label: 'May',
             data: {
                 series1: 55,
                 series2: 35,
-                series3: 40
-            }
-        }
+                series3: 40,
+            },
+        },
     ],
-    groupKeys: ['series1', 'series2', 'series3']
+    groupKeys: ['series1', 'series2', 'series3'],
 };
 
 /**
@@ -67,33 +67,33 @@ export const alternativeMockData: {
             data: {
                 revenue: 120,
                 cost: 80,
-                profit: 40
-            }
+                profit: 40,
+            },
         },
         {
             label: 'Product B',
             data: {
                 revenue: 150,
                 cost: 90,
-                profit: 60
-            }
+                profit: 60,
+            },
         },
         {
             label: 'Product C',
             data: {
                 revenue: 100,
                 cost: 70,
-                profit: 30
-            }
+                profit: 30,
+            },
         },
         {
             label: 'Product D',
             data: {
                 revenue: 180,
                 cost: 100,
-                profit: 80
-            }
-        }
+                profit: 80,
+            },
+        },
     ],
-    groupKeys: ['revenue', 'cost', 'profit']
+    groupKeys: ['revenue', 'cost', 'profit'],
 };

@@ -1,13 +1,10 @@
 import { AxisLeft } from '@visx/axis';
 import React from 'react';
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { YAxisProps } from './types';
 
-/**
- * Generic YAxis component to be used across different chart types
- */
 function YAxis({
     scale,
     numTicks = 5,
@@ -16,42 +13,47 @@ function YAxis({
     isLoading = false,
     hideAllTicks = false,
     textAnchor = 'end',
-    availableHeight,
+    isVisible = true,
     ...props
 }: YAxisProps) {
     const { theme } = useTheme();
-    // Render axis label with loading state handling
-    const renderAxisLabel = (formattedValue: string | undefined, tickProps: any) => (
-        <text
-            {...tickProps}
-            className={`${isLoading ? shimmerClassName : ''}`}
-            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-            style={{
-                fontSize: theme.typography.fontSize.small,
-            }}
-        >
-            {isLoading
-                ? ''
-                : ((label: string) => {
-                      if (typeof label !== 'string') return label;
-                      // Allow longer labels
-                      if (label.length > 6) {
-                          return `${label.substring(0, 6)}...`;
-                      }
-                      return label;
-                  })(formattedValue || '')}
-        </text>
-    );
+
+    const renderAxisLabel = (
+        formattedValue: string | number | undefined,
+        tickProps: React.SVGProps<SVGTextElement>,
+    ) => {
+        const label =
+            typeof formattedValue === 'string' && formattedValue.length > 6
+                ? `${formattedValue.substring(0, 6)}...`
+                : formattedValue;
+
+        return (
+            <text
+                {...tickProps}
+                className={`${isLoading ? shimmerClassName : ''}`}
+                fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+                style={{
+                    fontSize: '12px',
+                }}
+            >
+                {isLoading ? '' : label}
+            </text>
+        );
+    };
+
+    if (!isVisible) {
+        return null;
+    }
 
     return (
         <AxisLeft
             scale={scale}
             stroke={theme.colors.axis.line}
             tickStroke={theme.colors.axis.line}
-            tickLabelProps={(value, index, values) => ({
+            tickLabelProps={() => ({
                 fill: theme.colors.axis.label,
-                fontSize: theme.typography.fontSize.small,
-                textAnchor: textAnchor,
+                fontSize: '12px',
+                textAnchor,
                 dy: '0.33em',
             })}
             hideAxisLine={!showAxisLine}
