@@ -39,12 +39,14 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     titleProps,
     legendsProps,
     tooltipProps,
+    xAxisProps,
+    yAxisProps,
     showTicks = false,
     showGrid = true,
     showYAxis = false,
-    barProps
+    showXAxis = true,
+    barProps,
 }) => {
-   
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
 
@@ -67,18 +69,18 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     // Add extra margin if there are many labels that will likely be rotated
     const margin = useMemo(() => {
         if (!width) return initialMargin;
-        
+
         const innerWidth = width - initialMargin.left - initialMargin.right;
-        const labels = filteredData.map(d => String(d.label));
-        
+        const labels = filteredData.map((d) => String(d.label));
+
         // Estimate if we'll need extra margin for rotated labels
         const averageCharWidth = 7;
-        const totalLabelWidth = labels.join("").length * averageCharWidth;
+        const totalLabelWidth = labels.join('').length * averageCharWidth;
         const needsRotation = labels.length > 5 || totalLabelWidth >= innerWidth;
-        
+
         return {
             ...initialMargin,
-            bottom: initialMargin.bottom + (needsRotation ? 30 : 0)
+            bottom: initialMargin.bottom + (needsRotation ? 30 : 0),
         };
     }, [initialMargin, width, filteredData]);
 
@@ -89,7 +91,10 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         useTooltip<TooltipData>();
 
     // Calculate the maximum value for the y-axis scale
-    const maxValue = useMemo(() => Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) * SCALE_PADDING, [filteredData]);
+    const maxValue = useMemo(
+        () => Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) * SCALE_PADDING,
+        [filteredData],
+    );
 
     // Create scales
     const xScale = useMemo(
@@ -114,21 +119,15 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     );
 
     // Prepare legend data
-    const legendData = useMemo(
-        () => data.map((d) => ({ label: d.label, value: d.value })),
-        [data],
-    );
+    const legendData = useMemo(() => data.map((d) => ({ label: d.label, value: d.value })), [data]);
 
     // Color scale for the bars
-    const colorScale = useMemo(
-        () => {
-            if (colors?.length) {
-                return (index: number) => colors[index % colors.length];
-            }
-            return (index: number) => theme.colors.charts.bar[index % theme.colors.charts.bar.length];
-        },
-        [colors, theme.colors.charts.bar],
-    );
+    const colorScale = useMemo(() => {
+        if (colors?.length) {
+            return (index: number) => colors[index % colors.length];
+        }
+        return (index: number) => theme.colors.charts.bar[index % theme.colors.charts.bar.length];
+    }, [colors, theme.colors.charts.bar]);
 
     // Handle mouse events
     const handleBarMouseMove = (value: number, index: number) => (event: React.MouseEvent) => {
@@ -164,13 +163,14 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             legendsProps={{
                 data: legendData,
                 colorScale: scaleOrdinal({
-                    domain: legendData.map(d => d.label),
-                    range: filteredData.map((_, i) => colorScale(i))
+                    domain: legendData.map((d) => d.label),
+                    range: filteredData.map((_, i) => colorScale(i)),
                 }),
                 hideIndex,
                 setHideIndex,
                 hovered: hoveredBar !== null ? legendData[hoveredBar]?.label : null,
-                setHovered: (label) => setHoveredBar(legendData.findIndex(item => item.label === label)),
+                setHovered: (label) =>
+                    setHoveredBar(legendData.findIndex((item) => item.label === label)),
                 isLoading,
                 ...legendsProps,
             }}
@@ -190,34 +190,29 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                     {/* Y-Axis */}
                     <YAxis
                         scale={yScale}
-                        theme={theme}
                         isLoading={isLoading}
                         showTicks={showTicks}
                         showAxisLine={showYAxis}
-                        numTicks={5}
-                        tickFormat={(value) => `${value}`}
+                        availableHeight={innerHeight}
+                        {...yAxisProps}
                     />
 
                     {/* Grid Lines */}
                     {showGrid && (
-                        <Grid
-                            width={innerWidth}
-                            yScale={yScale}
-                            theme={theme}
-                            numTicks={5}
-                        />
+                        <Grid width={innerWidth} yScale={yScale} theme={theme} numTicks={5} />
                     )}
 
                     {/* X-Axis with auto-rotating labels */}
                     <XAxis
                         scale={xScale}
                         top={innerHeight}
-                        theme={theme}
                         isLoading={isLoading}
                         showTicks={showTicks}
-                        labels={filteredData.map(d => String(d.label))}
+                        showAxisLine={showXAxis}
+                        labels={filteredData.map((d) => String(d.label))}
                         availableWidth={innerWidth}
-                        autoRotate={true}
+                        autoRotate
+                        {...xAxisProps}
                     />
 
                     {/* Bars */}
@@ -230,7 +225,8 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                         const barX = xScale(d.label) || 0;
                         const barY = yScale(value);
                         const isHovered = hoveredBar === index;
-                        const barOpacity = hoveredBar !== null && !isHovered ? REDUCED_OPACITY : DEFAULT_OPACITY;
+                        const barOpacity =
+                            hoveredBar !== null && !isHovered ? REDUCED_OPACITY : DEFAULT_OPACITY;
 
                         return (
                             <Bar

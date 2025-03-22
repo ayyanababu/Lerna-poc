@@ -18,7 +18,7 @@ const DEFAULT_MARGIN = {
     top: 20,
     right: 50,
     bottom: 30,
-    left: 100,
+    left: 50,
 };
 const DEFAULT_BAR_RADIUS = 5;
 const DEFAULT_OPACITY = 1;
@@ -38,10 +38,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     titleProps,
     legendsProps,
     tooltipProps,
+    xAxisProps,
+    yAxisProps,
     showTicks = false,
     showGrid = true,
     showXAxis = false,
-    barProps
+    barProps,
 }) => {
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
@@ -99,21 +101,15 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     );
 
     // Prepare legend data
-    const legendData = useMemo(
-        () => data.map((d) => ({ label: d.label, value: d.value })),
-        [data],
-    );
+    const legendData = useMemo(() => data.map((d) => ({ label: d.label, value: d.value })), [data]);
 
     // Color scale for the bars
-    const colorScale = useMemo(
-        () => {
-            if (colors?.length) {
-                return (index: number) => colors[index % colors.length];
-            }
-            return (index: number) => theme.colors.charts.bar[index % theme.colors.charts.bar.length];
-        },
-        [colors, theme.colors.charts.bar],
-    );
+    const colorScale = useMemo(() => {
+        if (colors?.length) {
+            return (index: number) => colors[index % colors.length];
+        }
+        return (index: number) => theme.colors.charts.bar[index % theme.colors.charts.bar.length];
+    }, [colors, theme.colors.charts.bar]);
 
     // Handle mouse events
     const handleBarMouseMove = (value: number, index: number) => (event: React.MouseEvent) => {
@@ -145,13 +141,14 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             legendsProps={{
                 data: legendData,
                 colorScale: scaleOrdinal({
-                    domain: legendData.map(d => d.label),
-                    range: filteredData.map((_, i) => colorScale(i))
+                    domain: legendData.map((d) => d.label),
+                    range: filteredData.map((_, i) => colorScale(i)),
                 }),
                 hideIndex,
                 setHideIndex,
                 hovered: hoveredBar !== null ? legendData[hoveredBar]?.label : null,
-                setHovered: (label) => setHoveredBar(legendData.findIndex(item => item.label === label)),
+                setHovered: (label) =>
+                    setHoveredBar(legendData.findIndex((item) => item.label === label)),
                 isLoading,
                 ...legendsProps,
             }}
@@ -171,25 +168,23 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                     {/* Y-Axis (labels) */}
                     <YAxis
                         scale={yScale}
-                        theme={theme}
                         isLoading={isLoading}
                         showTicks={showTicks}
-                        tickFormat={(value) => `${value}`}
+                        numTicks={innerHeight / 20}
+                        {...yAxisProps}
                     />
 
                     {/* X-Axis (values) */}
                     <XAxis
                         scale={xScale}
                         top={innerHeight}
-                        theme={theme}
                         isLoading={isLoading}
                         showTicks={showTicks}
                         showAxisLine={showXAxis}
-                        numTicks={5}
-                        tickFormat={(value) => `${value}`}
                         labels={xScale.ticks(5).map(String)}
                         availableWidth={innerWidth}
                         autoRotate={false}
+                        {...xAxisProps}
                     />
 
                     {/* Grid Lines */}
@@ -214,7 +209,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                         const barX = 0;
                         const barY = yScale(d.label) || 0;
                         const isHovered = hoveredBar === index;
-                        const barOpacity = hoveredBar !== null && !isHovered ? REDUCED_OPACITY : DEFAULT_OPACITY;
+                        const barOpacity =
+                            hoveredBar !== null && !isHovered ? REDUCED_OPACITY : DEFAULT_OPACITY;
 
                         return (
                             <Bar
