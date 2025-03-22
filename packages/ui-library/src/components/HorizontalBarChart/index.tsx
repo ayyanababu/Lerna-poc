@@ -192,7 +192,6 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                         <Grid
                             height={innerHeight}
                             xScale={xScale}
-                            theme={theme}
                             showHorizontal={false}
                             showVertical={true}
                             numTicks={5}

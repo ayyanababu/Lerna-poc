@@ -9,7 +9,7 @@ export interface DataPoint {
     data: Record<string, number>;
 }
 
-export interface HorizontalGroupedBarChartProps {
+export interface HorizontalStackedBarChartProps {
     /**
      * Data for the chart
      */
@@ -90,6 +90,4 @@ export interface HorizontalGroupedBarChartProps {
      * @default false
      */
     showTicks?: boolean;
-
-    showGrid?: boolean;
 }

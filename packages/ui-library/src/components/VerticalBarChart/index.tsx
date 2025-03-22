@@ -198,9 +198,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                     />
 
                     {/* Grid Lines */}
-                    {showGrid && (
-                        <Grid width={innerWidth} yScale={yScale} theme={theme} numTicks={5} />
-                    )}
+                    {showGrid && <Grid width={innerWidth} yScale={yScale} numTicks={5} />}
 
                     {/* X-Axis with auto-rotating labels */}
                     <XAxis
