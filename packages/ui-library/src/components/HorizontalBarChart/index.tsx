@@ -187,6 +187,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                         showAxisLine={showXAxis}
                         numTicks={5}
                         tickFormat={(value) => `${value}`}
+                        labels={xScale.ticks(5).map(String)}
+                        availableWidth={innerWidth}
+                        autoRotate={false}
                     />
 
                     {/* Grid Lines */}
