@@ -3,10 +3,11 @@ import React from 'react';
 import useTheme from '../../hooks/useTheme';
 import { TitleProps } from './types';
 
-export default function Title({ title, ...props }: TitleProps) {
+export default function Title({ title, isVisible = true, ...props }: TitleProps) {
     const { theme } = useTheme();
 
-    if (!title) return null;
+    if (!title || !isVisible) return null;
+
     return (
         <Typography
             variant="subtitle1"

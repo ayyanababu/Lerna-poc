@@ -9,6 +9,7 @@ export interface CustomBarProps extends VisxBarProps {
 
     /**
      * Whether to show the bar
+     * @default true
      */
     isVisible?: boolean;
 }

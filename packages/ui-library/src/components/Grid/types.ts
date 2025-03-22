@@ -42,7 +42,8 @@ export interface GridProps {
     opacity?: number;
 
     /**
-     * Whether to show grid lines
+     * Whether to show the bar
+     * @default true
      */
     isVisible?: boolean;
 }

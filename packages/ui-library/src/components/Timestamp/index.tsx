@@ -3,8 +3,8 @@ import React from 'react';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { TimestampProps } from './types';
 
-function Timestamp({ timestamp, isLoading = false }: TimestampProps) {
-    if (!timestamp) return null;
+function Timestamp({ timestamp, isVisible = true, isLoading = false }: TimestampProps) {
+    if (!timestamp || !isVisible) return null;
 
     return (
         <Typography
