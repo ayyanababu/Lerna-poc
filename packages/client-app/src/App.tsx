@@ -131,7 +131,7 @@ function App() {
                 ...Array.from({ length: 100 }, (_, index) => ({
                   // label: `label ${index + 1}`,
                   label: `${index + 1} January sadf asdf asdf asdf asdfasdf asd asdf asf  `,
-                  value: Math.floor(Math.random() * 100) +20,
+                  value: Math.floor(Math.random() * 1000000000000) +20,
                 })),
               ]}
               title="Monthly Trade Volume"

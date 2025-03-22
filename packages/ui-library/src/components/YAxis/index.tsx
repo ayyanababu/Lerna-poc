@@ -1,60 +1,14 @@
 import { AxisLeft } from '@visx/axis';
-import { ScaleBand, ScaleLinear } from '@visx/vendor/d3-scale';
 import React from 'react';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { shimmerGradientId } from '../Shimmer/SvgShimmer';
+import { YAxisProps } from './types';
 
-export interface YAxisProps<Domain> {
-  /**
-   * Scale for the y-axis
-   */
-  scale: ScaleLinear<number, number> | ScaleBand<Domain>;
-  
-  /**
-   * Theme of the chart
-   */
-  theme: any;
-  
-  /**
-   * Format function for tick labels
-   */
-  tickFormat?: (value: any) => string;
-  
-  /**
-   * Number of ticks
-   */
-  numTicks?: number;
-  
-  /**
-   * Whether to show ticks
-   */
-  showTicks?: boolean;
-  
-  /**
-   * Whether to show the axis line
-   */
-  showAxisLine?: boolean;
-  
-  /**
-   * Whether the chart is in loading state
-   */
-  isLoading?: boolean;
-  
-  /**
-   * Whether to hide all ticks when a condition is met
-   */
-  hideAllTicks?: boolean;
-  
-  /**
-   * Custom text anchor for labels
-   */
-  textAnchor?: 'inherit' | 'end' | 'start' | 'middle';
-}
 
 /**
  * Generic YAxis component to be used across different chart types
  */
-function YAxis<Domain extends string | number>({
+function YAxis({
   scale,
   theme,
   tickFormat,
@@ -64,7 +18,7 @@ function YAxis<Domain extends string | number>({
   isLoading = false,
   hideAllTicks = false,
   textAnchor = 'end',
-}: YAxisProps<Domain>) {
+}: YAxisProps) {
 
   // Render axis label with loading state handling
   const renderAxisLabel = (formattedValue: string | undefined, tickProps: any) => (
@@ -76,7 +30,14 @@ function YAxis<Domain extends string | number>({
         fontSize: theme.typography.fontSize.small,
       }}
     >
-      {isLoading ? '' : formattedValue}
+      {isLoading ? '' : ((label: string) => {
+          if (typeof label !== 'string') return label;
+          // Allow longer labels
+          if (label.length > 12) {
+            return `${label.substring(0, 12)}...`;
+          }
+          return label;
+        })(formattedValue || '')}
     </text>
   );
 
