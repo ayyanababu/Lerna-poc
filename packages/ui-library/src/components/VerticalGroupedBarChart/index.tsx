@@ -368,7 +368,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
             className={`${isLoading ? shimmerClassName : ''}`}
             fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
             style={{
-                fontSize: theme.typography.fontSize.small,
+                fontSize: '12px',
             }}
         >
             {isLoading ? '' : formattedValue}
@@ -416,7 +416,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                             tickStroke={theme.colors.axis.line}
                             tickLabelProps={{
                                 fill: theme.colors.axis.label,
-                                fontSize: theme.typography.fontSize.small,
+                                fontSize: '12px',
                                 textAnchor: 'end',
                                 dy: '0.33em',
                             }}
@@ -455,7 +455,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                         }
                         tickLabelProps={{
                             fill: theme.colors.axis.label,
-                            fontSize: theme.typography.fontSize.small,
+                            fontSize: '12px',
                             textAnchor: 'middle',
                             dy: '0.33em',
                         }}

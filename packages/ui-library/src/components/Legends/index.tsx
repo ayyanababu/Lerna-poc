@@ -134,7 +134,7 @@ export default function Legends({
                                             variant="body2"
                                             sx={{
                                                 margin: 0,
-                                                fontWeight: theme.typography.fontWeight.regular,
+                                                fontWeight: 400,
                                                 textDecoration:
                                                     doStrike && hideIndex.includes(index)
                                                         ? 'line-through'
@@ -152,9 +152,9 @@ export default function Legends({
                                                 variant="h6"
                                                 sx={{
                                                     margin: 0,
-                                                    fontWeight: theme.typography.fontWeight.bold,
+                                                    fontWeight: 700,
                                                     color: theme.colors.legend.text,
-                                                    fontSize: theme.typography.fontSize.medium,
+                                                    fontSize: '16px',
                                                 }}
                                                 className={`${isLoading ? shimmerClassName : ''}`}
                                             >

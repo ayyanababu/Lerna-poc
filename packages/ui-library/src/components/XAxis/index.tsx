@@ -163,7 +163,7 @@ function XAxis({
             label = formatLabel ? formatLabel(formattedValue || '') : formattedValue;
         }
 
-        const textStyle = { fontSize: theme.typography.fontSize.small };
+        const textStyle = { fontSize: '12px' };
 
         const xPos =
             evenPositionsMap &&
@@ -215,7 +215,7 @@ function XAxis({
             tickValues={tickValues}
             tickLabelProps={() => ({
                 fill: theme.colors.axis.label,
-                fontSize: theme.typography.fontSize.small,
+                fontSize: '12px',
             })}
             numTicks={numTicks}
             hideAxisLine={!showAxisLine}

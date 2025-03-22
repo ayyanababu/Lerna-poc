@@ -177,7 +177,7 @@ function DonutChart({
                                                         ? 'bold'
                                                         : 'normal'
                                                 }
-                                                fontFamily={theme.typography.fontFamily}
+                                                fontFamily='"Roboto", "Open Sans", sans-serif'
                                             >
                                                 {arc.data.label}
                                             </text>

@@ -40,19 +40,6 @@ export const defaultLightTheme: Theme = {
             scatter: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e'],
         },
     },
-    typography: {
-        fontFamily: '"Roboto", "Open Sans", sans-serif',
-        fontSize: {
-            small: '12px',
-            medium: '16px',
-            large: '20px',
-        },
-        fontWeight: {
-            light: 300,
-            regular: 400,
-            bold: 700,
-        },
-    },
 };
 
 export const defaultDarkTheme: Theme = {
@@ -93,19 +80,6 @@ export const defaultDarkTheme: Theme = {
             donut: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e', '#fed8cc'],
             pie: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e', '#fed8cc'],
             scatter: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e'],
-        },
-    },
-    typography: {
-        fontFamily: '"Roboto", "Open Sans", sans-serif',
-        fontSize: {
-            small: '12px',
-            medium: '16px',
-            large: '20px',
-        },
-        fontWeight: {
-            light: 300,
-            regular: 400,
-            bold: 700,
         },
     },
 };

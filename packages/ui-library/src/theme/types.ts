@@ -30,17 +30,4 @@ export interface Theme {
             scatter: string[];
         };
     };
-    typography: {
-        fontFamily: string;
-        fontSize: {
-            small: string;
-            medium: string;
-            large: string;
-        };
-        fontWeight: {
-            light: number;
-            regular: number;
-            bold: number;
-        };
-    };
 }

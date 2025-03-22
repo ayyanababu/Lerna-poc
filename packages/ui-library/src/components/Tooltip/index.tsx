@@ -22,8 +22,8 @@ function Tooltip({ top, left, data, isVisible = true }: TooltipProps) {
                 borderRadius: '6px',
                 boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
                 border: `1px solid ${theme.colors.tooltip.border}`,
-                fontSize: theme.typography.fontSize.small,
-                fontWeight: theme.typography.fontWeight.bold,
+                fontSize: '12px',
+                fontWeight: 700,
                 pointerEvents: 'none',
                 transform: 'translate(-50%, -100%)',
                 whiteSpace: 'nowrap',
@@ -35,15 +35,15 @@ function Tooltip({ top, left, data, isVisible = true }: TooltipProps) {
                     marginBottom: '5px',
                     textAlign: 'center',
                     color: theme.colors.tooltip.text,
-                    fontSize: theme.typography.fontSize.small,
+                    fontSize: '12px',
                 }}
             >
                 {data.label}
             </Typography>
             <Typography
                 sx={{
-                    fontSize: theme.typography.fontSize.medium,
-                    fontWeight: theme.typography.fontWeight.bold,
+                    fontSize: '16px',
+                    fontWeight: 700,
                     textAlign: 'center',
                     color: theme.colors.tooltip.text,
                 }}

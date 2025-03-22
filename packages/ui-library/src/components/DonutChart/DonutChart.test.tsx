@@ -37,9 +37,6 @@ jest.mock('../../hooks/useTheme', () => ({
                     text: '#333333',
                 },
             },
-            typography: {
-                fontFamily: 'Arial',
-            },
         },
     }),
 }));
@@ -167,9 +164,6 @@ describe('DonutChart', () => {
                         border: '#dddddd',
                         text: '#eeeeee',
                     },
-                },
-                typography: {
-                    fontFamily: 'Roboto',
                 },
             },
         });

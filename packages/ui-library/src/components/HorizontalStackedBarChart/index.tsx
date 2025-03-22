@@ -217,7 +217,7 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
             className={`${isLoading ? shimmerClassName : ''}`}
             fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
             style={{
-                fontSize: theme.typography.fontSize.small,
+                fontSize: '12px',
             }}
         >
             {isLoading ? '' : formattedValue}

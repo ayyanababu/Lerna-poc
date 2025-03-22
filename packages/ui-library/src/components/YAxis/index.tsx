@@ -29,7 +29,7 @@ function YAxis({
             className={`${isLoading ? shimmerClassName : ''}`}
             fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
             style={{
-                fontSize: theme.typography.fontSize.small,
+                fontSize: '12px',
             }}
         >
             {isLoading
@@ -52,7 +52,7 @@ function YAxis({
             tickStroke={theme.colors.axis.line}
             tickLabelProps={() => ({
                 fill: theme.colors.axis.label,
-                fontSize: theme.typography.fontSize.small,
+                fontSize: '12px',
                 textAnchor,
                 dy: '0.33em',
             })}

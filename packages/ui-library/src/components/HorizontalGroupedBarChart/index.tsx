@@ -241,7 +241,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
             className={`${isLoading ? shimmerClassName : ''}`}
             fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
             style={{
-                fontSize: theme.typography.fontSize.small,
+                fontSize: '12px',
             }}
         >
             {isLoading ? '' : formattedValue}
@@ -387,7 +387,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
                             tickStroke={theme.colors.axis.line}
                             tickLabelProps={{
                                 fill: theme.colors.axis.label,
-                                fontSize: theme.typography.fontSize.small,
+                                fontSize: '12px',
                                 textAnchor: 'end',
                                 dy: '0.33em',
                                 dx: -8,
@@ -409,7 +409,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
                         tickFormat={(value) => `${value}`}
                         tickLabelProps={{
                             fill: theme.colors.axis.label,
-                            fontSize: theme.typography.fontSize.small,
+                            fontSize: '12px',
                             textAnchor: 'middle',
                         }}
                         tickComponent={({ formattedValue, ...tickProps }) =>

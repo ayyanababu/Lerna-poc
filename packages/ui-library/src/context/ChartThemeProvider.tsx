@@ -67,18 +67,6 @@ const ChartThemeProvider: React.FC<{
                         themeOverrides?.colors?.charts?.scatter || baseTheme.colors.charts.scatter,
                 },
             },
-            typography: {
-                ...baseTheme.typography,
-                ...themeOverrides?.typography,
-                fontSize: {
-                    ...baseTheme.typography.fontSize,
-                    ...themeOverrides?.typography?.fontSize,
-                },
-                fontWeight: {
-                    ...baseTheme.typography.fontWeight,
-                    ...themeOverrides?.typography?.fontWeight,
-                },
-            },
         }),
         [baseTheme, themeOverrides],
     );
