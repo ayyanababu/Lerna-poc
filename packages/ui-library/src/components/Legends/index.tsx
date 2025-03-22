@@ -104,6 +104,10 @@ export default function Legends({
                                         opacity:
                                             hovered && !hovered?.includes(label.text) ? 0.5 : 1,
                                         transition: 'all 0.3s ease',
+                                        filter:
+                                            !doStrike && hideIndex.includes(index)
+                                                ? 'grayscale(100%) opacity(0.5)'
+                                                : 'none',
                                     }}
                                 >
                                     <Box

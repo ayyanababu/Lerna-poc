@@ -343,7 +343,7 @@ function App() {
                                         data,
                                     );
                                 },
-                                doStrike: true,
+                                doStrike: false,
                             }}
                             tooltipProps={{}}
                         />
