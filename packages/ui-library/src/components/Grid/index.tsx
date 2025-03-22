@@ -2,9 +2,6 @@ import React from 'react';
 import useTheme from '../../hooks/useTheme';
 import { GridProps } from './types';
 
-/**
- * Generic Grid component to be used across different chart types
- */
 const Grid: React.FC<GridProps> = ({
     width = 0,
     height = 0,
@@ -14,8 +11,13 @@ const Grid: React.FC<GridProps> = ({
     showHorizontal = true,
     showVertical = false,
     opacity = 0.3,
+    isVisible = true,
 }) => {
     const { theme } = useTheme();
+
+    if (!isVisible) {
+        return null;
+    }
 
     return (
         <g>

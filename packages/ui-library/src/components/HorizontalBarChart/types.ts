@@ -1,5 +1,6 @@
-import { Bar } from '@visx/shape';
 import { CSSProperties } from 'react';
+import { CustomBarProps } from '../CustomBar/types';
+import { GridProps } from '../Grid/types';
 import { LegendsProps } from '../Legends/types';
 import { TitleProps } from '../Title/types';
 import { TooltipProps } from '../Tooltip/types';
@@ -79,6 +80,16 @@ export interface HorizontalBarChartProps {
     yAxisProps?: Partial<YAxisProps>;
 
     /**
+     * Grid props
+     */
+    gridProps?: GridProps;
+
+    /**
+     * barProps
+     */
+    barProps?: CustomBarProps;
+
+    /**
      * Chart container style
      */
     style?: CSSProperties;
@@ -100,9 +111,4 @@ export interface HorizontalBarChartProps {
      * @default false
      */
     showXAxis?: boolean;
-
-    /**
-     * barProps
-     */
-    barProps?: Parameters<typeof Bar>[0];
 }

@@ -1,5 +1,6 @@
-import { Bar } from '@visx/shape';
 import { CSSProperties } from 'react';
+import { CustomBarProps } from '../CustomBar/types';
+import { GridProps } from '../Grid/types';
 import { LegendsProps } from '../Legends/types';
 import { TimestampProps } from '../Timestamp/types';
 import { TitleProps } from '../Title/types';
@@ -80,6 +81,11 @@ export interface VerticalBarChartProps {
     yAxisProps?: Partial<YAxisProps>;
 
     /**
+     * Grid props
+     */
+    gridProps?: GridProps;
+
+    /**
      * Timestamp props
      */
     timestampProps?: Partial<TimestampProps>;
@@ -116,5 +122,5 @@ export interface VerticalBarChartProps {
     /**
      * barProps
      */
-    barProps?: Parameters<typeof Bar>[0];
+    barProps?: CustomBarProps;
 }

@@ -28,6 +28,7 @@ function XAxis({
     showAxisLine = true,
     showTicks = false,
     top,
+    isVisible = true,
     ...props
 }: XAxisProps): ReactNode {
     const { theme } = useTheme();
@@ -205,6 +206,10 @@ function XAxis({
             </g>
         );
     };
+
+    if (!isVisible) {
+        return null;
+    }
 
     return (
         <AxisBottom

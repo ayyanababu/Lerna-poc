@@ -41,4 +41,9 @@ export interface XAxisProps extends AxisBottomProps {
      * The labels to display (used for auto-rotation calculation)
      */
     labels?: string[];
+
+    /**
+     * Whether the axis is visible
+     */
+    isVisible?: boolean;
 }

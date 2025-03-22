@@ -1,12 +1,13 @@
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
-import { Bar, stack } from '@visx/shape';
+import { stack } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import React, { useCallback, useMemo, useState } from 'react';
 import useTheme from '../../hooks/useTheme';
 import ChartWrapper from '../ChartWrapper';
+import CustomBar from '../CustomBar';
 import Grid from '../Grid';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
@@ -14,21 +15,6 @@ import XAxis from '../XAxis';
 import YAxis from '../YAxis';
 import { mockVerticalStackedBarChartData } from './mockdata';
 import { VerticalStackedBarChartProps } from './types';
-
-interface BarProps {
-    key: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    fill: string;
-    opacity: number;
-    rx?: number;
-    value: number;
-    label: string;
-    onMouseMove: (event: React.MouseEvent) => void;
-    onMouseLeave: () => void;
-}
 
 const DEFAULT_MARGIN = {
     top: 20,
@@ -39,21 +25,6 @@ const DEFAULT_MARGIN = {
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
-
-interface BarProps {
-    key: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    fill: string;
-    opacity: number;
-    rx?: number;
-    value: number;
-    label: string;
-    onMouseMove: (event: React.MouseEvent) => void;
-    onMouseLeave: () => void;
-}
 
 function VerticalStackedBarChart({
     data: _data,
@@ -69,8 +40,10 @@ function VerticalStackedBarChart({
     showTicks = false,
     yAxisProps,
     xAxisProps,
+    gridProps,
+    barProps,
+    timestampProps,
     showYAxis = true,
-    showGrid = true,
     showXAxis = true,
 }: VerticalStackedBarChartProps) {
     const { theme } = useTheme();
@@ -172,7 +145,7 @@ function VerticalStackedBarChart({
         [innerHeight, maxValue],
     );
 
-    const groupColorScale = useMemo(
+    const colorScale = useMemo(
         () =>
             scaleOrdinal<string, string>({
                 domain: groupKeys,
@@ -180,8 +153,6 @@ function VerticalStackedBarChart({
             }),
         [groupKeys, colors, theme.colors.charts.bar],
     );
-
-    const renderBar = (props: BarProps) => <Bar {...props} />;
 
     const handleMouseMove = useCallback(
         (groupKey: string, value: number) => (event: React.MouseEvent) => {
@@ -234,20 +205,23 @@ function VerticalStackedBarChart({
                     const barOpacity =
                         hoveredGroupKey && !isHoveredGroup ? REDUCED_OPACITY : DEFAULT_OPACITY;
 
-                    return renderBar({
-                        key: `stacked-${category}-${groupKey}`,
-                        x: barX,
-                        y: barY,
-                        width: barWidth,
-                        height: barHeight,
-                        fill: isLoading ? `url(#${shimmerGradientId})` : groupColorScale(groupKey),
-                        opacity: barOpacity,
-                        rx: 0,
-                        value,
-                        label: groupKey,
-                        onMouseMove: handleMouseMove(groupKey, value),
-                        onMouseLeave: handleMouseLeave,
-                    });
+                    return (
+                        <CustomBar
+                            key={`stacked-${category}-${groupKey}`}
+                            x={barX}
+                            y={barY}
+                            width={barWidth}
+                            height={barHeight}
+                            fill={isLoading ? `url(#${shimmerGradientId})` : colorScale(groupKey)}
+                            opacity={barOpacity}
+                            rx={0}
+                            // value={value}
+                            // label={groupKey}
+                            onMouseMove={handleMouseMove(groupKey, value)}
+                            onMouseLeave={handleMouseLeave}
+                            {...barProps}
+                        />
+                    );
                 });
             }),
         [
@@ -258,9 +232,10 @@ function VerticalStackedBarChart({
             yScale,
             hoveredGroupKey,
             isLoading,
-            groupColorScale,
+            colorScale,
             handleMouseMove,
             handleMouseLeave,
+            barProps,
         ],
     );
 
@@ -276,7 +251,7 @@ function VerticalStackedBarChart({
             titleProps={titleProps}
             legendsProps={{
                 data: legendData,
-                colorScale: groupColorScale,
+                colorScale,
                 hideIndex,
                 setHideIndex,
                 hovered: hoveredGroupKey,
@@ -291,7 +266,7 @@ function VerticalStackedBarChart({
                 isVisible: !isLoading && tooltipOpen,
                 ...tooltipProps,
             }}
-            timestampProps={{ timestamp, isLoading }}
+            timestampProps={{ timestamp, isLoading, ...timestampProps }}
         >
             <svg width={width} height={height}>
                 {isLoading && <SvgShimmer />}
@@ -302,11 +277,10 @@ function VerticalStackedBarChart({
                         isLoading={isLoading}
                         showTicks={showTicks}
                         showAxisLine={showYAxis}
-                        availableHeight={innerHeight}
                         {...yAxisProps}
                     />
 
-                    {showGrid && <Grid width={innerWidth} yScale={yScale} numTicks={5} />}
+                    <Grid width={innerWidth} yScale={yScale} numTicks={5} {...gridProps} />
 
                     <XAxis
                         scale={xScale}

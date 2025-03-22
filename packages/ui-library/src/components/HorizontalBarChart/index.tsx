@@ -4,8 +4,8 @@ import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { useTooltip } from '@visx/tooltip';
 import React, { useMemo, useState } from 'react';
 import useTheme from '../../hooks/useTheme';
-import Bar from '../Bar';
 import ChartWrapper from '../ChartWrapper';
+import CustomBar from '../CustomBar';
 import Grid from '../Grid';
 import SvgShimmer from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
@@ -25,9 +25,6 @@ const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
 
-/**
- * HorizontalBarChart component that renders a simple horizontal bar chart
- */
 const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     data: _data,
     margin = DEFAULT_MARGIN,
@@ -40,10 +37,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     tooltipProps,
     xAxisProps,
     yAxisProps,
-    showTicks = false,
-    showGrid = true,
-    showXAxis = false,
+    gridProps,
     barProps,
+    showTicks = false,
+    showXAxis = false,
 }) => {
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -165,7 +162,6 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                 {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
-                    {/* Y-Axis (labels) */}
                     <YAxis
                         scale={yScale}
                         isLoading={isLoading}
@@ -174,7 +170,6 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                         {...yAxisProps}
                     />
 
-                    {/* X-Axis (values) */}
                     <XAxis
                         scale={xScale}
                         top={innerHeight}
@@ -187,18 +182,15 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                         {...xAxisProps}
                     />
 
-                    {/* Grid Lines */}
-                    {showGrid && (
-                        <Grid
-                            height={innerHeight}
-                            xScale={xScale}
-                            showHorizontal={false}
-                            showVertical
-                            numTicks={5}
-                        />
-                    )}
+                    <Grid
+                        height={innerHeight}
+                        xScale={xScale}
+                        showHorizontal={false}
+                        showVertical
+                        numTicks={5}
+                        {...gridProps}
+                    />
 
-                    {/* Bars */}
                     {filteredData.map((d, index) => {
                         const value = Number(d.value);
                         if (Number.isNaN(value)) return null;
@@ -212,7 +204,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                             hoveredBar !== null && !isHovered ? REDUCED_OPACITY : DEFAULT_OPACITY;
 
                         return (
-                            <Bar
+                            <CustomBar
                                 key={`bar-${d.label}`}
                                 x={barX}
                                 y={barY}
@@ -224,7 +216,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                                 rx={DEFAULT_BAR_RADIUS}
                                 onMouseMove={handleBarMouseMove(value, index)}
                                 onMouseLeave={handleBarMouseLeave}
-                                additionalProps={barProps}
+                                {...barProps}
                             />
                         );
                     })}

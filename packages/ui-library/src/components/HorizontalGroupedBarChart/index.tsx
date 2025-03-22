@@ -2,19 +2,20 @@ import { AxisBottom, AxisLeft } from '@visx/axis';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
-import { Bar, stack } from '@visx/shape';
+import { stack } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import React, { useMemo, useState } from 'react';
 import useTheme from '../../hooks/useTheme';
 import ChartWrapper from '../ChartWrapper';
+import CustomBar from '../CustomBar';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
 import { mockVerticalGroupedBarChartData } from '../VerticalGroupedBarChart/mockdata';
 import { DataPoint, HorizontalGroupedBarChartProps } from './types';
 
-interface BarProps {
+interface CustomBarProps {
     key: string;
     x: number;
     y: number;
@@ -210,7 +211,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     );
 
     // Helper function to create bars
-    const renderBar = (props: BarProps) => <Bar {...props} />;
+    const renderBar = (props: CustomBarProps) => <CustomBar {...props} />;
 
     // Handler for mouse events
     const handleMouseMove = (groupKey: string, value: number) => (event: React.MouseEvent) => {

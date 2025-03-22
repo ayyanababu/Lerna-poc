@@ -1,4 +1,6 @@
 import { CSSProperties } from 'react';
+import { CustomBarProps } from '../CustomBar/types';
+import { GridProps } from '../Grid/types';
 import { LegendsProps } from '../Legends/types';
 import { TimestampProps } from '../Timestamp/types';
 import { TitleProps } from '../Title/types';
@@ -74,6 +76,26 @@ export interface HorizontalGroupedBarChartProps {
      * Tooltip props
      */
     tooltipProps?: Partial<TooltipProps>;
+
+    /**
+     * X-axis props
+     */
+    xAxisProps?: Partial<TooltipProps>;
+
+    /**
+     * Y-axis props
+     */
+    yAxisProps?: Partial<TooltipProps>;
+
+    /**
+     * Grid props
+     */
+    gridProps?: GridProps;
+
+    /**
+     * barProps
+     */
+    barProps?: CustomBarProps;
 
     /**
      * Timestamp props

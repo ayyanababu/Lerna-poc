@@ -5,8 +5,8 @@ import { useTooltip } from '@visx/tooltip';
 import React, { useMemo, useState } from 'react';
 
 import useTheme from '../../hooks/useTheme';
-import Bar from '../Bar';
 import ChartWrapper from '../ChartWrapper';
+import CustomBar from '../CustomBar';
 import Grid from '../Grid';
 import SvgShimmer from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
@@ -26,9 +26,6 @@ const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
 
-/**
- * VerticalBarChart component that renders a simple vertical bar chart
- */
 const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     data: _data,
     margin: initialMargin = DEFAULT_MARGIN,
@@ -41,11 +38,11 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     tooltipProps,
     xAxisProps,
     yAxisProps,
+    barProps,
+    gridProps,
     showTicks = false,
-    showGrid = true,
     showYAxis = false,
     showXAxis = true,
-    barProps,
 }) => {
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -187,20 +184,16 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
-                    {/* Y-Axis */}
                     <YAxis
                         scale={yScale}
                         isLoading={isLoading}
                         showTicks={showTicks}
                         showAxisLine={showYAxis}
-                        availableHeight={innerHeight}
                         {...yAxisProps}
                     />
 
-                    {/* Grid Lines */}
-                    {showGrid && <Grid width={innerWidth} yScale={yScale} numTicks={5} />}
+                    <Grid width={innerWidth} yScale={yScale} numTicks={5} {...gridProps} />
 
-                    {/* X-Axis with auto-rotating labels */}
                     <XAxis
                         scale={xScale}
                         top={innerHeight}
@@ -227,7 +220,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                             hoveredBar !== null && !isHovered ? REDUCED_OPACITY : DEFAULT_OPACITY;
 
                         return (
-                            <Bar
+                            <CustomBar
                                 key={`bar-${d.label}`}
                                 x={barX}
                                 y={barY}
@@ -239,7 +232,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                                 rx={DEFAULT_BAR_RADIUS}
                                 onMouseMove={handleBarMouseMove(value, index)}
                                 onMouseLeave={handleBarMouseLeave}
-                                additionalProps={barProps}
+                                {...barProps}
                             />
                         );
                     })}

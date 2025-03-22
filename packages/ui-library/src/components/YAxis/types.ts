@@ -28,5 +28,8 @@ export interface YAxisProps extends AxisLeftProps {
      */
     textAnchor?: 'inherit' | 'end' | 'start' | 'middle';
 
-    availableHeight?: number;
+    /**
+     * Whether the axis is visible
+     */
+    isVisible?: boolean;
 }
