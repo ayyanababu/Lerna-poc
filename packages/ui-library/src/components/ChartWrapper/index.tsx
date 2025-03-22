@@ -58,13 +58,14 @@ const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                             display: 'flex',
                             flex: '1 1 auto',
                             minHeight: 0,
-                            gap: '20px',
+                            gap: position === 'bottom' ? '0px' : '20px',
                             ...(position === 'left' || position === 'right'
                                 ? {
                                       flexDirection: position === 'left' ? 'row' : 'row-reverse',
                                   }
                                 : {
-                                      flexDirection: 'column',
+                                      flexDirection:
+                                          position === 'top' ? 'column' : 'column-reverse',
                                   }),
                         }}
                     >

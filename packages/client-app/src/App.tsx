@@ -344,6 +344,7 @@ function App() {
                                     );
                                 },
                                 doStrike: false,
+                                position: 'bottom',
                             }}
                             tooltipProps={{}}
                         />
