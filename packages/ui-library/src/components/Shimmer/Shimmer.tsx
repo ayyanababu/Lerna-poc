@@ -1,11 +1,9 @@
 import React from 'react';
-import useTheme from '../../hooks/useTheme';
+import { Theme } from '../../theme/types';
 
 export const shimmerClassName = `my-lib-shimmer-${Math.random().toString(36).substring(7)}`;
 
-export function Shimmer() {
-    const { theme } = useTheme();
-
+export function Shimmer({ theme }: { theme: Theme }) {
     return (
         <style>
             {`
