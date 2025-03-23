@@ -1,10 +1,8 @@
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import { LegendOrdinal } from '@visx/legend';
-import { capitalize, lowerCase } from 'lodash-es';
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import useTheme from '../../hooks/useTheme';
-import { shimmerClassName } from '../Shimmer/Shimmer';
+import LegendItem from './LegendItem';
 import { LegendsProps } from './types';
 
 export default function Legends({
@@ -19,17 +17,11 @@ export default function Legends({
     isLoading = false,
     doStrike = false,
     isVisible = true,
+    variant = 'compact',
 }: LegendsProps) {
     const { theme } = useTheme();
 
-    if (!data || !colorScale || !setHideIndex || !setHovered || !isVisible) return null;
-
-    const getFlexDirection = () => {
-        if (position === 'left' || position === 'right') return 'column';
-        return 'row';
-    };
-
-    const getPosition = () => {
+    const positionStyles = useMemo(() => {
         switch (position) {
             case 'left':
                 return {
@@ -48,25 +40,55 @@ export default function Legends({
                     maxWidth: '150px',
                 };
             case 'bottom':
-                return {};
-            default: // top
+            case 'top':
+            default:
                 return {};
         }
-    };
+    }, [position]);
+
+    const flexDirection = position === 'left' || position === 'right' ? 'column' : 'row';
+
+    const handleToggleItem = useCallback(
+        (index, labelText) => {
+            setHideIndex((prev) =>
+                prev.includes(index) ? prev.filter((idx) => idx !== index) : [...prev, index],
+            );
+
+            if (onClick) {
+                onClick(data, labelText, index);
+            }
+        },
+        [data, onClick, setHideIndex],
+    );
+
+    const handleMouseOver = useCallback(
+        (labelText) => {
+            setHovered(labelText);
+        },
+        [setHovered],
+    );
+
+    const handleMouseLeave = useCallback(() => {
+        setHovered(null);
+    }, [setHovered]);
+
+    if (!data || !colorScale || !setHideIndex || !setHovered || !isVisible) {
+        return null;
+    }
 
     return (
         <Box
             sx={{
                 display: 'flex',
-                flexDirection: getFlexDirection(),
+                flexDirection,
                 flexWrap: 'wrap',
-                gap: '12px',
+                gap: variant === 'compact' ? '8px' : '12px',
                 backgroundColor: theme.colors.legend.background,
                 borderRadius: '4px',
-                ...getPosition(),
+                ...positionStyles,
             }}
         >
-            <LegendOrdinal scale={colorScale} direction={getFlexDirection()} labelMargin="0 0 0 0">
+            <LegendOrdinal scale={colorScale} direction={flexDirection} labelMargin="0 0 0 0">
                 {(labels) => (
                     <>
                         {labels.map((label, index) => {
@@ -74,97 +96,24 @@ export default function Legends({
                                 return null;
                             }
 
-                            return (
-                                <Box
-                                    key={label.index}
-                                    onClick={() => {
-                                        setHideIndex((prev) =>
-                                            prev.includes(index)
-                                                ? prev.filter((idx) => idx !== index)
-                                                : [...prev, index],
-                                        );
+                            const isHidden = hideIndex.includes(index);
+                            const isHoveredOther = hovered && !hovered.includes(label.text);
 
-                                        if (onClick) {
-                                            onClick(data, label.text, index);
-                                        }
-                                    }}
-                                    tabIndex={0}
-                                    onMouseOver={() => {
-                                        setHovered(label.text);
-                                    }}
-                                    onMouseLeave={() => {
-                                        setHovered(null);
-                                    }}
-                                    sx={{
-                                        gap: '12px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        cursor: 'pointer',
-                                        userSelect: 'none',
-                                        opacity:
-                                            hovered && !hovered?.includes(label.text) ? 0.5 : 1,
-                                        transition: 'all 0.3s ease',
-                                        filter:
-                                            !doStrike && hideIndex.includes(index)
-                                                ? 'grayscale(100%) opacity(0.5)'
-                                                : 'none',
-                                    }}
-                                >
-                                    <Box
-                                        sx={{
-                                            backgroundColor:
-                                                data?.[index]?.color || label.value || '#fff',
-                                            marginTop: '4px',
-                                            marginBottom: 'auto',
-                                            borderRadius: '20px',
-                                            width: '12px',
-                                            height: '12px',
-                                        }}
-                                        className={`${isLoading ? shimmerClassName : ''}`}
-                                    />
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            gap: '8px',
-                                            alignItems: 'flex-start',
-                                        }}
-                                    >
-                                        <Typography
-                                            variant="body2"
-                                            sx={{
-                                                margin: 0,
-                                                fontWeight: 400,
-                                                textDecoration:
-                                                    doStrike && hideIndex.includes(index)
-                                                        ? 'line-through'
-                                                        : 'none',
-                                                color: theme.colors.legend.text,
-                                            }}
-                                            className={`${isLoading ? shimmerClassName : ''}`}
-                                        >
-                                            {isLoading
-                                                ? `${'loading'.repeat(1)}`
-                                                : capitalize(lowerCase(label.datum))}
-                                        </Typography>
-                                        {data?.[label.index]?.value && (
-                                            <Typography
-                                                variant="h6"
-                                                sx={{
-                                                    margin: 0,
-                                                    fontWeight: 700,
-                                                    color: theme.colors.legend.text,
-                                                    fontSize: '16px',
-                                                }}
-                                                className={`${isLoading ? shimmerClassName : ''}`}
-                                            >
-                                                {isLoading
-                                                    ? `${'loading'.repeat(2)}`
-                                                    : data?.[label?.index]?.value}
-                                            </Typography>
-                                        )}
-                                    </Box>
-                                </Box>
+                            return (
+                                <LegendItem
+                                    key={`legend-${label.text}-${label.value}`}
+                                    label={label}
+                                    index={index}
+                                    data={data}
+                                    isHidden={isHidden}
+                                    isHoveredOther={isHoveredOther}
+                                    isLoading={isLoading}
+                                    doStrike={doStrike}
+                                    variant={variant}
+                                    onToggle={() => handleToggleItem(index, label.text)}
+                                    onMouseOver={() => handleMouseOver(label.text)}
+                                    onMouseLeave={handleMouseLeave}
+                                />
                             );
                         })}
                     </>
