@@ -17,4 +17,5 @@ export interface LegendsProps {
     isLoading?: boolean;
     doStrike?: boolean;
     isVisible?: boolean;
+    variant?: 'compact' | 'expanded';
 }

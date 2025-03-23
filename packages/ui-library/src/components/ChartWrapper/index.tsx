@@ -20,7 +20,7 @@ const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
         const {
             colorScale = defaultColorScale,
             data: legendData,
-            position = 'top',
+            position = 'bottom',
         } = legendsProps || {};
         const { data: toolTipData } = tooltipProps || {};
 

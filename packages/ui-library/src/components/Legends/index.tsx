@@ -19,6 +19,7 @@ export default function Legends({
     isLoading = false,
     doStrike = false,
     isVisible = true,
+    variant = 'compact',
 }: LegendsProps) {
     const { theme } = useTheme();
 
@@ -60,7 +61,7 @@ export default function Legends({
                 display: 'flex',
                 flexDirection: getFlexDirection(),
                 flexWrap: 'wrap',
-                gap: '12px',
+                gap: variant === 'compact' ? '8px' : '12px',
                 backgroundColor: theme.colors.legend.background,
                 borderRadius: '4px',
                 ...getPosition(),
@@ -96,9 +97,8 @@ export default function Legends({
                                         setHovered(null);
                                     }}
                                     sx={{
-                                        gap: '12px',
                                         display: 'flex',
-                                        alignItems: 'center',
+                                        flexDirection: 'column',
                                         cursor: 'pointer',
                                         userSelect: 'none',
                                         opacity:
@@ -112,24 +112,24 @@ export default function Legends({
                                 >
                                     <Box
                                         sx={{
-                                            backgroundColor:
-                                                data?.[index]?.color || label.value || '#fff',
-                                            marginTop: '4px',
-                                            marginBottom: 'auto',
-                                            borderRadius: '20px',
-                                            width: '12px',
-                                            height: '12px',
-                                        }}
-                                        className={`${isLoading ? shimmerClassName : ''}`}
-                                    />
-                                    <Box
-                                        sx={{
                                             display: 'flex',
-                                            flexDirection: 'column',
-                                            gap: '8px',
-                                            alignItems: 'flex-start',
+                                            alignItems: 'center',
+                                            gap: variant === 'compact' ? '4px' : '8px',
+                                            flexDirection: 'row',
                                         }}
                                     >
+                                        <Box
+                                            sx={{
+                                                backgroundColor:
+                                                    data?.[index]?.color || label.value || '#fff',
+
+                                                borderRadius: '20px',
+                                                width: '12px',
+                                                height: '12px',
+                                            }}
+                                            className={`${isLoading ? shimmerClassName : ''}`}
+                                        />
+
                                         <Typography
                                             variant="body2"
                                             sx={{
@@ -140,30 +140,52 @@ export default function Legends({
                                                         ? 'line-through'
                                                         : 'none',
                                                 color: theme.colors.legend.text,
+                                                fontSize: '12px',
+                                                lineHeight: '1',
+                                                letterSpacing: '0.4px',
                                             }}
                                             className={`${isLoading ? shimmerClassName : ''}`}
                                         >
                                             {isLoading
                                                 ? `${'loading'.repeat(1)}`
                                                 : capitalize(lowerCase(label.datum))}
-                                        </Typography>
-                                        {data?.[label.index]?.value && (
-                                            <Typography
-                                                variant="h6"
-                                                sx={{
-                                                    margin: 0,
-                                                    fontWeight: 700,
-                                                    color: theme.colors.legend.text,
-                                                    fontSize: '16px',
-                                                }}
-                                                className={`${isLoading ? shimmerClassName : ''}`}
-                                            >
-                                                {isLoading
+
+                                            {variant === 'compact' &&
+                                                data?.[label.index]?.value &&
+                                                (isLoading
                                                     ? `${'loading'.repeat(2)}`
-                                                    : data?.[label?.index]?.value}
-                                            </Typography>
-                                        )}
+                                                    : ` (${data?.[label?.index]?.value})`)}
+                                        </Typography>
                                     </Box>
+
+                                    {variant === 'expanded' && (
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                marginTop: '4px',
+                                                alignItems: 'start',
+                                                marginLeft: '20px',
+                                            }}
+                                        >
+                                            {data?.[label.index]?.value && (
+                                                <Typography
+                                                    variant="h6"
+                                                    sx={{
+                                                        margin: 0,
+                                                        fontWeight: 700,
+                                                        color: theme.colors.legend.text,
+                                                        fontSize: '16px',
+                                                    }}
+                                                    className={`${isLoading ? shimmerClassName : ''}`}
+                                                >
+                                                    {isLoading
+                                                        ? `${'loading'.repeat(2)}`
+                                                        : data?.[label?.index]?.value}
+                                                </Typography>
+                                            )}
+                                        </Box>
+                                    )}
                                 </Box>
                             );
                         })}
