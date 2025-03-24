@@ -6,6 +6,7 @@ import {
     HorizontalStackedBarChart,
     Sortable,
     SortableCard,
+    TreeMapChart,
     VerticalBarChart,
     VerticalGroupedBarChart,
     VerticalStackedBarChart,
@@ -487,6 +488,249 @@ function App() {
                                 doStrike: true,
                             }}
                             tooltipProps={{}}
+                        />
+                    </SortableCard>
+
+                    <SortableCard
+                        title="Asset Allocation"
+                        height={200}
+                        width={1000}>
+                        <TreeMapChart
+                            data={{
+                                id: 'portfolio',
+                                name: 'Portfolio',
+                                value: 1000,
+                                children: [
+                                    {
+                                        id: 'equities',
+                                        name: 'Equities',
+                                        value: 450,
+                                        children: [
+                                            {
+                                                id: 'tech',
+                                                name: 'Technology',
+                                                value: 180,
+                                            },
+                                            {
+                                                id: 'health',
+                                                name: 'Healthcare',
+                                                value: 120,
+                                            },
+                                            {
+                                                id: 'finance',
+                                                name: 'Financial',
+                                                value: 90,
+                                            },
+                                            {
+                                                id: 'consumer',
+                                                name: 'Consumer',
+                                                value: 60,
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        id: 'fixed-income',
+                                        name: 'Fixed Income',
+                                        value: 300,
+                                        children: [
+                                            {
+                                                id: 'treasury',
+                                                name: 'Treasury',
+                                                value: 120,
+                                            },
+                                            {
+                                                id: 'corporate',
+                                                name: 'Corporate',
+                                                value: 100,
+                                            },
+                                            {
+                                                id: 'municipal',
+                                                name: 'Municipal',
+                                                value: 80,
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        id: 'alternatives',
+                                        name: 'Alternatives',
+                                        value: 200,
+                                        children: [
+                                            {
+                                                id: 'realestate',
+                                                name: 'Real Estate',
+                                                value: 100,
+                                            },
+                                            {
+                                                id: 'commodities',
+                                                name: 'Commodities',
+                                                value: 60,
+                                            },
+                                            {
+                                                id: 'hedge',
+                                                name: 'Hedge Funds',
+                                                value: 40,
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        id: 'cash',
+                                        name: 'Cash',
+                                        value: 50,
+                                    },
+                                ],
+                            }}
+                            title="Investment Portfolio Allocation"
+                            timestamp={new Date().toISOString()}
+                            colors={Array.from(
+                                { length: 500 },
+                                () => `hsl(${Math.random() * 360}, 100%, 45%)`,
+                            )}
+                            isLoading={isLoading}
+                            titleProps={{
+                                variant: 'h6',
+                                align: 'left',
+                            }}
+                            legendsProps={{
+                                position: 'bottom',
+                                doStrike: true,
+                            }}
+                            tooltipProps={{}}
+                            tilePadding={2}
+                            borderRadius={5}
+                        />
+                    </SortableCard>
+
+                    {/* Second TreeMapChart example */}
+                    <SortableCard
+                        title="Market Analysis"
+                        height={500}
+                        width={'auto'}>
+                        <TreeMapChart
+                            data={{
+                                id: 'markets',
+                                name: 'Global Markets',
+                                value: 1000,
+                                children: [
+                                    {
+                                        id: 'north-america',
+                                        name: 'North America',
+                                        value: 450,
+                                        children: [
+                                            {
+                                                id: 'us',
+                                                name: 'United States',
+                                                value: 350,
+                                            },
+                                            {
+                                                id: 'canada',
+                                                name: 'Canada',
+                                                value: 80,
+                                            },
+                                            {
+                                                id: 'mexico',
+                                                name: 'Mexico',
+                                                value: 20,
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        id: 'europe',
+                                        name: 'Europe',
+                                        value: 350,
+                                        children: [
+                                            {
+                                                id: 'uk',
+                                                name: 'United Kingdom',
+                                                value: 100,
+                                            },
+                                            {
+                                                id: 'germany',
+                                                name: 'Germany',
+                                                value: 90,
+                                            },
+                                            {
+                                                id: 'france',
+                                                name: 'France',
+                                                value: 80,
+                                            },
+                                            {
+                                                id: 'others-eu',
+                                                name: 'Others',
+                                                value: 80,
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        id: 'asia',
+                                        name: 'Asia',
+                                        value: 300,
+                                        children: [
+                                            {
+                                                id: 'china',
+                                                name: 'China',
+                                                value: 130,
+                                            },
+                                            {
+                                                id: 'japan',
+                                                name: 'Japan',
+                                                value: 90,
+                                            },
+                                            {
+                                                id: 'india',
+                                                name: 'India',
+                                                value: 50,
+                                            },
+                                            {
+                                                id: 'others-asia',
+                                                name: 'Others',
+                                                value: 30,
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        id: 'rest-world',
+                                        name: 'Rest of World',
+                                        value: 100,
+                                        children: [
+                                            {
+                                                id: 'latam',
+                                                name: 'Latin America',
+                                                value: 45,
+                                            },
+                                            {
+                                                id: 'africa',
+                                                name: 'Africa',
+                                                value: 30,
+                                            },
+                                            {
+                                                id: 'oceania',
+                                                name: 'Oceania',
+                                                value: 25,
+                                            },
+                                        ],
+                                    },
+                                ],
+                            }}
+                            title="Global Market Exposure"
+                            timestamp={new Date().toISOString()}
+                            colors={[
+                                '#407abc',
+                                '#50c1c2',
+                                '#fad176',
+                                '#93a3bc',
+                            ]}
+                            isLoading={isLoading}
+                            titleProps={{
+                                variant: 'h6',
+                                align: 'left',
+                            }}
+                            legendsProps={{
+                                position: 'top',
+                                doStrike: true,
+                            }}
+                            tooltipProps={{}}
+                            showLabels={true}
+                            tilePadding={1}
                         />
                     </SortableCard>
                 </Sortable>
