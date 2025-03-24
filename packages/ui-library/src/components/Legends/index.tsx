@@ -3,7 +3,7 @@ import { LegendOrdinal } from '@visx/legend';
 import React, { useCallback, useMemo } from 'react';
 import useTheme from '../../hooks/useTheme';
 import LegendItem from './LegendItem';
-import { LegendsProps } from './types';
+import { LegendsProps, LegendVariant } from './types';
 
 export default function Legends({
     colorScale,
@@ -17,7 +17,7 @@ export default function Legends({
     isLoading = false,
     doStrike = false,
     isVisible = true,
-    variant = 'compact',
+    variant = LegendVariant.COMPACT,
 }: LegendsProps) {
     const { theme } = useTheme();
 

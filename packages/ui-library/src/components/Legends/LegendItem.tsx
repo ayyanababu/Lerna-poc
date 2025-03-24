@@ -3,7 +3,7 @@ import { capitalize, lowerCase } from 'lodash-es';
 import React from 'react';
 import useTheme from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
-import { LegendItemProps } from './types';
+import { LegendItemProps, LegendVariant } from './types';
 
 export default function LegendItem({
     label,
@@ -136,7 +136,7 @@ export default function LegendItem({
             onMouseLeave={onMouseLeave}
             sx={itemStyles}
         >
-            {variant === 'compact' ? renderCompactItem() : renderExpandedItem()}
+            {variant === LegendVariant.COMPACT ? renderCompactItem() : renderExpandedItem()}
         </Box>
     );
 }
