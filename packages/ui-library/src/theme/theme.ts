@@ -22,6 +22,10 @@ export const defaultLightTheme: Theme = {
             background: '#ffffff',
         },
         charts: {
+            gradient: {
+                from: '#9bc5ef',
+                to: '#9bc5ef',
+            },
             bar: ['#9bc5ef'],
             stackedBar: [
                 '#9bc5ef',
@@ -64,6 +68,10 @@ export const defaultDarkTheme: Theme = {
             background: '#0f172a',
         },
         charts: {
+            gradient: {
+                from: '#9bc5ef',
+                to: '#9bc5ef',
+            },
             bar: ['#9bc5ef'],
             stackedBar: [
                 '#9bc5ef',

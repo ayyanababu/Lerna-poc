@@ -20,6 +20,10 @@ export interface Theme {
             background: string;
         };
         charts: {
+            gradient: {
+                from: string;
+                to: string;
+            };
             bar: string[];
             stackedBar: string[];
             line: string[];

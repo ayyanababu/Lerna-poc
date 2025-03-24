@@ -78,7 +78,7 @@ const ChartThemeProvider: React.FC<{
 
     return (
         <ThemeContext.Provider value={contextValue}>
-            <Shimmer />
+            <Shimmer theme={mergedTheme} />
             {children}
         </ThemeContext.Provider>
     );

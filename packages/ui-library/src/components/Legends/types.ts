@@ -1,7 +1,11 @@
 import { scaleOrdinal } from '@visx/scale';
 import React, { SetStateAction } from 'react';
 
-export type LegendVariant = 'compact' | 'expanded';
+export enum LegendVariant {
+    COMPACT = 'compact',
+    EXPANDED = 'expanded',
+}
+
 export type LegendPosition = 'top' | 'bottom' | 'left' | 'right';
 
 export type LegendItem = {
