@@ -40,8 +40,8 @@ export default function LegendItem({
                 borderRadius: '20px',
                 width: '12px',
                 height: '12px',
+                visibility: isLoading ? 'hidden' : 'visible',
             }}
-            className={isLoading ? shimmerClassName : ''}
         />
     );
 
