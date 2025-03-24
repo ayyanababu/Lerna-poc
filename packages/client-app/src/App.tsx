@@ -293,8 +293,6 @@ function App() {
                         height={400}
                         width={'auto'}>
                         <VerticalStackedBarChart
-                            width={600}
-                            height={200}
                             data={[
                                 ...new Array(100).fill(0).map((_, index) => ({
                                     label: `Region ${index + 1}`,
@@ -438,9 +436,6 @@ function App() {
                         height={400}
                         width={'auto'}>
                         <HorizontalStackedBarChart
-                            width={600}
-                            height={200}
-                            type="stacked"
                             data={[
                                 ...new Array(100).fill(0).map((_, index) => ({
                                     label: `${index + 1} Team Beta`,

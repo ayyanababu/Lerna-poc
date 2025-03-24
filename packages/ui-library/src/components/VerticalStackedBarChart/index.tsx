@@ -34,17 +34,15 @@ function VerticalStackedBarChart({
     timestamp,
     colors = [],
     isLoading,
+    showTicks = false,
     titleProps,
     legendsProps,
     tooltipProps,
-    showTicks = false,
+    timestampProps,
     yAxisProps,
     xAxisProps,
     gridProps,
     barProps,
-    timestampProps,
-    showYAxis = true,
-    showXAxis = true,
 }: VerticalStackedBarChartProps) {
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -276,7 +274,6 @@ function VerticalStackedBarChart({
                         scale={yScale}
                         isLoading={isLoading}
                         showTicks={showTicks}
-                        showAxisLine={showYAxis}
                         {...yAxisProps}
                     />
 
@@ -287,7 +284,6 @@ function VerticalStackedBarChart({
                         top={innerHeight}
                         isLoading={isLoading}
                         showTicks={showTicks}
-                        showAxisLine={showXAxis}
                         labels={filteredData.map((d) => String(d.label))}
                         availableWidth={innerWidth}
                         autoRotate

@@ -1,8 +1,11 @@
-import { CSSProperties } from 'react';
+import { CustomBarProps } from '../CustomBar/types';
+import { GridProps } from '../Grid/types';
 import { LegendsProps } from '../Legends/types';
 import { TimestampProps } from '../Timestamp/types';
 import { TitleProps } from '../Title/types';
 import { TooltipProps } from '../Tooltip/types';
+import { XAxisProps } from '../XAxis/types';
+import { YAxisProps } from '../YAxis/types';
 
 export interface DataPoint {
     label: string;
@@ -10,84 +13,20 @@ export interface DataPoint {
 }
 
 export interface HorizontalStackedBarChartProps {
-    /**
-     * Data for the chart
-     */
     data: DataPoint[];
-
-    /**
-     * Keys for the data groups
-     */
     groupKeys: string[];
-
-    /**
-     * Type of chart - 'grouped' or 'stacked'
-     */
-    type?: 'grouped' | 'stacked';
-
-    /**
-     * Chart title
-     */
-    title?: string;
-
-    /**
-     * Chart timestamp
-     */
-    timestamp?: string;
-
-    /**
-     * Margin around the chart
-     */
     margin?: { top: number; right: number; bottom: number; left: number };
-
-    /**
-     * Width of the chart
-     */
-    width?: number;
-
-    /**
-     * Height of the chart
-     */
-    height?: number;
-
-    /**
-     * Custom colors for the chart
-     */
+    title?: string;
+    timestamp?: string;
     colors?: string[];
-
-    /**
-     * Loading state
-     */
     isLoading?: boolean;
-
-    /**
-     * Title props
-     */
-    titleProps?: TitleProps;
-
-    /**
-     * Legend props
-     */
-    legendsProps?: Partial<LegendsProps>;
-
-    /**
-     * Tooltip props
-     */
-    tooltipProps?: Partial<TooltipProps>;
-
-    /**
-     * Timestamp props
-     */
-    timestampProps?: Partial<TimestampProps>;
-
-    /**
-     * Chart container style
-     */
-    style?: CSSProperties;
-
-    /**
-     * Show ticks on axes
-     * @default false
-     */
     showTicks?: boolean;
+    titleProps?: TitleProps;
+    legendsProps?: Partial<LegendsProps>;
+    tooltipProps?: Partial<TooltipProps>;
+    timestampProps?: Partial<TimestampProps>;
+    xAxisProps?: Partial<XAxisProps>;
+    yAxisProps?: Partial<YAxisProps>;
+    gridProps?: Partial<GridProps>;
+    barProps?: Partial<CustomBarProps>;
 }

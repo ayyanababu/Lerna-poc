@@ -9,14 +9,13 @@ import useTheme from '../../hooks/useTheme';
 import ChartWrapper from '../ChartWrapper';
 import CustomBar from '../CustomBar';
 import Grid from '../Grid';
-import { HorizontalGroupedBarChartProps } from '../HorizontalGroupedBarChart/types';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
-import { mockVerticalGroupedBarChartData } from '../VerticalGroupedBarChart/mockdata';
 import XAxis from '../XAxis';
 import YAxis from '../YAxis';
-import { DataPoint } from './types';
+import { mockHorizontalStackedBarChartData } from './mockdata';
+import { DataPoint, HorizontalStackedBarChartProps } from './types';
 
 const DEFAULT_MARGIN = {
     top: 20,
@@ -31,7 +30,7 @@ const SCALE_PADDING = 1.2;
 /**
  * HorizontalStackedBarChart component that renders either grouped or stacked bar charts horizontally
  */
-const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
+const HorizontalStackedBarChart: React.FC<HorizontalStackedBarChartProps> = ({
     data: _data,
     groupKeys: _groupKeys,
     margin = DEFAULT_MARGIN,
@@ -39,15 +38,15 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     timestamp,
     colors = [],
     isLoading,
+    showTicks = false,
     titleProps,
     legendsProps,
     tooltipProps,
+    timestampProps,
     xAxisProps,
     yAxisProps,
     gridProps,
     barProps,
-    timestampProps,
-    showTicks = false,
 }) => {
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -67,7 +66,7 @@ const HorizontalStackedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
         groupKeys: string[];
     }>(
         () =>
-            isLoading ? mockVerticalGroupedBarChartData : { data: _data, groupKeys: _groupKeys },
+            isLoading ? mockHorizontalStackedBarChartData : { data: _data, groupKeys: _groupKeys },
         [isLoading, _data, _groupKeys],
     );
 
