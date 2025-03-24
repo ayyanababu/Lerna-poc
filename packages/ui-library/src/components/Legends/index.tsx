@@ -5,7 +5,7 @@ import useTheme from '../../hooks/useTheme';
 import LegendItem from './LegendItem';
 import { LegendsProps, LegendVariant } from './types';
 
-export default function Legends({
+function Legends({
     colorScale,
     data,
     hideIndex,
@@ -122,3 +122,7 @@ export default function Legends({
         </Box>
     );
 }
+
+Legends.Variant = LegendVariant;
+
+export default Legends;

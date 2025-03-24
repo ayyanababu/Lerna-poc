@@ -4,6 +4,7 @@ import {
     HorizontalBarChart,
     HorizontalGroupedBarChart,
     HorizontalStackedBarChart,
+    Legends,
     Sortable,
     SortableCard,
     TreeMapChart,
@@ -486,6 +487,7 @@ function App() {
                                     );
                                 },
                                 doStrike: true,
+                                variant: Legends.Variant.EXPANDED,
                             }}
                             tooltipProps={{}}
                         />

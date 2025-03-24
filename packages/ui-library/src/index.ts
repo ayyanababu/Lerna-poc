@@ -2,6 +2,7 @@ import DonutChart from './components/DonutChart';
 import HorizontalBarChart from './components/HorizontalBarChart';
 import HorizontalGroupedBarChart from './components/HorizontalGroupedBarChart';
 import HorizontalStackedBarChart from './components/HorizontalStackedBarChart';
+import Legends from './components/Legends';
 import SortableComponent from './components/Sortable';
 import SortableCard from './components/SortableCard';
 import TreeMapChart from './components/TreeMapChart';
@@ -16,6 +17,7 @@ export {
     HorizontalBarChart,
     HorizontalGroupedBarChart,
     HorizontalStackedBarChart,
+    Legends,
     SortableComponent as Sortable,
     SortableCard,
     TreeMapChart,
@@ -23,4 +25,3 @@ export {
     VerticalGroupedBarChart,
     VerticalStackedBarChart,
 };
-
