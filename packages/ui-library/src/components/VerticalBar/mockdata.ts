@@ -4,7 +4,7 @@ import { DataPoint } from './types';
  * Mock data for the VerticalBarChart component
  * Used when the chart is in loading state
  */
-const mockVerticalBarChartData: DataPoint[] = [
+export const mockVerticalBarChartData: DataPoint[] = [
     {
         label: 'A',
         value: 65,
@@ -12,7 +12,5 @@ const mockVerticalBarChartData: DataPoint[] = [
     {
         label: 'B',
         value: 45,
-    },
+    }
 ];
-
-export default mockVerticalBarChartData;

@@ -32,4 +32,9 @@ export interface YAxisProps extends AxisLeftProps {
      * Whether the axis is visible
      */
     isVisible?: boolean;
+    /**
+     * Whether the axis is on right side of chart
+     */
+    isRightYAxis?: boolean;
+
 }

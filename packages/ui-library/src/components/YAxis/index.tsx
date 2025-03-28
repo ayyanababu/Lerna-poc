@@ -1,6 +1,7 @@
-import { AxisLeft } from '@visx/axis';
+import { AxisLeft, AxisRight } from '@visx/axis';
 import React from 'react';
-import useTheme from '../../hooks/useTheme';
+
+import { useTheme } from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { YAxisProps } from './types';
@@ -14,9 +15,11 @@ function YAxis({
     hideAllTicks = false,
     textAnchor = 'end',
     isVisible = true,
+    isRightYAxis = false,
     ...props
 }: YAxisProps) {
     const { theme } = useTheme();
+    const AxisComponent = isRightYAxis ? AxisRight : AxisLeft;
 
     const renderAxisLabel = (
         formattedValue: string | number | undefined,
@@ -44,9 +47,9 @@ function YAxis({
     if (!isVisible) {
         return null;
     }
-
+    
     return (
-        <AxisLeft
+        <AxisComponent
             scale={scale}
             stroke={theme.colors.axis.line}
             tickStroke={theme.colors.axis.line}

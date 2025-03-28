@@ -9,17 +9,19 @@
  *    - Rotate labels if needed to fit available space
  * 3. Truncate long label text and add ellipsis
  * 4. Handle loading states with shimmer effect
+ * 
  */
 
 import { AxisBottom } from '@visx/axis';
-import React, { ReactNode, useMemo } from 'react';
-import useTheme from '../../hooks/useTheme';
+import React, { useMemo } from 'react';
+
+import { useTheme } from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { XAxisProps } from './types';
 
 function XAxis({
-    availableWidth,
+    availableWidth = 0,
     hideAllTicks = false,
     isLoading = false,
     labels: providedLabels,
@@ -30,7 +32,7 @@ function XAxis({
     top,
     isVisible = true,
     ...props
-}: XAxisProps): ReactNode {
+}: XAxisProps): JSX.Element | null {
     const { theme } = useTheme();
 
     const { angle, evenPositionsMap, formatLabel, rotate, textAnchor, tickValues } = useMemo(() => {
@@ -158,10 +160,10 @@ function XAxis({
     const renderAxisLabel = (
         formattedValue: string | undefined,
         tickProps: React.SVGProps<SVGTextElement>,
-    ): ReactNode => {
+    ): JSX.Element => {
         let label = '';
         if (!isLoading) {
-            label = formatLabel ? formatLabel(formattedValue || '') : formattedValue;
+            label = formatLabel ? formatLabel(formattedValue || '') : (formattedValue || '');
         }
 
         const textStyle = { fontSize: '12px' };
@@ -217,7 +219,7 @@ function XAxis({
             top={top}
             stroke={theme.colors.axis.line}
             tickStroke={theme.colors.axis.line}
-            tickValues={tickValues}
+            tickValues={tickValues === null ? undefined : tickValues}
             tickLabelProps={() => ({
                 fill: theme.colors.axis.label,
                 fontSize: '12px',

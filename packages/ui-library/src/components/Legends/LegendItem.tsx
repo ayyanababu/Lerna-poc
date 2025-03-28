@@ -1,142 +1,148 @@
 import { Box, Typography } from '@mui/material';
 import { capitalize, lowerCase } from 'lodash-es';
 import React from 'react';
-import useTheme from '../../hooks/useTheme';
+
+import { useTheme } from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { LegendItemProps, LegendVariant } from './types';
 
 export default function LegendItem({
-    label,
-    index,
-    data,
-    isHidden,
-    isHoveredOther,
-    isLoading,
-    doStrike,
-    variant,
-    onToggle,
-    onMouseOver,
-    onMouseLeave,
+  label,
+  index = 0,
+  data,
+  isHidden = false,
+  isHoveredOther = false,
+  isLoading = false,
+  doStrike = false,
+  variant = LegendVariant.COMPACT,
+  onToggle,
+  onMouseOver,
+  onMouseLeave,
+  hideValues = false
 }: LegendItemProps) {
-    const { theme } = useTheme();
-    const itemStyles = {
+  const { theme } = useTheme();
+  const itemStyles = {
+    display: 'flex',
+    flexDirection: 'column',
+    cursor: 'pointer',
+    userSelect: 'none',
+    opacity: isHoveredOther ? 0.5 : 1,
+    transition: 'all 0.3s ease',
+    filter: !doStrike && isHidden ? 'grayscale(100%) opacity(0.5)' : 'none'
+  };
+
+  const markerColor = (data && index !== undefined && data[index]?.color) || label?.value || '#fff';
+
+  let displayText = '';
+  if (isLoading) {
+    displayText = 'loading';
+  } else if (label?.datum) {
+    displayText = capitalize(lowerCase(label.datum));
+  }
+
+  const valueText = data && label?.index !== undefined ? data[label.index]?.value : undefined;
+
+  const renderMarker = () => (
+    <Box
+      sx={{
+        backgroundColor: markerColor,
+        borderRadius: '20px',
+        width: '12px',
+        height: '12px'
+      }}
+      className={isLoading ? shimmerClassName : ''}
+    />
+  );
+
+  const renderCompactItem = () => (
+    <Box
+      sx={{
         display: 'flex',
-        flexDirection: 'column',
-        cursor: 'pointer',
-        userSelect: 'none',
-        opacity: isHoveredOther ? 0.5 : 1,
-        transition: 'all 0.3s ease',
-        filter: !doStrike && isHidden ? 'grayscale(100%) opacity(0.5)' : 'none',
-    };
+        alignItems: 'center',
+        gap: '4px',
+        flexDirection: 'row'
+      }}
+    >
+      {renderMarker()}
+      <Typography
+        variant="caption"
+        sx={{
+          margin: 0,
+          textDecoration: doStrike && isHidden ? 'line-through' : 'none',
+          color: theme.colors.legend.text,
+          lineHeight: 'normal',
+          letterSpacing: '0.4px',
+          paddingTop: '1px'
+        }}
+        className={isLoading ? shimmerClassName : ''}
+      >
+        {displayText}
+        {!hideValues && valueText && (isLoading ? 'loadingloading' : ` (${valueText})`)}
+      </Typography>
+    </Box>
+  );
 
-    const markerColor = data?.[index]?.color || label.value || '#fff';
-    const displayText = isLoading ? 'loading' : capitalize(lowerCase(label.datum));
-    const valueText = data?.[label.index]?.value;
-
-    const renderMarker = () => (
-        <Box
-            sx={{
-                backgroundColor: markerColor,
-                borderRadius: '20px',
-                width: '12px',
-                height: '12px',
-                visibility: isLoading ? 'hidden' : 'visible',
-            }}
-        />
-    );
-
-    const renderCompactItem = () => (
-        <Box
-            sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                flexDirection: 'row',
-            }}
+  const renderExpandedItem = () => (
+    <>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          flexDirection: 'row'
+        }}
+      >
+        {renderMarker()}
+        <Typography
+          variant="caption"
+          sx={{
+            margin: 0,
+            textDecoration: doStrike && isHidden ? 'line-through' : 'none',
+            color: theme.colors.legend.text,
+            lineHeight: 'normal',
+            letterSpacing: '0.4px',
+            paddingTop: '1px'
+          }}
+          className={isLoading ? shimmerClassName : ''}
         >
-            {renderMarker()}
-            <Typography
-                variant="body2"
-                sx={{
-                    margin: 0,
-                    fontWeight: 400,
-                    textDecoration: doStrike && isHidden ? 'line-through' : 'none',
-                    color: theme.colors.legend.text,
-                    fontSize: '12px',
-                    lineHeight: '1',
-                    letterSpacing: '0.4px',
-                }}
-                className={isLoading ? shimmerClassName : ''}
-            >
-                {displayText}
-                {valueText && (isLoading ? 'loadingloading' : ` (${valueText})`)}
-            </Typography>
-        </Box>
-    );
-
-    const renderExpandedItem = () => (
-        <>
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    flexDirection: 'row',
-                }}
-            >
-                {renderMarker()}
-                <Typography
-                    variant="body2"
-                    sx={{
-                        margin: 0,
-                        fontWeight: 400,
-                        textDecoration: doStrike && isHidden ? 'line-through' : 'none',
-                        color: theme.colors.legend.text,
-                        fontSize: '12px',
-                        lineHeight: '1',
-                        letterSpacing: '0.4px',
-                    }}
-                    className={isLoading ? shimmerClassName : ''}
-                >
-                    {displayText}
-                </Typography>
-            </Box>
-            {valueText && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        marginTop: '4px',
-                        alignItems: 'start',
-                        marginLeft: '20px',
-                    }}
-                >
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            margin: 0,
-                            fontWeight: 700,
-                            color: theme.colors.legend.text,
-                            fontSize: '16px',
-                        }}
-                        className={isLoading ? shimmerClassName : ''}
-                    >
-                        {isLoading ? 'loadingloading' : valueText}
-                    </Typography>
-                </Box>
-            )}
-        </>
-    );
-
-    return (
+          {displayText}
+        </Typography>
+      </Box>
+      {!hideValues && valueText && (
         <Box
-            onClick={onToggle}
-            tabIndex={0}
-            onMouseOver={onMouseOver}
-            onMouseLeave={onMouseLeave}
-            sx={itemStyles}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            marginTop: '4px',
+            alignItems: 'start',
+            marginLeft: '20px'
+          }}
         >
-            {variant === LegendVariant.COMPACT ? renderCompactItem() : renderExpandedItem()}
+          <Typography
+            variant="body1"
+            sx={{
+              margin: 0,
+              fontWeight: 700,
+              color: theme.colors.legend.text,
+            }}
+            className={isLoading ? shimmerClassName : ''}
+          >
+            {isLoading ? 'loadingloading' : valueText}
+          </Typography>
         </Box>
-    );
+      )}
+    </>
+  );
+
+  return (
+    <Box
+      onClick={onToggle}
+      tabIndex={0}
+      onMouseOver={onMouseOver}
+      onMouseLeave={onMouseLeave}
+      sx={itemStyles}
+    >
+      {variant === 'compact' ? renderCompactItem() : renderExpandedItem()}
+    </Box>
+  );
 }

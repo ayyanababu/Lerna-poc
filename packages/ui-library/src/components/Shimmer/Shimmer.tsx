@@ -1,12 +1,13 @@
 import React from 'react';
+
 import { Theme } from '../../theme/types';
 
-export const shimmerClassName = `my-lib-shimmer-${Math.random().toString(36).substring(7)}`;
+export const shimmerClassName = `my-lib-shimmer`;
 
 export function Shimmer({ theme }: { theme: Theme }) {
-    return (
-        <style>
-            {`
+  return (
+    <style>
+      {`
           @keyframes shimmer {
             0% {
               background-position: 200% 0;
@@ -40,6 +41,6 @@ export function Shimmer({ theme }: { theme: Theme }) {
             background-color: transparent !important;
           }
         `}
-        </style>
-    );
+    </style>
+  );
 }
