@@ -1,93 +1,85 @@
+import { common } from '@arcesium/react-mui-commons/theme/colors';
+import { alpha } from '@mui/material/styles';
+
 import { Theme } from './types';
 
+const colors = [
+  '#4277ce',
+  '#99c7ef',
+  '#f97f50',
+  '#FAD173',
+  '#4bc4c2',
+  '#fa8cf8',
+  '#a3296e',
+  '#01866E',
+  '#349E8B',
+  '#4f135e'
+];
+
 export const defaultLightTheme: Theme = {
-    colors: {
-        common: {
-            background: '#fff',
-            text: '#0f172a',
-            border: 'transparent',
-        },
-        axis: {
-            line: '#94a3bb',
-            label: '#64748b',
-            grid: '#94a3bb',
-        },
-        tooltip: {
-            background: '#ffffff',
-            text: '#0f172a',
-            border: '#e2e8f0',
-        },
-        legend: {
-            text: '#475569',
-            background: '#ffffff',
-        },
-        charts: {
-            gradient: {
-                from: '#9bc5ef',
-                to: '#9bc5ef',
-            },
-            bar: ['#9bc5ef'],
-            stackedBar: [
-                '#9bc5ef',
-                '#50c1c2',
-                '#fad176',
-                '#407abc',
-                '#93a3bc',
-                '#f9804e',
-                '#fed8cc',
-            ],
-            line: ['#407abc', '#50c1c2', '#f9804e', '#fad176', '#93a3bc'],
-            area: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e'],
-            treemap: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e', '#fed8cc'],
-            donut: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e', '#fed8cc'],
-            pie: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e', '#fed8cc'],
-            scatter: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e'],
-        },
+  colors: {
+    common: {
+      background: common.white,
+      text: '#0F172A',
+      border: 'transparent'
     },
+    axis: {
+      line: '#94A3B8',
+      label: '#94A3B8',
+      grid: '#94A3B8'
+    },
+    tooltip: {
+      background: common.white,
+      text: '#0F172A',
+      border:  '#E2E8F0'
+    },
+    legend: {
+      text:'#475569', 
+      background: common.white
+    },
+    charts: {
+      bar: [...colors],
+      stackedBar: [...colors],
+      line: [...colors],
+      area: [...colors],
+      treemap: [...colors],
+      donut: [...colors],
+      pie: [...colors],
+      scatter: [...colors]
+    }
+  }
 };
 
 export const defaultDarkTheme: Theme = {
-    colors: {
-        common: {
-            background: '#0f172a',
-            text: '#f1f5f9',
-            border: '#45556b',
-        },
-        axis: {
-            line: '#94a3bb',
-            label: '#94a3b8',
-            grid: '#94a3bb',
-        },
-        tooltip: {
-            background: '#1e293b',
-            text: '#f1f5f9',
-            border: '#45556b',
-        },
-        legend: {
-            text: '#f1f5f9',
-            background: '#0f172a',
-        },
-        charts: {
-            gradient: {
-                from: '#9bc5ef',
-                to: '#9bc5ef',
-            },
-            bar: ['#9bc5ef'],
-            stackedBar: [
-                '#9bc5ef',
-                '#50c1c2',
-                '#fad176',
-                '#407abc',
-                '#93a3bc',
-                '#f9804e',
-                '#fed8cc',
-            ],
-            line: ['#407abc', '#50c1c2', '#f9804e', '#fad176', '#93a3bc'],
-            area: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e'],
-            treemap: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e', '#fed8cc'],
-            donut: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e', '#fed8cc'],
-            pie: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e', '#fed8cc'],
-            scatter: ['#9bc5ef', '#50c1c2', '#fad176', '#407abc', '#93a3bc', '#f9804e'],
-        },
+  colors: {
+    common: {
+      background:'#1B2025',
+      text: '#E4E7EB',
+      border: alpha('#3E4C59', 0.6)
     },
+    axis: {
+      line:'#7B8695',
+      label:'#7B8695',
+      grid:'#7B8695'
+    },
+    tooltip: {
+      background: '#1E293B',
+      text: '#E4E7EB',
+      border: '#3E4C59'
+    },
+    legend: {
+      text: '#ACBBC7',
+      background:'#1B2025'
+    },
+    charts: {
+      bar: [...colors],
+      stackedBar: [...colors],
+      line: [...colors],
+      area: [...colors],
+      treemap: [...colors],
+      donut: [...colors],
+      pie: [...colors],
+      scatter: [...colors]
+    }
+  }
 };

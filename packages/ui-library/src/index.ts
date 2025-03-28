@@ -1,27 +1,8 @@
-import DonutChart from './components/DonutChart';
-import HorizontalBarChart from './components/HorizontalBarChart';
-import HorizontalGroupedBarChart from './components/HorizontalGroupedBarChart';
-import HorizontalStackedBarChart from './components/HorizontalStackedBarChart';
-import Legends from './components/Legends';
-import SortableComponent from './components/Sortable';
-import SortableCard from './components/SortableCard';
-import TreeMapChart from './components/TreeMapChart';
-import VerticalBarChart from './components/VerticalBarChart';
-import VerticalGroupedBarChart from './components/VerticalGroupedBarChart';
-import VerticalStackedBarChart from './components/VerticalStackedBarChart';
-import ChartThemeProvider from './context/ChartThemeProvider';
+export { BarLineChart } from './components/BarLine';
+export { DonutChart } from './components/Donut';
+export { HorizontalBarChart } from './components/HorizontalBar';
+export { HorizontalStackedBar } from './components/StackedBar/Horizontal';
+export { VerticalStackedBar } from './components/StackedBar/Vertical';
+export { VerticalBarChart } from './components/VerticalBar';
+export { ChartThemeProvider } from './context/ChartThemeProvider';
 
-export {
-    ChartThemeProvider,
-    DonutChart,
-    HorizontalBarChart,
-    HorizontalGroupedBarChart,
-    HorizontalStackedBarChart,
-    Legends,
-    SortableComponent as Sortable,
-    SortableCard,
-    TreeMapChart,
-    VerticalBarChart,
-    VerticalGroupedBarChart,
-    VerticalStackedBarChart,
-};

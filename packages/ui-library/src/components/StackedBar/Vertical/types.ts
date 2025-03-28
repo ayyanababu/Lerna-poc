@@ -1,23 +1,34 @@
 import { CSSProperties } from 'react';
-import { CustomBarProps } from '../CustomBar/types';
-import { GridProps } from '../Grid/types';
-import { LegendsProps } from '../Legends/types';
-import { TitleProps } from '../Title/types';
-import { TooltipProps } from '../Tooltip/types';
-import { XAxisProps } from '../XAxis/types';
-import { YAxisProps } from '../YAxis/types';
+
+import { CustomBarProps } from '../../CustomBar/types';
+import { GridProps } from '../../Grid/types';
+import { LegendsProps } from '../../Legends/types';
+import { TimestampProps } from '../../TimeStamp/types';
+import { TitleProps } from '../../Title/types';
+import { TooltipProps } from '../../Tooltip/types';
+import { XAxisProps } from '../../XAxis/types';
+import { YAxisProps } from '../../YAxis/types';
 
 export interface DataPoint {
     label: string;
-    value: number;
-    color?: string;
+    data: Record<string, number>;
 }
 
-export interface HorizontalBarChartProps {
+export interface VerticalStackedBarChartProps {
     /**
      * Data for the chart
      */
     data: DataPoint[];
+
+    /**
+     * Keys for the data groups
+     */
+    groupKeys: string[];
+
+    /**
+     * Type of chart - 'grouped' or 'stacked'
+     */
+    type?: 'grouped' | 'stacked';
 
     /**
      * Chart title
@@ -90,9 +101,9 @@ export interface HorizontalBarChartProps {
     barProps?: CustomBarProps;
 
     /**
-     * Chart container style
+     * Timestamp props
      */
-    style?: CSSProperties;
+    timestampProps?: Partial<TimestampProps>;
 
     /**
      * Show ticks on axes
@@ -101,14 +112,25 @@ export interface HorizontalBarChartProps {
     showTicks?: boolean;
 
     /**
+     * Chart container style
+     */
+    style?: CSSProperties;
+
+    /**
      * Show grid lines
      * @default true
      */
     showGrid?: boolean;
 
     /**
-     * Show x-axis
-     * @default false
+     * Show Y axis
+     * @default true
+     */
+    showYAxis?: boolean;
+
+    /**
+     * Show X axis
+     * @default true
      */
     showXAxis?: boolean;
 }

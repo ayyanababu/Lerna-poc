@@ -1,6 +1,10 @@
 import { DataPoint } from './types';
 
-export const mockHorizontalStackedBarChartData: {
+/**
+ * Mock data for the VerticalStackedBarChart component
+ * Used when the chart is in loading state
+ */
+export const mockVerticalStackedBarChartData: {
     data: DataPoint[];
     groupKeys: string[];
 } = {

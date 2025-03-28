@@ -1,5 +1,6 @@
 import { Bar } from '@visx/shape';
 import React from 'react';
+
 import { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { CustomBarProps } from './types';
 
