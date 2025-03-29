@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 import { Tooltip as VisxTooltip } from '@visx/tooltip';
 import React from 'react';
 
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { TooltipProps } from './types';
 
 export function Tooltip({

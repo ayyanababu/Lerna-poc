@@ -2,7 +2,7 @@ import { Bar } from '@visx/shape';
 import { CSSProperties } from 'react';
 
 import { LegendsProps } from '../Legends/types';
-import { TimestampProps } from '../TimeStamp/types';
+import { TimestampProps } from '../Timestamp/types';
 import { TitleProps } from '../Title/types';
 import { TooltipProps } from '../Tooltip/types';
 

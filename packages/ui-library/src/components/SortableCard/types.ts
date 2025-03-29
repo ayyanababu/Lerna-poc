@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 export interface SortableCardProps {
     children: ReactNode;
     title?: string;

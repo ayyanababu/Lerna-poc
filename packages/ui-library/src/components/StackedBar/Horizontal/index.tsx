@@ -6,7 +6,7 @@ import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import React, { useMemo, useState } from 'react';
 
-import { useTheme } from '../../../hooks/useTheme';
+import useTheme from '../../../hooks/useTheme';
 import { ChartWrapper } from '../../ChartWrapper';
 import CustomBar from '../../CustomBar';
 import Grid from '../../Grid';
@@ -329,5 +329,4 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     );
 };
 
-
-export { HorizontalStackedBar };
+export default HorizontalStackedBar;

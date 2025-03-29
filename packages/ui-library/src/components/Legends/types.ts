@@ -3,18 +3,15 @@ import React, { SetStateAction } from 'react';
 
 export enum LegendVariant {
     COMPACT = 'compact',
-    EXPANDED = 'expanded'
+    EXPANDED = 'expanded',
 }
 
 export enum LegendPosition {
     TOP = 'top',
     BOTTOM = 'bottom',
     LEFT = 'left',
-    RIGHT = 'right'
+    RIGHT = 'right',
 }
-
-export type LegendVariantType = LegendVariant | 'compact' | 'expanded';
-export type LegendPositionType = LegendPosition | 'top' | 'bottom' | 'left' | 'right';
 
 export type LegendItem = {
     label: string;
@@ -38,12 +35,12 @@ export interface LegendsProps {
     setHideIndex?: React.Dispatch<SetStateAction<number[]>>;
     hovered?: string | null | undefined;
     setHovered?: React.Dispatch<SetStateAction<string | null | undefined>>;
-    position?: LegendPositionType;
+    position?: LegendPosition;
     onClick?: (data: LegendData, legend: string, index: number) => void;
     isLoading?: boolean;
     doStrike?: boolean;
     isVisible?: boolean;
-    variant?: LegendVariantType;
+    variant?: LegendVariant;
     hideValues?: boolean;
 }
 
@@ -55,7 +52,7 @@ export interface LegendItemProps {
     isHoveredOther?: boolean;
     isLoading?: boolean;
     doStrike?: boolean;
-    variant?: LegendVariantType;
+    variant?: LegendVariant;
     onToggle?: () => void;
     onMouseOver?: () => void;
     onMouseLeave?: () => void;

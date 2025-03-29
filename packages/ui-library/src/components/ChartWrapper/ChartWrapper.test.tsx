@@ -3,6 +3,13 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import ChartWrapper from '.';
 
+// Create a mock for ScaleOrdinal
+const mockColorScale = jest.fn() as any;
+mockColorScale.domain = jest.fn().mockReturnValue(mockColorScale);
+mockColorScale.range = jest.fn().mockReturnValue(mockColorScale);
+mockColorScale.unknown = jest.fn().mockReturnValue(mockColorScale);
+mockColorScale.copy = jest.fn().mockReturnValue(mockColorScale);
+
 // Mock the Title component
 jest.mock('../Title', () => ({
     Title: ({ title, ...props }: any) => (
@@ -112,7 +119,7 @@ describe('ChartWrapper', () => {
     test('renders legends when legendsProps is provided', () => {
         const legendsProps = {
             data: [{ label: 'Test Legend', value: 100 }],
-            colorScale: jest.fn(),
+            colorScale: mockColorScale,
             hideIndex: [],
             setHideIndex: jest.fn(),
             hovered: null,
@@ -186,7 +193,7 @@ describe('ChartWrapper', () => {
     test('applies default colorScale when legendsProps has no colorScale', () => {
         const legendsProps = {
             data: [{ label: 'Test Legend', value: 100 }],
-            colorScale: jest.fn(),
+            colorScale: mockColorScale,
             hideIndex: [],
             setHideIndex: jest.fn(),
             hovered: null,
@@ -205,7 +212,7 @@ describe('ChartWrapper', () => {
                     { label: 'Series A', value: 100 },
                     { label: 'Series B', value: 200 },
                 ],
-                colorScale: jest.fn(),
+                colorScale: mockColorScale,
                 hideIndex: [],
                 setHideIndex: jest.fn(),
                 hovered: null,

@@ -2,7 +2,7 @@ import { Box, Typography } from '@mui/material';
 import { capitalize, lowerCase } from 'lodash-es';
 import React from 'react';
 
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { LegendItemProps, LegendVariant } from './types';
 

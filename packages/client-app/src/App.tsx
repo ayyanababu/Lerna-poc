@@ -61,7 +61,7 @@ function App() {
               align: 'left',
             }}
             legendsProps={{
-              position: 'top',
+              position: Legends.Position.TOP,
 
               doStrike: true,
             }}
@@ -101,7 +101,7 @@ function App() {
                                 gutterBottom: true,
                             }}
                             legendsProps={{
-                                position: 'top',
+                                position: Legends.Position.TOP,
                                 onClick: (data, legend, index) => {
                                     console.log(
                                         `Clicked ${legend} at index ${index}`,
@@ -143,7 +143,7 @@ function App() {
                                 align: 'center',
                             }}
                             legendsProps={{
-                                position: 'top',
+                                position: Legends.Position.TOP,
                                 onClick: (data, legend, index) => {
                                     console.log(
                                         `Clicked ${legend} at index ${index}`,
@@ -180,7 +180,7 @@ function App() {
                                 align: 'left',
                             }}
                             legendsProps={{
-                                position: 'top',
+                                position: Legends.Position.TOP,
                                 doStrike: true,
                                 isVisible: false,
                             }}
@@ -209,7 +209,7 @@ function App() {
                                 align: 'left',
                             }}
                             legendsProps={{
-                                position: 'top',
+                                position: Legends.Position.TOP,
                                 doStrike: true,
                                 isVisible: false,
                             }}
@@ -344,7 +344,7 @@ function App() {
                                     );
                                 },
                                 doStrike: false,
-                                position: 'bottom',
+                                position: Legends.Position.BOTTOM,
                             }}
                             tooltipProps={{}}
                         />
@@ -588,7 +588,7 @@ function App() {
                                 align: 'left',
                             }}
                             legendsProps={{
-                                position: 'bottom',
+                                position: Legends.Position.BOTTOM,
                                 doStrike: true,
                             }}
                             tooltipProps={{}}
@@ -722,7 +722,7 @@ function App() {
                                 align: 'left',
                             }}
                             legendsProps={{
-                                position: 'top',
+                                position: Legends.Position.TOP,
                                 doStrike: true,
                             }}
                             tooltipProps={{}}

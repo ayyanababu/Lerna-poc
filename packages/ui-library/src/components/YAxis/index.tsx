@@ -1,7 +1,7 @@
 import { AxisLeft, AxisRight } from '@visx/axis';
 import React from 'react';
 
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { YAxisProps } from './types';

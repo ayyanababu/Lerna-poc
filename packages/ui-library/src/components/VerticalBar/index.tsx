@@ -6,7 +6,7 @@ import { Bar } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import React, { useMemo, useState } from 'react';
 
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';

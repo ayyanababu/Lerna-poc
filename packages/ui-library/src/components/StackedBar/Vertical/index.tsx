@@ -6,7 +6,7 @@ import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { useTheme } from '../../../hooks/useTheme';
+import useTheme from '../../../hooks/useTheme';
 import { ChartWrapper } from '../../ChartWrapper';
 import CustomBar from '../../CustomBar';
 import Grid from '../../Grid';
@@ -302,4 +302,4 @@ function VerticalStackedBar({
     );
 }
 
-export { VerticalStackedBar };
+export default VerticalStackedBar;
