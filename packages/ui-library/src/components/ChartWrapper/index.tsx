@@ -7,7 +7,7 @@ import Legends from '../Legends';
 import { LegendPosition } from '../Legends/types';
 import Timestamp from '../Timestamp';
 import Title from '../Title';
-import { Tooltip } from '../Tooltip';
+import Tooltip from '../Tooltip';
 import { ChartWrapperProps } from './types';
 
 const common = {

@@ -32,6 +32,7 @@ export const defaultLightTheme: Theme = {
             line: '#94A3B8',
             label: '#94A3B8',
             grid: '#94A3B8',
+            title: '#475569',
         },
         tooltip: {
             background: common.white,
@@ -66,6 +67,7 @@ export const defaultDarkTheme: Theme = {
             line: '#7B8695',
             label: '#7B8695',
             grid: '#7B8695',
+            title: '#acbbc7',
         },
         tooltip: {
             background: '#1E293B',

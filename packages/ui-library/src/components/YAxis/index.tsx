@@ -47,7 +47,7 @@ function YAxis({
     if (!isVisible) {
         return null;
     }
-    
+
     return (
         <AxisComponent
             scale={scale}

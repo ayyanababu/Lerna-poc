@@ -10,125 +10,125 @@ import { XAxisProps } from '../XAxis/types';
 import { YAxisProps } from '../YAxis/types';
 
 export interface BarLineDataPoint {
-  xAxis: string;
-  yAxisLeft: number;
-  yAxisRight: number;
+    xAxis: string;
+    yAxisLeft: number;
+    yAxisRight: number;
 }
 
 export interface BarLineData {
-  xAxislabel: string;
-  yAxisLeftLabel: string;
-  yAxisRightLabel: string;
-  chartData: BarLineDataPoint[];
+    xAxisLabel: string;
+    yAxisLeftLabel: string;
+    yAxisRightLabel: string;
+    chartData: BarLineDataPoint[];
 }
 
 export interface BarLineChartProps {
-  /**
-   * Data for the chart
-   */
-  data: BarLineData;
+    /**
+     * Data for the chart
+     */
+    data: BarLineData;
 
-  title?: string;
+    title?: string;
 
-  /**
-   * Chart timestamp
-   */
-  timestamp?: string;
+    /**
+     * Chart timestamp
+     */
+    timestamp?: string;
 
-  /**
-   * Margin around the chart
-   */
-  margin?: { top: number; right: number; bottom: number; left: number };
+    /**
+     * Margin around the chart
+     */
+    margin?: { top: number; right: number; bottom: number; left: number };
 
-  /**
-   * Width of the chart
-   */
-  width?: number;
+    /**
+     * Width of the chart
+     */
+    width?: number;
 
-  /**
-   * Height of the chart
-   */
-  height?: number;
+    /**
+     * Height of the chart
+     */
+    height?: number;
 
-  /**
-   * Custom colors for the chart
-   */
-  colors?: {
-    line: string;
-    bar: string;
-  };
+    /**
+     * Custom colors for the chart
+     */
+    colors?: {
+        line: string;
+        bar: string;
+    };
 
-  /**
-   * Loading state
-   */
-  isLoading?: boolean;
+    /**
+     * Loading state
+     */
+    isLoading?: boolean;
 
-  /**
-   * Title props
-   */
-  titleProps?: TitleProps;
+    /**
+     * Title props
+     */
+    titleProps?: TitleProps;
 
-  /**
-   * Legend props
-   */
-  legendsProps?: Partial<LegendsProps>;
+    /**
+     * Legend props
+     */
+    legendsProps?: Partial<LegendsProps>;
 
-  /**
-   * Tooltip props
-   */
-  tooltipProps?: Partial<TooltipProps>;
+    /**
+     * Tooltip props
+     */
+    tooltipProps?: Partial<TooltipProps>;
 
-  /**
-   * X axis props
-   */
-  xAxisProps?: Partial<XAxisProps>;
+    /**
+     * X axis props
+     */
+    xAxisProps?: Partial<XAxisProps>;
 
-  /**
-   * Y axis props
-   */
-  yAxisProps?: Partial<YAxisProps>;
+    /**
+     * Y axis props
+     */
+    yAxisProps?: Partial<YAxisProps>;
 
-  /**
-   * Grid props
-   */
-  gridProps?: GridProps;
+    /**
+     * Grid props
+     */
+    gridProps?: GridProps;
 
-  /**
-   * barProps
-   */
-  barProps?: CustomBarProps;
+    /**
+     * barProps
+     */
+    barProps?: CustomBarProps;
 
-  /**
-   * Timestamp props
-   */
-  timestampProps?: Partial<TimestampProps>;
+    /**
+     * Timestamp props
+     */
+    timestampProps?: Partial<TimestampProps>;
 
-  /**
-   * Show ticks on axes
-   * @default false
-   */
-  showTicks?: boolean;
+    /**
+     * Show ticks on axes
+     * @default false
+     */
+    showTicks?: boolean;
 
-  /**
-   * Chart container style
-   */
-  style?: CSSProperties;
+    /**
+     * Chart container style
+     */
+    style?: CSSProperties;
 
-  /**
-   * Show grid lines
-   * @default true
-   */
-  showGrid?: boolean;
+    /**
+     * Show grid lines
+     * @default true
+     */
+    showGrid?: boolean;
 
-  /**
-   * Show Y axis
-   * @default true
-   */
-  showYAxis?: boolean;
+    /**
+     * Show Y axis
+     * @default true
+     */
+    showYAxis?: boolean;
 
-  /**
-   * Show X axis
-   * @default true
-   */
-  showXAxis?: boolean;
+    /**
+     * Show X axis
+     * @default true
+     */
+    showXAxis?: boolean;
 }

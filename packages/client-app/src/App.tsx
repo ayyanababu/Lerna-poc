@@ -1,4 +1,5 @@
 import {
+    BarLineChart,
     ChartThemeProvider,
     DonutChart,
     HorizontalBarChart,
@@ -73,10 +74,7 @@ function App() {
             {
                 <Sortable className="my-cards">
                     {/* Original Donut Chart examples */}
-                    <SortableCard
-                        title="Trade Capture"
-                        height={400}
-                        width={'auto'}>
+                    <SortableCard title="SemiDonut" height={400} width={400}>
                         <DonutChart
                             data={[
                                 {
@@ -114,10 +112,7 @@ function App() {
                         />
                     </SortableCard>
 
-                    <SortableCard
-                        title="Trade Notification"
-                        height={400}
-                        width={'auto'}>
+                    <SortableCard title="DonutChart" height={400} width={400}>
                         <DonutChart
                             data={[
                                 {
@@ -133,15 +128,10 @@ function App() {
                                 { label: 'Seat', value: 25, color: '#fad176' },
                             ]}
                             type="full"
-                            hideLabels={false}
                             title="Trade Status Distribution"
                             timestamp={new Date().toISOString()}
                             colors={['#9bc5ef', '#50c1c2', '#fad176']}
                             isLoading={isLoading}
-                            titleProps={{
-                                variant: 'subtitle1',
-                                align: 'center',
-                            }}
                             legendsProps={{
                                 position: Legends.Position.TOP,
                                 onClick: (data, legend, index) => {
@@ -151,6 +141,46 @@ function App() {
                                     );
                                 },
                                 doStrike: true,
+                            }}
+                            tooltipProps={{}}
+                        />
+                    </SortableCard>
+
+                    <SortableCard
+                        title="BarLineChart"
+                        height={400}
+                        width={1000}>
+                        <BarLineChart
+                            data={{
+                                xAxisLabel: 'Months',
+                                yAxisLeftLabel: 'Volume',
+                                yAxisRightLabel: 'Growth Rate',
+                                chartData: Array.from(
+                                    { length: 100 },
+                                    (_, index) => ({
+                                        xAxis: `${index + 1} January`,
+                                        yAxisLeft:
+                                            Math.floor(
+                                                Math.random() * 1000000000000,
+                                            ) + 20,
+                                        yAxisRight:
+                                            Math.floor(
+                                                Math.random() * 1000000000000,
+                                            ) + 20,
+                                    }),
+                                ),
+                            }}
+                            title="Monthly Trade Volume"
+                            timestamp={new Date().toISOString()}
+                            isLoading={isLoading}
+                            titleProps={{
+                                variant: 'h6',
+                                align: 'left',
+                            }}
+                            legendsProps={{
+                                position: Legends.Position.TOP,
+                                doStrike: true,
+                                isVisible: false,
                             }}
                             tooltipProps={{}}
                         />
@@ -192,12 +222,12 @@ function App() {
                     <SortableCard
                         title="HorizontalBarChart"
                         height={400}
-                        width={'auto'}>
+                        width={400}>
                         <HorizontalBarChart
                             data={[
                                 // Array of 30 values with 30 labels
-                                ...Array.from({ length: 100 }, (_, index) => ({
-                                    label: `${index + 1} Product`,
+                                ...Array.from({ length: 10 }, (_, index) => ({
+                                    label: `${index + 1} asdf adfasdf a`,
                                     value: Math.floor(Math.random() * 100),
                                 })),
                             ]}
@@ -218,15 +248,15 @@ function App() {
                     </SortableCard>
 
                     <SortableCard
-                        title="Quarterly Trade Distribution"
+                        title="VerticalGroupedBarChart"
                         height={400}
-                        width={'auto'}>
+                        width={400}>
                         <VerticalGroupedBarChart
                             width={600}
                             height={200}
                             data={[
                                 ...new Array(100).fill(0).map((_, index) => ({
-                                    label: `Q${index + 1} 2024`,
+                                    label: `Q${index + 1} 2024 asfd asdf asdf asdf asdfa sdf `,
                                     data: {
                                         future:
                                             Math.floor(Math.random() * 100) +
@@ -291,7 +321,7 @@ function App() {
                     <SortableCard
                         title="VerticalStackedBarChart"
                         height={400}
-                        width={'auto'}>
+                        width={400}>
                         <VerticalStackedBarChart
                             data={[
                                 ...new Array(100).fill(0).map((_, index) => ({
@@ -354,7 +384,7 @@ function App() {
                     <SortableCard
                         title="Department Performance"
                         height={400}
-                        width={'auto'}>
+                        width={400}>
                         <HorizontalGroupedBarChart
                             width={600}
                             height={200}
@@ -434,7 +464,7 @@ function App() {
                     <SortableCard
                         title="HorizontalStackedBarChart"
                         height={400}
-                        width={'auto'}>
+                        width={400}>
                         <HorizontalStackedBarChart
                             data={[
                                 ...new Array(100).fill(0).map((_, index) => ({
@@ -601,7 +631,7 @@ function App() {
                     <SortableCard
                         title="Market Analysis"
                         height={500}
-                        width={'auto'}>
+                        width={400}>
                         <TreeMapChart
                             data={{
                                 id: 'markets',
