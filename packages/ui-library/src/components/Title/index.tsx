@@ -10,10 +10,14 @@ export default function Title({ title, ...props }: TitleProps) {
     if (!title) return null;
     return (
         <Typography
-            variant="subtitle1"
+            variant="subtitle2"
             gutterBottom
-            fontWeight="bold"
             color={theme.colors.common.text}
+            fontSize="13px"
+            fontStyle="normal"
+            fontWeight={500}
+            lineHeight="150%"
+            letterSpacing="0.25px"
             {...props}
         >
             {title}
