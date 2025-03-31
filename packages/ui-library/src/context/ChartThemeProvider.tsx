@@ -8,14 +8,12 @@ type ThemeMode = 'light' | 'dark';
 
 type ThemeContextType = {
     theme: Theme;
-
     activeMode: ThemeMode;
     setActiveMode: React.Dispatch<React.SetStateAction<ThemeMode>>;
 };
 
 export const ThemeContext = createContext<ThemeContextType>({
     theme: defaultLightTheme,
-
     activeMode: 'light',
     setActiveMode: () => {},
 });
@@ -25,6 +23,7 @@ export const ChartThemeProvider: React.FC<{
     themeOverrides?: Partial<Theme>;
     children: React.ReactNode;
 }> = ({ themeMode = 'light', themeOverrides, children }) => {
+    const uniqueId = Math.random().toString(36).substring(2, 15);
     const [activeMode, setActiveMode] = React.useState<ThemeMode>(themeMode);
 
     const baseTheme = useMemo(
@@ -79,8 +78,22 @@ export const ChartThemeProvider: React.FC<{
 
     return (
         <ThemeContext.Provider value={contextValue}>
-            <Shimmer theme={mergedTheme} />
-            {children}
+            <div className={`chart-theme-provider-${uniqueId}`}>
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+                    rel="stylesheet"
+                />
+                <style>
+                    {`
+                        .chart-theme-provider-${uniqueId} {
+                            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen,
+                            Ubuntu, Cantarell, sans-serif;
+                        }
+                    `}
+                </style>
+                <Shimmer theme={mergedTheme} />
+                {children}
+            </div>
         </ThemeContext.Provider>
     );
 };
