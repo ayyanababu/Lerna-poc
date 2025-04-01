@@ -27,7 +27,7 @@ const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
 
-function VerticalStackedBarChart({
+function VerticalStackedBar({
     data: _data,
     groupKeys: _groupKeys,
     margin = DEFAULT_MARGIN,
@@ -35,15 +35,17 @@ function VerticalStackedBarChart({
     timestamp,
     colors = [],
     isLoading,
-    showTicks = false,
     titleProps,
     legendsProps,
     tooltipProps,
-    timestampProps,
+    showTicks = false,
     yAxisProps,
     xAxisProps,
     gridProps,
     barProps,
+    timestampProps,
+    showYAxis = true,
+    showXAxis = true,
 }: VerticalStackedBarChartProps) {
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -275,6 +277,7 @@ function VerticalStackedBarChart({
                         scale={yScale}
                         isLoading={isLoading}
                         showTicks={showTicks}
+                        showAxisLine={showYAxis}
                         {...yAxisProps}
                     />
 
@@ -285,6 +288,7 @@ function VerticalStackedBarChart({
                         top={innerHeight}
                         isLoading={isLoading}
                         showTicks={showTicks}
+                        showAxisLine={showXAxis}
                         labels={filteredData.map((d) => String(d.label))}
                         availableWidth={innerWidth}
                         autoRotate
@@ -298,4 +302,4 @@ function VerticalStackedBarChart({
     );
 }
 
-export default VerticalStackedBarChart;
+export default VerticalStackedBar;

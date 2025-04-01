@@ -23,6 +23,7 @@ export interface HorizontalStackedBarChartProps {
     showTicks?: boolean;
     titleProps?: TitleProps;
     legendsProps?: Partial<LegendsProps>;
+    showXAxis?: boolean;
     tooltipProps?: Partial<TooltipProps>;
     timestampProps?: Partial<TimestampProps>;
     xAxisProps?: Partial<XAxisProps>;

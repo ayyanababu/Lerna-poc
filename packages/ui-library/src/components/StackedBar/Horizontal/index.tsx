@@ -29,9 +29,9 @@ const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
 
 /**
- * HorizontalStackedBarChart component that renders either grouped or stacked bar charts horizontally
+ * HorizontalStackedBar component that renders either grouped or stacked bar charts horizontally
  */
-const HorizontalStackedBarChart: React.FC<HorizontalStackedBarChartProps> = ({
+const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     data: _data,
     groupKeys: _groupKeys,
     margin = DEFAULT_MARGIN,
@@ -42,6 +42,7 @@ const HorizontalStackedBarChart: React.FC<HorizontalStackedBarChartProps> = ({
     showTicks = false,
     titleProps,
     legendsProps,
+    showXAxis = false,
     tooltipProps,
     timestampProps,
     xAxisProps,
@@ -291,19 +292,23 @@ const HorizontalStackedBarChart: React.FC<HorizontalStackedBarChartProps> = ({
                         scale={categoryScale}
                         tickStroke={theme.colors.axis.line}
                         tickComponent={({ formattedValue, ...tickProps }) =>
-                            renderAxisLabel(formattedValue, tickProps)
+                            renderAxisLabel(formattedValue as string, tickProps)
                         }
                         hideAxisLine
                         numTicks={innerHeight / 20}
-                        hideTicks={!showTicks}
+                        showTicks={showTicks}
+                        isLoading={isLoading}
                         {...yAxisProps}
                     />
 
                     <XAxis
                         scale={xScale}
                         top={innerHeight}
-                        hideTicks={hideIndex.length === groupKeys.length || !showTicks}
+                        showTicks={hideIndex.length === groupKeys.length || showTicks}
                         numTicks={5}
+                        isLoading={isLoading}
+                        availableWidth={innerWidth}
+                        showAxisLine={showXAxis}
                         {...xAxisProps}
                     />
 
@@ -324,4 +329,4 @@ const HorizontalStackedBarChart: React.FC<HorizontalStackedBarChartProps> = ({
     );
 };
 
-export default HorizontalStackedBarChart;
+export default HorizontalStackedBar;
