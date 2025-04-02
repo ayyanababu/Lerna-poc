@@ -43,7 +43,7 @@ export interface GridProps {
 
     /**
      * Whether to show the bar
-     * @default true
+     * @default false
      */
     isVisible?: boolean;
 }

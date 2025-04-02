@@ -12,7 +12,7 @@ const Grid: React.FC<GridProps> = ({
     showHorizontal = true,
     showVertical = false,
     opacity = 0.3,
-    isVisible = true,
+    isVisible = false,
 }) => {
     const { theme } = useTheme();
 
