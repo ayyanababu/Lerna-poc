@@ -128,7 +128,7 @@ function DonutChart({
                                 return (
                                     <g
                                         key={`arc-${arc.data.label}`}
-                                        onMouseEnter={(
+                                        onMouseMove={(
                                             event: React.MouseEvent<SVGGElement, MouseEvent>,
                                         ) => {
                                             showTooltip({

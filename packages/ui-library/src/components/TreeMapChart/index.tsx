@@ -217,7 +217,7 @@ const TreeMapChart = ({
                                                         strokeWidth={1}
                                                         cursor="pointer"
                                                         onClick={() => onClick(i, node.data, data)}
-                                                        onMouseEnter={handleNodeMouseEnter(
+                                                        onMouseMove={handleNodeMouseEnter(
                                                             node.data,
                                                         )}
                                                         onMouseLeave={handleNodeMouseLeave}
