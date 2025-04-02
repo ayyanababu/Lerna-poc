@@ -1,20 +1,58 @@
 import { Typography } from '@mui/material';
 import { Tooltip as VisxTooltip } from '@visx/tooltip';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import useTheme from '../../hooks/useTheme';
 import { TooltipProps } from './types';
 
-export default function Tooltip({ top, left, data, isVisible = true }: TooltipProps) {
+export default function Tooltip({ top, left, data, isVisible = true, containerRef }: TooltipProps) {
     const { theme } = useTheme();
+    const [adjustedPosition, setAdjustedPosition] = useState({ top, left });
+
+    useEffect(() => {
+        if (!isVisible || top === undefined || left === undefined) {
+            setAdjustedPosition({ top, left });
+            return;
+        }
+
+        let adjustedTop = top;
+        let adjustedLeft = left;
+
+        if (containerRef?.current) {
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const tooltipWidth = 100;
+            const tooltipHeight = 80;
+
+            if (left + tooltipWidth / 2 > containerRect.right) {
+                adjustedLeft = containerRect.right - tooltipWidth / 2;
+            }
+
+            if (left - tooltipWidth / 2 < containerRect.left) {
+                adjustedLeft = containerRect.left + tooltipWidth / 2;
+            }
+
+            if (top - tooltipHeight < containerRect.top) {
+                adjustedTop = containerRect.top + tooltipHeight;
+            }
+
+            if (top > containerRect.bottom) {
+                adjustedTop = containerRect.bottom;
+            }
+
+            const MOUSE_TOP_ADJUSTMENT = 10;
+            adjustedTop -= MOUSE_TOP_ADJUSTMENT;
+        }
+
+        setAdjustedPosition({ top: adjustedTop, left: adjustedLeft });
+    }, [top, left, isVisible, containerRef]);
 
     if (!isVisible) return null;
 
     const tooltipContent = (
         <VisxTooltip
-            top={top}
-            left={left}
+            top={adjustedPosition.top}
+            left={adjustedPosition.left}
             style={{
                 position: 'fixed',
                 backgroundColor: theme.colors.tooltip.background,
@@ -28,9 +66,8 @@ export default function Tooltip({ top, left, data, isVisible = true }: TooltipPr
                 pointerEvents: 'none',
                 transform: 'translate(-50%, -100%)',
                 whiteSpace: 'pre-line',
-                transition: 'all 0.250s ease-in-out',
                 width: '100px',
-                zIndex: 9999, // Ensure tooltip is above other elements
+                zIndex: 9999,
             }}
         >
             <Typography
