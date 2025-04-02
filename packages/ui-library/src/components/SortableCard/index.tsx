@@ -22,6 +22,10 @@ const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
                     padding: 1,
                     boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.05)',
                     border: `1px solid ${theme.colors.common.border}`,
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                        transform: 'translateY(-2px)',
+                    },
                 }}
             >
                 <Box

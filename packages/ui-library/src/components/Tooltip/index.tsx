@@ -1,6 +1,7 @@
 import { Typography } from '@mui/material';
 import { Tooltip as VisxTooltip } from '@visx/tooltip';
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 import useTheme from '../../hooks/useTheme';
 import { TooltipProps } from './types';
@@ -10,7 +11,7 @@ export default function Tooltip({ top, left, data, isVisible = true }: TooltipPr
 
     if (!isVisible) return null;
 
-    return (
+    const tooltipContent = (
         <VisxTooltip
             top={top}
             left={left}
@@ -29,6 +30,7 @@ export default function Tooltip({ top, left, data, isVisible = true }: TooltipPr
                 whiteSpace: 'pre-line',
                 transition: 'all 0.250s ease-in-out',
                 width: '100px',
+                zIndex: 9999, // Ensure tooltip is above other elements
             }}
         >
             <Typography
@@ -59,4 +61,6 @@ export default function Tooltip({ top, left, data, isVisible = true }: TooltipPr
             </Typography>
         </VisxTooltip>
     );
+
+    return ReactDOM.createPortal(tooltipContent, document.body);
 }

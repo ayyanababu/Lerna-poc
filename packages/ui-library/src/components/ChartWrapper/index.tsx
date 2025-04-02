@@ -99,8 +99,6 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                         </Box>
                     </Box>
 
-                    {toolTipData && <Tooltip {...tooltipProps} data={toolTipData} />}
-
                     <Timestamp {...timestampProps} />
                 </>
             ),
@@ -108,12 +106,10 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                 title,
                 titleProps,
                 legendsProps,
-                tooltipProps,
                 timestampProps,
                 position,
                 colorScale,
                 legendData,
-                toolTipData,
                 children,
                 ref,
             ],
@@ -133,6 +129,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                 ref={containerRef}
             >
                 {canRender ? renderContent() : <p> Cannot Render the chart under this size</p>}
+                {toolTipData && <Tooltip {...tooltipProps} data={toolTipData} />}
             </Stack>
         );
     },
