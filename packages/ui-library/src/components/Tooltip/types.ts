@@ -1,9 +1,11 @@
+import { WithBoundingRectsProps } from '@visx/bounds';
+
 export interface TooltipData {
     label: string;
     value: number | string;
 }
 
-export interface TooltipProps {
+export interface TooltipProps extends WithBoundingRectsProps {
     top?: number;
     left?: number;
     data?: TooltipData;

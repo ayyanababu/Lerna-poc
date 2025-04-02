@@ -3,10 +3,11 @@ import { Tooltip as VisxTooltip } from '@visx/tooltip';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
+import { withBoundingRects } from '@visx/bounds';
 import useTheme from '../../hooks/useTheme';
 import { TooltipProps } from './types';
 
-export default function Tooltip({ top, left, data, isVisible = true, containerRef }: TooltipProps) {
+function Tooltip({ top, left, data, isVisible = true, containerRef }: TooltipProps) {
     const { theme } = useTheme();
     const [adjustedPosition, setAdjustedPosition] = useState({ top, left });
 
@@ -101,3 +102,5 @@ export default function Tooltip({ top, left, data, isVisible = true, containerRe
 
     return ReactDOM.createPortal(tooltipContent, document.body);
 }
+
+export default withBoundingRects(Tooltip);
