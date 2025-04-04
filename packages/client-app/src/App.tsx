@@ -18,7 +18,7 @@ import './App.css';
 
 function App() {
     const [isLoading, setIsLoading] = useState(true);
-    const [activeMode, setActiveMode] = useState<'light' | 'dark'>('light');
+    const [activeMode, setActiveMode] = useState<'light' | 'dark'>('dark');
 
     useEffect(() => {
         setTimeout(() => {
@@ -26,11 +26,64 @@ function App() {
         }, 2000);
     }, []);
 
+    useEffect(() => {
+        const root = document.documentElement;
+
+        if (activeMode === 'light') {
+            root.classList.remove('dark');
+        } else {
+            root.classList.add('dark');
+        }
+    }, [activeMode]);
+
     return (
         <ChartThemeProvider themeMode={activeMode}>
             <>
-                <button onClick={() => setActiveMode('light')}>Light</button>
-                <button onClick={() => setActiveMode('dark')}>Dark</button>
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        margin: '20px 0',
+                        padding: '10px',
+                        borderRadius: '8px',
+                        width: 'fit-content',
+                        background:
+                            activeMode === 'dark' ? '#2a3854' : '#e8f0fb',
+                    }}>
+                    <button
+                        onClick={() => setActiveMode('light')}
+                        style={{
+                            padding: '8px 16px',
+                            borderRadius: '6px',
+                            border: 'none',
+                            background:
+                                activeMode === 'light' ? '#407abc' : '#e0e0e0',
+                            color: activeMode === 'light' ? 'white' : '#333',
+                            fontWeight:
+                                activeMode === 'light' ? 'bold' : 'normal',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                        }}>
+                        Light
+                    </button>
+                    <button
+                        onClick={() => setActiveMode('dark')}
+                        style={{
+                            padding: '8px 16px',
+                            borderRadius: '6px',
+                            border: 'none',
+                            background:
+                                activeMode === 'dark' ? '#407abc' : '#e0e0e0',
+                            color: activeMode === 'dark' ? 'white' : '#333',
+                            fontWeight:
+                                activeMode === 'dark' ? 'bold' : 'normal',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                        }}>
+                        Dark
+                    </button>
+                </div>
             </>
 
             {/* <div
