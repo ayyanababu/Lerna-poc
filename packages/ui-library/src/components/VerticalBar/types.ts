@@ -1,4 +1,3 @@
-import { CSSProperties } from 'react';
 import { CustomBarProps } from '../CustomBar/types';
 import { GridProps } from '../Grid/types';
 import { LegendsProps } from '../Legends/types';
@@ -15,112 +14,17 @@ export interface DataPoint {
 }
 
 export interface VerticalBarChartProps {
-    /**
-     * Data for the chart
-     */
     data: DataPoint[];
-
-    /**
-     * Chart title
-     */
     title?: string;
-
-    /**
-     * Chart timestamp
-     */
-    timestamp?: string;
-
-    /**
-     * Margin around the chart
-     */
     margin?: { top: number; right: number; bottom: number; left: number };
-
-    /**
-     * Width of the chart
-     */
-    width?: number;
-
-    /**
-     * Height of the chart
-     */
-    height?: number;
-
-    /**
-     * Custom colors for the chart
-     */
     colors?: string[];
-
-    /**
-     * Loading state
-     */
     isLoading?: boolean;
-
-    /**
-     * Title props
-     */
-    titleProps?: TitleProps;
-
-    /**
-     * Legend props
-     */
+    titleProps?: Partial<TitleProps>;
     legendsProps?: Partial<LegendsProps>;
-
-    /**
-     * Tooltip props
-     */
     tooltipProps?: Partial<TooltipProps>;
-
-    /**
-     * X axis props
-     */
     xAxisProps?: Partial<XAxisProps>;
-
-    /**
-     * Y axis props
-     */
     yAxisProps?: Partial<YAxisProps>;
-
-    /**
-     * Grid props
-     */
-    gridProps?: GridProps;
-
-    /**
-     * Timestamp props
-     */
+    gridProps?: Partial<GridProps>;
     timestampProps?: Partial<TimestampProps>;
-
-    /**
-     * Chart container style
-     */
-    style?: CSSProperties;
-
-    /**
-     * Show ticks on axes
-     * @default false
-     */
-    showTicks?: boolean;
-
-    /**
-     * Show grid lines
-     * @default true
-     */
-    showGrid?: boolean;
-
-    /**
-     * Show Y axis
-     * @default false
-     */
-    showYAxis?: boolean;
-
-    /**
-     * Show X axis
-     * @default true
-     */
-    showXAxis?: boolean;
-
-    /**
-     * barProps
-     */
-    barProps?: CustomBarProps;
+    barProps?: Partial<CustomBarProps>;
 }

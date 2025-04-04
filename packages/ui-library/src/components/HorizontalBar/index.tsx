@@ -1,16 +1,17 @@
-import { AxisBottom, AxisLeft } from '@visx/axis';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
-import { Bar } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import React, { useMemo, useState } from 'react';
 
 import useTheme from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
-import { shimmerClassName } from '../Shimmer/Shimmer';
-import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
+import CustomBar from '../CustomBar';
+import Grid from '../Grid';
+import SvgShimmer from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
+import XAxis from '../XAxis';
+import YAxis from '../YAxis';
 import { mockHorizontalBarChartData } from './mockdata';
 import { DataPoint, HorizontalBarChartProps } from './types';
 
@@ -20,7 +21,7 @@ const DEFAULT_MARGIN = {
     bottom: 30,
     left: 100,
 };
-const DEFAULT_BAR_RADIUS = 5;
+const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
@@ -30,18 +31,18 @@ const SCALE_PADDING = 1.2;
  */
 const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     data: _data,
-    margin = DEFAULT_MARGIN,
     title,
-    timestamp,
+    margin = DEFAULT_MARGIN,
     colors = [],
     isLoading = false,
     titleProps,
     legendsProps,
     tooltipProps,
-    showTicks = false,
-    showGrid = true,
-    showXAxis = false,
-    barProps
+    xAxisProps,
+    yAxisProps,
+    gridProps,
+    timestampProps,
+    barProps,
 }) => {
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -67,7 +68,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     );
 
     // Calculate the maximum value for the x-axis scale
-    const maxValue = useMemo(() => Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) * SCALE_PADDING, [filteredData]);
+    const maxValue = useMemo(
+        () => Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) * SCALE_PADDING,
+        [filteredData],
+    );
 
     // Create scales
     // For horizontal bars, yScale uses band and xScale uses linear
@@ -93,21 +97,15 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     );
 
     // Prepare legend data
-    const legendData = useMemo(
-        () => data.map((d) => ({ label: d.label, value: d.value })),
-        [data],
-    );
+    const legendData = useMemo(() => data.map((d) => ({ label: d.label, value: d.value })), [data]);
 
     // Color scale for the bars
-    const colorScale = useMemo(
-        () => {
-            if (colors?.length) {
-                return (index: number) => colors[index % colors.length];
-            }
-            return (index: number) => theme.colors.charts.bar[index % theme.colors.charts.bar.length];
-        },
-        [colors, theme.colors.charts.bar],
-    );
+    const colorScale = useMemo(() => {
+        if (colors?.length) {
+            return (index: number) => colors[index % colors.length];
+        }
+        return (index: number) => theme.colors.charts.bar[index % theme.colors.charts.bar.length];
+    }, [colors, theme.colors.charts.bar]);
 
     // Handle mouse events
     const handleBarMouseMove = (value: number, index: number) => (event: React.MouseEvent) => {
@@ -131,20 +129,6 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         }
     };
 
-    // Hide axis labels when loading
-    const renderAxisLabel = (formattedValue: string | undefined, tickProps: any, isChartLoading: boolean) => (
-        <text
-            {...tickProps}
-            className={`${isChartLoading ? shimmerClassName : ''}`}
-            fill={isChartLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-            style={{
-                fontSize: '12px',
-            }}
-        >
-            {isLoading ? '' : formattedValue}
-        </text>
-    );
-
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
     }
@@ -157,13 +141,14 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             legendsProps={{
                 data: legendData,
                 colorScale: scaleOrdinal({
-                    domain: legendData.map(d => d.label),
-                    range: filteredData.map((_, i) => colorScale(i))
+                    domain: legendData.map((d) => d.label),
+                    range: filteredData.map((_, i) => colorScale(i)),
                 }),
                 hideIndex,
                 setHideIndex,
                 hovered: hoveredBar !== null ? legendData[hoveredBar]?.label : null,
-                setHovered: (label) => setHoveredBar(legendData.findIndex(item => item.label === label)),
+                setHovered: (label) =>
+                    setHoveredBar(legendData.findIndex((item) => item.label === label)),
                 isLoading,
                 ...legendsProps,
             }}
@@ -174,67 +159,29 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                 isVisible: !isLoading && tooltipOpen,
                 ...tooltipProps,
             }}
-            timestampProps={{ timestamp, isLoading }}
+            timestampProps={{ isLoading, ...timestampProps }}
         >
             <svg width={width} height={height}>
                 {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
-                    {/* Y-Axis (labels) */}
-                    <AxisLeft
-                        scale={yScale}
-                        stroke={theme.colors.axis.line}
-                        tickStroke={theme.colors.axis.line}
-                        tickLabelProps={{
-                            fill: theme.colors.axis.label,
-                            fontSize: '12px',
-                            textAnchor: 'end',
-                            dy: '0.33em',
-                        }}
-                        tickFormat={(value) => (isLoading ? '' : `${value}`)}
-                        hideTicks={!showTicks}
-                        tickComponent={({ formattedValue, ...tickProps }) =>
-                            renderAxisLabel(formattedValue, tickProps, isLoading)
-                        }
+                    <YAxis scale={yScale} isLoading={isLoading} {...yAxisProps} />
+
+                    <Grid
+                        height={innerHeight}
+                        xScale={xScale}
+                        showHorizontal={false}
+                        showVertical
+                        {...gridProps}
                     />
 
-                    {/* X-Axis (values) */}
-                    <AxisBottom
+                    <XAxis
                         scale={xScale}
                         top={innerHeight}
-                        stroke={theme.colors.axis.line}
-                        tickStroke={theme.colors.axis.line}
-                        tickLabelProps={{
-                            fill: theme.colors.axis.label,
-                            fontSize: '12px',
-                            textAnchor: 'middle',
-                        }}
-                        tickFormat={(value) => (isLoading ? '' : `${value}`)}
-                        numTicks={5}
-                        hideTicks={!showTicks}
-                        hideAxisLine={!showXAxis}
-                        tickComponent={({ formattedValue, ...tickProps }) =>
-                            renderAxisLabel(formattedValue, tickProps, isLoading)
-                        }
+                        isLoading={isLoading}
+                        availableWidth={innerWidth}
+                        {...xAxisProps}
                     />
-
-                    {/* Grid Lines */}
-                    {showGrid && (
-                        <g>
-                            {xScale.ticks(5).map((tick) => (
-                                <line
-                                    key={tick}
-                                    y1={0}
-                                    y2={innerHeight}
-                                    x1={xScale(tick)}
-                                    x2={xScale(tick)}
-                                    stroke={theme.colors.axis.grid}
-                                    strokeDasharray="2,2"
-                                    opacity={0.5}
-                                />
-                            ))}
-                        </g>
-                    )}
 
                     {/* Bars */}
                     {filteredData.map((d, index) => {
@@ -246,18 +193,30 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                         const barX = 0;
                         const barY = yScale(d.label) || 0;
                         const isHovered = hoveredBar === index;
-                        const barOpacity = hoveredBar !== null && !isHovered ? REDUCED_OPACITY : DEFAULT_OPACITY;
+                        const barOpacity =
+                            hoveredBar !== null && !isHovered ? REDUCED_OPACITY : DEFAULT_OPACITY;
 
                         return (
-                            <Bar
+                            <CustomBar
                                 key={`bar-${d.label}`}
                                 x={barX}
                                 y={barY}
                                 width={barWidth}
                                 height={barHeight}
-                                fill={isLoading ? `url(#${shimmerGradientId})` : d.color || colorScale(index)}
+                                fill={d.color || colorScale(index)}
+                                isLoading={isLoading}
                                 opacity={barOpacity}
-                                rx={DEFAULT_BAR_RADIUS}
+                                pathProps={{
+                                    d: `
+                                    M ${barX},${barY + barHeight}
+                                    L ${barX + barWidth - DEFAULT_BAR_RADIUS},${barY + barHeight}
+                                    Q ${barX + barWidth},${barY + barHeight} ${barX + barWidth},${barY + barHeight - DEFAULT_BAR_RADIUS}
+                                    L ${barX + barWidth},${barY + DEFAULT_BAR_RADIUS}
+                                    Q ${barX + barWidth},${barY} ${barX + barWidth - DEFAULT_BAR_RADIUS},${barY}
+                                    L ${barX},${barY}
+                                    Z
+                                  `,
+                                }}
                                 onMouseMove={handleBarMouseMove(value, index)}
                                 onMouseLeave={handleBarMouseLeave}
                                 {...barProps}
@@ -270,4 +229,4 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     );
 };
 
-export { HorizontalBarChart };
+export default HorizontalBarChart;

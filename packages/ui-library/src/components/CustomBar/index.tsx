@@ -4,12 +4,26 @@ import React from 'react';
 import { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { CustomBarProps } from './types';
 
-const CustomBar = ({ fill, isVisible = true, isLoading = false, ...props }: CustomBarProps) => {
+const CustomBar = ({
+    fill,
+    isVisible = true,
+    isLoading = false,
+    rx,
+    ry,
+    pathProps,
+    ...props
+}: CustomBarProps) => {
     if (!isVisible) {
         return null;
     }
 
-    return <Bar {...props} fill={isLoading ? `url(#${shimmerGradientId})` : fill} />;
+    const barFill = isLoading ? `url(#${shimmerGradientId})` : fill;
+
+    if (pathProps) {
+        return <path {...pathProps} fill={barFill} {...props} />;
+    }
+
+    return <Bar {...props} rx={rx} ry={ry} fill={barFill} />;
 };
 
 export default CustomBar;

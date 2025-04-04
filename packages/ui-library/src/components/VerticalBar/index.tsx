@@ -21,16 +21,15 @@ const DEFAULT_MARGIN = {
     bottom: 50,
     left: 50,
 };
-const DEFAULT_BAR_RADIUS = 5;
+const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
 
 const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     data: _data,
-    margin: initialMargin = DEFAULT_MARGIN,
     title,
-    timestamp,
+    margin: initialMargin = DEFAULT_MARGIN,
     colors = [],
     isLoading = false,
     titleProps,
@@ -38,11 +37,9 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     tooltipProps,
     xAxisProps,
     yAxisProps,
-    barProps,
     gridProps,
-    showTicks = false,
-    showYAxis = false,
-    showXAxis = true,
+    timestampProps,
+    barProps,
 }) => {
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -178,31 +175,21 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 isVisible: !isLoading && tooltipOpen,
                 ...tooltipProps,
             }}
-            timestampProps={{ timestamp, isLoading }}
+            timestampProps={{ isLoading, ...timestampProps }}
         >
             <svg width={width} height={height}>
                 {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
-                    <YAxis
-                        scale={yScale}
-                        isLoading={isLoading}
-                        showTicks={showTicks}
-                        showAxisLine={showYAxis}
-                        {...yAxisProps}
-                    />
+                    <YAxis scale={yScale} isLoading={isLoading} {...yAxisProps} />
 
-                    <Grid width={innerWidth} yScale={yScale} numTicks={5} {...gridProps} />
+                    <Grid width={innerWidth} yScale={yScale} {...gridProps} />
 
                     <XAxis
                         scale={xScale}
                         top={innerHeight}
                         isLoading={isLoading}
-                        showTicks={showTicks}
-                        showAxisLine={showXAxis}
-                        labels={filteredData.map((d) => String(d.label))}
                         availableWidth={innerWidth}
-                        autoRotate
                         {...xAxisProps}
                     />
 
@@ -229,7 +216,18 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                                 fill={d.color || colorScale(index)}
                                 isLoading={isLoading}
                                 opacity={barOpacity}
-                                rx={DEFAULT_BAR_RADIUS}
+                                pathProps={{
+                                    d: `
+                                    M ${barX},${barY + barHeight}
+                                    L ${barX + barWidth},${barY + barHeight}
+                                    L ${barX + barWidth},${barY + DEFAULT_BAR_RADIUS}
+                                    Q ${barX + barWidth},${barY} ${barX + barWidth - DEFAULT_BAR_RADIUS},${barY}
+                                    L ${barX + DEFAULT_BAR_RADIUS},${barY}
+                                    Q ${barX},${barY} ${barX},${barY + DEFAULT_BAR_RADIUS}
+                                    L ${barX},${barY + barHeight}
+                                    Z
+                                  `,
+                                }}
                                 onMouseMove={handleBarMouseMove(value, index)}
                                 onMouseLeave={handleBarMouseLeave}
                                 {...barProps}

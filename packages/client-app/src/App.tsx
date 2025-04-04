@@ -193,7 +193,7 @@ function App() {
                         width={1000}>
                         <VerticalBarChart
                             data={[
-                                ...Array.from({ length: 100 }, (_, index) => ({
+                                ...Array.from({ length: 21 }, (_, index) => ({
                                     // label: `label ${index + 1}`,
                                     label: `${index + 1} January sadf asdf asdf asdf asdfasdf asd asdf asf  `,
                                     value:
