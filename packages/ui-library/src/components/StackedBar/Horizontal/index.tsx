@@ -247,6 +247,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                         xScale={xScale}
                         showHorizontal={false}
                         showVertical
+                        isLoading={isLoading}
                         {...gridProps}
                     />
 

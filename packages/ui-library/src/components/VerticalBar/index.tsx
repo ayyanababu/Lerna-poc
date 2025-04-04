@@ -183,7 +183,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 <Group top={margin.top} left={margin.left}>
                     <YAxis scale={yScale} isLoading={isLoading} {...yAxisProps} />
 
-                    <Grid width={innerWidth} yScale={yScale} {...gridProps} />
+                    <Grid width={innerWidth} yScale={yScale} isLoading={isLoading} {...gridProps} />
 
                     <XAxis
                         scale={xScale}

@@ -177,6 +177,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                         xScale={xScale}
                         showHorizontal={false}
                         showVertical
+                        isLoading={isLoading}
                         {...gridProps}
                     />
 

@@ -13,10 +13,11 @@ const Grid: React.FC<GridProps> = ({
     showVertical = false,
     opacity = 0.3,
     isVisible = false,
+    isLoading = false,
 }) => {
     const { theme } = useTheme();
 
-    if (!isVisible) {
+    if (!isVisible || isLoading) {
         return null;
     }
 

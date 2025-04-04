@@ -46,4 +46,10 @@ export interface GridProps {
      * @default false
      */
     isVisible?: boolean;
+
+    /**
+     * Whether to show the loading state
+     * @default false
+     */
+    isLoading?: boolean;
 }
