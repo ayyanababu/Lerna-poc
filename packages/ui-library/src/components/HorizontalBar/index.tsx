@@ -165,7 +165,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                 {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
-                    <YAxis scale={yScale} isLoading={isLoading} {...yAxisProps} />
+                    <YAxis
+                        scale={yScale}
+                        isLoading={isLoading}
+                        numTicks={innerHeight / 20}
+                        {...yAxisProps}
+                    />
 
                     <Grid
                         height={innerHeight}
