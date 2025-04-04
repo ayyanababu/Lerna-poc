@@ -69,12 +69,11 @@ function getRoundedRight({
 }): string {
     return `
         M ${barX},${barY + barHeight}
-        L ${barX + barWidth},${barY + barHeight}
+        L ${barX + barWidth - barRadius},${barY + barHeight}
+        Q ${barX + barWidth},${barY + barHeight} ${barX + barWidth},${barY + barHeight - barRadius}
         L ${barX + barWidth},${barY + barRadius}
         Q ${barX + barWidth},${barY} ${barX + barWidth - barRadius},${barY}
-        L ${barX + barWidth - barRadius},${barY}
-        Q ${barX + barWidth},${barY} ${barX + barWidth},${barY + barRadius}
-        L ${barX},${barY + barHeight}
+        L ${barX},${barY}
         Z
     `;
 }

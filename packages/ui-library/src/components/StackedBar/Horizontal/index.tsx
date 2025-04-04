@@ -10,7 +10,6 @@ import useTheme from '../../../hooks/useTheme';
 import { ChartWrapper } from '../../ChartWrapper';
 import CustomBar from '../../CustomBar';
 import Grid from '../../Grid';
-import { shimmerClassName } from '../../Shimmer/Shimmer';
 import SvgShimmer, { shimmerGradientId } from '../../Shimmer/SvgShimmer';
 import { TooltipData } from '../../Tooltip/types';
 import XAxis from '../../XAxis';
@@ -24,6 +23,7 @@ const DEFAULT_MARGIN = {
     bottom: 30,
     left: 120,
 };
+const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
@@ -34,20 +34,17 @@ const SCALE_PADDING = 1.2;
 const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     data: _data,
     groupKeys: _groupKeys,
-    margin = DEFAULT_MARGIN,
     title,
-    timestamp,
+    margin = DEFAULT_MARGIN,
     colors = [],
-    isLoading,
-    showTicks = false,
+    isLoading = false,
     titleProps,
     legendsProps,
-    showXAxis = false,
     tooltipProps,
-    timestampProps,
     xAxisProps,
     yAxisProps,
     gridProps,
+    timestampProps,
     barProps,
 }) => {
     const { theme } = useTheme();
@@ -147,7 +144,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     );
 
     // Create scales for horizontal orientation
-    const categoryScale = useMemo(
+    const yScale = useMemo(
         () =>
             scaleBand<string>({
                 domain: filteredData.map((d) => String(d.label)),
@@ -198,64 +195,6 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         }
     };
 
-    // Hide axis labels when loading
-    const renderAxisLabel = (formattedValue: string, tickProps: React.SVGProps<SVGTextElement>) => (
-        <text
-            {...tickProps}
-            className={`${isLoading ? shimmerClassName : ''}`}
-            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-            style={{
-                fontSize: '12px',
-            }}
-        >
-            {isLoading ? '' : formattedValue}
-        </text>
-    );
-
-    const renderStackedBars = () =>
-        filteredData.map((categoryData, categoryIndex) => {
-            const category = String(categoryData.label);
-            const barY = categoryScale(category) || 0;
-            const barHeight = categoryScale.bandwidth();
-
-            return activeKeys.map((groupKey) => {
-                // Find the corresponding stack data
-                const seriesData = stackedData.find((s) => s.key === groupKey);
-                if (!seriesData || !seriesData[categoryIndex]) return null;
-
-                const [x0, x1] = seriesData[categoryIndex];
-                const barWidth = xScale(x1) - xScale(x0);
-                const barX = xScale(x0);
-                const value = x1 - x0;
-
-                if (!value) return null;
-
-                const isHoveredGroup = hoveredGroupKey === groupKey;
-                const barOpacity =
-                    hoveredGroupKey && !isHoveredGroup ? REDUCED_OPACITY : DEFAULT_OPACITY;
-
-                return (
-                    <CustomBar
-                        key={`stacked-${categoryData.label}-${groupKey}`}
-                        x={barX}
-                        y={barY}
-                        width={barWidth}
-                        height={barHeight}
-                        fill={isLoading ? `url(#${shimmerGradientId})` : groupColorScale(groupKey)}
-                        opacity={barOpacity}
-                        rx={0}
-                        // value={value}
-                        // label={groupKey}
-                        onMouseMove={handleMouseMove(groupKey, value)}
-                        onMouseLeave={handleMouseLeave}
-                        {...barProps}
-                    />
-                );
-            });
-        });
-
-    const renderBars = () => renderStackedBars();
-
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
     }
@@ -282,33 +221,24 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                 isVisible: !isLoading && tooltipOpen,
                 ...tooltipProps,
             }}
-            timestampProps={{ timestamp, isLoading, ...timestampProps }}
+            timestampProps={{ isLoading, ...timestampProps }}
         >
             <svg width={width} height={height}>
                 {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
                     <YAxis
-                        scale={categoryScale}
-                        tickStroke={theme.colors.axis.line}
-                        tickComponent={({ formattedValue, ...tickProps }) =>
-                            renderAxisLabel(formattedValue as string, tickProps)
-                        }
-                        hideAxisLine
-                        numTicks={innerHeight / 20}
-                        showTicks={showTicks}
+                        scale={yScale}
                         isLoading={isLoading}
+                        numTicks={innerHeight / 20}
                         {...yAxisProps}
                     />
 
                     <XAxis
                         scale={xScale}
                         top={innerHeight}
-                        showTicks={hideIndex.length === groupKeys.length || showTicks}
-                        numTicks={5}
                         isLoading={isLoading}
                         availableWidth={innerWidth}
-                        showAxisLine={showXAxis}
                         {...xAxisProps}
                     />
 
@@ -317,12 +247,66 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                         xScale={xScale}
                         showHorizontal={false}
                         showVertical
-                        numTicks={5}
                         {...gridProps}
                     />
 
                     {/* Bars */}
-                    {renderBars()}
+                    {filteredData.map((categoryData, categoryIndex) => {
+                        const category = String(categoryData.label);
+                        const barY = yScale(category) || 0;
+                        const barHeight = yScale.bandwidth();
+
+                        return activeKeys.map((groupKey, idx) => {
+                            // Find the corresponding stack data
+                            const seriesData = stackedData.find((s) => s.key === groupKey);
+                            if (!seriesData || !seriesData[categoryIndex]) return null;
+
+                            const [x0, x1] = seriesData[categoryIndex];
+                            const barWidth = xScale(x1) - xScale(x0);
+                            const barX = xScale(x0);
+                            const value = x1 - x0;
+
+                            if (!value) return null;
+
+                            const isHoveredGroup = hoveredGroupKey === groupKey;
+                            const barOpacity =
+                                hoveredGroupKey && !isHoveredGroup
+                                    ? REDUCED_OPACITY
+                                    : DEFAULT_OPACITY;
+
+                            return (
+                                <CustomBar
+                                    key={`stacked-${categoryData.label}-${groupKey}`}
+                                    x={barX}
+                                    y={barY}
+                                    width={barWidth}
+                                    height={barHeight}
+                                    fill={
+                                        isLoading
+                                            ? `url(#${shimmerGradientId})`
+                                            : groupColorScale(groupKey)
+                                    }
+                                    opacity={barOpacity}
+                                    pathProps={
+                                        activeKeys.length - 1 === idx
+                                            ? {
+                                                  d: CustomBar.PathProps.getRoundedRight({
+                                                      barX,
+                                                      barY,
+                                                      barHeight,
+                                                      barWidth,
+                                                      barRadius: DEFAULT_BAR_RADIUS,
+                                                  }),
+                                              }
+                                            : null
+                                    }
+                                    onMouseMove={handleMouseMove(groupKey, value)}
+                                    onMouseLeave={handleMouseLeave}
+                                    {...barProps}
+                                />
+                            );
+                        });
+                    })}
                 </Group>
             </svg>
         </ChartWrapper>

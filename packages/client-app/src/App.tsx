@@ -467,7 +467,7 @@ function App() {
                         width={400}>
                         <HorizontalStackedBarChart
                             data={[
-                                ...new Array(100).fill(0).map((_, index) => ({
+                                ...new Array(10).fill(0).map((_, index) => ({
                                     label: `${index + 1} Team Beta`,
                                     data: {
                                         payroll:

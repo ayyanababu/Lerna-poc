@@ -15,15 +15,12 @@ export interface DataPoint {
 export interface HorizontalStackedBarChartProps {
     data: DataPoint[];
     groupKeys: string[];
-    margin?: { top: number; right: number; bottom: number; left: number };
     title?: string;
-    timestamp?: string;
+    margin?: { top: number; right: number; bottom: number; left: number };
     colors?: string[];
     isLoading?: boolean;
-    showTicks?: boolean;
     titleProps?: TitleProps;
     legendsProps?: Partial<LegendsProps>;
-    showXAxis?: boolean;
     tooltipProps?: Partial<TooltipProps>;
     timestampProps?: Partial<TimestampProps>;
     xAxisProps?: Partial<XAxisProps>;
