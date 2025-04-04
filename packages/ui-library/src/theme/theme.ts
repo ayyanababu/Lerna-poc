@@ -30,7 +30,7 @@ export const defaultLightTheme: Theme = {
         },
         axis: {
             line: '#94A3B8',
-            label: '#94A3B8',
+            label: '#475569',
             grid: '#94A3B8',
             title: '#475569',
         },
@@ -65,7 +65,7 @@ export const defaultDarkTheme: Theme = {
         },
         axis: {
             line: '#7B8695',
-            label: '#7B8695',
+            label: '#acbbc7',
             grid: '#7B8695',
             title: '#acbbc7',
         },
