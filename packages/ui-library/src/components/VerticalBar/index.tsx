@@ -217,16 +217,13 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                                 isLoading={isLoading}
                                 opacity={barOpacity}
                                 pathProps={{
-                                    d: `
-                                    M ${barX},${barY + barHeight}
-                                    L ${barX + barWidth},${barY + barHeight}
-                                    L ${barX + barWidth},${barY + DEFAULT_BAR_RADIUS}
-                                    Q ${barX + barWidth},${barY} ${barX + barWidth - DEFAULT_BAR_RADIUS},${barY}
-                                    L ${barX + DEFAULT_BAR_RADIUS},${barY}
-                                    Q ${barX},${barY} ${barX},${barY + DEFAULT_BAR_RADIUS}
-                                    L ${barX},${barY + barHeight}
-                                    Z
-                                  `,
+                                    d: CustomBar.PathProps.getRoundedTop({
+                                        barX,
+                                        barY,
+                                        barHeight,
+                                        barWidth,
+                                        barRadius: DEFAULT_BAR_RADIUS,
+                                    }),
                                 }}
                                 onMouseMove={handleBarMouseMove(value, index)}
                                 onMouseLeave={handleBarMouseLeave}

@@ -212,15 +212,13 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                                 isLoading={isLoading}
                                 opacity={barOpacity}
                                 pathProps={{
-                                    d: `
-                                    M ${barX},${barY + barHeight}
-                                    L ${barX + barWidth - DEFAULT_BAR_RADIUS},${barY + barHeight}
-                                    Q ${barX + barWidth},${barY + barHeight} ${barX + barWidth},${barY + barHeight - DEFAULT_BAR_RADIUS}
-                                    L ${barX + barWidth},${barY + DEFAULT_BAR_RADIUS}
-                                    Q ${barX + barWidth},${barY} ${barX + barWidth - DEFAULT_BAR_RADIUS},${barY}
-                                    L ${barX},${barY}
-                                    Z
-                                  `,
+                                    d: CustomBar.PathProps.getRoundedRight({
+                                        barX,
+                                        barY,
+                                        barHeight,
+                                        barWidth,
+                                        barRadius: DEFAULT_BAR_RADIUS,
+                                    }),
                                 }}
                                 onMouseMove={handleBarMouseMove(value, index)}
                                 onMouseLeave={handleBarMouseLeave}
