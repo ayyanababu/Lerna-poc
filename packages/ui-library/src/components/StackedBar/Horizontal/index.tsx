@@ -34,6 +34,7 @@ const SCALE_PADDING = 1.2;
 const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     data: _data,
     groupKeys: _groupKeys,
+    stackGap = 0,
     title,
     margin = DEFAULT_MARGIN,
     colors = [],
@@ -257,17 +258,47 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                         const barY = yScale(category) || 0;
                         const barHeight = yScale.bandwidth();
 
+                        // Calculate total value and number of segments with value for this category
+                        const segmentsWithValue = activeKeys.filter((key) => {
+                            const seriesData = stackedData.find((s) => s.key === key);
+                            if (!seriesData || !seriesData[categoryIndex]) return false;
+                            const [x0, x1] = seriesData[categoryIndex];
+                            return x1 - x0 > 0;
+                        });
+
+                        // Calculate total gaps needed and scale factor to ensure we stay within bounds
+                        const totalGaps = Math.max(0, segmentsWithValue.length - 1) * stackGap;
+
+                        // Calculate how much we need to scale each bar to accommodate gaps
+                        const categoryTotal = activeKeys.reduce(
+                            (sum, key) => sum + (Number(categoryData.data[key]) || 0),
+                            0,
+                        );
+                        const scaleFactor =
+                            categoryTotal > 0
+                                ? (xScale(categoryTotal) - totalGaps) / xScale(categoryTotal)
+                                : 1;
+
+                        // Track the current position
+                        let currentX = 0;
+
                         return activeKeys.map((groupKey, idx) => {
                             // Find the corresponding stack data
                             const seriesData = stackedData.find((s) => s.key === groupKey);
                             if (!seriesData || !seriesData[categoryIndex]) return null;
 
                             const [x0, x1] = seriesData[categoryIndex];
-                            const barWidth = xScale(x1) - xScale(x0);
-                            const barX = xScale(x0);
                             const value = x1 - x0;
 
                             if (!value) return null;
+
+                            // Calculate the scaled width for this segment
+                            const originalWidth = xScale(x1) - xScale(x0);
+                            const scaledWidth = originalWidth * scaleFactor;
+
+                            // Calculate x position considering previous segments and gaps
+                            const barX = idx === 0 ? xScale(x0) : currentX + stackGap;
+                            currentX = barX + scaledWidth;
 
                             const isHoveredGroup = hoveredGroupKey === groupKey;
                             const barOpacity =
@@ -280,7 +311,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                                     key={`stacked-${categoryData.label}-${groupKey}`}
                                     x={barX}
                                     y={barY}
-                                    width={barWidth}
+                                    width={scaledWidth}
                                     height={barHeight}
                                     fill={
                                         isLoading
@@ -295,7 +326,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                                                       barX,
                                                       barY,
                                                       barHeight,
-                                                      barWidth,
+                                                      barWidth: scaledWidth,
                                                       barRadius: DEFAULT_BAR_RADIUS,
                                                   }),
                                               }

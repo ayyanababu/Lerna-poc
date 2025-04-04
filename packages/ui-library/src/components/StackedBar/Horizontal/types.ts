@@ -15,6 +15,7 @@ export interface DataPoint {
 export interface HorizontalStackedBarChartProps {
     data: DataPoint[];
     groupKeys: string[];
+    stackGap?: number;
     title?: string;
     margin?: { top: number; right: number; bottom: number; left: number };
     colors?: string[];

@@ -31,6 +31,7 @@ const SCALE_PADDING = 1.2;
 function VerticalStackedBar({
     data: _data,
     groupKeys: _groupKeys,
+    stackGap = 0,
     title,
     margin = DEFAULT_MARGIN,
     colors = [],
@@ -219,26 +220,62 @@ function VerticalStackedBar({
                         {...xAxisProps}
                     />
 
-                    {filteredData.map((categoryData) => {
+                    {/* Bars */}
+                    {filteredData.map((categoryData, categoryIndex) => {
                         const category = String(categoryData.label);
                         const barX = xScale(category) || 0;
                         const barWidth = xScale.bandwidth();
 
-                        return activeKeys.map((groupKey, idx) => {
-                            const seriesData = stackedData.find((s) => s.key === groupKey);
-                            if (!seriesData) return null;
+                        // Calculate total value and number of segments with value for this category
+                        const segmentsWithValue = activeKeys.filter((key) => {
+                            const seriesData = stackedData.find((s) => s.key === key);
+                            if (!seriesData || !seriesData[categoryIndex]) return false;
+                            const [y0, y1] = seriesData[categoryIndex];
+                            return y1 - y0 > 0;
+                        });
 
-                            const categoryIndex = filteredData.findIndex(
-                                (d) => d.label === categoryData.label,
-                            );
-                            if (categoryIndex === -1) return null;
+                        // Calculate total gaps needed
+                        const totalGaps = Math.max(0, segmentsWithValue.length - 1) * stackGap;
+
+                        // Calculate how much we need to scale each bar to accommodate gaps
+                        const categoryTotal = activeKeys.reduce(
+                            (sum, key) => sum + (Number(categoryData.data[key]) || 0),
+                            0,
+                        );
+
+                        // For vertical chart, we need to scale height proportion
+                        const totalHeight = innerHeight - yScale(categoryTotal);
+                        const scaleFactor =
+                            categoryTotal > 0 ? (totalHeight - totalGaps) / totalHeight : 1;
+
+                        // Track the current position from the bottom
+                        let currentY = innerHeight;
+
+                        return activeKeys.map((groupKey, idx) => {
+                            // Find the corresponding stack data
+                            const seriesData = stackedData.find((s) => s.key === groupKey);
+                            if (!seriesData || !seriesData[categoryIndex]) return null;
 
                             const [y0, y1] = seriesData[categoryIndex];
-                            const barHeight = yScale(y0) - yScale(y1);
-                            const barY = yScale(y1);
                             const value = y1 - y0;
 
                             if (!value) return null;
+
+                            // Calculate the scaled height for this segment
+                            const originalHeight = yScale(y0) - yScale(y1);
+                            const scaledHeight = originalHeight * scaleFactor;
+
+                            // Calculate y position considering previous segments and gaps
+                            // For the first segment, start from the bottom
+                            const positionFromBottom =
+                                idx === 0
+                                    ? innerHeight - scaledHeight
+                                    : currentY - scaledHeight - stackGap;
+
+                            const barY = positionFromBottom;
+
+                            // Update current position for next segment
+                            currentY = positionFromBottom;
 
                             const isHoveredGroup = hoveredGroupKey === groupKey;
                             const barOpacity =
@@ -248,11 +285,11 @@ function VerticalStackedBar({
 
                             return (
                                 <CustomBar
-                                    key={`stacked-${category}-${groupKey}`}
+                                    key={`stacked-${categoryData.label}-${groupKey}`}
                                     x={barX}
                                     y={barY}
                                     width={barWidth}
-                                    height={barHeight}
+                                    height={scaledHeight}
                                     fill={
                                         isLoading
                                             ? `url(#${shimmerGradientId})`
@@ -265,7 +302,7 @@ function VerticalStackedBar({
                                                   d: CustomBar.PathProps.getRoundedTop({
                                                       barX,
                                                       barY,
-                                                      barHeight,
+                                                      barHeight: scaledHeight,
                                                       barWidth,
                                                       barRadius: DEFAULT_BAR_RADIUS,
                                                   }),
