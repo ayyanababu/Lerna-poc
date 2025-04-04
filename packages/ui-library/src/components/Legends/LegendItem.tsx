@@ -2,6 +2,7 @@ import { Box, Typography } from '@mui/material';
 import { capitalize, lowerCase } from 'lodash-es';
 import React from 'react';
 
+import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import useTheme from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { LegendItemProps, LegendVariant } from './types';
@@ -62,6 +63,18 @@ export default function LegendItem({
                 alignItems: 'center',
                 gap: '4px',
                 flexDirection: 'row',
+                '&:hover svg': {
+                    opacity: 1,
+                },
+                '&:focus-visible svg': {
+                    opacity: 1,
+                },
+                '&:focus svg': {
+                    opacity: 1,
+                },
+                '&:active svg': {
+                    opacity: 0.7,
+                },
             }}
         >
             {renderMarker()}
@@ -80,6 +93,16 @@ export default function LegendItem({
                 {displayText}
                 {!hideValues && valueText && (isLoading ? 'loadingloading' : ` (${valueText})`)}
             </Typography>
+
+            <ArrowOutwardIcon
+                sx={{
+                    height: '16px',
+                    width: '16px',
+                    color: theme.colors.legend.text,
+                    opacity: 0,
+                    transition: 'opacity 0.250s ease-in-out',
+                }}
+            />
         </Box>
     );
 
