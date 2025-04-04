@@ -154,20 +154,29 @@ function VerticalStackedBar({
     );
 
     const handleMouseMove = useCallback(
-        (groupKey: string, value: number) => (event: React.MouseEvent) => {
-            if (!isLoading) {
-                showTooltip({
-                    tooltipData: {
-                        label: capitalize(lowerCase(groupKey)),
-                        value,
-                    },
-                    tooltipLeft: event.clientX,
-                    tooltipTop: event.clientY,
-                });
-                setHoveredGroupKey(groupKey);
-            }
-        },
-        [isLoading, showTooltip, setHoveredGroupKey],
+        (groupKey: string, value: number, barX: number, barY: number, barWidth: number) =>
+            (event: React.MouseEvent<SVGPathElement>) => {
+                if (!isLoading) {
+                    // Get the SVG's position in the document
+                    const svgElement = event.currentTarget.ownerSVGElement;
+                    const svgRect = svgElement?.getBoundingClientRect();
+
+                    // Calculate the center of the bar and its top position
+                    const barCenterX = barX + barWidth / 6 + margin.left + (svgRect?.left || 0);
+                    const barTopY = barY + margin.top + (svgRect?.top || 0) - 10; // Position slightly above the bar
+
+                    showTooltip({
+                        tooltipData: {
+                            label: capitalize(lowerCase(groupKey)),
+                            value,
+                        },
+                        tooltipLeft: barCenterX,
+                        tooltipTop: barTopY,
+                    });
+                    setHoveredGroupKey(groupKey);
+                }
+            },
+        [isLoading, showTooltip, setHoveredGroupKey, margin],
     );
 
     const handleMouseLeave = useCallback(() => {
@@ -309,7 +318,13 @@ function VerticalStackedBar({
                                               }
                                             : null
                                     }
-                                    onMouseMove={handleMouseMove(groupKey, value)}
+                                    onMouseMove={handleMouseMove(
+                                        groupKey,
+                                        value,
+                                        barX,
+                                        barY,
+                                        barWidth,
+                                    )}
                                     onMouseLeave={handleMouseLeave}
                                     {...barProps}
                                 />

@@ -124,19 +124,32 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     }, [colors, theme.colors.charts.bar]);
 
     // Handle mouse events
-    const handleBarMouseMove = (value: number, index: number) => (event: React.MouseEvent) => {
-        if (!isLoading) {
-            showTooltip({
-                tooltipData: {
-                    label: filteredData[index].label,
-                    value,
-                },
-                tooltipLeft: event.clientX,
-                tooltipTop: event.clientY,
-            });
-            setHoveredBar(index);
-        }
-    };
+    const handleBarMouseMove =
+        (value: number, index: number) => (event: React.MouseEvent<SVGPathElement>) => {
+            if (!isLoading) {
+                const barX = xScale(filteredData[index].label) || 0;
+                const barWidth = xScale.bandwidth();
+                const barY = yScale(value);
+
+                // Get the SVG's position in the document
+                const svgElement = event.currentTarget.ownerSVGElement;
+                const svgRect = svgElement?.getBoundingClientRect();
+
+                // Calculate the center of the bar and its top position
+                const barCenterX = barX + barWidth / 6 + margin.left + (svgRect?.left || 0);
+                const barTopY = barY + margin.top + (svgRect?.top || 0) - 10; // Position slightly above the bar
+
+                showTooltip({
+                    tooltipData: {
+                        label: filteredData[index].label,
+                        value,
+                    },
+                    tooltipLeft: barCenterX,
+                    tooltipTop: barTopY,
+                });
+                setHoveredBar(index);
+            }
+        };
 
     const handleBarMouseLeave = () => {
         if (!isLoading) {
