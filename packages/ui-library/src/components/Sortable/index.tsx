@@ -20,6 +20,25 @@ export default function SortableComponent({ children, className }: SortableProps
             animation: 200,
             easing: 'cubic-bezier(1, 0, 0, 1)',
             delay: 2,
+            onStart: (evt) => {
+                const draggedItem = evt.item;
+                const draggedItemId = draggedItem.getAttribute('data-id');
+
+                if (containerRef.current) {
+                    Array.from(containerRef.current.children).forEach((child) => {
+                        if (child.getAttribute('data-id') !== draggedItemId) {
+                            child.classList.add('jiggle-animation');
+                        }
+                    });
+                }
+            },
+            onEnd: () => {
+                if (containerRef.current) {
+                    Array.from(containerRef.current.children).forEach((child) => {
+                        child.classList.remove('jiggle-animation');
+                    });
+                }
+            },
             onUpdate: () => {
                 const nodes = Array.from(containerRef.current?.children || []);
                 const newIds = nodes.map((node) =>
@@ -41,7 +60,7 @@ export default function SortableComponent({ children, className }: SortableProps
             sx={{
                 gap: '16px',
                 display: 'grid',
-                gridTemplateColumns: '1fr ',
+                gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
                 '& .sortable-ghost': {
                     backgroundColor: '#8fc5ff',
                     borderRadius: '8px',
@@ -49,10 +68,27 @@ export default function SortableComponent({ children, className }: SortableProps
                         opacity: 0,
                     },
                 },
+                '@keyframes jiggle': {
+                    '0%': {
+                        transform: 'rotate(0deg)',
+                    },
+                    '25%': {
+                        transform: 'rotate(-1deg)',
+                    },
+                    '75%': {
+                        transform: 'rotate(1deg)',
+                    },
+                    '100%': {
+                        transform: 'rotate(0deg)',
+                    },
+                },
+                '& .jiggle-animation': {
+                    animation: 'jiggle 0.3s infinite ease-in-out',
+                },
             }}
         >
             {state.map((item) => (
-                <div key={item.id} data-id={item.id}>
+                <div key={item.id} data-id={item.id} className="drag-handle">
                     {childrenArray[item.id]}
                 </div>
             ))}

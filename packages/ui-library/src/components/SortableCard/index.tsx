@@ -2,7 +2,6 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import React, { forwardRef } from 'react';
-import { RxDragHandleDots2 } from 'react-icons/rx';
 import useTheme from '../../hooks/useTheme';
 import Title from '../Title';
 import { SortableCardProps } from './types';
@@ -37,7 +36,7 @@ const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
                     }}
                 >
                     <Title title={title} />
-                    <Box
+                    {/* <Box
                         sx={{
                             display: 'flex',
                             cursor: 'pointer',
@@ -51,7 +50,7 @@ const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
                         className="drag-handle"
                     >
                         <RxDragHandleDots2 />
-                    </Box>
+                    </Box> */}
                 </Box>
 
                 <CardContent
