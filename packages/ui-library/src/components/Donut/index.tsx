@@ -24,6 +24,8 @@ function DonutChart({
     titleProps,
     legendsProps,
     tooltipProps,
+    arcGap = 0,
+    arcRadius = 0,
 }: DonutChartProps) {
     const { parentRef, width, height } = useParentSize({
         debounceTime: 150,
@@ -40,8 +42,6 @@ function DonutChart({
         [type, width, height],
     );
     const innerRadius = useMemo(() => radius * 0.6, [radius]);
-    const cornerRadius = 6;
-    const padAngle = 0;
 
     const data = useMemo(() => {
         if (!isLoading) return _data;
@@ -92,7 +92,7 @@ function DonutChart({
                         pieValue={(d: { value: number }) => d.value}
                         outerRadius={radius}
                         innerRadius={innerRadius}
-                        padAngle={padAngle}
+                        padAngle={arcGap}
                         pieSortValues={(a, b) => a - b}
                         startAngle={type === 'semi' ? -Math.PI / 2 : 0}
                         endAngle={type === 'semi' ? Math.PI / 2 : 360}
@@ -107,8 +107,8 @@ function DonutChart({
                                 const arcGenerator = d3Arc()
                                     .innerRadius(innerRadius)
                                     .outerRadius(radius)
-                                    .cornerRadius(cornerRadius)
-                                    .padAngle(padAngle) as unknown as (
+                                    .cornerRadius(arcRadius)
+                                    .padAngle(arcGap) as unknown as (
                                     d: PieArcDatum<{
                                         label: string;
                                         value: number;
@@ -116,9 +116,11 @@ function DonutChart({
                                 ) => string;
 
                                 const shadowArcGenerator = d3Arc()
+                                    .cornerRadius(arcRadius)
                                     .innerRadius(innerRadius * 1.7)
-                                    .outerRadius(isHovered ? radius + 10 : radius + 15)
-                                    .cornerRadius(cornerRadius) as unknown as (
+                                    .outerRadius(
+                                        isHovered ? radius + 10 : radius + 15,
+                                    ) as unknown as (
                                     d: PieArcDatum<{
                                         label: string;
                                         value: number;

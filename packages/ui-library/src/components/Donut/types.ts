@@ -21,4 +21,16 @@ export interface DonutChartProps {
     titleProps?: TitleProps;
     legendsProps?: LegendsProps;
     tooltipProps?: DonutTooltipProps;
+    /**
+     * @example 0.02
+     * @description The gap between the arcs in the donut chart. It is a value between 0 and 1, where 0 means no gap and 1 means a full gap.
+     * @default 0
+     */
+    arcGap?: number;
+    /**
+     * @example 10
+     * @description The radius of the arcs in the donut chart. It is a value in pixels.
+     * @default 0
+     */
+    arcRadius?: number;
 }
