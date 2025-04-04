@@ -324,7 +324,7 @@ function App() {
                         width={400}>
                         <VerticalStackedBarChart
                             data={[
-                                ...new Array(100).fill(0).map((_, index) => ({
+                                ...new Array(10).fill(0).map((_, index) => ({
                                     label: `Region ${index + 1}`,
                                     data: {
                                         future:

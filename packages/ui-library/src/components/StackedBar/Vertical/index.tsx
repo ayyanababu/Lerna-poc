@@ -23,6 +23,7 @@ const DEFAULT_MARGIN = {
     bottom: 100,
     left: 50,
 };
+const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
@@ -30,22 +31,18 @@ const SCALE_PADDING = 1.2;
 function VerticalStackedBar({
     data: _data,
     groupKeys: _groupKeys,
-    margin = DEFAULT_MARGIN,
     title,
-    timestamp,
+    margin = DEFAULT_MARGIN,
     colors = [],
-    isLoading,
+    isLoading = false,
     titleProps,
     legendsProps,
     tooltipProps,
-    showTicks = false,
-    yAxisProps,
     xAxisProps,
+    yAxisProps,
     gridProps,
-    barProps,
     timestampProps,
-    showYAxis = true,
-    showXAxis = true,
+    barProps,
 }: VerticalStackedBarChartProps) {
     const { theme } = useTheme();
     const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -179,69 +176,6 @@ function VerticalStackedBar({
         }
     }, [isLoading, hideTooltip, setHoveredGroupKey]);
 
-    const renderStackedBars = useCallback(
-        () =>
-            filteredData.map((categoryData) => {
-                const category = String(categoryData.label);
-                const barX = xScale(category) || 0;
-                const barWidth = xScale.bandwidth();
-
-                return activeKeys.map((groupKey) => {
-                    const seriesData = stackedData.find((s) => s.key === groupKey);
-                    if (!seriesData) return null;
-
-                    const categoryIndex = filteredData.findIndex(
-                        (d) => d.label === categoryData.label,
-                    );
-                    if (categoryIndex === -1) return null;
-
-                    const [y0, y1] = seriesData[categoryIndex];
-                    const barHeight = yScale(y0) - yScale(y1);
-                    const barY = yScale(y1);
-                    const value = y1 - y0;
-
-                    if (!value) return null;
-
-                    const isHoveredGroup = hoveredGroupKey === groupKey;
-                    const barOpacity =
-                        hoveredGroupKey && !isHoveredGroup ? REDUCED_OPACITY : DEFAULT_OPACITY;
-
-                    return (
-                        <CustomBar
-                            key={`stacked-${category}-${groupKey}`}
-                            x={barX}
-                            y={barY}
-                            width={barWidth}
-                            height={barHeight}
-                            fill={isLoading ? `url(#${shimmerGradientId})` : colorScale(groupKey)}
-                            opacity={barOpacity}
-                            rx={0}
-                            // value={value}
-                            // label={groupKey}
-                            onMouseMove={handleMouseMove(groupKey, value)}
-                            onMouseLeave={handleMouseLeave}
-                            {...barProps}
-                        />
-                    );
-                });
-            }),
-        [
-            filteredData,
-            xScale,
-            activeKeys,
-            stackedData,
-            yScale,
-            hoveredGroupKey,
-            isLoading,
-            colorScale,
-            handleMouseMove,
-            handleMouseLeave,
-            barProps,
-        ],
-    );
-
-    const renderBars = useCallback(() => renderStackedBars(), [renderStackedBars]);
-
     if (!_data || _data.length === 0) {
         return <div>No data to display.</div>;
     }
@@ -267,35 +201,84 @@ function VerticalStackedBar({
                 isVisible: !isLoading && tooltipOpen,
                 ...tooltipProps,
             }}
-            timestampProps={{ timestamp, isLoading, ...timestampProps }}
+            timestampProps={{ isLoading, ...timestampProps }}
         >
             <svg width={width} height={height}>
                 {isLoading && <SvgShimmer />}
 
                 <Group top={margin.top} left={margin.left}>
-                    <YAxis
-                        scale={yScale}
-                        isLoading={isLoading}
-                        showTicks={showTicks}
-                        showAxisLine={showYAxis}
-                        {...yAxisProps}
-                    />
+                    <YAxis scale={yScale} isLoading={isLoading} {...yAxisProps} />
 
-                    <Grid width={innerWidth} yScale={yScale} numTicks={5} {...gridProps} />
+                    <Grid width={innerWidth} yScale={yScale} {...gridProps} />
 
                     <XAxis
                         scale={xScale}
                         top={innerHeight}
                         isLoading={isLoading}
-                        showTicks={showTicks}
-                        showAxisLine={showXAxis}
-                        labels={filteredData.map((d) => String(d.label))}
                         availableWidth={innerWidth}
-                        autoRotate
                         {...xAxisProps}
                     />
 
-                    {renderBars()}
+                    {filteredData.map((categoryData) => {
+                        const category = String(categoryData.label);
+                        const barX = xScale(category) || 0;
+                        const barWidth = xScale.bandwidth();
+
+                        return activeKeys.map((groupKey, idx) => {
+                            const seriesData = stackedData.find((s) => s.key === groupKey);
+                            if (!seriesData) return null;
+
+                            const categoryIndex = filteredData.findIndex(
+                                (d) => d.label === categoryData.label,
+                            );
+                            if (categoryIndex === -1) return null;
+
+                            const [y0, y1] = seriesData[categoryIndex];
+                            const barHeight = yScale(y0) - yScale(y1);
+                            const barY = yScale(y1);
+                            const value = y1 - y0;
+
+                            if (!value) return null;
+
+                            const isHoveredGroup = hoveredGroupKey === groupKey;
+                            const barOpacity =
+                                hoveredGroupKey && !isHoveredGroup
+                                    ? REDUCED_OPACITY
+                                    : DEFAULT_OPACITY;
+
+                            return (
+                                <CustomBar
+                                    key={`stacked-${category}-${groupKey}`}
+                                    x={barX}
+                                    y={barY}
+                                    width={barWidth}
+                                    height={barHeight}
+                                    fill={
+                                        isLoading
+                                            ? `url(#${shimmerGradientId})`
+                                            : colorScale(groupKey)
+                                    }
+                                    opacity={barOpacity}
+                                    pathProps={
+                                        idx === activeKeys.length - 1
+                                            ? {
+                                                  d: CustomBar.PathProps.getRoundedTop({
+                                                      barX,
+                                                      barY,
+                                                      barHeight,
+                                                      barWidth,
+                                                      barRadius: DEFAULT_BAR_RADIUS,
+                                                  }),
+                                              }
+                                            : null
+                                    }
+                                    onMouseMove={handleMouseMove(groupKey, value)}
+                                    onMouseLeave={handleMouseLeave}
+                                    {...barProps}
+                                />
+                            );
+                        });
+                    })}
                 </Group>
             </svg>
         </ChartWrapper>
