@@ -26,7 +26,6 @@ const TreeMapChart = ({
   data: _data,
   margin = DEFAULT_MARGIN,
   title,
-  timestamp,
   colors = [],
   isLoading = false,
   titleProps,
@@ -35,7 +34,7 @@ const TreeMapChart = ({
   timestampProps,
   tilePadding = 1,
   borderRadius = 4,
-  showLabels = true,
+  showLabels = false,
   onClick = () => {},
 }: TreeMapChartProps) => {
   const { theme } = useTheme();
@@ -147,6 +146,7 @@ const TreeMapChart = ({
 
   return (
     <ChartWrapper
+      minRenderHeight={50}
       ref={parentRef}
       title={title}
       titleProps={titleProps}
@@ -177,7 +177,7 @@ const TreeMapChart = ({
         isVisible: !isLoading && tooltipOpen,
         ...tooltipProps,
       }}
-      timestampProps={{ timestamp, isLoading, ...timestampProps }}
+      timestampProps={{ isLoading, ...timestampProps }}
     >
       <svg width={width} height={height} rx={borderRadius} ry={borderRadius}>
         {isLoading && <SvgShimmer />}
