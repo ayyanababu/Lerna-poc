@@ -1,6 +1,6 @@
 import React from 'react';
 
-import useTheme from '../../hooks/useTheme';
+import { useTheme } from '../../hooks/useTheme';
 import { GridProps } from './types';
 
 const Grid: React.FC<GridProps> = ({
