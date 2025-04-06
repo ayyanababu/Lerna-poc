@@ -93,3 +93,72 @@ module.exports = {
     "prettier": "^2.8.7"
   },
 
+
+
+// Raja Ui repo
+// eslintrc.json
+
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "jest": true
+  },
+  "extends": ["@arcesium/eslint-config-arcesium"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/node_modules/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.d.ts",
+    "**/examples/**"
+
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "project": ["./tsconfig.json"]
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": "./tsconfig.json",
+        "tsconfig": "./"
+      }
+    }
+  ],
+  "rules": {
+    /* Avoid unnecessary dependencies in the useEffect */
+    "react-hooks/exhaustive-deps": "off",
+    "react/react-in-jsx-scope": "off",
+    "prefer-default-export": "off",
+    "import/prefer-default-export": "off",
+    "no-unused-vars": ["error", { "varsIgnorePattern": "^React$" }],
+    "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^React$" }],
+    "@typescript-eslint/ban-ts-comment": "off",
+
+    /* Restrict lines in a file */
+    "max-lines": [
+      "warn",
+      {
+        "max": 500,
+        "skipBlankLines": true,
+        "skipComments": true
+      }
+    ]
+  }
+}
+
