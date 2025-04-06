@@ -1,10 +1,10 @@
-import { Bar } from '@visx/shape';
 import React from 'react';
+import { Bar } from '@visx/shape';
 
 import { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { CustomBarProps } from './types';
 
-function CustomBar({
+const CustomBar = ({
     fill,
     isVisible = true,
     isLoading = false,
@@ -12,73 +12,18 @@ function CustomBar({
     ry,
     pathProps,
     ...props
-}: CustomBarProps) {
+}: CustomBarProps) => {
     if (!isVisible) {
         return null;
     }
 
     const barFill = isLoading ? `url(#${shimmerGradientId})` : fill;
 
-    if (pathProps) {
+    if (pathProps && pathProps.d) {
         return <path {...pathProps} fill={barFill} {...props} />;
     }
 
     return <Bar {...props} rx={rx} ry={ry} fill={barFill} />;
-}
-
-/**
- * Custom Bar Cap roundness generator
- */
-function getRoundedTop({
-    barX,
-    barY,
-    barHeight,
-    barWidth,
-    barRadius,
-}: {
-    barX: number;
-    barY: number;
-    barHeight: number;
-    barWidth: number;
-    barRadius: number;
-}): string {
-    return `
-        M ${barX},${barY + barHeight}
-        L ${barX + barWidth},${barY + barHeight}
-        L ${barX + barWidth},${barY + barRadius}
-        Q ${barX + barWidth},${barY} ${barX + barWidth - barRadius},${barY}
-        L ${barX + barRadius},${barY}
-        Q ${barX},${barY} ${barX},${barY + barRadius}
-        L ${barX},${barY + barHeight}
-        Z
-    `;
-}
-
-function getRoundedRight({
-    barX,
-    barY,
-    barHeight,
-    barWidth,
-    barRadius,
-}: {
-    barX: number;
-    barY: number;
-    barHeight: number;
-    barWidth: number;
-    barRadius: number;
-}): string {
-    return `
-        M ${barX},${barY + barHeight}
-        L ${barX + barWidth - barRadius},${barY + barHeight}
-        Q ${barX + barWidth},${barY + barHeight} ${barX + barWidth},${barY + barHeight - barRadius}
-        L ${barX + barWidth},${barY + barRadius}
-        Q ${barX + barWidth},${barY} ${barX + barWidth - barRadius},${barY}
-        L ${barX},${barY}
-        Z
-    `;
-}
-
-CustomBar.displayName = 'CustomBar';
-CustomBar.PathProps = { getRoundedTop, getRoundedRight };
+};
 
 export default CustomBar;
