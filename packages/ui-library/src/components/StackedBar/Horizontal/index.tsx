@@ -1,12 +1,12 @@
-import React, { useMemo, useState } from 'react';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { stack } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
+import React, { useMemo, useState } from 'react';
 
-import { useTheme } from '../../../hooks/useTheme';
+import useTheme from '../../../hooks/useTheme';
 import { ChartWrapper } from '../../ChartWrapper';
 import CustomBar from '../../CustomBar';
 import Grid from '../../Grid';
@@ -16,7 +16,7 @@ import { TooltipData } from '../../Tooltip/types';
 import XAxis from '../../XAxis';
 import YAxis from '../../YAxis';
 import { mockHorizontalStackedBarChartData } from './mockdata';
-import { DataPoint, HorizontalStackedBarChartProps } from './types';
+import { HorizontalStackedBarChartProps } from './types';
 
 interface DynamicMargin {
   top: number;
@@ -155,7 +155,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
 
       bottom: bottomMargin
     };
-  }, [initialMargin, maxLabelPx, width]);
+  }, [initialMargin, maxLabelPx, width, xAxisProps?.isVisible]);
 
   // Inner chart dimensions
   const innerWidth = width - dynamicMargin.left - dynamicMargin.right;
@@ -328,8 +328,8 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                 Q ${barX + barWidth},${barY} ${barX + barWidth},${barY + dynamicRadius}
                 L ${barX + barWidth},${barY + barHeight - dynamicRadius}
                 Q ${barX + barWidth},${barY + barHeight} ${barX + barWidth - dynamicRadius},${
-                barY + barHeight
-              }
+                  barY + barHeight
+                }
                 Z
               `
             }
@@ -427,4 +427,4 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   );
 };
 
-export { HorizontalStackedBar };
+export default HorizontalStackedBar;

@@ -4,7 +4,7 @@ import { BarLineData } from './types';
  * Mock data for the HorizontalBarChart component
  * Used when the chart is in loading state
  */
-export const mockBarLineChartData: BarLineData = {
+const mockBarLineChartData: BarLineData = {
     xAxisLabel: 'Planet',
     yAxisLeftLabel: 'Distance',
     yAxisRightLabel: 'Radius',
@@ -501,3 +501,5 @@ export const mockBarLineChartData: BarLineData = {
         },
     ],
 };
+
+export default mockBarLineChartData;

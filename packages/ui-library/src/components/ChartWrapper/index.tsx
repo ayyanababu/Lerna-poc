@@ -1,12 +1,12 @@
-import React, { forwardRef, useEffect, useRef } from 'react';
+// import { common } from '@arcesium/react-mui-commons/theme/colors';
 import { Box, Stack } from '@mui/material';
 import { scaleOrdinal } from '@visx/scale';
-import { common } from '@arcesium/react-mui-commons/theme/colors';
-
-import { Legends } from '../Legends';
+import React, { forwardRef, useEffect, useRef } from 'react';
+import { common } from '../../theme/theme';
+import Legends from '../Legends';
 import { LegendPosition } from '../Legends/types';
-import { Timestamp } from '../TimeStamp';
-import { Title } from '../Title';
+import Timestamp from '../Timestamp';
+import Title from '../Title';
 import { Tooltip } from '../Tooltip';
 import { ChartWrapperProps } from './types';
 
@@ -96,12 +96,10 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
         title,
         titleProps,
         legendsProps,
-        tooltipProps,
         timestampProps,
         position,
         colorScale,
         legendData,
-        toolTipData,
         children,
         ref
       ]

@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { useTooltip } from '@visx/tooltip';
+import React, { useMemo, useState } from 'react';
 
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
 import CustomBar from '../CustomBar';
 import Grid from '../Grid';
@@ -12,7 +12,7 @@ import SvgShimmer from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
 import XAxis from '../XAxis';
 import YAxis from '../YAxis';
-import { mockVerticalBarChartData } from './mockdata';
+import mockVerticalBarChartData from './mockdata';
 import { DataPoint, VerticalBarChartProps } from './types';
 
 const DEFAULT_MARGIN = {
@@ -253,4 +253,4 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   );
 };
 
-export { VerticalBarChart };
+export default VerticalBarChart;

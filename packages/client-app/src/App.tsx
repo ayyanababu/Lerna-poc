@@ -573,7 +573,7 @@ function App() {
 
                     <SortableCard
                         title="Asset Allocation"
-                        height={200}
+                        height={150}
                         width={1000}>
                         <TreeMapChart
                             data={{

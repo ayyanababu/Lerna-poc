@@ -3,7 +3,7 @@ import { alpha } from '@mui/material/styles';
 
 import { Theme } from './types';
 
-const common = {
+export const common = {
     white: '#FFFFFF',
     black: '#000000',
 };

@@ -12,10 +12,10 @@
  *
  */
 
-import React, { useMemo } from 'react';
 import { AxisBottom } from '@visx/axis';
+import React, { useMemo } from 'react';
 
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { XAxisProps } from './types';

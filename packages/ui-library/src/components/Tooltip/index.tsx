@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { Typography } from '@mui/material';
 import { withBoundingRects } from '@visx/bounds';
 import { Tooltip as VisxTooltip } from '@visx/tooltip';
+import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { TooltipProps } from './types';
 
 const MOUSE_OFFSET = 10;
@@ -26,19 +26,19 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
 
     const updatePosition = () => {
       if (!isVisible || !containerRef?.current) return;
-      
+
       let adjustedTop = top;
       let adjustedLeft = left;
-      
+
       try {
         const containerRect = containerRef.current.getBoundingClientRect();
-        const tooltipWidth = tooltipRef.current 
+        const tooltipWidth = tooltipRef.current
           ? Math.max(tooltipRef.current.getBoundingClientRect().width, MIN_TOOLTIP_WIDTH)
           : MIN_TOOLTIP_WIDTH;
-        const tooltipHeight = tooltipRef.current 
+        const tooltipHeight = tooltipRef.current
           ? Math.max(tooltipRef.current.getBoundingClientRect().height, MIN_TOOLTIP_HEIGHT)
           : MIN_TOOLTIP_HEIGHT;
-        
+
         // Boundary checks
         if (left + tooltipWidth / 2 > containerRect.right) {
           adjustedLeft = containerRect.right - tooltipWidth / 2;
@@ -52,26 +52,26 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
         if (top > containerRect.bottom) {
           adjustedTop = containerRect.bottom;
         }
-        
+
         adjustedTop -= MOUSE_OFFSET;
-        
+
         setAdjustedPosition({ top: adjustedTop, left: adjustedLeft });
       } catch (error) {
         console.warn('Tooltip positioning error:', error);
         setAdjustedPosition({ top, left });
       }
     };
-    
+
     // Initial update
     updatePosition();
-    
+
     // Use requestAnimationFrame to avoid ResizeObserver loop errors
     const setupResizeObserver = () => {
       if (resizeObserverRef.current) {
         resizeObserverRef.current.disconnect();
         resizeObserverRef.current = null;
       }
-      
+
       try {
         if (containerRef?.current) {
           const observer = new ResizeObserver((entries) => {
@@ -81,7 +81,7 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
               }
             });
           });
-          
+
           observer.observe(containerRef.current);
           resizeObserverRef.current = observer;
         }
@@ -89,9 +89,9 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
         console.warn('ResizeObserver error:', error);
       }
     };
-    
+
     const timeoutId = setTimeout(setupResizeObserver, 0);
-    
+
     // eslint-disable-next-line consistent-return
     return () => {
       clearTimeout(timeoutId);
@@ -122,7 +122,7 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
         transform: 'translate(-50%, -100%)',
         whiteSpace: 'pre-line',
         zIndex: DEFAULT_Z_INDEX, // ensure tooltip is above other elements
-        minWidth: `${MIN_TOOLTIP_WIDTH}px`, 
+        minWidth: `${MIN_TOOLTIP_WIDTH}px`,
         minHeight: `${MIN_TOOLTIP_HEIGHT}px`
       }}
       ref={tooltipRef}

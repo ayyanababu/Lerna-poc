@@ -1,7 +1,7 @@
-import React from 'react';
 import { AxisLeft, AxisRight } from '@visx/axis';
+import React from 'react';
 
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { shimmerClassName } from '../Shimmer/Shimmer';
 import { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { YAxisProps } from './types';
@@ -44,14 +44,14 @@ function YAxis({
           className={shimmerClassName}
           fill={`url(#${shimmerGradientId})`}
           style={baseFontStyles as React.CSSProperties}
-         />
+        />
       );
     }
 
     // Possibly truncate
     let label = String(formattedValue || '');
     if (label.length > MAX_LABEL_CHARS) {
-      label = `${label.substring(0, MAX_LABEL_CHARS - 1)  }…`;
+      label = `${label.substring(0, MAX_LABEL_CHARS - 1)}…`;
     }
 
     return (

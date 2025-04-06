@@ -1,12 +1,12 @@
-import React, { useCallback, useMemo, useState } from 'react';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { stack } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
 import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import { useTheme } from '../../../hooks/useTheme';
+import useTheme from '../../../hooks/useTheme';
 import { ChartWrapper } from '../../ChartWrapper';
 import CustomBar from '../../CustomBar';
 import Grid from '../../Grid';
@@ -238,8 +238,8 @@ function VerticalStackedBar({
                                     L ${barX + barWidth},${barY + barHeight}
                                     L ${barX + barWidth},${barY + dynamicRadius}
                                     Q ${barX + barWidth},${barY} ${
-                        barX + barWidth - dynamicRadius
-                      },${barY}
+                                      barX + barWidth - dynamicRadius
+                                    },${barY}
                                     L ${barX + dynamicRadius},${barY}
                                     Q ${barX},${barY} ${barX},${barY + dynamicRadius}
                                     L ${barX},${barY + barHeight}
@@ -341,4 +341,4 @@ function VerticalStackedBar({
   );
 }
 
-export { VerticalStackedBar };
+export default VerticalStackedBar;

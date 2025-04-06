@@ -1,12 +1,12 @@
-import React, { useMemo, useState } from 'react';
 import { curveLinear } from '@visx/curve';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { LinePath } from '@visx/shape';
 import { useTooltip } from '@visx/tooltip';
+import React, { useMemo, useState } from 'react';
 
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
 import CustomBar from '../CustomBar';
 import Grid from '../Grid';
@@ -14,7 +14,7 @@ import SvgShimmer, { shimmerGradientId } from '../Shimmer/SvgShimmer';
 import { TooltipData } from '../Tooltip/types';
 import XAxis from '../XAxis';
 import YAxis from '../YAxis';
-import { mockBarLineChartData } from './mockData';
+import mockBarLineChartData from './mockData';
 import { BarLineChartProps, BarLineData } from './types';
 
 const DEFAULT_MARGIN = {
@@ -64,7 +64,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     [isLoading, _data]
   );
 
-  const { xAxislabel, yAxisLeftLabel, yAxisRightLabel, chartData } = data;
+  const { xAxisLabel, yAxisLeftLabel, yAxisRightLabel, chartData } = data;
 
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
@@ -81,7 +81,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       { label: yAxisLeftLabel, value: 0 },
       { label: yAxisRightLabel, value: 0 }
     ],
-    [data]
+    [yAxisLeftLabel, yAxisRightLabel]
   );
 
   const xScale = useMemo(
@@ -91,7 +91,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         padding: 0.4,
         domain: chartData.map((d) => d.xAxis)
       }),
-    [xMax]
+    [chartData, xMax]
   );
 
   const leftScale = useMemo(
@@ -100,7 +100,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         range: [yMax, 0],
         domain: [0, Math.max(...chartData.map((d) => d.yAxisLeft)) * SCALE_PADDING]
       }),
-    [yMax]
+    [chartData, yMax]
   );
 
   const rightScale = useMemo(
@@ -109,7 +109,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         range: [yMax, 0],
         domain: [0, Math.max(...chartData.map((d) => d.yAxisRight)) * SCALE_PADDING]
       }),
-    [yMax]
+    [chartData, yMax]
   );
 
   const handleBarMouseMove = (value: number, index: number) => (event: React.MouseEvent) => {
@@ -187,7 +187,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
             labels={chartData.map((d) => String(d.xAxis))}
             availableWidth={innerWidth}
             autoRotate
-            label={xAxislabel}
+            label={xAxisLabel}
             labelProps={{
               verticalAnchor: 'start',
               fontSize: '13px',
@@ -311,4 +311,4 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   );
 };
 
-export { BarLineChart };
+export default BarLineChart;

@@ -3,7 +3,7 @@ import { CSSProperties } from 'react';
 import { CustomBarProps } from '../../CustomBar/types';
 import { GridProps } from '../../Grid/types';
 import { LegendsProps } from '../../Legends/types';
-import { TimestampProps } from '../../TimeStamp/types';
+import { TimestampProps } from '../../Timestamp/types';
 import { TitleProps } from '../../Title/types';
 import { TooltipProps } from '../../Tooltip/types';
 import { XAxisProps } from '../../XAxis/types';

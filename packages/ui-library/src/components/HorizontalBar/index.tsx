@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
 import { Group } from '@visx/group';
 import { useParentSize } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { useTooltip } from '@visx/tooltip';
+import React, { useMemo, useState } from 'react';
 
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 import { ChartWrapper } from '../ChartWrapper';
 import CustomBar from '../CustomBar';
 import Grid from '../Grid';
@@ -119,18 +119,17 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     }
     desiredLeft = Math.max(desiredLeft, initialMargin.left);
     const showingXAxis = xAxisProps?.isVisible !== false;
-    
-    const bottomMargin = showingXAxis 
-      ? initialMargin.bottom 
-      : Math.max(initialMargin.bottom - 10, 10);
 
+    const bottomMargin = showingXAxis
+      ? initialMargin.bottom
+      : Math.max(initialMargin.bottom - 10, 10);
 
     return {
       ...initialMargin,
       left: desiredLeft,
       bottom: bottomMargin
     };
-  }, [initialMargin, maxLabelPx, width]);
+  }, [initialMargin, maxLabelPx, width, xAxisProps?.isVisible]);
 
   // Chart's inner dimensions
   const innerWidth = width - margin.left - margin.right;
@@ -287,8 +286,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                  M ${barX},${barY + barHeight}
                  L ${barX + barWidth - radius},${barY + barHeight}
                  Q ${barX + barWidth},${barY + barHeight} ${barX + barWidth},${
-              barY + barHeight - radius
-            }
+                   barY + barHeight - radius
+                 }
                  L ${barX + barWidth},${barY + radius}
                  Q ${barX + barWidth},${barY} ${barX + barWidth - radius},${barY}
                  L ${barX},${barY}
@@ -318,4 +317,4 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   );
 };
 
-export { HorizontalBarChart };
+export default HorizontalBarChart;
