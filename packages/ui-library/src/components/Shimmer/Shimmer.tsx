@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-import { Theme } from '../../theme/types';
+import { Theme } from "../../theme/types";
 
 export const shimmerClassName = `my-lib-shimmer`;
 

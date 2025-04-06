@@ -1,22 +1,22 @@
-import { Group } from '@visx/group';
-import { useParentSize } from '@visx/responsive';
-import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
-import { stack } from '@visx/shape';
-import { useTooltip } from '@visx/tooltip';
-import { capitalize, cloneDeep, lowerCase } from 'lodash-es';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from "react";
+import { Group } from "@visx/group";
+import { useParentSize } from "@visx/responsive";
+import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
+import { stack } from "@visx/shape";
+import { useTooltip } from "@visx/tooltip";
+import { capitalize, cloneDeep, lowerCase } from "lodash-es";
 
-import useTheme from '../../../hooks/useTheme';
-import { ChartWrapper } from '../../ChartWrapper';
-import CustomBar from '../../CustomBar';
-import Grid from '../../Grid';
-import { shimmerClassName } from '../../Shimmer/Shimmer';
-import SvgShimmer, { shimmerGradientId } from '../../Shimmer/SvgShimmer';
-import { TooltipData } from '../../Tooltip/types';
-import XAxis from '../../XAxis';
-import YAxis from '../../YAxis';
-import { mockHorizontalStackedBarChartData } from './mockdata';
-import { HorizontalStackedBarChartProps } from './types';
+import useTheme from "../../../hooks/useTheme";
+import { ChartWrapper } from "../../ChartWrapper";
+import CustomBar from "../../CustomBar";
+import Grid from "../../Grid";
+import { shimmerClassName } from "../../Shimmer/Shimmer";
+import SvgShimmer, { shimmerGradientId } from "../../Shimmer/SvgShimmer";
+import { TooltipData } from "../../Tooltip/types";
+import XAxis from "../../XAxis";
+import YAxis from "../../YAxis";
+import { mockHorizontalStackedBarChartData } from "./mockdata";
+import { HorizontalStackedBarChartProps } from "./types";
 
 interface DynamicMargin {
   top: number;
@@ -29,7 +29,7 @@ const DEFAULT_MARGIN = {
   top: 20,
   right: 50,
   bottom: 30,
-  left: 80
+  left: 80,
 };
 
 const DEFAULT_BAR_RADIUS = 4;
@@ -42,10 +42,10 @@ const MAX_LABEL_CHARS = 15;
 /**
  * Helper: measure the widest label in pixels using a hidden <canvas>
  */
-function getMaxLabelWidth(labels: string[], font = '10px sans-serif'): number {
+function getMaxLabelWidth(labels: string[], font = "10px sans-serif"): number {
   if (!labels.length) return 0;
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
   if (!ctx) return 0;
   ctx.font = font;
 
@@ -88,7 +88,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   xAxisProps,
   yAxisProps,
   gridProps,
-  barProps
+  barProps,
 }) => {
   const { theme } = useTheme();
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -97,8 +97,14 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   const [hideIndex, setHideIndex] = useState<number[]>([]);
 
   // Tooltip
-  const { showTooltip, hideTooltip, tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
-    useTooltip<TooltipData>();
+  const {
+    showTooltip,
+    hideTooltip,
+    tooltipData,
+    tooltipLeft,
+    tooltipTop,
+    tooltipOpen,
+  } = useTooltip<TooltipData>();
 
   // Decide whether to use real data or mock data
   const { data, groupKeys } = useMemo(() => {
@@ -122,16 +128,19 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         }
         return d;
       }),
-    [data, hideIndex, groupKeys]
+    [data, hideIndex, groupKeys],
   );
 
-  const labels = useMemo(() => filteredData.map((item) => String(item.label)), [filteredData]);
+  const labels = useMemo(
+    () => filteredData.map((item) => String(item.label)),
+    [filteredData],
+  );
   const truncatedLabels = useMemo(() => labels.map(truncateLabel), [labels]);
 
   // Measure the widest truncated label
   const maxLabelPx = useMemo(() => {
     if (!truncatedLabels.length) return 0;
-    return getMaxLabelWidth(truncatedLabels, '10px sans-serif');
+    return getMaxLabelWidth(truncatedLabels, "10px sans-serif");
   }, [truncatedLabels]);
 
   // Dynamic margin: expand or shrink left margin
@@ -153,7 +162,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       ...initialMargin,
       left: desiredLeft,
 
-      bottom: bottomMargin
+      bottom: bottomMargin,
     };
   }, [initialMargin, maxLabelPx, width, xAxisProps?.isVisible]);
 
@@ -166,15 +175,18 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     () =>
       groupKeys.map((key) => ({
         label: capitalize(lowerCase(key)),
-        value: data.reduce((sum, category) => sum + Number(category.data[key] || 0), 0)
+        value: data.reduce(
+          (sum, category) => sum + Number(category.data[key] || 0),
+          0,
+        ),
       })),
-    [groupKeys, data]
+    [groupKeys, data],
   );
 
   // Active (not hidden) keys
   const activeKeys = useMemo(
     () => groupKeys.filter((_, idx) => !hideIndex.includes(idx)),
-    [groupKeys, hideIndex]
+    [groupKeys, hideIndex],
   );
 
   // Convert data to stacked
@@ -191,7 +203,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       const stackGenerator = stack({ keys: activeKeys });
       return stackGenerator(prepared);
     } catch (err) {
-      console.error('Error generating stack data:', err);
+      console.error("Error generating stack data:", err);
       return [];
     }
   }, [filteredData, activeKeys]);
@@ -204,10 +216,10 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         ...filteredData.map((d) =>
           Object.entries(d.data)
             .filter(([k]) => activeKeys.includes(k))
-            .reduce((sum, [_, val]) => sum + Number(val || 0), 0)
-        )
+            .reduce((sum, [, val]) => sum + Number(val || 0), 0),
+        ),
       ),
-    [filteredData, activeKeys]
+    [filteredData, activeKeys],
   );
 
   // categoryScale => for band dimension (bar height)
@@ -216,9 +228,9 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       scaleBand<string>({
         domain: filteredData.map((d) => String(d.label)),
         range: [0, innerHeight],
-        padding: 0.4
+        padding: 0.4,
       }),
-    [filteredData, innerHeight]
+    [filteredData, innerHeight],
   );
 
   // xScale => for linear dimension (bar length)
@@ -227,9 +239,9 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       scaleLinear<number>({
         domain: [0, maxValue * SCALE_PADDING],
         range: [0, innerWidth],
-        nice: true
+        nice: true,
       }),
-    [innerWidth, maxValue]
+    [innerWidth, maxValue],
   );
 
   // Color scale
@@ -237,25 +249,26 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     () =>
       scaleOrdinal<string, string>({
         domain: groupKeys,
-        range: colors?.length ? colors : theme.colors.charts.bar
+        range: colors?.length ? colors : theme.colors.charts.bar,
       }),
-    [groupKeys, colors, theme.colors.charts.bar]
+    [groupKeys, colors, theme.colors.charts.bar],
   );
 
   // Tooltip handlers
-  const handleMouseMove = (groupKey: string, value: number) => (evt: React.MouseEvent) => {
-    if (!isLoading) {
-      showTooltip({
-        tooltipData: {
-          label: capitalize(lowerCase(groupKey)),
-          value
-        },
-        tooltipLeft: evt.clientX,
-        tooltipTop: evt.clientY
-      });
-      setHoveredGroupKey(groupKey);
-    }
-  };
+  const handleMouseMove =
+    (groupKey: string, value: number) => (evt: React.MouseEvent) => {
+      if (!isLoading) {
+        showTooltip({
+          tooltipData: {
+            label: capitalize(lowerCase(groupKey)),
+            value,
+          },
+          tooltipLeft: evt.clientX,
+          tooltipTop: evt.clientY,
+        });
+        setHoveredGroupKey(groupKey);
+      }
+    };
 
   const handleMouseLeave = () => {
     if (!isLoading) {
@@ -265,14 +278,17 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   };
 
   // Axis label
-  const renderAxisLabel = (formattedValue: string, tickProps: React.SVGProps<SVGTextElement>) => (
+  const renderAxisLabel = (
+    formattedValue: string,
+    tickProps: React.SVGProps<SVGTextElement>,
+  ) => (
     <text
       {...tickProps}
-      className={`${isLoading ? shimmerClassName : ''}`}
+      className={`${isLoading ? shimmerClassName : ""}`}
       fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-      style={{ fontSize: '12px' }}
+      style={{ fontSize: "12px" }}
     >
-      {isLoading ? '' : formattedValue}
+      {isLoading ? "" : formattedValue}
     </text>
   );
 
@@ -303,7 +319,10 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         if (!value) return null;
 
         const isHoveredGroup = hoveredGroupKey === groupKey;
-        const barOpacity = hoveredGroupKey && !isHoveredGroup ? REDUCED_OPACITY : DEFAULT_OPACITY;
+        const barOpacity =
+          hoveredGroupKey && !isHoveredGroup
+            ? REDUCED_OPACITY
+            : DEFAULT_OPACITY;
 
         // figure out if it's the rightmost bar
         let rightmostKey = activeKeys[0];
@@ -331,7 +350,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                   barY + barHeight
                 }
                 Z
-              `
+              `,
             }
           : undefined;
 
@@ -342,7 +361,11 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
             y={barY}
             width={barWidth}
             height={barHeight}
-            fill={isLoading ? `url(#${shimmerGradientId})` : groupColorScale(groupKey)}
+            fill={
+              isLoading
+                ? `url(#${shimmerGradientId})`
+                : groupColorScale(groupKey)
+            }
             opacity={barOpacity}
             pathProps={pathProps}
             onMouseMove={handleMouseMove(groupKey, value)}
@@ -370,14 +393,14 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         hovered: hoveredGroupKey,
         setHovered: setHoveredGroupKey,
         isLoading,
-        ...legendsProps
+        ...legendsProps,
       }}
       tooltipProps={{
         data: tooltipData,
         top: tooltipTop,
         left: tooltipLeft,
         isVisible: !isLoading && tooltipOpen,
-        ...tooltipProps
+        ...tooltipProps,
       }}
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
     >

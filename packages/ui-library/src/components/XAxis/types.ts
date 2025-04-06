@@ -1,4 +1,4 @@
-import { AxisBottom } from '@visx/axis';
+import { AxisBottom } from "@visx/axis";
 
 type AxisBottomProps = Parameters<typeof AxisBottom>[0];
 export interface XAxisProps extends AxisBottomProps {

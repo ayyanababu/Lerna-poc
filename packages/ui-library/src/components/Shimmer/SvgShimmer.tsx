@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-import useTheme from '../../hooks/useTheme';
+import useTheme from "../../hooks/useTheme";
 
 export const shimmerGradientId = `my-lib-shimmer-gradient-${Math.random().toString(36).substring(2, 9)}`;
 

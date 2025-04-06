@@ -1,103 +1,90 @@
-import { FlatCompat } from '@eslint/eslintrc';
-import js from '@eslint/js';
-import prettierConfig from 'eslint-config-prettier';
-import eslintPluginPrettier from 'eslint-plugin-prettier';
-import fs from 'fs';
+import eslint from '@eslint/js';
+import prettier from 'eslint-config-prettier';
+import importPlugin from 'eslint-plugin-import';
+import prettierPlugin from 'eslint-plugin-prettier';
+import reactPlugin from 'eslint-plugin-react';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
-import path from 'path';
 import tseslint from 'typescript-eslint';
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-});
-
-// Load prettier config from .prettierrc.json
-const prettierrcPath = path.join(import.meta.dirname, '.prettierrc.json');
-const prettierOptions = JSON.parse(fs.readFileSync(prettierrcPath, 'utf8'));
-
 export default [
-  js.configs.recommended,
+  eslint.configs.recommended,
   ...tseslint.configs.recommended,
-  ...compat.extends('airbnb', 'airbnb/hooks'),
-  prettierConfig,
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
-    ignores: ['dist/**', 'node_modules/**'],
     languageOptions: {
-      ecmaVersion: 2021,
+      ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
         ...globals.browser,
-        ...globals.jest,
-        ...globals.es2021,
+        ...globals.jest
       },
       parser: tseslint.parser,
       parserOptions: {
         ecmaFeatures: {
-          jsx: true,
+          jsx: true
         },
-        project: './tsconfig.json',
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-    linterOptions: {
-      reportUnusedDisableDirectives: true,
+        project: './tsconfig.json'
+      }
     },
     plugins: {
-      prettier: eslintPluginPrettier,
-      '@typescript-eslint': tseslint.plugin,
+      react: reactPlugin,
+      'react-hooks': reactHooksPlugin,
+      'simple-import-sort': simpleImportSortPlugin,
+      import: importPlugin,
+      prettier: prettierPlugin
     },
     rules: {
-      'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
-      'import/extensions': [
-        'error',
-        'ignorePackages',
-        {
-          ts: 'never',
-          tsx: 'never',
-          js: 'never',
-          jsx: 'never',
-        },
-      ],
-      'prettier/prettier': ['error', prettierOptions],
-      'react/jsx-props-no-spreading': 'off',
-
-      // Rest of your rules remain unchanged
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/ban-ts-comment': 'warn',
-      '@typescript-eslint/no-empty-interface': 'warn',
-      '@typescript-eslint/no-inferrable-types': 'error',
-      'no-unused-vars': 'off',
-      'no-shadow': 'off',
-      '@typescript-eslint/no-shadow': 'error',
-      'no-undef': 'off',
+      // React rules
+      'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/require-default-props': 'off',
-      'react/function-component-definition': [
+      'react/jsx-no-useless-fragment': 'off',
+      'react/function-component-definition': 'off',
+      'react/jsx-props-no-spreading': 'off',
+      'react/no-unstable-nested-components': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+
+      // Import rules
+      'import/first': 'error',
+      'import/newline-after-import': 'error',
+      'import/no-duplicates': 'error',
+      'import/no-extraneous-dependencies': 'off',
+      'import/prefer-default-export': 'off',
+
+      // Simple import sort rules
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [['^react', '^@?\\w', '^(@arc|arc)', '^(src/)'], ['\n^[./]']]
+        }
+      ],
+      'simple-import-sort/exports': 'error',
+
+      // TypeScript rules
+      '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^React$' }],
+      '@typescript-eslint/ban-ts-comment': 'off',
+
+      // General rules
+      'no-plusplus': 'off',
+      'func-names': 'off',
+      'no-console': 'off',
+      'prefer-default-export': 'off',
+      'prettier/prettier': 'error',
+
+      'max-lines': [
         'warn',
         {
-          namedComponents: ['function-declaration', 'arrow-function'],
-          unnamedComponents: 'arrow-function',
-        },
-      ],
-    },
-    settings: {
-      'import/resolver': {
-        node: {
-          extensions: ['.js', '.jsx', '.ts', '.tsx'],
-          paths: ['src'],
-        },
-        typescript: {
-          alwaysTryTypes: true,
-          project: './tsconfig.json',
-        },
-      },
-      react: {
-        version: 'detect',
-      },
-    },
+          max: 500,
+          skipBlankLines: true,
+          skipComments: true
+        }
+      ]
+    }
   },
+  {
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    rules: prettier.rules
+  }
 ];

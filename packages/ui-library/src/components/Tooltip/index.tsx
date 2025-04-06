@@ -1,18 +1,24 @@
-import { Typography } from '@mui/material';
-import { withBoundingRects } from '@visx/bounds';
-import { Tooltip as VisxTooltip } from '@visx/tooltip';
-import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { Typography } from "@mui/material";
+import { withBoundingRects } from "@visx/bounds";
+import { Tooltip as VisxTooltip } from "@visx/tooltip";
 
-import useTheme from '../../hooks/useTheme';
-import { TooltipProps } from './types';
+import useTheme from "../../hooks/useTheme";
+import { TooltipProps } from "./types";
 
 const MOUSE_OFFSET = 10;
 const DEFAULT_Z_INDEX = 9999;
 const MIN_TOOLTIP_WIDTH = 100;
 const MIN_TOOLTIP_HEIGHT = 80;
 
-function TooltipBase({ top, left, data, isVisible = true, containerRef }: TooltipProps) {
+function TooltipBase({
+  top,
+  left,
+  data,
+  isVisible = true,
+  containerRef,
+}: TooltipProps) {
   const { theme } = useTheme();
   const [adjustedPosition, setAdjustedPosition] = useState({ top, left });
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -33,10 +39,16 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
       try {
         const containerRect = containerRef.current.getBoundingClientRect();
         const tooltipWidth = tooltipRef.current
-          ? Math.max(tooltipRef.current.getBoundingClientRect().width, MIN_TOOLTIP_WIDTH)
+          ? Math.max(
+              tooltipRef.current.getBoundingClientRect().width,
+              MIN_TOOLTIP_WIDTH,
+            )
           : MIN_TOOLTIP_WIDTH;
         const tooltipHeight = tooltipRef.current
-          ? Math.max(tooltipRef.current.getBoundingClientRect().height, MIN_TOOLTIP_HEIGHT)
+          ? Math.max(
+              tooltipRef.current.getBoundingClientRect().height,
+              MIN_TOOLTIP_HEIGHT,
+            )
           : MIN_TOOLTIP_HEIGHT;
 
         // Boundary checks
@@ -57,7 +69,7 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
 
         setAdjustedPosition({ top: adjustedTop, left: adjustedLeft });
       } catch (error) {
-        console.warn('Tooltip positioning error:', error);
+        console.warn("Tooltip positioning error:", error);
         setAdjustedPosition({ top, left });
       }
     };
@@ -74,7 +86,7 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
 
       try {
         if (containerRef?.current) {
-          const observer = new ResizeObserver((entries) => {
+          const observer = new ResizeObserver(() => {
             window.requestAnimationFrame(() => {
               if (document.contains(containerRef.current)) {
                 updatePosition();
@@ -86,13 +98,12 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
           resizeObserverRef.current = observer;
         }
       } catch (error) {
-        console.warn('ResizeObserver error:', error);
+        console.warn("ResizeObserver error:", error);
       }
     };
 
     const timeoutId = setTimeout(setupResizeObserver, 0);
 
-    // eslint-disable-next-line consistent-return
     return () => {
       clearTimeout(timeoutId);
       if (resizeObserverRef.current) {
@@ -109,21 +120,21 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
       top={adjustedPosition.top}
       left={adjustedPosition.left}
       style={{
-        position: 'fixed',
+        position: "fixed",
         backgroundColor: theme.colors.tooltip.background,
         color: theme.colors.tooltip.text,
-        padding: '10px',
-        borderRadius: '6px',
-        boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
+        padding: "10px",
+        borderRadius: "6px",
+        boxShadow: "0px 4px 8px rgba(0,0,0,0.2)",
         border: `1px solid ${theme.colors.tooltip.border}`,
-        fontSize: '12px',
-        fontWeight: 'bold',
-        pointerEvents: 'none',
-        transform: 'translate(-50%, -100%)',
-        whiteSpace: 'pre-line',
+        fontSize: "12px",
+        fontWeight: "bold",
+        pointerEvents: "none",
+        transform: "translate(-50%, -100%)",
+        whiteSpace: "pre-line",
         zIndex: DEFAULT_Z_INDEX, // ensure tooltip is above other elements
         minWidth: `${MIN_TOOLTIP_WIDTH}px`,
-        minHeight: `${MIN_TOOLTIP_HEIGHT}px`
+        minHeight: `${MIN_TOOLTIP_HEIGHT}px`,
       }}
       ref={tooltipRef}
       role="tooltip"
@@ -131,20 +142,20 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
     >
       <Typography
         sx={{
-          marginBottom: '5px',
-          textAlign: 'center',
+          marginBottom: "5px",
+          textAlign: "center",
           color: theme.colors.tooltip.text,
-          fontSize: '12px'
+          fontSize: "12px",
         }}
       >
         {data?.label}
       </Typography>
       <Typography
         sx={{
-          fontSize: '16px',
-          fontWeight: 'bold',
-          textAlign: 'center',
-          color: theme.colors.tooltip.text
+          fontSize: "16px",
+          fontWeight: "bold",
+          textAlign: "center",
+          color: theme.colors.tooltip.text,
         }}
       >
         {data?.value}

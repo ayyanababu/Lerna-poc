@@ -12,13 +12,13 @@
  *
  */
 
-import { AxisBottom } from '@visx/axis';
-import React, { useMemo } from 'react';
+import React, { useMemo } from "react";
+import { AxisBottom } from "@visx/axis";
 
-import useTheme from '../../hooks/useTheme';
-import { shimmerClassName } from '../Shimmer/Shimmer';
-import { shimmerGradientId } from '../Shimmer/SvgShimmer';
-import { XAxisProps } from './types';
+import useTheme from "../../hooks/useTheme";
+import { shimmerClassName } from "../Shimmer/Shimmer";
+import { shimmerGradientId } from "../Shimmer/SvgShimmer";
+import { XAxisProps } from "./types";
 
 function XAxis({
   availableWidth = 0,
@@ -34,16 +34,15 @@ function XAxis({
   labelProps: externalLabelProps,
   tickLabelProps: externalTickLabelProps,
   tickLength = 5,
-  labelOffset = 5,
   ...props
 }: XAxisProps): JSX.Element | null {
   const { theme } = useTheme();
 
   const overLineStyles = {
-    fontSize: '10px',
-    fontWeight: 'normal',
-    lineHeight: '165%',
-    letterSpacing: '0.4px'
+    fontSize: "10px",
+    fontWeight: "normal",
+    lineHeight: "165%",
+    letterSpacing: "0.4px",
   };
 
   // const { angle, evenPositionsMap, formatLabel, rotate, textAnchor, tickValues } = useMemo(() => {
@@ -168,10 +167,19 @@ function XAxis({
   //   };
   // }, [availableWidth, providedLabels, scale]);
 
-  const { angle, evenPositionsMap, formatLabel, rotate, textAnchor, tickValues } = useMemo(() => {
+  const {
+    angle,
+    evenPositionsMap,
+    formatLabel,
+    rotate,
+    textAnchor,
+    tickValues,
+  } = useMemo(() => {
     const scaleLabels =
       providedLabels ||
-      (scale.domain && typeof scale.domain === 'function' ? scale.domain().map(String) : []);
+      (scale.domain && typeof scale.domain === "function"
+        ? scale.domain().map(String)
+        : []);
 
     if (scaleLabels.length <= 1) {
       return {
@@ -179,8 +187,8 @@ function XAxis({
         evenPositionsMap: null,
         formatLabel: (label: string): string => label,
         rotate: false,
-        textAnchor: 'middle',
-        tickValues: []
+        textAnchor: "middle",
+        tickValues: [],
       };
     }
 
@@ -195,8 +203,8 @@ function XAxis({
         evenPositionsMap: null,
         formatLabel: (label: string): string => label, // No truncation
         rotate: false,
-        textAnchor: 'middle',
-        tickValues: null
+        textAnchor: "middle",
+        tickValues: null,
       };
     }
 
@@ -208,8 +216,8 @@ function XAxis({
         evenPositionsMap: null,
         formatLabel: (label: string): string => label, // No truncation with rotation
         rotate: true,
-        textAnchor: 'end',
-        tickValues: null
+        textAnchor: "end",
+        tickValues: null,
       };
     }
 
@@ -244,29 +252,35 @@ function XAxis({
 
     // Only truncate as a last resort for extremely crowded axes
     // Calculate how many characters we can show based on available space
-    const maxCharsPerLabel = Math.floor(availableWidthPerLabel / averageCharWidth);
+    const maxCharsPerLabel = Math.floor(
+      availableWidthPerLabel / averageCharWidth,
+    );
     const charLimit = Math.max(20, maxCharsPerLabel); // At least 20 chars, more if space allows
 
     return {
       angle: -45,
       evenPositionsMap: positions,
       formatLabel: (label: string): string => {
-        if (typeof label !== 'string') return String(label);
+        if (typeof label !== "string") return String(label);
         // Only truncate if label is very long
-        return label.length > charLimit ? `${label.substring(0, charLimit)}...` : label;
+        return label.length > charLimit
+          ? `${label.substring(0, charLimit)}...`
+          : label;
       },
       rotate: true,
-      textAnchor: 'end',
-      tickValues: indicesToShow.map((i) => scaleLabels[i])
+      textAnchor: "end",
+      tickValues: indicesToShow.map((i) => scaleLabels[i]),
     };
   }, [availableWidth, providedLabels, scale]);
   const renderAxisLabel = (
     formattedValue: string | undefined,
-    tickProps: React.SVGProps<SVGTextElement>
+    tickProps: React.SVGProps<SVGTextElement>,
   ): JSX.Element => {
-    let label = '';
+    let label = "";
     if (!isLoading) {
-      label = formatLabel ? formatLabel(formattedValue || '') : formattedValue || '';
+      label = formatLabel
+        ? formatLabel(formattedValue || "")
+        : formattedValue || "";
     }
 
     const textStyle = { ...overLineStyles };
@@ -279,14 +293,16 @@ function XAxis({
         ? evenPositionsMap.get(formattedValue)
         : tickProps.x;
 
-    const yOffset = showAxisLine ? '0.71em' : '0.1em';
+    const yOffset = showAxisLine ? "0.71em" : "0.1em";
 
     if (rotate) {
       return (
         <g transform={`translate(${xPos},${tickProps.y})`}>
           <text
-            className={isLoading ? shimmerClassName : ''}
-            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+            className={isLoading ? shimmerClassName : ""}
+            fill={
+              isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label
+            }
             style={textStyle}
             textAnchor={textAnchor}
             transform={`rotate(${angle})`}
@@ -302,8 +318,10 @@ function XAxis({
     return (
       <g transform={`translate(${tickProps.x},${tickProps.y})`}>
         <text
-          className={isLoading ? shimmerClassName : ''}
-          fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+          className={isLoading ? shimmerClassName : ""}
+          fill={
+            isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label
+          }
           style={textStyle}
           textAnchor="middle"
           dy={yOffset}
@@ -319,14 +337,14 @@ function XAxis({
     ...overLineStyles,
     color: theme.colors.axis.title,
     fill: theme.colors.axis.title,
-    dy: showAxisLine ? '4px' : '0px'
+    dy: showAxisLine ? "4px" : "0px",
   };
 
   const mergedTickLabelProps = {
     ...externalTickLabelProps,
     ...overLineStyles,
     color: theme.colors.axis.label,
-    fill: theme.colors.axis.label
+    fill: theme.colors.axis.label,
   };
 
   if (!isVisible) {

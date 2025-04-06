@@ -1,11 +1,12 @@
-import React from 'react';
-import { Theme } from '../theme/types';
+import React from "react";
 
-export type ThemeMode = 'light' | 'dark';
+import { Theme } from "../theme/types";
+
+export type ThemeMode = "light" | "dark";
 
 export type ThemeContextType = {
-    theme: Theme;
+  theme: Theme;
 
-    activeMode: ThemeMode;
-    setActiveMode: React.Dispatch<React.SetStateAction<ThemeMode>>;
+  activeMode: ThemeMode;
+  setActiveMode: React.Dispatch<React.SetStateAction<ThemeMode>>;
 };
