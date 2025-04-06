@@ -1,7 +1,7 @@
 import { CustomBarProps } from '../../CustomBar/types';
 import { GridProps } from '../../Grid/types';
 import { LegendsProps } from '../../Legends/types';
-import { TimestampProps } from '../../Timestamp/types';
+import { TimestampProps } from '../../TimeStamp/types';
 import { TitleProps } from '../../Title/types';
 import { TooltipProps } from '../../Tooltip/types';
 import { XAxisProps } from '../../XAxis/types';
@@ -15,13 +15,15 @@ export interface DataPoint {
 export interface HorizontalStackedBarChartProps {
     data: DataPoint[];
     groupKeys: string[];
-    stackGap?: number;
-    title?: string;
     margin?: { top: number; right: number; bottom: number; left: number };
+    title?: string;
+    timestamp?: string;
     colors?: string[];
     isLoading?: boolean;
+    showTicks?: boolean;
     titleProps?: TitleProps;
     legendsProps?: Partial<LegendsProps>;
+    showXAxis?: boolean;
     tooltipProps?: Partial<TooltipProps>;
     timestampProps?: Partial<TimestampProps>;
     xAxisProps?: Partial<XAxisProps>;
