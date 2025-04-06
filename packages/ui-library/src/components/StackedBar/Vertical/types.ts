@@ -1,7 +1,9 @@
+import { CSSProperties } from 'react';
+
 import { CustomBarProps } from '../../CustomBar/types';
 import { GridProps } from '../../Grid/types';
 import { LegendsProps } from '../../Legends/types';
-import { TimestampProps } from '../../Timestamp/types';
+import { TimestampProps } from '../../TimeStamp/types';
 import { TitleProps } from '../../Title/types';
 import { TooltipProps } from '../../Tooltip/types';
 import { XAxisProps } from '../../XAxis/types';
@@ -13,19 +15,122 @@ export interface DataPoint {
 }
 
 export interface VerticalStackedBarChartProps {
+    /**
+     * Data for the chart
+     */
     data: DataPoint[];
+
+    /**
+     * Keys for the data groups
+     */
     groupKeys: string[];
-    stackGap?: number;
+
+    /**
+     * Type of chart - 'grouped' or 'stacked'
+     */
+    type?: 'grouped' | 'stacked';
+
+    /**
+     * Chart title
+     */
     title?: string;
+
+    /**
+     * Chart timestamp
+     */
+    timestamp?: string;
+
+    /**
+     * Margin around the chart
+     */
     margin?: { top: number; right: number; bottom: number; left: number };
+
+    /**
+     * Width of the chart
+     */
+    width?: number;
+
+    /**
+     * Height of the chart
+     */
+    height?: number;
+
+    /**
+     * Custom colors for the chart
+     */
     colors?: string[];
+
+    /**
+     * Loading state
+     */
     isLoading?: boolean;
-    titleProps?: Partial<TitleProps>;
+
+    /**
+     * Title props
+     */
+    titleProps?: TitleProps;
+
+    /**
+     * Legend props
+     */
     legendsProps?: Partial<LegendsProps>;
+
+    /**
+     * Tooltip props
+     */
     tooltipProps?: Partial<TooltipProps>;
+
+    /**
+     * X axis props
+     */
     xAxisProps?: Partial<XAxisProps>;
+
+    /**
+     * Y axis props
+     */
     yAxisProps?: Partial<YAxisProps>;
-    gridProps?: Partial<GridProps>;
+
+    /**
+     * Grid props
+     */
+    gridProps?: GridProps;
+
+    /**
+     * barProps
+     */
+    barProps?: CustomBarProps;
+
+    /**
+     * Timestamp props
+     */
     timestampProps?: Partial<TimestampProps>;
-    barProps?: Partial<CustomBarProps>;
+
+    /**
+     * Show ticks on axes
+     * @default false
+     */
+    showTicks?: boolean;
+
+    /**
+     * Chart container style
+     */
+    style?: CSSProperties;
+
+    /**
+     * Show grid lines
+     * @default true
+     */
+    showGrid?: boolean;
+
+    /**
+     * Show Y axis
+     * @default true
+     */
+    showYAxis?: boolean;
+
+    /**
+     * Show X axis
+     * @default true
+     */
+    showXAxis?: boolean;
 }
