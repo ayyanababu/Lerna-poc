@@ -20,7 +20,7 @@ import { BarLineChartProps, BarLineData } from "./types";
 const DEFAULT_MARGIN = {
   top: 20,
   right: 60,
-  bottom: 50,
+  bottom: 60,
   left: 60,
 };
 const DEFAULT_OPACITY = 1;
