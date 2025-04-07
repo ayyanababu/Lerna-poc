@@ -381,19 +381,19 @@ function App() {
                                     label: `Region ${index + 1}`,
                                     data: {
                                         future:
-                                            Math.floor(Math.random() * 100) +
+                                            Math.floor(Math.random() * 100000) +
                                             20,
                                         options:
-                                            Math.floor(Math.random() * 100) +
+                                            Math.floor(Math.random() * 100000) +
                                             20,
                                         forwards:
-                                            Math.floor(Math.random() * 100) +
+                                            Math.floor(Math.random() * 100000) +
                                             20,
                                         fixedIncome:
-                                            Math.floor(Math.random() * 100) +
+                                            Math.floor(Math.random() * 100000) +
                                             20,
                                         others:
-                                            Math.floor(Math.random() * 100) +
+                                            Math.floor(Math.random() * 100000) +
                                             20,
                                     },
                                 })),

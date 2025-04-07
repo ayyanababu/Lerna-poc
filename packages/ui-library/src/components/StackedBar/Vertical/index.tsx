@@ -20,8 +20,8 @@ import { VerticalStackedBarChartProps } from "./types";
 const DEFAULT_MARGIN = {
   top: 20,
   right: 30,
-  bottom: 100,
-  left: 50,
+  bottom: 45,
+  left: 35,
 };
 
 const DEFAULT_BAR_RADIUS = 4; // Top bar radius
