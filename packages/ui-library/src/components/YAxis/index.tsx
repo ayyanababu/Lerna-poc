@@ -2,6 +2,7 @@ import React from "react";
 import { AxisLeft, AxisRight } from "@visx/axis";
 
 import useTheme from "../../hooks/useTheme";
+import { formatNumberWithSuffix, isNumeric } from "../../utils/number";
 import { shimmerClassName } from "../Shimmer/Shimmer";
 import { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { YAxisProps } from "./types";
@@ -32,6 +33,13 @@ function YAxis({
   const { theme } = useTheme();
   const AxisComponent = isRightYAxis ? AxisRight : AxisLeft;
 
+  const tickFormat = (value: number | string) => {
+    if (isNumeric(value)) {
+      return formatNumberWithSuffix(Number(value));
+    }
+    return String(value);
+  };
+
   const renderAxisLabel = (
     formattedValue: string | number | undefined,
     tickProps: React.SVGProps<SVGTextElement>,
@@ -48,8 +56,9 @@ function YAxis({
       );
     }
 
-    // Possibly truncate
     let label = String(formattedValue || "");
+
+    // Possibly truncate
     if (label.length > MAX_LABEL_CHARS) {
       label = `${label.substring(0, MAX_LABEL_CHARS - 1)}…`;
     }
@@ -99,6 +108,7 @@ function YAxis({
       hideAxisLine={!showAxisLine}
       hideTicks={hideAllTicks || !showTicks}
       numTicks={numTicks}
+      tickFormat={tickFormat}
       tickComponent={({ formattedValue, ...tickProps }) =>
         renderAxisLabel(formattedValue, tickProps)
       }
