@@ -10,7 +10,6 @@ import useTheme from "../../../hooks/useTheme";
 import { ChartWrapper } from "../../ChartWrapper";
 import CustomBar from "../../CustomBar";
 import Grid from "../../Grid";
-import { shimmerClassName } from "../../Shimmer/Shimmer";
 import SvgShimmer, { shimmerGradientId } from "../../Shimmer/SvgShimmer";
 import { TooltipData } from "../../Tooltip/types";
 import XAxis from "../../XAxis";
@@ -27,8 +26,8 @@ interface DynamicMargin {
 
 const DEFAULT_MARGIN = {
   top: 20,
-  right: 50,
-  bottom: 30,
+  right: 20,
+  bottom: 20,
   left: 80,
 };
 
@@ -277,21 +276,6 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     }
   };
 
-  // Axis label
-  const renderAxisLabel = (
-    formattedValue: string,
-    tickProps: React.SVGProps<SVGTextElement>,
-  ) => (
-    <text
-      {...tickProps}
-      className={`${isLoading ? shimmerClassName : ""}`}
-      fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-      style={{ fontSize: "12px" }}
-    >
-      {isLoading ? "" : formattedValue}
-    </text>
-  );
-
   const calculatedNumTicks = useMemo(() => {
     const tickHeight = 20;
     return Math.max(2, Math.floor(innerHeight / tickHeight));
@@ -412,9 +396,6 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
           <YAxis
             scale={categoryScale}
             tickStroke={theme.colors.axis.line}
-            tickComponent={({ formattedValue, ...tickProps }) =>
-              renderAxisLabel(formattedValue as string, tickProps)
-            }
             hideAxisLine
             numTicks={calculatedNumTicks}
             showTicks={showTicks}
