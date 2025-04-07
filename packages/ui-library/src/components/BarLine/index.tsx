@@ -293,6 +293,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                 hideAxisLine={!showYAxis}
                 label={yAxisRightLabel}
                 labelProps={{ fontSize: "13px", fontWeight: "bold" }}
+                textAnchor="start"
                 tickLabelProps={() => ({
                   fill: theme.colors.axis.label,
                   fontSize: "12px",

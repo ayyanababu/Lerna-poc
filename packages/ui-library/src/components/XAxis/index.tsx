@@ -269,7 +269,7 @@ function XAxis({
     ...overLineStyles,
     color: theme.colors.axis.title,
     fill: theme.colors.axis.title,
-    dy: showAxisLine ? labelOffset + 4 + "px" : labelOffset + "px",
+    dy: showAxisLine ? labelOffset + 4 + "px" : labelOffset + 15 + "px",
   };
 
   const mergedTickLabelProps = {
