@@ -21,6 +21,9 @@ import { shimmerClassName } from "../Shimmer/Shimmer";
 import { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { XAxisProps } from "./types";
 
+const MAX_LABEL_CHARS = 15;
+const MIN_SPACE_BETWEEN_TICKS = 45;
+
 function XAxis({
   availableWidth = 0,
   hideAllTicks = false,
@@ -35,6 +38,7 @@ function XAxis({
   labelProps: externalLabelProps,
   tickLabelProps: externalTickLabelProps,
   tickLength = 5,
+  labelOffset = 8,
   ...props
 }: XAxisProps): JSX.Element | null {
   const { theme } = useTheme();
@@ -52,6 +56,12 @@ function XAxis({
     }
     return String(value);
   };
+
+  const dynamicNumTicks = useMemo(() => {
+    if (availableWidth <= 0) return numTicks;
+
+    return Math.max(2, Math.floor(availableWidth / MIN_SPACE_BETWEEN_TICKS));
+  }, [availableWidth, numTicks]);
 
   const {
     angle,
@@ -71,7 +81,12 @@ function XAxis({
       return {
         angle: 0,
         evenPositionsMap: null,
-        formatLabel: (label: string): string => label,
+        formatLabel: (label: string): string => {
+          if (typeof label !== "string") return String(label);
+          return label.length > MAX_LABEL_CHARS
+            ? `${label.substring(0, MAX_LABEL_CHARS - 3)}...`
+            : label;
+        },
         rotate: false,
         textAnchor: "middle",
         tickValues: [],
@@ -82,34 +97,58 @@ function XAxis({
     const availableWidthPerLabel = availableWidth / scaleLabels.length;
     const averageCharWidth = 6; // Approximate width per character
 
-    // For few labels, or when there's plenty of space, don't truncate
-    if (scaleLabels.length <= 5 || availableWidthPerLabel > 80) {
+    const maxLabelLength = Math.max(
+      ...scaleLabels.map((label) => String(label).length),
+    );
+    const estimatedMaxLabelWidth = maxLabelLength * averageCharWidth;
+
+    if (
+      scaleLabels.length <= dynamicNumTicks ||
+      availableWidthPerLabel > estimatedMaxLabelWidth * 1.2
+    ) {
       return {
         angle: 0,
         evenPositionsMap: null,
-        formatLabel: (label: string): string => label, // No truncation
+        formatLabel: (label: string): string => {
+          if (typeof label !== "string") return String(label);
+
+          return label.length > MAX_LABEL_CHARS
+            ? `${label.substring(0, MAX_LABEL_CHARS - 3)}...`
+            : label;
+        },
         rotate: false,
         textAnchor: "middle",
         tickValues: null,
       };
     }
 
-    // For moderate number of labels with decent space, use rotation but no truncation
-    if (scaleLabels.length <= 10 || availableWidthPerLabel > 40) {
-      // With rotation, we can fit longer text
+    if (
+      scaleLabels.length <= dynamicNumTicks * 2 ||
+      availableWidthPerLabel > estimatedMaxLabelWidth * 0.6
+    ) {
+      const rotatedCharLimit = Math.min(
+        MAX_LABEL_CHARS,
+        Math.floor((availableWidthPerLabel * 1.5) / averageCharWidth),
+      );
+
       return {
         angle: -45,
         evenPositionsMap: null,
-        formatLabel: (label: string): string => label, // No truncation with rotation
+        formatLabel: (label: string): string => {
+          if (typeof label !== "string") return String(label);
+          return label.length > rotatedCharLimit
+            ? `${label.substring(0, rotatedCharLimit - 3)}...`
+            : label;
+        },
         rotate: true,
         textAnchor: "end",
         tickValues: null,
       };
     }
 
-    // For crowded axes, use the original logic with sample selection
     const indicesToShow: number[] = [0, scaleLabels.length - 1]; // Always show first and last
-    const optimalLabelCount = Math.max(2, Math.floor(availableWidth / 40));
+
+    const optimalLabelCount = Math.min(dynamicNumTicks, scaleLabels.length);
     const middleLabelsToShow = optimalLabelCount - 2;
 
     if (middleLabelsToShow > 0 && scaleLabels.length > 2) {
@@ -136,28 +175,31 @@ function XAxis({
       positions.set(scaleLabels[indicesToShow[0]], availableWidth / 2);
     }
 
-    // Only truncate as a last resort for extremely crowded axes
     // Calculate how many characters we can show based on available space
+
+    const rotatedSpaceFactor = 1.8;
     const maxCharsPerLabel = Math.floor(
-      availableWidthPerLabel / averageCharWidth,
+      (availableWidthPerLabel * rotatedSpaceFactor) / averageCharWidth,
     );
-    const charLimit = Math.max(20, maxCharsPerLabel); // At least 20 chars, more if space allows
+
+    const charLimit = Math.min(MAX_LABEL_CHARS, Math.max(8, maxCharsPerLabel));
 
     return {
       angle: -45,
       evenPositionsMap: positions,
       formatLabel: (label: string): string => {
         if (typeof label !== "string") return String(label);
-        // Only truncate if label is very long
+
         return label.length > charLimit
-          ? `${label.substring(0, charLimit)}...`
+          ? `${label.substring(0, charLimit - 3)}...`
           : label;
       },
       rotate: true,
       textAnchor: "end",
       tickValues: indicesToShow.map((i) => scaleLabels[i]),
     };
-  }, [availableWidth, providedLabels, scale]);
+  }, [availableWidth, providedLabels, scale, dynamicNumTicks]);
+
   const renderAxisLabel = (
     formattedValue: string | undefined,
     tickProps: React.SVGProps<SVGTextElement>,
@@ -183,7 +225,7 @@ function XAxis({
         ? evenPositionsMap.get(formattedValue)
         : tickProps.x;
 
-    const yOffset = showAxisLine ? "0.71em" : "0.1em";
+    const yOffset = showAxisLine ? labelOffset : labelOffset / 2;
 
     if (rotate) {
       return (
@@ -206,7 +248,7 @@ function XAxis({
     }
 
     return (
-      <g transform={`translate(${tickProps.x},${tickProps.y})`}>
+      <g transform={`translate(${xPos},${tickProps.y})`}>
         <text
           className={isLoading ? shimmerClassName : ""}
           fill={
@@ -214,7 +256,7 @@ function XAxis({
           }
           style={textStyle}
           textAnchor="middle"
-          dy={yOffset}
+          dy={yOffset + "px"}
         >
           {label}
         </text>
@@ -227,7 +269,7 @@ function XAxis({
     ...overLineStyles,
     color: theme.colors.axis.title,
     fill: theme.colors.axis.title,
-    dy: showAxisLine ? "4px" : "0px",
+    dy: showAxisLine ? labelOffset + 4 + "px" : labelOffset + "px",
   };
 
   const mergedTickLabelProps = {
@@ -249,7 +291,7 @@ function XAxis({
       tickStroke={theme.colors.axis.line}
       tickValues={tickValues === null ? undefined : tickValues}
       tickLabelProps={mergedTickLabelProps}
-      numTicks={numTicks}
+      numTicks={dynamicNumTicks}
       hideAxisLine={!showAxisLine}
       hideTicks={hideAllTicks || !showTicks}
       tickLength={showTicks ? tickLength : 0}
