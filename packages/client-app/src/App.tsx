@@ -202,7 +202,7 @@ function App() {
                     <SortableCard
                         title="BarLineChart"
                         height={400}
-                        width={1000}>
+                        width={'100%'}>
                         <BarLineChart
                             data={{
                                 xAxisLabel: 'Corporate Action',
@@ -266,7 +266,7 @@ function App() {
                     <SortableCard
                         title="VerticalBarChart"
                         height={400}
-                        width={1000}>
+                        width={'100%'}>
                         <VerticalBarChart
                             data={[
                                 { label: 'Not Priced', value: 30 },
@@ -324,7 +324,7 @@ function App() {
                     <SortableCard
                         title="VerticalGroupedBarChart"
                         height={400}
-                        width={400}>
+                        width={'100%'}>
                         <VerticalGroupedBarChart
                             width={600}
                             height={200}
@@ -395,7 +395,7 @@ function App() {
                     <SortableCard
                         title="VerticalStackedBarChart"
                         height={400}
-                        width={400}>
+                        width={'100%'}>
                         <VerticalStackedBarChart
                             data={[
                                 ...new Array(10).fill(0).map((_, index) => ({
@@ -458,7 +458,7 @@ function App() {
                     <SortableCard
                         title="Department Performance"
                         height={400}
-                        width={400}>
+                        width={'100%'}>
                         <HorizontalGroupedBarChart
                             width={600}
                             height={200}
@@ -595,7 +595,7 @@ function App() {
                     <SortableCard
                         title="Asset Allocation"
                         height={80}
-                        width={1000}>
+                        width={'100%'}>
                         <TreeMapChart
                             data={{
                                 id: 'portfolio',

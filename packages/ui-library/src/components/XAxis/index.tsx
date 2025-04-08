@@ -4,11 +4,11 @@
  * Algorithm:
  * 1. Calculate optimal label display based on available width
  * 2. For crowded axes:
+ *    - First attempt to solve overlap by truncating labels
+ *    - Only rotate labels if truncation would make labels too short (< 3 chars)
  *    - Always show first and last labels
- *    - Distribute remaining labels evenly
- *    - Rotate labels if needed to fit available space
- * 3. Truncate long label text and add ellipsis
- * 4. Handle loading states with shimmer effect
+ *    - Distribute remaining labels evenly if needed
+ * 3. Handle loading states with shimmer effect
  *
  */
 
@@ -23,6 +23,7 @@ import { XAxisProps } from "./types";
 
 const MAX_LABEL_CHARS = 15;
 const MIN_SPACE_BETWEEN_TICKS = 45;
+const MIN_CHAR_LENGTH = 10; // Minimum acceptable characters before rotation
 
 function XAxis({
   availableWidth = 0,
@@ -102,16 +103,17 @@ function XAxis({
     );
     const estimatedMaxLabelWidth = maxLabelLength * averageCharWidth;
 
-    if (
-      scaleLabels.length <= dynamicNumTicks ||
-      availableWidthPerLabel > estimatedMaxLabelWidth * 1.2
-    ) {
+    // Check if there's enough space for all labels without any modifications
+    const wouldLabelsOverlap =
+      availableWidthPerLabel < estimatedMaxLabelWidth * 0.9;
+
+    if (!wouldLabelsOverlap) {
+      // No need for truncation or rotation - labels fit naturally
       return {
         angle: 0,
         evenPositionsMap: null,
         formatLabel: (label: string): string => {
           if (typeof label !== "string") return String(label);
-
           return label.length > MAX_LABEL_CHARS
             ? `${label.substring(0, MAX_LABEL_CHARS - 3)}...`
             : label;
@@ -122,10 +124,38 @@ function XAxis({
       };
     }
 
-    if (
-      scaleLabels.length <= dynamicNumTicks * 2 ||
-      availableWidthPerLabel > estimatedMaxLabelWidth * 0.6
-    ) {
+    // Calculate how many characters can fit given the available width per label
+    const maxCharsWithoutRotation = Math.floor(
+      (availableWidthPerLabel * 0.9) / averageCharWidth,
+    );
+
+    // If we can fit at least MIN_CHAR_LENGTH characters, we can solve by truncation
+    if (maxCharsWithoutRotation >= MIN_CHAR_LENGTH) {
+      // Truncation can solve the issue - no need to rotate
+      return {
+        angle: 0,
+        evenPositionsMap: null,
+        formatLabel: (label: string): string => {
+          if (typeof label !== "string") return String(label);
+          return label.length > maxCharsWithoutRotation
+            ? `${label.substring(0, maxCharsWithoutRotation - 3)}...`
+            : label;
+        },
+        rotate: false,
+        textAnchor: "middle",
+        tickValues: null,
+      };
+    }
+
+    // If we're here, truncation would make labels too short
+    // Try rotation to see if it helps
+    const rotatedLabelHeight = estimatedMaxLabelWidth * 0.7; // Approximate height when rotated
+    const rotatedWidthNeeded = rotatedLabelHeight * 0.5; // Approximate width needed when rotated
+
+    const canFitWithRotation = availableWidthPerLabel > rotatedWidthNeeded;
+
+    // If we can fit all labels with rotation
+    if (canFitWithRotation && scaleLabels.length <= dynamicNumTicks * 2) {
       const rotatedCharLimit = Math.min(
         MAX_LABEL_CHARS,
         Math.floor((availableWidthPerLabel * 1.5) / averageCharWidth),
@@ -146,6 +176,7 @@ function XAxis({
       };
     }
 
+    // If we still can't fit all labels, we need to select a subset of labels to show
     const indicesToShow: number[] = [0, scaleLabels.length - 1]; // Always show first and last
 
     const optimalLabelCount = Math.min(dynamicNumTicks, scaleLabels.length);
