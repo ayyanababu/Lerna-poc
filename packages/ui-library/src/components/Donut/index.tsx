@@ -164,8 +164,8 @@ function DonutChart({
                           ? `url(#${shimmerGradientId})`
                           : arc.data?.color || colorScale(arc.data.label)
                       }
-                      stroke={theme.colors.common.border}
-                      strokeWidth={2}
+                      // stroke={theme.colors.common.border}
+                      // strokeWidth={2}
                       style={{
                         filter:
                           hoveredArc === arc.data.label

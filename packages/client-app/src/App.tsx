@@ -205,23 +205,46 @@ function App() {
                         width={1000}>
                         <BarLineChart
                             data={{
-                                xAxisLabel: 'Months',
-                                yAxisLeftLabel: 'Volume',
-                                yAxisRightLabel: 'Growth Rate',
-                                chartData: Array.from(
-                                    { length: 100 },
-                                    (_, index) => ({
-                                        xAxis: `${index + 1} January`,
-                                        yAxisLeft:
-                                            Math.floor(
-                                                Math.random() * 1000000000000,
-                                            ) + 20,
-                                        yAxisRight:
-                                            Math.floor(
-                                                Math.random() * 1000000000000,
-                                            ) + 20,
-                                    }),
-                                ),
+                                xAxisLabel: 'Corporate Action',
+                                yAxisLeftLabel: 'Number of Actions',
+                                yAxisRightLabel: 'Positions Impacted',
+                                chartData: [
+                                    {
+                                        xAxis: 'Dividend (NNA)',
+                                        yAxisLeft: 25,
+                                        yAxisRight: 35,
+                                    },
+                                    {
+                                        xAxis: 'Dividend (NCA)',
+                                        yAxisLeft: 15,
+                                        yAxisRight: 22,
+                                    },
+                                    {
+                                        xAxis: 'Dividend (NEA)',
+                                        yAxisLeft: 18,
+                                        yAxisRight: 45,
+                                    },
+                                    {
+                                        xAxis: 'Stock Split (NCA)',
+                                        yAxisLeft: 22,
+                                        yAxisRight: 28,
+                                    },
+                                    {
+                                        xAxis: 'Rights Issue (NCA)',
+                                        yAxisLeft: 30,
+                                        yAxisRight: 40,
+                                    },
+                                    {
+                                        xAxis: 'Merger (NEA)',
+                                        yAxisLeft: 35,
+                                        yAxisRight: 25,
+                                    },
+                                    {
+                                        xAxis: 'Tender Offer (NCA)',
+                                        yAxisLeft: 42,
+                                        yAxisRight: 55,
+                                    },
+                                ],
                             }}
                             title="Monthly Trade Volume"
                             timestamp={new Date().toISOString()}
@@ -246,26 +269,24 @@ function App() {
                         width={1000}>
                         <VerticalBarChart
                             data={[
-                                ...Array.from({ length: 21 }, (_, index) => ({
-                                    // label: `label ${index + 1}`,
-                                    label: `${index + 1} January sadf asdf asdf asdf asdfasdf asd asdf asf  `,
-                                    value:
-                                        Math.floor(
-                                            Math.random() * 1000000000000,
-                                        ) + 20,
-                                })),
+                                { label: 'Not Priced', value: 30 },
+                                { label: 'Stale Price', value: 45 },
+                                {
+                                    label: 'Priced/Auto s asdf asdf adfasdfa sdfasdf asdf',
+                                    value: 15,
+                                },
+                                { label: 'Priced/Manual', value: 10 },
                             ]}
-                            title="Monthly Trade Volume"
-                            timestamp={new Date().toISOString()}
-                            isLoading={isLoading}
-                            titleProps={{
-                                variant: 'h6',
-                                align: 'left',
-                            }}
+                            title="Valuation"
+                            colors={[
+                                '#AC48C6',
+                                '#E88661',
+                                '#9FC7E9',
+                                '#93a3bc',
+                            ]}
                             legendsProps={{
-                                position: Legends.Position.TOP,
-                                doStrike: true,
-                                isVisible: false,
+                                position: Legends.Position.BOTTOM,
+                                isVisible: true,
                             }}
                             tooltipProps={{}}
                         />
@@ -275,7 +296,7 @@ function App() {
                     <SortableCard
                         title="HorizontalBarChart"
                         height={400}
-                        width={400}>
+                        width={'100%'}>
                         <HorizontalBarChart
                             data={[
                                 // Array of 30 values with 30 labels
