@@ -1,0 +1,23 @@
+body {
+  
+  padding: 8px;
+}
+
+body:not(.dark) {
+  background-color: #ecf6ff;
+}
+
+.dark body{
+  background-color: #1e293b;
+}
+
+
+.my-cards {
+  max-width: 1280px;
+  margin: 0 auto;
+
+ .card-body {
+    height: 350px;
+    width: 100%;
+  }
+}
