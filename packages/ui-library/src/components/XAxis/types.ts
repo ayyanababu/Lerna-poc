@@ -48,4 +48,5 @@ export interface XAxisProps extends AxisBottomProps {
   isVisible?: boolean;
   tickLength?: number;
   labelOffset?: number;
+  forceFullLabels?: boolean;
 }
