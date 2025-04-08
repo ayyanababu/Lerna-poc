@@ -75,7 +75,9 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   const xMax = innerWidth;
   const yMax = innerHeight;
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
-  const [hoveredChart, setHoveredChart] = useState<string | null | undefined>(null);
+  const [hoveredChart, setHoveredChart] = useState<string | null | undefined>(
+    null,
+  );
   const {
     showTooltip,
     hideTooltip,

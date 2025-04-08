@@ -2,6 +2,7 @@
   "name": "cra-react",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -39,15 +40,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
-    "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx src --fix",
+    "lint": "eslint --config eslint.config.js --ext .js,.jsx,.ts,.tsx src",
+    "lint:fix": "eslint --config eslint.config.js --ext .js,.jsx,.ts,.tsx src --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [

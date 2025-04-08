@@ -8,12 +8,12 @@ import HorizontalGroupedBarChart from "./components/HorizontalGroupedBarChart";
 import Legends from "./components/Legends";
 import Sortable from "./components/Sortable";
 import SortableCard from "./components/SortableCard";
+import HorizontalStackedBarChart from "./components/StackedBar/Horizontal";
+import VerticalStackedBarChart from "./components/StackedBar/Vertical";
 import TreeMapChart from "./components/TreeMapChart";
 import VerticalBarChart from "./components/VerticalBar";
 import VerticalGroupedBarChart from "./components/VerticalGroupedBarChart";
 import { ChartThemeProvider } from "./context/ChartThemeProvider";
-import HorizontalStackedBarChart from "./components/StackedBar/Horizontal";
-import VerticalStackedBarChart from "./components/StackedBar/Vertical";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);

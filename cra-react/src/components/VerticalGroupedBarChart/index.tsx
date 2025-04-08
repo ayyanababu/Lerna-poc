@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { AxisBottom, AxisLeft } from "@visx/axis";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
@@ -10,13 +9,12 @@ import { capitalize, cloneDeep, lowerCase } from "lodash-es";
 import useTheme from "../../hooks/useTheme";
 import ChartWrapper from "../ChartWrapper";
 import CustomBar from "../CustomBar";
-import { shimmerClassName } from "../Shimmer/Shimmer";
 import SvgShimmer, { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { TooltipData } from "../Tooltip/types";
+import XAxis from "../XAxis";
+import YAxis from "../YAxis";
 import { mockVerticalGroupedBarChartData } from "./mockdata";
 import { DataPoint, VerticalGroupedBarChartProps } from "./types";
-import YAxis from "../YAxis";
-import XAxis from "../XAxis";
 
 interface CustomBarProps {
   key: string;
@@ -67,7 +65,9 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   const innerHeight = height - margin.top - margin.bottom;
 
   // State hooks
-  const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null | undefined>(null);
+  const [hoveredGroupKey, setHoveredGroupKey] = useState<
+    string | null | undefined
+  >(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
 
   const {
@@ -136,7 +136,9 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     try {
       // Convert data to the format expected by stack generator
       const prepared = filteredData.map((item) => {
-        const result: { label: string; [key: string]: string | number } = { label: item.label };
+        const result: { label: string; [key: string]: string | number } = {
+          label: item.label,
+        };
         activeKeys.forEach((key) => {
           result[key] = Number(item.data[key]) || 0;
         });
@@ -378,23 +380,6 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     }
     return renderGroupedBars();
   }, [type, stackedData, renderStackedBars, renderGroupedBars]);
-
-  // Hide axis labels when loading
-  const renderAxisLabel = (
-    formattedValue: string,
-    tickProps: React.SVGProps<SVGTextElement>,
-  ) => (
-    <text
-      {...tickProps}
-      className={`${isLoading ? shimmerClassName : ""}`}
-      fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-      style={{
-        fontSize: "12px",
-      }}
-    >
-      {isLoading ? "" : formattedValue}
-    </text>
-  );
 
   if (!_data || _data.length === 0) {
     return <div>No data to display.</div>;

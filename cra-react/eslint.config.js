@@ -9,6 +9,13 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default [
+  {
+    // Disable react-scripts' built-in ESLint configuration
+    ignores: ['node_modules/**', 'build/**'],
+    linterOptions: {
+      reportUnusedDisableDirectives: 'warn',
+    }
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {

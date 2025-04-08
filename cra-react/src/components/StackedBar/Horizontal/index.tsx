@@ -92,7 +92,9 @@ const HorizontalStackedBarChart: React.FC<HorizontalStackedBarChartProps> = ({
   const { theme } = useTheme();
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
 
-  const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null | undefined>(null);
+  const [hoveredGroupKey, setHoveredGroupKey] = useState<
+    string | null | undefined
+  >(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
 
   // Tooltip

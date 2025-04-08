@@ -42,7 +42,9 @@ const TreeMapChart = ({
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-  const [hoveredNode, setHoveredNode] = useState<string | null | undefined>(null);
+  const [hoveredNode, setHoveredNode] = useState<string | null | undefined>(
+    null,
+  );
   const [hideIndex, setHideIndex] = useState<number[]>([]);
 
   const {

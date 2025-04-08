@@ -1,4 +1,4 @@
-import React, { ReactNode,  useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Typography } from "@mui/material";
 import { withBoundingRects } from "@visx/bounds";
@@ -115,53 +115,57 @@ function TooltipBase({
 
   if (!isVisible) return null;
 
-
-  return createPortal( <VisxTooltip
-    top={adjustedPosition.top}
-    left={adjustedPosition.left}
-    style={{
-      position: "fixed",
-      backgroundColor: theme.colors.tooltip.background,
-      color: theme.colors.tooltip.text,
-      padding: "10px",
-      borderRadius: "6px",
-      boxShadow: "0px 4px 8px rgba(0,0,0,0.2)",
-      border: `1px solid ${theme.colors.tooltip.border}`,
-      fontSize: "12px",
-      fontWeight: "bold",
-      pointerEvents: "none",
-      transform: "translate(-50%, -100%)",
-      whiteSpace: "pre-line",
-      zIndex: DEFAULT_Z_INDEX, // ensure tooltip is above other elements
-      minWidth: `${MIN_TOOLTIP_WIDTH}px`,
-      minHeight: `${MIN_TOOLTIP_HEIGHT}px`,
-    }}
-    ref={tooltipRef}
-    role="tooltip"
-    aria-hidden={!isVisible}
-  >
-    <Typography
-      sx={{
-        marginBottom: "5px",
-        textAlign: "center",
+  return createPortal(
+    <VisxTooltip
+      top={adjustedPosition.top}
+      left={adjustedPosition.left}
+      style={{
+        position: "fixed",
+        backgroundColor: theme.colors.tooltip.background,
         color: theme.colors.tooltip.text,
+        padding: "10px",
+        borderRadius: "6px",
+        boxShadow: "0px 4px 8px rgba(0,0,0,0.2)",
+        border: `1px solid ${theme.colors.tooltip.border}`,
         fontSize: "12px",
-      }}
-    >
-      {data?.label}
-    </Typography>
-    <Typography
-      sx={{
-        fontSize: "16px",
         fontWeight: "bold",
-        textAlign: "center",
-        color: theme.colors.tooltip.text,
+        pointerEvents: "none",
+        transform: "translate(-50%, -100%)",
+        whiteSpace: "pre-line",
+        zIndex: DEFAULT_Z_INDEX, // ensure tooltip is above other elements
+        minWidth: `${MIN_TOOLTIP_WIDTH}px`,
+        minHeight: `${MIN_TOOLTIP_HEIGHT}px`,
       }}
+      ref={tooltipRef}
+      role="tooltip"
+      aria-hidden={!isVisible}
     >
-      {data?.value}
-    </Typography>
-  </VisxTooltip>, document.body);
+      <Typography
+        sx={{
+          marginBottom: "5px",
+          textAlign: "center",
+          color: theme.colors.tooltip.text,
+          fontSize: "12px",
+        }}
+      >
+        {data?.label}
+      </Typography>
+      <Typography
+        sx={{
+          fontSize: "16px",
+          fontWeight: "bold",
+          textAlign: "center",
+          color: theme.colors.tooltip.text,
+        }}
+      >
+        {data?.value}
+      </Typography>
+    </VisxTooltip>,
+    document.body,
+  );
 }
 
 // Export the Tooltip component wrapped with withBoundingRects
-export const Tooltip = withBoundingRects(TooltipBase) as React.FC<TooltipProps>;
+export const Tooltip = withBoundingRects(
+  TooltipBase,
+) as unknown as React.FC<TooltipProps>;

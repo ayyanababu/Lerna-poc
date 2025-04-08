@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { AxisBottom, AxisLeft } from "@visx/axis";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
@@ -10,13 +9,12 @@ import { capitalize, cloneDeep, lowerCase } from "lodash-es";
 import useTheme from "../../hooks/useTheme";
 import ChartWrapper from "../ChartWrapper";
 import CustomBar from "../CustomBar";
-import { shimmerClassName } from "../Shimmer/Shimmer";
 import SvgShimmer, { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { TooltipData } from "../Tooltip/types";
 import { mockVerticalGroupedBarChartData } from "../VerticalGroupedBarChart/mockdata";
-import { DataPoint, HorizontalGroupedBarChartProps } from "./types";
 import XAxis from "../XAxis";
 import YAxis from "../YAxis";
+import { DataPoint, HorizontalGroupedBarChartProps } from "./types";
 
 interface CustomBarProps {
   key: string;
@@ -67,7 +65,9 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
   const innerHeight = height - margin.top - margin.bottom;
 
   // State hooks
-  const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null | undefined>(null);
+  const [hoveredGroupKey, setHoveredGroupKey] = useState<
+    string | null | undefined
+  >(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
 
   const {
@@ -247,23 +247,6 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
       setHoveredGroupKey(null);
     }
   };
-
-  // Hide axis labels when loading
-  const renderAxisLabel = (
-    formattedValue: string,
-    tickProps: React.SVGProps<SVGTextElement>,
-  ) => (
-    <text
-      {...tickProps}
-      className={`${isLoading ? shimmerClassName : ""}`}
-      fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
-      style={{
-        fontSize: "12px",
-      }}
-    >
-      {isLoading ? "" : formattedValue}
-    </text>
-  );
 
   // Render stacked bars (horizontal)
   const renderStackedBars = () => {

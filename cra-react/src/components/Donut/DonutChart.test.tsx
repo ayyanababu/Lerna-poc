@@ -48,19 +48,10 @@ jest.mock("../ChartWrapper", () => ({
   ChartWrapper: ({
     children,
     ref,
-    tooltipProps,
     ...props
-  }: React.HTMLProps<HTMLDivElement> & { tooltipProps?: TooltipProps }) => {
-    // Extract props that would cause DOM warnings
-    const { isVisible, ...safeTooltipProps } = tooltipProps || {};
-
+  }: React.HTMLProps<HTMLDivElement>) => {
     return (
-      <div
-        data-testid="chart-wrapper"
-        ref={ref}
-        {...props}
-        tooltipProps={JSON.stringify(safeTooltipProps)}
-      >
+      <div data-testid="chart-wrapper" ref={ref} {...props}>
         {children}
       </div>
     );
