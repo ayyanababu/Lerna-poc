@@ -21,10 +21,10 @@ const DEFAULT_MARGIN = {
   top: 20,
   right: 30,
   bottom: 45,
-  left: 35,
+  left: 35
 };
 
-const DEFAULT_BAR_RADIUS = 4; // Top bar radius
+const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
@@ -48,7 +48,7 @@ function VerticalStackedBar({
   barProps,
   timestampProps,
   showYAxis = true,
-  showXAxis = true,
+  showXAxis = true
 }: VerticalStackedBarChartProps) {
   const { theme } = useTheme();
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -58,21 +58,12 @@ function VerticalStackedBar({
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
 
-  const {
-    showTooltip,
-    hideTooltip,
-    tooltipData,
-    tooltipLeft,
-    tooltipTop,
-    tooltipOpen,
-  } = useTooltip<TooltipData>();
+  const { showTooltip, hideTooltip, tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
+    useTooltip<TooltipData[]>();
 
   const { data, groupKeys } = useMemo(
-    () =>
-      isLoading
-        ? mockVerticalStackedBarChartData
-        : { data: _data, groupKeys: _groupKeys },
-    [isLoading, _data, _groupKeys],
+    () => (isLoading ? mockVerticalStackedBarChartData : { data: _data, groupKeys: _groupKeys }),
+    [isLoading, _data, _groupKeys]
   );
 
   const filteredData = useMemo(
@@ -88,24 +79,21 @@ function VerticalStackedBar({
         }
         return d;
       }),
-    [data, hideIndex, groupKeys],
+    [data, hideIndex, groupKeys]
   );
 
   const legendData = useMemo(
     () =>
       groupKeys.map((key) => ({
         label: capitalize(lowerCase(key)),
-        value: data.reduce(
-          (total, categoryData) => total + Number(categoryData.data[key] || 0),
-          0,
-        ),
+        value: data.reduce((total, categoryData) => total + Number(categoryData.data[key] || 0), 0)
       })),
-    [groupKeys, data],
+    [groupKeys, data]
   );
 
   const activeKeys = useMemo(
     () => groupKeys.filter((_, index) => !hideIndex.includes(index)),
-    [groupKeys, hideIndex],
+    [groupKeys, hideIndex]
   );
 
   const stackedData = useMemo(() => {
@@ -120,7 +108,7 @@ function VerticalStackedBar({
       const stackGenerator = stack({ keys: activeKeys });
       return stackGenerator(prepared);
     } catch (error) {
-      console.error("Error generating stack data:", error);
+      console.error('Error generating stack data:', error);
       return [];
     }
   }, [activeKeys, filteredData]);
@@ -132,10 +120,10 @@ function VerticalStackedBar({
         ...filteredData.map((d) =>
           Object.entries(d.data)
             .filter(([key]) => activeKeys.includes(key))
-            .reduce((sum, [, value]) => sum + Number(value || 0), 0),
-        ),
+            .reduce((sum, [_, value]) => sum + Number(value || 0), 0)
+        )
       ),
-    [filteredData, activeKeys],
+    [filteredData, activeKeys]
   );
 
   const xScale = useMemo(
@@ -143,44 +131,45 @@ function VerticalStackedBar({
       scaleBand<string>({
         domain: filteredData.map((d) => String(d.label)),
         range: [0, innerWidth],
-        padding: 0.4,
+        padding: 0.4
       }),
-    [filteredData, innerWidth],
+    [filteredData, innerWidth]
   );
 
   const yScale = useMemo(
     () =>
       scaleLinear<number>({
         domain: [0, maxValue * SCALE_PADDING],
-        range: [innerHeight, 0],
+        range: [innerHeight, 0]
       }),
-    [innerHeight, maxValue],
+    [innerHeight, maxValue]
   );
 
   const colorScale = useMemo(
     () =>
       scaleOrdinal<string, string>({
         domain: groupKeys,
-        range: colors?.length ? colors : theme.colors.charts.bar,
+        range: colors?.length ? colors : theme.colors.charts.bar
       }),
-    [groupKeys, colors, theme.colors.charts.bar],
+    [groupKeys, colors, theme.colors.charts.bar]
   );
 
   const handleMouseMove = useCallback(
     (groupKey: string, value: number) => (event: React.MouseEvent) => {
       if (!isLoading) {
         showTooltip({
-          tooltipData: {
+          tooltipData: [{
             label: capitalize(lowerCase(groupKey)),
             value,
-          },
+            color: colorScale(groupKey)
+          }],
           tooltipLeft: event.clientX,
-          tooltipTop: event.clientY,
+          tooltipTop: event.clientY
         });
         setHoveredGroupKey(groupKey);
       }
     },
-    [isLoading, showTooltip, setHoveredGroupKey],
+    [isLoading, showTooltip, setHoveredGroupKey]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -211,9 +200,7 @@ function VerticalStackedBar({
           const seriesData = stackedData.find((s) => s.key === groupKey);
           if (!seriesData) return null;
 
-          const categoryIndex = filteredData.findIndex(
-            (d) => d.label === categoryData.label,
-          );
+          const categoryIndex = filteredData.findIndex((d) => d.label === categoryData.label);
           if (categoryIndex === -1) return null;
 
           const [y0, y1] = seriesData[categoryIndex];
@@ -224,20 +211,14 @@ function VerticalStackedBar({
           if (!value) return null;
 
           const isHoveredGroup = hoveredGroupKey === groupKey;
-          const barOpacity =
-            hoveredGroupKey && !isHoveredGroup
-              ? REDUCED_OPACITY
-              : DEFAULT_OPACITY;
+          const barOpacity = hoveredGroupKey && !isHoveredGroup ? REDUCED_OPACITY : DEFAULT_OPACITY;
 
           // Determine if this is the top bar in the stack
           const isTopBar =
             seriesData.key ===
             stackedData.reduce((topKey, current) => {
               const currentY1 = current[categoryIndex]?.[1] || 0;
-              const topY1 =
-                stackedData.find((s) => s.key === topKey)?.[
-                  categoryIndex
-                ]?.[1] || 0;
+              const topY1 = stackedData.find((s) => s.key === topKey)?.[categoryIndex]?.[1] || 0;
               return currentY1 > topY1 ? current.key : topKey;
             }, activeKeys[0]);
 
@@ -248,9 +229,7 @@ function VerticalStackedBar({
               y={barY}
               width={barWidth}
               height={barHeight}
-              fill={
-                isLoading ? `url(#${shimmerGradientId})` : colorScale(groupKey)
-              }
+              fill={isLoading ? `url(#${shimmerGradientId})` : colorScale(groupKey)}
               opacity={barOpacity}
               pathProps={
                 isTopBar
@@ -260,13 +239,13 @@ function VerticalStackedBar({
                                     L ${barX + barWidth},${barY + barHeight}
                                     L ${barX + barWidth},${barY + dynamicRadius}
                                     Q ${barX + barWidth},${barY} ${
-                                      barX + barWidth - dynamicRadius
-                                    },${barY}
+                        barX + barWidth - dynamicRadius
+                      },${barY}
                                     L ${barX + dynamicRadius},${barY}
                                     Q ${barX},${barY} ${barX},${barY + dynamicRadius}
                                     L ${barX},${barY + barHeight}
                                     Z
-                                `,
+                                `
                     }
                   : undefined
               }
@@ -291,14 +270,11 @@ function VerticalStackedBar({
       colorScale,
       handleMouseMove,
       handleMouseLeave,
-      barProps,
-    ],
+      barProps
+    ]
   );
 
-  const renderBars = useCallback(
-    () => renderStackedBars(),
-    [renderStackedBars],
-  );
+  const renderBars = useCallback(() => renderStackedBars(), [renderStackedBars]);
 
   if (!_data || _data.length === 0) {
     return <div>No data to display.</div>;
@@ -316,14 +292,14 @@ function VerticalStackedBar({
         hovered: hoveredGroupKey,
         setHovered: setHoveredGroupKey,
         isLoading,
-        ...legendsProps,
+        ...legendsProps
       }}
       tooltipProps={{
         data: tooltipData,
         top: tooltipTop,
         left: tooltipLeft,
         isVisible: !isLoading && tooltipOpen,
-        ...tooltipProps,
+        ...tooltipProps
       }}
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
     >
@@ -356,6 +332,7 @@ function VerticalStackedBar({
             labels={filteredData.map((d) => String(d.label))}
             availableWidth={innerWidth}
             autoRotate
+            forceFullLabels
             {...xAxisProps}
           />
 
@@ -366,4 +343,4 @@ function VerticalStackedBar({
   );
 }
 
-export default VerticalStackedBar;
+export { VerticalStackedBar };
