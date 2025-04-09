@@ -11,31 +11,21 @@ import Title from "../Title";
 import { Tooltip } from "../Tooltip";
 import { ChartWrapperProps } from "./types";
 
+
 const defaultColorScale = scaleOrdinal<string, string>({
-  domain: ["default"],
-  range: [common.black],
+  domain: ['default'],
+  range: [common.black]
 });
 
 export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
-  (
-    {
-      children,
-      title,
-      titleProps,
-      legendsProps,
-      tooltipProps,
-      timestampProps,
-      minRenderHeight = 200,
-    },
-    ref,
-  ) => {
+  ({ children, title, titleProps, legendsProps, tooltipProps, timestampProps }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [canRender, setCanRender] = React.useState(true);
 
     const {
       colorScale = defaultColorScale,
       data: legendData,
-      position = LegendPosition.BOTTOM,
+      position = LegendPosition.BOTTOM
     } = legendsProps || {};
     const { data: toolTipData } = tooltipProps || {};
 
@@ -48,15 +38,13 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
         }
         const isParentElementAvailable = !!parentElement;
         const parentRect = parentElement?.getBoundingClientRect();
-        const isParentSizeValid =
-          parentRect?.width > minRenderHeight &&
-          parentRect?.height > minRenderHeight;
+        const isParentSizeValid = parentRect?.width > 200 && parentRect?.height > 200;
         setCanRender(isParentElementAvailable && isParentSizeValid);
       };
       checkCanRender();
-      window.addEventListener("resize", checkCanRender);
+      window.addEventListener('resize', checkCanRender);
       return () => {
-        window.removeEventListener("resize", checkCanRender);
+        window.removeEventListener('resize', checkCanRender);
       };
     }, []);
 
@@ -67,25 +55,20 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
           {title && <Title title={title} {...titleProps} />}
           <Box
             sx={{
-              position: "relative",
-              display: "flex",
-              flex: "1 1 auto",
+              position: 'relative',
+              display: 'flex',
+              flex: '1 1 auto',
               minHeight: 0,
               // Gap between chart and legends based on position
-              gap: position === LegendPosition.BOTTOM ? "12px" : "20px",
-              marginTop: title ? "12px" : "0px", // Add 12px gap only if title exists
-              ...(position === LegendPosition.LEFT ||
-              position === LegendPosition.RIGHT
+              gap: position === LegendPosition.BOTTOM ? '12px' : '20px',
+              marginTop: title ? '12px' : '0px', // Add 12px gap only if title exists
+              ...(position === LegendPosition.LEFT || position === LegendPosition.RIGHT
                 ? {
-                    flexDirection:
-                      position === LegendPosition.LEFT ? "row" : "row-reverse",
+                    flexDirection: position === LegendPosition.LEFT ? 'row' : 'row-reverse'
                   }
                 : {
-                    flexDirection:
-                      position === LegendPosition.TOP
-                        ? "column"
-                        : "column-reverse",
-                  }),
+                    flexDirection: position === LegendPosition.TOP ? 'column' : 'column-reverse'
+                  })
             }}
           >
             <Legends
@@ -97,12 +80,12 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
             <Box
               ref={ref}
               sx={{
-                position: "relative",
-                height: "100%",
-                width: "100%",
-                display: "flex",
-                flex: "1 1 100%",
-                minHeight: 0,
+                position: 'relative',
+                height: '100%',
+                width: '100%',
+                display: 'flex',
+                flex: '1 1 100%',
+                minHeight: 0
               }}
             >
               {children}
@@ -115,43 +98,37 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
         title,
         titleProps,
         legendsProps,
+        tooltipProps,
         timestampProps,
         position,
         colorScale,
         legendData,
+        toolTipData,
         children,
-        ref,
-      ],
+        ref
+      ]
     );
 
     return (
       <Stack
         sx={{
-          position: "relative",
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          gap: "0px", // Removed parent gap to control internal gaps more precisely
-          flex: 1,
+          position: 'relative',
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0px', // Removed parent gap to control internal gaps more precisely
+          flex: 1
         }}
         ref={containerRef}
       >
-        {canRender ? (
-          renderContent()
-        ) : (
-          <p> Cannot Render the chart under this size</p>
-        )}
+        {canRender ? renderContent() : <p> Cannot Render the chart under this size</p>}
         {toolTipData && (
-          <Tooltip
-            {...tooltipProps}
-            data={toolTipData}
-            containerRef={containerRef}
-          />
+          <Tooltip {...tooltipProps} data={toolTipData} containerRef={containerRef} />
         )}
       </Stack>
     );
-  },
+  }
 );
 
 export default ChartWrapper;
