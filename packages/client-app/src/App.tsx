@@ -147,17 +147,7 @@ function App() {
                                                 id: 'health',
                                                 name: 'Healthcare',
                                                 value: 120,
-                                            },
-                                            {
-                                                id: 'finance',
-                                                name: 'Financial',
-                                                value: 90,
-                                            },
-                                            {
-                                                id: 'consumer',
-                                                name: 'Consumer',
-                                                value: 60,
-                                            },
+                                            }
                                         ],
                                     },
                                     {
@@ -175,39 +165,12 @@ function App() {
                                                 name: 'Corporate',
                                                 value: 100,
                                             },
-                                            {
-                                                id: 'municipal',
-                                                name: 'Municipal',
-                                                value: 80,
-                                            },
-                                        ],
-                                    },
-                                    {
-                                        id: 'alternatives',
-                                        name: 'Alternatives',
-                                        value: 200,
-                                        children: [
-                                            {
-                                                id: 'realestate',
-                                                name: 'Real Estate',
-                                                value: 100,
-                                            },
-                                            {
-                                                id: 'commodities',
-                                                name: 'Commodities',
-                                                value: 60,
-                                            },
-                                            {
-                                                id: 'hedge',
-                                                name: 'Hedge Funds',
-                                                value: 40,
-                                            },
                                         ],
                                     },
                                     {
                                         id: 'cash',
                                         name: 'Cash',
-                                        value: 50,
+                                        value: 400,
                                     },
                                 ],
                             }}

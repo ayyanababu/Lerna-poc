@@ -12,6 +12,50 @@ import { TooltipData } from "../Tooltip/types";
 import mockTreeMapChartData from "./mockdata";
 import { TreeMapChartProps, TreeMapNode } from "./types";
 
+const EPSILON = 2;
+
+// const isOuterTopLeft = (node: any): boolean =>
+//   Math.abs(node.x0) < EPSILON && Math.abs(node.y0) < EPSILON;
+
+// const isOuterTopRight = (node: any, totalWidth: number): boolean =>
+//   Math.abs(node.x1 - totalWidth) < EPSILON && Math.abs(node.y0) < EPSILON;
+
+// const isOuterBottomLeft = (node: any, totalHeight: number): boolean =>
+//   Math.abs(node.x0) < EPSILON && Math.abs(node.y1 - totalHeight) < EPSILON;
+
+// const isOuterBottomRight = (
+//   node: any,
+//   totalWidth: number,
+//   totalHeight: number,
+// ): boolean =>
+//   Math.abs(node.x1 - totalWidth) < EPSILON &&
+//   Math.abs(node.y1 - totalHeight) < EPSILON;
+
+const getOuterCornerNodes = (nodes: any[]) => {
+  let minX = Infinity,
+    maxX = -Infinity,
+    minY = Infinity,
+    maxY = -Infinity;
+
+  nodes.forEach((n) => {
+    minX = Math.min(minX, n.x0);
+    maxX = Math.max(maxX, n.x1);
+    minY = Math.min(minY, n.y0);
+    maxY = Math.max(maxY, n.y1);
+  });
+
+  return {
+    isTopLeft: (n: any) =>
+      Math.abs(n.x0 - minX) < EPSILON && Math.abs(n.y0 - minY) < EPSILON,
+    isTopRight: (n: any) =>
+      Math.abs(n.x1 - maxX) < EPSILON && Math.abs(n.y0 - minY) < EPSILON,
+    isBottomLeft: (n: any) =>
+      Math.abs(n.x0 - minX) < EPSILON && Math.abs(n.y1 - maxY) < EPSILON,
+    isBottomRight: (n: any) =>
+      Math.abs(n.x1 - maxX) < EPSILON && Math.abs(n.y1 - maxY) < EPSILON,
+  };
+};
+
 const DEFAULT_MARGIN = {
   top: 10,
   right: 10,
@@ -52,7 +96,7 @@ const TreeMapChart = ({
     tooltipLeft,
     tooltipTop,
     tooltipOpen,
-  } = useTooltip<TooltipData>();
+  } = useTooltip<TooltipData[]>();
 
   const data = useMemo<TreeMapNode>(
     () => (isLoading ? mockTreeMapChartData : _data),
@@ -111,10 +155,13 @@ const TreeMapChart = ({
     (node: TreeMapNode) => (event: React.MouseEvent) => {
       if (!isLoading) {
         showTooltip({
-          tooltipData: {
-            label: node.name,
-            value: node.value,
-          },
+          tooltipData: [
+            {
+              label: node.name,
+              value: node.value,
+              color: node.color || colorScale(node.id),
+            },
+          ],
           tooltipLeft: event.clientX,
           tooltipTop: event.clientY,
         });
@@ -213,23 +260,76 @@ const TreeMapChart = ({
                           key={`node-${node.data.id}`}
                           opacity={nodeOpacity}
                         >
-                          <rect
-                            x={node.x0}
-                            y={node.y0}
-                            width={nodeWidth}
-                            height={nodeHeight}
-                            fill={
-                              isLoading
-                                ? `url(#${shimmerGradientId})`
-                                : nodeColor
-                            }
-                            stroke={theme.colors.common.background}
-                            strokeWidth={1}
-                            cursor="pointer"
-                            onClick={() => onClick(i, node.data, data)}
-                            onMouseMove={handleNodeMouseEnter(node.data)}
-                            onMouseLeave={handleNodeMouseLeave}
-                          />
+                          {(() => {
+                            const {
+                              isTopLeft,
+                              isTopRight,
+                              isBottomLeft,
+                              isBottomRight,
+                            } = getOuterCornerNodes(
+                              treemap.descendants().filter((d) => d.depth > 0),
+                            );
+
+                            const topLeft = isTopLeft(node) ? borderRadius : 0;
+                            const topRight = isTopRight(node)
+                              ? borderRadius
+                              : 0;
+                            const bottomLeft = isBottomLeft(node)
+                              ? borderRadius
+                              : 0;
+                            const bottomRight = isBottomRight(node)
+                              ? borderRadius
+                              : 0;
+
+                            const hasRoundedCorners =
+                              topLeft || topRight || bottomRight || bottomLeft;
+
+                            return hasRoundedCorners ? (
+                              <path
+                                d={`
+        M ${node.x0 + topLeft} ${node.y0}
+        L ${node.x1 - topRight} ${node.y0}
+        ${topRight ? `Q ${node.x1} ${node.y0} ${node.x1} ${node.y0 + topRight}` : `L ${node.x1} ${node.y0}`}
+        L ${node.x1} ${node.y1 - bottomRight}
+        ${bottomRight ? `Q ${node.x1} ${node.y1} ${node.x1 - bottomRight} ${node.y1}` : `L ${node.x1} ${node.y1}`}
+        L ${node.x0 + bottomLeft} ${node.y1}
+        ${bottomLeft ? `Q ${node.x0} ${node.y1} ${node.x0} ${node.y1 - bottomLeft}` : `L ${node.x0} ${node.y1}`}
+        L ${node.x0} ${node.y0 + topLeft}
+        ${topLeft ? `Q ${node.x0} ${node.y0} ${node.x0 + topLeft} ${node.y0}` : `L ${node.x0} ${node.y0}`}
+        Z
+      `}
+                                fill={
+                                  isLoading
+                                    ? `url(#${shimmerGradientId})`
+                                    : nodeColor
+                                }
+                                stroke={theme.colors.common.background}
+                                strokeWidth={1}
+                                cursor="pointer"
+                                onClick={() => onClick(i, node.data, data)}
+                                onMouseMove={handleNodeMouseEnter(node.data)}
+                                onMouseLeave={handleNodeMouseLeave}
+                              />
+                            ) : (
+                              <rect
+                                x={node.x0}
+                                y={node.y0}
+                                width={nodeWidth}
+                                height={nodeHeight}
+                                fill={
+                                  isLoading
+                                    ? `url(#${shimmerGradientId})`
+                                    : nodeColor
+                                }
+                                stroke={theme.colors.common.background}
+                                strokeWidth={1}
+                                cursor="pointer"
+                                onClick={() => onClick(i, node.data, data)}
+                                onMouseMove={handleNodeMouseEnter(node.data)}
+                                onMouseLeave={handleNodeMouseLeave}
+                              />
+                            );
+                          })()}
 
                           {/* Only render text if not loading and the node is large enough */}
                           {!isLoading &&
