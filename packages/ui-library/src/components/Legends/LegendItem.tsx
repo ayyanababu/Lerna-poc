@@ -3,132 +3,174 @@ import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { Box, Typography } from "@mui/material";
 import { capitalize, lowerCase } from "lodash-es";
 
-import useTheme from "../../hooks/useTheme";
-import { shimmerClassName } from "../Shimmer/Shimmer";
-import { LegendItemProps, LegendVariant } from "./types";
-
-export function Legends({
-  colorScale,
+export default function LegendItem({
+  label,
+  index = 0,
   data,
-  hideIndex,
-  setHideIndex,
-  hovered,
-  setHovered,
-  position = 'top',
-  onClick = () => {},
+  isHidden = false,
+  isHoveredOther = false,
   isLoading = false,
   doStrike = false,
-  isVisible = true,
-  variant = 'compact',
+  variant = LegendVariant.COMPACT,
+  onToggle,
+  onMouseOver,
+  onMouseLeave,
   hideValues = false
-}: LegendsProps) {
+}: LegendItemProps) {
   const { theme } = useTheme();
+  const itemStyles = {
+    display: 'flex',
+    flexDirection: 'column',
+    cursor: 'pointer',
+    userSelect: 'none',
+    opacity: isHoveredOther ? 0.5 : 1,
+    transition: 'all 0.3s ease',
+    filter: !doStrike && isHidden ? 'grayscale(100%) opacity(0.5)' : 'none'
+  };
 
-  const positionStyles = useMemo((): SxProps<Theme> => {
-    switch (position) {
-      case 'left':
-        return {
-          position: 'absolute',
-          left: 0,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          maxWidth: '150px'
-        };
-      case 'right':
-        return {
-          position: 'absolute',
-          right: 0,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          maxWidth: '150px'
-        };
-      case 'bottom':
-      case 'top':
-      default:
-        return {};
-    }
-  }, [position]);
+  const markerColor = (data && index !== undefined && data[index]?.color) || label?.value || '#fff';
 
-  const flexDirection = position === 'left' || position === 'right' ? 'column' : 'row';
-
-  const handleToggleItem = useCallback(
-    (index: number, labelText: string) => {
-      if (setHideIndex && hideIndex) {
-        setHideIndex((prev) =>
-          prev.includes(index) ? prev.filter((idx) => idx !== index) : [...prev, index]
-        );
-      }
-
-      if (onClick && data) {
-        onClick(data, labelText, index);
-      }
-    },
-    [data, onClick, setHideIndex, hideIndex]
-  );
-
-  const handleMouseOver = useCallback(
-    (labelText: string) => {
-      if (setHovered) {
-        setHovered(labelText);
-      }
-    },
-    [setHovered]
-  );
-
-  const handleMouseLeave = useCallback(() => {
-    if (setHovered) {
-      setHovered(null);
-    }
-  }, [setHovered]);
-
-  if (!data || !colorScale || !setHideIndex || !setHovered || !isVisible) {
-    return null;
+  let displayText = '';
+  if (isLoading) {
+    displayText = 'loading';
+  } else if (label?.datum) {
+    displayText = capitalize(lowerCase(label.datum));
   }
 
-  return (
+  const valueText = data && label?.index !== undefined ? data[label.index]?.value : undefined;
+
+  const renderMarker = () => (
+    <Box
+      sx={{
+        backgroundColor: markerColor,
+        borderRadius: '20px',
+        width: '12px',
+        height: '12px'
+      }}
+      className={isLoading ? shimmerClassName : ''}
+    />
+  );
+
+  const renderCompactItem = () => (
     <Box
       sx={{
         display: 'flex',
-        flexDirection,
-        flexWrap: 'wrap',
-        gap: variant === 'compact' ? '8px' : '8px',
-        backgroundColor: theme.colors.legend.background,
-        borderRadius: '4px',
-        ...positionStyles
+        alignItems: 'center',
+        gap: '4px',
+        flexDirection: 'row',
+        '&:hover .arrow-icon': {
+          opacity: 1,
+        },
+        '&:focus-visible .arrow-icon': {
+          opacity: 1,
+        },
+        '&:focus .arrow-icon': {
+          opacity: 1,
+        },
+        '&:active .arrow-icon': {
+          opacity: 0.7,
+        }
       }}
     >
-      <LegendOrdinal scale={colorScale} direction={flexDirection} labelMargin="0 0 0 0">
-        {(labels) => (
-          <>
-            {labels.map((label, index) => {
-              if (index > data.length - 1) {
-                return null;
-              }
+      {renderMarker()}
+      <Typography
+        variant="caption"
+        sx={{
+          margin: 0,
+          textDecoration: doStrike && isHidden ? 'line-through' : 'none',
+          color: theme.colors.legend.text,
+          lineHeight: 'normal',
+          letterSpacing: '0.4px',
+          paddingTop: '1px'
+        }}
+        className={isLoading ? shimmerClassName : ''}
+      >
+        {displayText}
+        {!hideValues && valueText && (isLoading ? 'loadingloading' : ` (${valueText})`)}
+      </Typography>
+      <ArrowOutwardIcon
+        className="arrow-icon"
+        sx={{
+          height: '16px',
+          width: '16px',
+          color: theme.colors.legend.text,
+          opacity: 0,
+          transition: 'opacity 0.250s ease-in-out'
+        }}
+      />
+    </Box>
+  );
 
-              const isHidden = hideIndex?.includes(index);
-              const isHoveredOther = hovered && !hovered.includes(label.text);
+  const renderExpandedItem = () => (
+    <>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          flexDirection: 'row'
+        }}
+      >
+        {renderMarker()}
+        <Typography
+          variant="caption"
+          sx={{
+            margin: 0,
+            textDecoration: doStrike && isHidden ? 'line-through' : 'none',
+            color: theme.colors.legend.text,
+            lineHeight: 'normal',
+            letterSpacing: '0.4px',
+            paddingTop: '1px'
+          }}
+          className={isLoading ? shimmerClassName : ''}
+        >
+          {displayText}
+        </Typography>
+      </Box>
+      {!hideValues && valueText && (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            marginTop: '4px',
+            alignItems: 'start',
+            marginLeft: '20px'
+          }}
+        >
+          <Typography
+            variant="body1"
+            sx={{
+              margin: 0,
+              fontWeight: 700,
+              color: theme.colors.legend.text
+            }}
+            className={isLoading ? shimmerClassName : ''}
+          >
+            {isLoading ? 'loadingloading' : valueText}
+          </Typography>
+          <ArrowOutwardIcon
+            sx={{
+              height: '16px',
+              width: '16px',
+              color: theme.colors.legend.text,
+              opacity: 0,
+              transition: 'opacity 0.250s ease-in-out'
+            }}
+          />
+        </Box>
+      )}
+    </>
+  );
 
-              return (
-                <LegendItem
-                  key={`legend-${label.text}-${label.value}`}
-                  label={label}
-                  index={index}
-                  data={data}
-                  isHidden={isHidden}
-                  isHoveredOther={!!isHoveredOther}
-                  isLoading={isLoading}
-                  doStrike={doStrike}
-                  variant={variant}
-                  onToggle={() => handleToggleItem(index, label.text)}
-                  onMouseOver={() => handleMouseOver(label.text)}
-                  onMouseLeave={handleMouseLeave}
-                  hideValues={hideValues}
-                />
-              );
-            })}
-          </>
-        )}
-      </LegendOrdinal>
+  return (
+    <Box
+      onClick={onToggle}
+      tabIndex={0}
+      onMouseOver={onMouseOver}
+      onMouseLeave={onMouseLeave}
+      sx={itemStyles}
+    >
+      {variant === 'compact' ? renderCompactItem() : renderExpandedItem()}
     </Box>
   );
 }
