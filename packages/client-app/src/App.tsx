@@ -126,7 +126,108 @@ function App() {
 
             {
                 <Sortable className="my-cards">
-                    {/* Original Donut Chart examples */}
+                    <SortableCard title="Tree map" height={400} width={1000}>
+                    <TreeMapChart
+                            data={{
+                                id: 'portfolio',
+                                name: 'Portfolio',
+                                value: 1000,
+                                children: [
+                                    {
+                                        id: 'equities',
+                                        name: 'Equities',
+                                        value: 450,
+                                        children: [
+                                            {
+                                                id: 'tech',
+                                                name: 'Technology',
+                                                value: 180,
+                                            },
+                                            {
+                                                id: 'health',
+                                                name: 'Healthcare',
+                                                value: 120,
+                                            },
+                                            {
+                                                id: 'finance',
+                                                name: 'Financial',
+                                                value: 90,
+                                            },
+                                            {
+                                                id: 'consumer',
+                                                name: 'Consumer',
+                                                value: 60,
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        id: 'fixed-income',
+                                        name: 'Fixed Income',
+                                        value: 300,
+                                        children: [
+                                            {
+                                                id: 'treasury',
+                                                name: 'Treasury',
+                                                value: 120,
+                                            },
+                                            {
+                                                id: 'corporate',
+                                                name: 'Corporate',
+                                                value: 100,
+                                            },
+                                            {
+                                                id: 'municipal',
+                                                name: 'Municipal',
+                                                value: 80,
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        id: 'alternatives',
+                                        name: 'Alternatives',
+                                        value: 200,
+                                        children: [
+                                            {
+                                                id: 'realestate',
+                                                name: 'Real Estate',
+                                                value: 100,
+                                            },
+                                            {
+                                                id: 'commodities',
+                                                name: 'Commodities',
+                                                value: 60,
+                                            },
+                                            {
+                                                id: 'hedge',
+                                                name: 'Hedge Funds',
+                                                value: 40,
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        id: 'cash',
+                                        name: 'Cash',
+                                        value: 50,
+                                    },
+                                ],
+                            }}
+                            title="Investment Portfolio Allocation"
+                            timestamp={new Date().toISOString()}
+                            colors={['rgba(232, 134, 97,0.50)', 'rgba(232, 134, 97,0.30)','rgba(232, 134, 97,0.15)', '#4E7AC2']}
+                            isLoading={isLoading}
+                            titleProps={{
+                                variant: 'h6',
+                                align: 'left',
+                            }}
+                            legendsProps={{
+                                position: Legends.Position.BOTTOM,
+                                doStrike: true,
+                            }}
+                            tooltipProps={{}}
+                            tilePadding={2}
+                            borderRadius={5}
+                        />
+                    </SortableCard>
                     <SortableCard title="SemiDonut" height={400} width={400}>
                         <DonutChart
                             data={[
