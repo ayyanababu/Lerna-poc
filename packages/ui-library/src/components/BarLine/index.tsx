@@ -68,6 +68,8 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     [isLoading, _data],
   );
 
+  console.log("##### isLoading", isLoading, data);
+
   const { xAxislabel, yAxisLeftLabel, yAxisRightLabel, chartData } = data;
 
   const innerWidth = width - margin.left - margin.right;

@@ -205,7 +205,7 @@ function App() {
                         width={'100%'}>
                         <BarLineChart
                             data={{
-                                xAxisLabel: 'Corporate Action',
+                                xAxislabel: 'Corporate Action',
                                 yAxisLeftLabel: 'Number of Actions',
                                 yAxisRightLabel: 'Positions Impacted',
                                 chartData: [

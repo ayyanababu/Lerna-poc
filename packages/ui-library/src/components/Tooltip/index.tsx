@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { withBoundingRects } from "@visx/bounds";
 import { Tooltip as VisxTooltip } from "@visx/tooltip";
 
@@ -13,7 +13,13 @@ const MIN_TOOLTIP_WIDTH = 72;
 const MAX_TOOLTIP_WIDTH = 144;
 const MIN_TOOLTIP_HEIGHT = 24;
 
-function TooltipBase({ top, left, data, isVisible = true, containerRef }: TooltipProps) {
+function TooltipBase({
+  top,
+  left,
+  data,
+  isVisible = true,
+  containerRef,
+}: TooltipProps) {
   const { theme } = useTheme();
   const [adjustedPosition, setAdjustedPosition] = useState({ top, left });
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -34,10 +40,16 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
       try {
         const containerRect = containerRef.current.getBoundingClientRect();
         const tooltipWidth = tooltipRef.current
-          ? Math.max(tooltipRef.current.getBoundingClientRect().width, MIN_TOOLTIP_WIDTH)
+          ? Math.max(
+              tooltipRef.current.getBoundingClientRect().width,
+              MIN_TOOLTIP_WIDTH,
+            )
           : MIN_TOOLTIP_WIDTH;
         const tooltipHeight = tooltipRef.current
-          ? Math.max(tooltipRef.current.getBoundingClientRect().height, MIN_TOOLTIP_HEIGHT)
+          ? Math.max(
+              tooltipRef.current.getBoundingClientRect().height,
+              MIN_TOOLTIP_HEIGHT,
+            )
           : MIN_TOOLTIP_HEIGHT;
 
         // Boundary checks
@@ -58,7 +70,7 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
 
         setAdjustedPosition({ top: adjustedTop, left: adjustedLeft });
       } catch (error) {
-        console.warn('Tooltip positioning error:', error);
+        console.warn("Tooltip positioning error:", error);
         setAdjustedPosition({ top, left });
       }
     };
@@ -87,13 +99,12 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
           resizeObserverRef.current = observer;
         }
       } catch (error) {
-        console.warn('ResizeObserver error:', error);
+        console.warn("ResizeObserver error:", error);
       }
     };
 
     const timeoutId = setTimeout(setupResizeObserver, 0);
 
-    // eslint-disable-next-line consistent-return
     return () => {
       clearTimeout(timeoutId);
       if (resizeObserverRef.current) {
@@ -110,20 +121,20 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
       top={adjustedPosition.top}
       left={adjustedPosition.left}
       style={{
-        position: 'fixed',
+        position: "fixed",
         backgroundColor: theme.colors.tooltip.background,
         color: theme.colors.tooltip.text,
-        padding: '8px',
-        borderRadius: '6px',
-        boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
+        padding: "8px",
+        borderRadius: "6px",
+        boxShadow: "0px 4px 8px rgba(0,0,0,0.2)",
         border: `1px solid ${theme.colors.tooltip.border}`,
-        pointerEvents: 'none',
-        transform: 'translate(-50%, -100%)',
-        whiteSpace: 'pre-line',
+        pointerEvents: "none",
+        transform: "translate(-50%, -100%)",
+        whiteSpace: "pre-line",
         zIndex: DEFAULT_Z_INDEX,
         minWidth: `${MIN_TOOLTIP_WIDTH}px`,
         maxWidth: `${MAX_TOOLTIP_WIDTH}px`,
-        minHeight: `${MIN_TOOLTIP_HEIGHT}px`
+        minHeight: `${MIN_TOOLTIP_HEIGHT}px`,
       }}
       ref={tooltipRef}
       role="tooltip"
@@ -131,34 +142,34 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
     >
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px'
+          display: "flex",
+          flexDirection: "column",
+          gap: "8px",
         }}
       >
         {data.map((item) => (
           <Box
             key={`${item.label}-${item.value}`}
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              width: '100%'
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
             }}
           >
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center'
+                display: "flex",
+                alignItems: "center",
               }}
             >
               <Box
                 sx={{
-                  width: '12px',
-                  height: '12px',
+                  width: "12px",
+                  height: "12px",
                   backgroundColor: item.color,
-                  borderRadius: '50%',
-                  marginRight: '8px'
+                  borderRadius: "50%",
+                  marginRight: "8px",
                 }}
               />
               <Typography
@@ -166,12 +177,12 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
                 sx={{
                   color: theme.colors.tooltip.text,
                   fontFeatureSettings: "'liga' off, 'clig' off",
-                  fontFamily: 'Roboto',
-                  fontSize: '12px',
-                  fontStyle: 'normal',
+                  fontFamily: "Roboto",
+                  fontSize: "12px",
+                  fontStyle: "normal",
                   fontWeight: 400,
-                  lineHeight: '143%',
-                  letterSpacing: '0.4px'
+                  lineHeight: "143%",
+                  letterSpacing: "0.4px",
                 }}
               >
                 {item.label}
@@ -182,13 +193,13 @@ function TooltipBase({ top, left, data, isVisible = true, containerRef }: Toolti
               sx={{
                 color: theme.colors.tooltip.text,
                 fontFeatureSettings: "'liga' off, 'clig' off",
-                fontFamily: 'Roboto',
-                fontSize: '13px',
-                fontStyle: 'normal',
+                fontFamily: "Roboto",
+                fontSize: "13px",
+                fontStyle: "normal",
                 fontWeight: 500,
-                lineHeight: '150%',
-                letterSpacing: '0.25px',
-                marginLeft: '16px'
+                lineHeight: "150%",
+                letterSpacing: "0.25px",
+                marginLeft: "16px",
               }}
             >
               {item.value}
