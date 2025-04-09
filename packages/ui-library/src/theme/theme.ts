@@ -27,6 +27,7 @@ export const defaultLightTheme: Theme = {
       background: common.white,
       text: "#0F172A",
       border: "transparent",
+      stroke: common.white,
     },
     axis: {
       line: "#94A3B8",
@@ -62,6 +63,7 @@ export const defaultDarkTheme: Theme = {
       background: "#1B2025",
       text: "#E4E7EB",
       border: alpha("#3E4C59", 0.6),
+      stroke: alpha(common.white, 0.3),
     },
     axis: {
       line: "#7B8695",
