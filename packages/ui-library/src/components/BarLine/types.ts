@@ -10,16 +10,16 @@ import { XAxisProps } from "../XAxis/types";
 import { YAxisProps } from "../YAxis/types";
 
 export interface BarLineDataPoint {
-  xAxis: string;
-  yAxisLeft: number;
-  yAxisRight: number;
+    xAxis: string;
+    yAxisLeft: number;
+    yAxisRight: number;
 }
 
 export interface BarLineData {
-  xAxisLabel: string;
-  yAxisLeftLabel: string;
-  yAxisRightLabel: string;
-  chartData: BarLineDataPoint[];
+    xAxislabel: string;
+    yAxisLeftLabel: string;
+    yAxisRightLabel: string;
+    chartData: BarLineDataPoint[]
 }
 
 export interface BarLineChartProps {
