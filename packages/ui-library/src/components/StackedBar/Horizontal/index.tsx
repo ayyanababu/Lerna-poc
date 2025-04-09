@@ -103,7 +103,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     tooltipLeft,
     tooltipTop,
     tooltipOpen,
-  } = useTooltip<TooltipData>();
+  } = useTooltip<TooltipData[]>();
 
   // Decide whether to use real data or mock data
   const { data, groupKeys } = useMemo(() => {
@@ -258,10 +258,11 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     (groupKey: string, value: number) => (evt: React.MouseEvent) => {
       if (!isLoading) {
         showTooltip({
-          tooltipData: {
+          tooltipData: [{
             label: capitalize(lowerCase(groupKey)),
             value,
-          },
+            color: groupColorScale(groupKey)
+          }],
           tooltipLeft: evt.clientX,
           tooltipTop: evt.clientY,
         });
@@ -431,4 +432,4 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   );
 };
 
-export default HorizontalStackedBar;
+export { HorizontalStackedBar }
