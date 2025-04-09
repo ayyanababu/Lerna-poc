@@ -126,7 +126,7 @@ function App() {
 
             {
                 <Sortable className="my-cards">
-                    <SortableCard title="Tree map" height={400} width={1000}>
+                    <SortableCard height={400} width={1000}>
                     <TreeMapChart
                             data={{
                                 id: 'portfolio',
@@ -175,16 +175,11 @@ function App() {
                                 ],
                             }}
                             title="Investment Portfolio Allocation"
-                            timestamp={new Date().toISOString()}
                             colors={['rgba(232, 134, 97,0.50)', 'rgba(232, 134, 97,0.30)','rgba(232, 134, 97,0.15)', '#4E7AC2']}
                             isLoading={isLoading}
-                            titleProps={{
-                                variant: 'h6',
-                                align: 'left',
-                            }}
                             legendsProps={{
-                                position: Legends.Position.BOTTOM,
-                                doStrike: true,
+                                position: 'bottom',
+                                doStrike: false,
                             }}
                             tooltipProps={{}}
                             tilePadding={2}

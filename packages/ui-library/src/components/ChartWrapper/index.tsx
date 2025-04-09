@@ -18,7 +18,15 @@ const defaultColorScale = scaleOrdinal<string, string>({
 
 export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
   (
-    { children, title, titleProps, legendsProps, tooltipProps, timestampProps },
+    {
+      children,
+      title,
+      titleProps,
+      legendsProps,
+      tooltipProps,
+      timestampProps,
+      minRenderHeight = 200,
+    },
     ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -41,7 +49,8 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
         const isParentElementAvailable = !!parentElement;
         const parentRect = parentElement?.getBoundingClientRect();
         const isParentSizeValid =
-          parentRect?.width > 200 && parentRect?.height > 200;
+          parentRect?.width > minRenderHeight &&
+          parentRect?.height > minRenderHeight;
         setCanRender(isParentElementAvailable && isParentSizeValid);
       };
       checkCanRender();

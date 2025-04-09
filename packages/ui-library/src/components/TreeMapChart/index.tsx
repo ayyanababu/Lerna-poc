@@ -4,6 +4,7 @@ import { hierarchy, Treemap, treemapSquarify } from "@visx/hierarchy";
 import { useParentSize } from "@visx/responsive";
 import { scaleOrdinal } from "@visx/scale";
 import { useTooltip } from "@visx/tooltip";
+import type { HierarchyNode } from "d3-hierarchy";
 
 import useTheme from "../../hooks/useTheme";
 import ChartWrapper from "../ChartWrapper";
@@ -12,26 +13,16 @@ import { TooltipData } from "../Tooltip/types";
 import mockTreeMapChartData from "./mockdata";
 import { TreeMapChartProps, TreeMapNode } from "./types";
 
+type RectNode = HierarchyNode<TreeMapNode> & {
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+};
+
 const EPSILON = 2;
 
-// const isOuterTopLeft = (node: any): boolean =>
-//   Math.abs(node.x0) < EPSILON && Math.abs(node.y0) < EPSILON;
-
-// const isOuterTopRight = (node: any, totalWidth: number): boolean =>
-//   Math.abs(node.x1 - totalWidth) < EPSILON && Math.abs(node.y0) < EPSILON;
-
-// const isOuterBottomLeft = (node: any, totalHeight: number): boolean =>
-//   Math.abs(node.x0) < EPSILON && Math.abs(node.y1 - totalHeight) < EPSILON;
-
-// const isOuterBottomRight = (
-//   node: any,
-//   totalWidth: number,
-//   totalHeight: number,
-// ): boolean =>
-//   Math.abs(node.x1 - totalWidth) < EPSILON &&
-//   Math.abs(node.y1 - totalHeight) < EPSILON;
-
-const getOuterCornerNodes = (nodes: any[]) => {
+const getOuterCornerNodes = (nodes: RectNode[]) => {
   let minX = Infinity,
     maxX = -Infinity,
     minY = Infinity,
@@ -45,13 +36,13 @@ const getOuterCornerNodes = (nodes: any[]) => {
   });
 
   return {
-    isTopLeft: (n: any) =>
+    isTopLeft: (n: RectNode) =>
       Math.abs(n.x0 - minX) < EPSILON && Math.abs(n.y0 - minY) < EPSILON,
-    isTopRight: (n: any) =>
+    isTopRight: (n: RectNode) =>
       Math.abs(n.x1 - maxX) < EPSILON && Math.abs(n.y0 - minY) < EPSILON,
-    isBottomLeft: (n: any) =>
+    isBottomLeft: (n: RectNode) =>
       Math.abs(n.x0 - minX) < EPSILON && Math.abs(n.y1 - maxY) < EPSILON,
-    isBottomRight: (n: any) =>
+    isBottomRight: (n: RectNode) =>
       Math.abs(n.x1 - maxX) < EPSILON && Math.abs(n.y1 - maxY) < EPSILON,
   };
 };
@@ -85,6 +76,8 @@ const TreeMapChart = ({
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
+
+  console.log("treemap size:", { width, height, innerWidth, innerHeight });
 
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
