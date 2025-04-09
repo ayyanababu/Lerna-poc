@@ -21,7 +21,7 @@ const DEFAULT_MARGIN = {
   top: 20,
   right: 60,
   bottom: 100,
-  left: 60
+  left: 60,
 };
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
@@ -49,19 +49,23 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   gridProps,
   barProps,
   timestampProps,
-  timestamp
+  timestamp,
 }) => {
   const { theme } = useTheme();
   const colors = _colors ?? {
     line: theme.colors.charts.bar[2],
-    bar: theme.colors.charts.line[0]
+    bar: theme.colors.charts.line[0],
   };
   const [hideChart, setHideChart] = useState<number[]>([]);
-  const { parentRef, width = 100, height } = useParentSize({ debounceTime: 150 });
+  const {
+    parentRef,
+    width = 100,
+    height,
+  } = useParentSize({ debounceTime: 150 });
   // Use the provided data, or mock data if loading
   const data = useMemo<BarLineData>(
     () => (isLoading ? mockBarLineChartData : _data),
-    [isLoading, _data]
+    [isLoading, _data],
   );
 
   const { xAxislabel, yAxisLeftLabel, yAxisRightLabel, chartData } = data;
@@ -72,16 +76,22 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   const yMax = innerHeight;
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
   const [hoveredChart, setHoveredChart] = useState<string | null>(null);
-  const { showTooltip, hideTooltip, tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
-    useTooltip<TooltipData[]>();
+  const {
+    showTooltip,
+    hideTooltip,
+    tooltipData,
+    tooltipLeft,
+    tooltipTop,
+    tooltipOpen,
+  } = useTooltip<TooltipData[]>();
 
   // Prepare legend data
   const legendData = useMemo(
     () => [
       { label: yAxisLeftLabel, value: 0 },
-      { label: yAxisRightLabel, value: 0 }
+      { label: yAxisRightLabel, value: 0 },
     ],
-    [data]
+    [data],
   );
 
   const xScale = useMemo(
@@ -89,46 +99,53 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       scaleBand<string>({
         range: [0, xMax],
         padding: 0.4,
-        domain: chartData.map((d) => d.xAxis)
+        domain: chartData.map((d) => d.xAxis),
       }),
-    [xMax]
+    [xMax],
   );
 
   const leftScale = useMemo(
     () =>
       scaleLinear<number>({
         range: [yMax, 0],
-        domain: [0, Math.max(...chartData.map((d) => d.yAxisLeft)) * SCALE_PADDING]
+        domain: [
+          0,
+          Math.max(...chartData.map((d) => d.yAxisLeft)) * SCALE_PADDING,
+        ],
       }),
-    [yMax]
+    [yMax],
   );
 
   const rightScale = useMemo(
     () =>
       scaleLinear<number>({
         range: [yMax, 0],
-        domain: [0, Math.max(...chartData.map((d) => d.yAxisRight)) * SCALE_PADDING]
+        domain: [
+          0,
+          Math.max(...chartData.map((d) => d.yAxisRight)) * SCALE_PADDING,
+        ],
       }),
-    [yMax]
+    [yMax],
   );
 
-  const handleBarMouseMove = (value: number, index: number) => (event: React.MouseEvent) => {
-    if (!isLoading) {
-      // xAxis
-      const { yAxisLeft, yAxisRight } = chartData[index];
-      const toolTipdata = [
-        { label: yAxisLeftLabel, value: yAxisLeft, color: colors.bar },
-        { label: yAxisRightLabel, value: yAxisRight, color: colors.line }
-      ];
+  const handleBarMouseMove =
+    (value: number, index: number) => (event: React.MouseEvent) => {
+      if (!isLoading) {
+        // xAxis
+        const { yAxisLeft, yAxisRight } = chartData[index];
+        const toolTipdata = [
+          { label: yAxisLeftLabel, value: yAxisLeft, color: colors.bar },
+          { label: yAxisRightLabel, value: yAxisRight, color: colors.line },
+        ];
 
-      showTooltip({
-        tooltipData: toolTipdata,
-        tooltipLeft: event.clientX,
-        tooltipTop: event.clientY
-      });
-      setHoveredBar(index);
-    }
-  };
+        showTooltip({
+          tooltipData: toolTipdata,
+          tooltipLeft: event.clientX,
+          tooltipTop: event.clientY,
+        });
+        setHoveredBar(index);
+      }
+    };
 
   const handleBarMouseLeave = () => {
     if (!isLoading) {
@@ -142,7 +159,8 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   const barWidth = Math.min(MAX_BAR_WIDTH, defaultBarWidth);
 
   // Center the bar if it's smaller than the available space
-  const xOffset = barWidth < defaultBarWidth ? (defaultBarWidth - barWidth) / 2 : 0;
+  const xOffset =
+    barWidth < defaultBarWidth ? (defaultBarWidth - barWidth) / 2 : 0;
 
   // Calculate circle radius for line points - proportional to bar width
   const circleRadius = Math.min(4, barWidth / 4);
@@ -158,7 +176,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         data: legendData,
         colorScale: scaleOrdinal({
           domain: legendData.map((d) => d.label),
-          range: [colors.bar, colors.line]
+          range: [colors.bar, colors.line],
         }),
         hovered: hoveredChart,
         setHovered: setHoveredChart,
@@ -166,14 +184,14 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         hideIndex: hideChart,
         setHideIndex: setHideChart,
         hideValues: true,
-        ...legendsProps
+        ...legendsProps,
       }}
       tooltipProps={{
         data: tooltipData,
         top: tooltipTop,
         left: tooltipLeft,
         isVisible: !isLoading && tooltipOpen,
-        ...tooltipProps
+        ...tooltipProps,
       }}
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
     >
@@ -190,8 +208,8 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
             availableWidth={innerWidth}
             label={xAxislabel}
             labelProps={{
-              verticalAnchor: 'start',
-              dy: 60
+              verticalAnchor: "start",
+              dy: 60,
             }}
             autoRotate
             forceFullLabels
@@ -199,7 +217,14 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
           />
 
           {/* Grid Lines */}
-          {showGrid && <Grid width={innerWidth} yScale={leftScale} numTicks={5} {...gridProps} />}
+          {showGrid && (
+            <Grid
+              width={innerWidth}
+              yScale={leftScale}
+              numTicks={5}
+              {...gridProps}
+            />
+          )}
 
           {/* bar chart */}
           {hideChart.length && hideChart.includes(0) ? null : (
@@ -223,7 +248,10 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                     ? REDUCED_OPACITY
                     : DEFAULT_OPACITY;
 
-                const dynamicRadius = Math.min(DEFAULT_BAR_RADIUS, barWidth / 2);
+                const dynamicRadius = Math.min(
+                  DEFAULT_BAR_RADIUS,
+                  barWidth / 2,
+                );
 
                 return (
                   <CustomBar
@@ -246,7 +274,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                         Q ${barX},${barY} ${barX},${barY + dynamicRadius}
                         L ${barX},${barY + barHeight}
                         Z
-                      `
+                      `,
                     }}
                     {...barProps}
                   />
@@ -267,8 +295,8 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                 textAnchor="start"
                 tickLabelProps={() => ({
                   fill: theme.colors.axis.label,
-                  dx: '.33em',
-                  dy: '.33em'
+                  dx: ".33em",
+                  dy: ".33em",
                 })}
                 {...yAxisProps}
               />
@@ -310,4 +338,4 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   );
 };
 
-export { BarLineChart };
+export default BarLineChart;

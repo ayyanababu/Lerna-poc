@@ -31,15 +31,15 @@ function XAxis({
   ...props
 }: XAxisProps): JSX.Element | null {
   const theme = useTheme()?.theme || {
-    colors: { axis: { label: '#888', title: '#555', line: '#ddd' } }
+    colors: { axis: { label: "#888", title: "#555", line: "#ddd" } },
   };
 
   const overLineStyles = {
-    fontSize: '10px',
-    fontWeight: 'normal',
-    lineHeight: '165%',
-    letterSpacing: '0.4px',
-    fontFamily: 'Roboto',
+    fontSize: "10px",
+    fontWeight: "normal",
+    lineHeight: "165%",
+    letterSpacing: "0.4px",
+    fontFamily: "Roboto",
   };
 
   const tickFormat = (value: number | string) => {
@@ -48,31 +48,40 @@ function XAxis({
     }
     return String(value);
   };
- 
+
   const dynamicNumTicks = useMemo(() => {
     if (availableWidth <= 0) return numTicks;
     return Math.max(2, Math.floor(availableWidth / MIN_SPACE_BETWEEN_TICKS));
   }, [availableWidth, numTicks]);
 
-  const { angle, evenPositionsMap, formatLabel, rotate, textAnchor, tickValues } = useMemo(() => {
+  const {
+    angle,
+    evenPositionsMap,
+    formatLabel,
+    rotate,
+    textAnchor,
+    tickValues,
+  } = useMemo(() => {
     const scaleLabels =
       providedLabels ||
-      (scale.domain && typeof scale.domain === 'function' ? scale.domain().map(String) : []);
+      (scale.domain && typeof scale.domain === "function"
+        ? scale.domain().map(String)
+        : []);
 
     if (scaleLabels.length <= 1) {
       return {
         angle: 0,
         evenPositionsMap: null,
         formatLabel: (label: string): string => {
-          if (typeof label !== 'string') return String(label);
+          if (typeof label !== "string") return String(label);
           if (forceFullLabels) return label;
           return label.length > MAX_LABEL_CHARS
             ? `${label.substring(0, MAX_LABEL_CHARS - 3)}...`
             : label;
         },
         rotate: false,
-        textAnchor: 'middle' as const,
-        tickValues: []
+        textAnchor: "middle" as const,
+        tickValues: [],
       };
     }
 
@@ -80,7 +89,9 @@ function XAxis({
     const availableWidthPerLabel = availableWidth / scaleLabels.length;
     const averageCharWidth = 6; // Approximate width per character
 
-    const maxLabelLength = Math.max(...scaleLabels.map((label) => String(label).length));
+    const maxLabelLength = Math.max(
+      ...scaleLabels.map((label) => String(label).length),
+    );
     const estimatedMaxLabelWidth = maxLabelLength * averageCharWidth;
 
     // Improved spacing calculation for horizontal labels
@@ -89,12 +100,14 @@ function XAxis({
     // If we have enough space or few labels, display all labels flat
     if (
       scaleLabels.length <= dynamicNumTicks ||
-      (availableWidthPerLabel > estimatedMaxLabelWidth * horizontalSpaceFactor && !autoRotate)
+      (availableWidthPerLabel >
+        estimatedMaxLabelWidth * horizontalSpaceFactor &&
+        !autoRotate)
     ) {
       // Added adaptive character limit based on available width
       const horizontalCharLimit = Math.min(
         100,
-        Math.floor((availableWidthPerLabel / averageCharWidth) * 0.9)
+        Math.floor((availableWidthPerLabel / averageCharWidth) * 0.9),
       );
 
       const effectiveCharLimit = forceFullLabels
@@ -105,15 +118,15 @@ function XAxis({
         angle: 0,
         evenPositionsMap: null,
         formatLabel: (label: string): string => {
-          if (typeof label !== 'string') return String(label);
+          if (typeof label !== "string") return String(label);
           if (forceFullLabels) return label;
           return label.length > effectiveCharLimit
             ? `${label.substring(0, effectiveCharLimit - 3)}...`
             : label;
         },
         rotate: false,
-        textAnchor: 'middle' as const,
-        tickValues: null
+        textAnchor: "middle" as const,
+        tickValues: null,
       };
     }
 
@@ -128,22 +141,24 @@ function XAxis({
       const rotatedSpaceFactor = 2.0; // Increased from previous value
       const rotatedCharLimit = Math.min(
         forceFullLabels ? 100 : MAX_LABEL_CHARS + 8,
-        Math.floor((availableWidthPerLabel * rotatedSpaceFactor) / averageCharWidth)
+        Math.floor(
+          (availableWidthPerLabel * rotatedSpaceFactor) / averageCharWidth,
+        ),
       );
 
       return {
         angle: -45,
         evenPositionsMap: null,
         formatLabel: (label: string): string => {
-          if (typeof label !== 'string') return String(label);
+          if (typeof label !== "string") return String(label);
           if (forceFullLabels) return label;
           return label.length > rotatedCharLimit
             ? `${label.substring(0, rotatedCharLimit - 3)}...`
             : label;
         },
         rotate: true,
-        textAnchor: 'end' as const,
-        tickValues: null
+        textAnchor: "end" as const,
+        tickValues: null,
       };
     }
 
@@ -183,7 +198,7 @@ function XAxis({
     // Calculate how many characters we can show based on available space
     const filteredSpaceFactor = 2.2; // Increased for better readability
     const maxCharsPerLabel = Math.floor(
-      (availableWidthPerLabel * filteredSpaceFactor) / averageCharWidth
+      (availableWidthPerLabel * filteredSpaceFactor) / averageCharWidth,
     );
 
     const charLimit = forceFullLabels
@@ -194,23 +209,34 @@ function XAxis({
       angle: -45,
       evenPositionsMap: positions,
       formatLabel: (label: string): string => {
-        if (typeof label !== 'string') return String(label);
+        if (typeof label !== "string") return String(label);
         if (forceFullLabels) return label;
-        return label.length > charLimit ? `${label.substring(0, charLimit - 3)}...` : label;
+        return label.length > charLimit
+          ? `${label.substring(0, charLimit - 3)}...`
+          : label;
       },
       rotate: true,
-      textAnchor: 'end' as const,
-      tickValues: indicesToShow.map((i) => scaleLabels[i])
+      textAnchor: "end" as const,
+      tickValues: indicesToShow.map((i) => scaleLabels[i]),
     };
-  }, [availableWidth, providedLabels, scale, dynamicNumTicks, forceFullLabels, autoRotate]);
+  }, [
+    availableWidth,
+    providedLabels,
+    scale,
+    dynamicNumTicks,
+    forceFullLabels,
+    autoRotate,
+  ]);
 
   const renderAxisLabel = (
     formattedValue: string | undefined,
-    tickProps: React.SVGProps<SVGTextElement>
+    tickProps: React.SVGProps<SVGTextElement>,
   ): JSX.Element => {
-    let label = '';
+    let label = "";
     if (!isLoading) {
-      label = formatLabel ? formatLabel(formattedValue || '') : formattedValue || '';
+      label = formatLabel
+        ? formatLabel(formattedValue || "")
+        : formattedValue || "";
 
       if (isNumeric(label)) {
         label = formatNumberWithSuffix(Number(label));
@@ -236,8 +262,10 @@ function XAxis({
       return (
         <g transform={`translate(${xPos},${tickProps.y})`}>
           <text
-            className={isLoading ? shimmerClassName : ''}
-            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+            className={isLoading ? shimmerClassName : ""}
+            fill={
+              isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label
+            }
             style={textStyle}
             textAnchor={textAnchor}
             transform={`rotate(${angle})`}
@@ -253,8 +281,10 @@ function XAxis({
     return (
       <g transform={`translate(${xPos},${tickProps.y})`}>
         <text
-          className={isLoading ? shimmerClassName : ''}
-          fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+          className={isLoading ? shimmerClassName : ""}
+          fill={
+            isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label
+          }
           style={textStyle}
           textAnchor="middle"
           dy={`${yOffset}px`}
@@ -272,7 +302,7 @@ function XAxis({
     fill: theme.colors.axis.title,
     dy: showAxisLine
       ? `${labelOffset + 4 + (rotate ? ROTATED_LABEL_PADDING : 0)}px`
-      : `${labelOffset + 23}px`
+      : `${labelOffset + 23}px`,
   };
 
   // Fixed the tickLabelProps function to return proper typing
@@ -281,7 +311,7 @@ function XAxis({
     ...overLineStyles,
     color: theme.colors.axis.label,
     fill: theme.colors.axis.label,
-    textAnchor: 'middle' as const
+    textAnchor: "middle" as const,
   });
 
   if (!isVisible) {

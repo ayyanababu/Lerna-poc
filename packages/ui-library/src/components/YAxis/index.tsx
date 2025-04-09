@@ -10,11 +10,11 @@ import { YAxisProps } from "./types";
 const MAX_LABEL_CHARS = 15; // Or however many you want before truncating
 
 const baseFontStyles = {
-  fontSize: '10px',
-  fontWeight: 'normal',
-  lineHeight: '165%',
-  letterSpacing: '0.4px',
-  fontFamily: 'Roboto',
+  fontSize: "10px",
+  fontWeight: "normal",
+  lineHeight: "165%",
+  letterSpacing: "0.4px",
+  fontFamily: "Roboto",
 };
 
 function YAxis({
@@ -24,7 +24,7 @@ function YAxis({
   showAxisLine = false,
   isLoading = false,
   hideAllTicks = false,
-  textAnchor = 'end',
+  textAnchor = "end",
   isVisible = true,
   isRightYAxis = false,
   labelProps: externalLabelProps,
@@ -43,7 +43,7 @@ function YAxis({
 
   const renderAxisLabel = (
     formattedValue: string | number | undefined,
-    tickProps: React.SVGProps<SVGTextElement>
+    tickProps: React.SVGProps<SVGTextElement>,
   ) => {
     if (isLoading) {
       // Show shimmer effect
@@ -57,7 +57,7 @@ function YAxis({
       );
     }
 
-    let label = String(formattedValue || '');
+    let label = String(formattedValue || "");
 
     // Possibly truncate
     if (label.length > MAX_LABEL_CHARS) {
@@ -82,14 +82,14 @@ function YAxis({
     color: theme.colors.axis.title,
     fill: theme.colors.axis.title,
     dx: labelOffset,
-    transform: isRightYAxis ? 'rotate(90)' : 'rotate(-90)'
+    transform: isRightYAxis ? "rotate(90)" : "rotate(-90)",
   };
 
   const mergedTickLabelProps = {
     ...externalTickLabelProps,
     ...baseFontStyles,
     color: theme.colors.axis.label,
-    fill: theme.colors.axis.label
+    fill: theme.colors.axis.label,
   };
 
   if (!isVisible) {
@@ -103,8 +103,8 @@ function YAxis({
       tickStroke={theme.colors.axis.line}
       tickLabelProps={() => ({
         textAnchor,
-        dy: '0.33em',
-        ...mergedTickLabelProps
+        dy: "0.33em",
+        ...mergedTickLabelProps,
       })}
       hideAxisLine={!showAxisLine}
       hideTicks={hideAllTicks || !showTicks}

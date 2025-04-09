@@ -258,11 +258,13 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     (groupKey: string, value: number) => (evt: React.MouseEvent) => {
       if (!isLoading) {
         showTooltip({
-          tooltipData: [{
-            label: capitalize(lowerCase(groupKey)),
-            value,
-            color: groupColorScale(groupKey)
-          }],
+          tooltipData: [
+            {
+              label: capitalize(lowerCase(groupKey)),
+              value,
+              color: groupColorScale(groupKey),
+            },
+          ],
           tooltipLeft: evt.clientX,
           tooltipTop: evt.clientY,
         });
@@ -432,4 +434,4 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   );
 };
 
-export { HorizontalStackedBar }
+export default HorizontalStackedBar;
