@@ -15,7 +15,7 @@ function Legends({
   hovered,
   setHovered,
   position = LegendPosition.TOP,
-  onClick = () => {},
+  onClick,
   isLoading = false,
   doStrike = false,
   isVisible = true,

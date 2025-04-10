@@ -26,6 +26,7 @@ function DonutChart({
   tooltipProps,
   arcGap = 0,
   arcRadius = 0,
+  onClick,
 }: DonutChartProps) {
   const { parentRef, width, height } = useParentSize({
     debounceTime: 150,
@@ -154,6 +155,11 @@ function DonutChart({
                       scale: hoveredArc === arc.data.label ? 1.1 : 1,
                       cursor: "pointer",
                       transition: "all 250ms ease-in-out",
+                    }}
+                    onClick={(event) => {
+                      if (onClick) {
+                        onClick(event, arc.data, arc.index);
+                      }
                     }}
                   >
                     <path

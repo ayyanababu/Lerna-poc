@@ -49,6 +49,7 @@ function VerticalStackedBar({
   timestampProps,
   showYAxis = true,
   showXAxis = true,
+  onClick,
 }: VerticalStackedBarChartProps) {
   const { theme } = useTheme();
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -132,7 +133,7 @@ function VerticalStackedBar({
         ...filteredData.map((d) =>
           Object.entries(d.data)
             .filter(([key]) => activeKeys.includes(key))
-            .reduce((sum, [_, value]) => sum + Number(value || 0), 0),
+            .reduce((sum, [, value]) => sum + Number(value || 0), 0),
         ),
       ),
     [filteredData, activeKeys],
@@ -195,7 +196,7 @@ function VerticalStackedBar({
 
   const renderStackedBars = useCallback(
     () =>
-      filteredData.map((categoryData) => {
+      filteredData.map((categoryData, index) => {
         const category = String(categoryData.label);
         // Calculate bar width with maximum limit
         const calculatedBarWidth = xScale.bandwidth();
@@ -210,7 +211,7 @@ function VerticalStackedBar({
         // Calculate dynamic radius based on bar width
         const dynamicRadius = Math.min(DEFAULT_BAR_RADIUS, barWidth / 2);
 
-        return activeKeys.map((groupKey) => {
+        return activeKeys.map((groupKey, groupIndex) => {
           const seriesData = stackedData.find((s) => s.key === groupKey);
           if (!seriesData) return null;
 
@@ -279,6 +280,14 @@ function VerticalStackedBar({
               onMouseMove={handleMouseMove(groupKey, value)}
               onMouseLeave={handleMouseLeave}
               {...barProps}
+              onClick={(event) => {
+                if (barProps?.onClick) {
+                  barProps.onClick(event);
+                }
+                if (onClick) {
+                  onClick(event, filteredData[index], [index, groupIndex]);
+                }
+              }}
             />
           );
         });

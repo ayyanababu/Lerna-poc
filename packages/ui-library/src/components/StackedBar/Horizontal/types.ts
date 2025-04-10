@@ -30,4 +30,9 @@ export interface HorizontalStackedBarChartProps {
   yAxisProps?: Partial<YAxisProps>;
   gridProps?: Partial<GridProps>;
   barProps?: Partial<CustomBarProps>;
+  onClick?: (
+    event: React.MouseEvent<SVGGElement, MouseEvent>,
+    data: DataPoint,
+    index: [number, number],
+  ) => void;
 }

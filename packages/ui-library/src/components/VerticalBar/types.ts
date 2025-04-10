@@ -8,23 +8,28 @@ import { XAxisProps } from "../XAxis/types";
 import { YAxisProps } from "../YAxis/types";
 
 export interface DataPoint {
-    label: string;
-    value: number;
-    color?: string;
+  label: string;
+  value: number;
+  color?: string;
 }
 
 export interface VerticalBarChartProps {
-    data: DataPoint[];
-    title?: string;
-    margin?: { top: number; right: number; bottom: number; left: number };
-    colors?: string[];
-    isLoading?: boolean;
-    titleProps?: Partial<TitleProps>;
-    legendsProps?: Partial<LegendsProps>;
-    tooltipProps?: Partial<TooltipProps>;
-    xAxisProps?: Partial<XAxisProps>;
-    yAxisProps?: Partial<YAxisProps>;
-    gridProps?: Partial<GridProps>;
-    timestampProps?: Partial<TimestampProps>;
-    barProps?: Partial<CustomBarProps>;
+  data: DataPoint[];
+  title?: string;
+  margin?: { top: number; right: number; bottom: number; left: number };
+  colors?: string[];
+  isLoading?: boolean;
+  titleProps?: Partial<TitleProps>;
+  legendsProps?: Partial<LegendsProps>;
+  tooltipProps?: Partial<TooltipProps>;
+  xAxisProps?: Partial<XAxisProps>;
+  yAxisProps?: Partial<YAxisProps>;
+  gridProps?: Partial<GridProps>;
+  timestampProps?: Partial<TimestampProps>;
+  barProps?: Partial<CustomBarProps>;
+  onClick?: (
+    event: React.MouseEvent<SVGGElement, MouseEvent>,
+    data: DataPoint,
+    index: number,
+  ) => void;
 }

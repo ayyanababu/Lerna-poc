@@ -41,6 +41,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   gridProps,
   timestampProps,
   barProps,
+  onClick,
 }) => {
   const { theme } = useTheme();
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -271,6 +272,14 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 onMouseMove={handleBarMouseMove(value, barColor, index)}
                 onMouseLeave={handleBarMouseLeave}
                 {...barProps}
+                onClick={(event) => {
+                  if (barProps?.onClick) {
+                    barProps.onClick(event);
+                  }
+                  if (onClick) {
+                    onClick(event, d, index);
+                  }
+                }}
               />
             );
           })}

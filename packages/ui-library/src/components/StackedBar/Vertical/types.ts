@@ -133,4 +133,9 @@ export interface VerticalStackedBarChartProps {
    * @default true
    */
   showXAxis?: boolean;
+  onClick?: (
+    event: React.MouseEvent<SVGGElement, MouseEvent>,
+    data: DataPoint,
+    index: [number, number],
+  ) => void;
 }

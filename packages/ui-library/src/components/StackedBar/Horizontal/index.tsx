@@ -88,6 +88,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   yAxisProps,
   gridProps,
   barProps,
+  onClick,
 }) => {
   const { theme } = useTheme();
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -295,7 +296,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       const bandY = categoryScale(category) || 0;
       const barY = bandY + (rawBarHeight - barHeight) / 2;
 
-      return activeKeys.map((groupKey) => {
+      return activeKeys.map((groupKey, groupIndex) => {
         const seriesData = stackedData.find((s) => s.key === groupKey);
         if (!seriesData) return null;
 
@@ -358,6 +359,17 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
             onMouseMove={handleMouseMove(groupKey, value)}
             onMouseLeave={handleMouseLeave}
             {...barProps}
+            onClick={(event) => {
+              if (barProps?.onClick) {
+                barProps.onClick(event);
+              }
+              if (onClick) {
+                onClick(event, filteredData[categoryIndex], [
+                  categoryIndex,
+                  groupIndex,
+                ]);
+              }
+            }}
           />
         );
       });
