@@ -94,6 +94,13 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   const { theme } = useTheme();
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
 
+  const getStrokeWidth = (width: number, height: number) => {
+    const size = Math.min(width, height);
+    // Scale between 0.3 and 1 based on size
+    return Math.max(0.3, Math.min(1, size / 500));
+  };
+  const strokeWidth = getStrokeWidth(width, height);
+
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
   const [legendHoveredGroupKey, setLegendHoveredGroupKey] = useState<
     string | null
@@ -386,6 +393,18 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                 }
               }}
             />
+
+            {barX > xScale(0) && (
+              <line
+                x1={barX}
+                y1={barY}
+                x2={barX}
+                y2={barY + actualBarHeight}
+                stroke={theme.colors.common.stroke}
+                strokeWidth={strokeWidth}
+                pointerEvents="none"
+              />
+            )}
           </React.Fragment>
         );
       });

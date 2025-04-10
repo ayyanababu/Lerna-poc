@@ -57,6 +57,13 @@ function VerticalStackedBar({
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
+  const getStrokeWidth = (width: number, height: number) => {
+    const size = Math.min(width, height);
+    // Scale between 0.3 and 1 based on size
+    return Math.max(0.3, Math.min(1, size / 500));
+  };
+  const strokeWidth = getStrokeWidth(width, height);
+
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
   const [legendHoveredGroupKey, setLegendHoveredGroupKey] = useState<
     string | null
@@ -305,6 +312,18 @@ function VerticalStackedBar({
                   }
                 }}
               />
+
+              {!isTopBar && (
+                <line
+                  x1={barX}
+                  y1={barY}
+                  x2={barX + actualBarWidth}
+                  y2={barY}
+                  stroke={theme.colors.common.stroke}
+                  strokeWidth={strokeWidth}
+                  pointerEvents="none"
+                />
+              )}
             </React.Fragment>
           );
         });
@@ -324,6 +343,8 @@ function VerticalStackedBar({
       barProps,
       legendHoveredGroupKey,
       theme.colors.common.text,
+      theme.colors.common.stroke,
+      strokeWidth,
     ],
   );
 
