@@ -131,10 +131,15 @@ function TooltipBase({
         pointerEvents: "none",
         transform: "translate(-50%, -100%)",
         whiteSpace: "pre-line",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
         zIndex: DEFAULT_Z_INDEX,
         minWidth: `${MIN_TOOLTIP_WIDTH}px`,
         maxWidth: `${MAX_TOOLTIP_WIDTH}px`,
         minHeight: `${MIN_TOOLTIP_HEIGHT}px`,
+        transition: "opacity 0.2s ease-in-out",
+        opacity: isVisible ? 1 : 0,
       }}
       ref={tooltipRef}
       role="tooltip"
@@ -152,6 +157,7 @@ function TooltipBase({
             key={`${item.label}-${item.value}`}
             sx={{
               display: "flex",
+              flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
               width: "100%",
@@ -159,35 +165,29 @@ function TooltipBase({
           >
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
+                width: "12px",
+                height: "12px",
+                backgroundColor: item.color,
+                borderRadius: "50%",
+                marginRight: "8px",
+                aspectRatio: "1 / 1",
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{
+                color: theme.colors.tooltip.text,
+                fontFeatureSettings: "'liga' off, 'clig' off",
+                fontFamily: "Roboto",
+                fontSize: "12px",
+                fontStyle: "normal",
+                fontWeight: 400,
+                lineHeight: "143%",
+                letterSpacing: "0.4px",
               }}
             >
-              <Box
-                sx={{
-                  width: "12px",
-                  height: "12px",
-                  backgroundColor: item.color,
-                  borderRadius: "50%",
-                  marginRight: "8px",
-                }}
-              />
-              <Typography
-                variant="caption"
-                sx={{
-                  color: theme.colors.tooltip.text,
-                  fontFeatureSettings: "'liga' off, 'clig' off",
-                  fontFamily: "Roboto",
-                  fontSize: "12px",
-                  fontStyle: "normal",
-                  fontWeight: 400,
-                  lineHeight: "143%",
-                  letterSpacing: "0.4px",
-                }}
-              >
-                {item.label}
-              </Typography>
-            </Box>
+              {item.label}
+            </Typography>
             <Typography
               variant="subtitle2"
               sx={{
