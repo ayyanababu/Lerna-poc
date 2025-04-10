@@ -78,6 +78,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   timestamp,
   colors = [],
   isLoading,
+  barWidth,
   showTicks = false,
   titleProps,
   legendsProps,
@@ -301,10 +302,14 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       const category = String(catData.label);
       // bar thickness with clamp
       const rawBarHeight = categoryScale.bandwidth();
-      const barHeight = Math.min(rawBarHeight, MAX_BAR_HEIGHT);
+      // Use custom barWidth if provided, otherwise use default with maximum limit
+      const actualBarHeight =
+        barWidth !== undefined
+          ? barWidth
+          : Math.min(rawBarHeight, MAX_BAR_HEIGHT);
       // center if clamped
       const bandY = categoryScale(category) || 0;
-      const barY = bandY + (rawBarHeight - barHeight) / 2;
+      const barY = bandY + (rawBarHeight - actualBarHeight) / 2;
 
       return activeKeys.map((groupKey, groupIndex) => {
         const seriesData = stackedData.find((s) => s.key === groupKey);
@@ -334,18 +339,18 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         });
         const isRightmostBar = seriesData.key === rightmostKey;
 
-        const dynamicRadius = Math.min(DEFAULT_BAR_RADIUS, barHeight / 2);
+        const dynamicRadius = Math.min(DEFAULT_BAR_RADIUS, actualBarHeight / 2);
         // if rightmost => round corners
         const pathProps = isRightmostBar
           ? {
               d: `
-                M ${barX},${barY + barHeight}
+                M ${barX},${barY + actualBarHeight}
                 L ${barX},${barY}
                 L ${barX + barWidth - dynamicRadius},${barY}
                 Q ${barX + barWidth},${barY} ${barX + barWidth},${barY + dynamicRadius}
-                L ${barX + barWidth},${barY + barHeight - dynamicRadius}
-                Q ${barX + barWidth},${barY + barHeight} ${barX + barWidth - dynamicRadius},${
-                  barY + barHeight
+                L ${barX + barWidth},${barY + actualBarHeight - dynamicRadius}
+                Q ${barX + barWidth},${barY + actualBarHeight} ${barX + barWidth - dynamicRadius},${
+                  barY + actualBarHeight
                 }
                 Z
               `,
@@ -358,7 +363,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
               x={barX}
               y={barY}
               width={barWidth}
-              height={barHeight}
+              height={actualBarHeight}
               fill={
                 isLoading
                   ? `url(#${shimmerGradientId})`

@@ -38,6 +38,7 @@ function VerticalStackedBar({
   timestamp,
   colors = [],
   isLoading,
+  barWidth,
   titleProps,
   legendsProps,
   tooltipProps,
@@ -209,16 +210,21 @@ function VerticalStackedBar({
         const category = String(categoryData.label);
         // Calculate bar width with maximum limit
         const calculatedBarWidth = xScale.bandwidth();
-        const barWidth = Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
+        // Use custom barWidth if provided, otherwise use default with maximum limit
+        const actualBarWidth =
+          barWidth !== undefined
+            ? barWidth
+            : Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
 
         // If the bar width is limited, center it
         const barX =
-          barWidth < calculatedBarWidth
-            ? (xScale(category) || 0) + (calculatedBarWidth - barWidth) / 2
+          actualBarWidth < calculatedBarWidth
+            ? (xScale(category) || 0) +
+              (calculatedBarWidth - actualBarWidth) / 2
             : xScale(category) || 0;
 
         // Calculate dynamic radius based on bar width
-        const dynamicRadius = Math.min(DEFAULT_BAR_RADIUS, barWidth / 2);
+        const dynamicRadius = Math.min(DEFAULT_BAR_RADIUS, actualBarWidth / 2);
 
         return activeKeys.map((groupKey, groupIndex) => {
           const seriesData = stackedData.find((s) => s.key === groupKey);
@@ -260,7 +266,7 @@ function VerticalStackedBar({
                 key={`stacked-${category}-${groupKey}`}
                 x={barX}
                 y={barY}
-                width={barWidth}
+                width={actualBarWidth}
                 height={barHeight}
                 fill={
                   isLoading
@@ -273,10 +279,10 @@ function VerticalStackedBar({
                     ? {
                         d: `
                                     M ${barX},${barY + barHeight}
-                                    L ${barX + barWidth},${barY + barHeight}
-                                    L ${barX + barWidth},${barY + dynamicRadius}
-                                    Q ${barX + barWidth},${barY} ${
-                                      barX + barWidth - dynamicRadius
+                                    L ${barX + actualBarWidth},${barY + barHeight}
+                                    L ${barX + actualBarWidth},${barY + dynamicRadius}
+                                    Q ${barX + actualBarWidth},${barY} ${
+                                      barX + actualBarWidth - dynamicRadius
                                     },${barY}
                                     L ${barX + dynamicRadius},${barY}
                                     Q ${barX},${barY} ${barX},${barY + dynamicRadius}
@@ -306,6 +312,7 @@ function VerticalStackedBar({
     [
       filteredData,
       xScale,
+      barWidth,
       activeKeys,
       stackedData,
       yScale,

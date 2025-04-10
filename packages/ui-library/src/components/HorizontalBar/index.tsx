@@ -71,6 +71,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   margin: initialMargin = DEFAULT_MARGIN,
   colors = [],
   isLoading = false,
+  barWidth,
   titleProps,
   legendsProps,
   tooltipProps,
@@ -295,13 +296,17 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
             // Calculate bar "thickness"
             const rawBarHeight = yScale.bandwidth();
-            const barHeight = Math.min(rawBarHeight, MAX_BAR_HEIGHT);
+            // Use custom barWidth for the bar height (thickness) if provided
+            const actualBarHeight =
+              barWidth !== undefined
+                ? barWidth
+                : Math.min(rawBarHeight, MAX_BAR_HEIGHT);
             // Center if we clamped
             const bandY = yScale(d.label) || 0;
-            const barY = bandY + (rawBarHeight - barHeight) / 2;
+            const barY = bandY + (rawBarHeight - actualBarHeight) / 2;
 
             // Bar length
-            const barWidth = xScale(value);
+            const barLength = xScale(value);
             const barX = 0;
 
             const isHovered = hoveredBar === index;
@@ -313,17 +318,17 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             // Rounded right corners
             const radius = Math.min(
               DEFAULT_BAR_RADIUS,
-              barHeight / 2,
-              barWidth,
+              actualBarHeight / 2,
+              barLength,
             );
             const pathD = `
-                 M ${barX},${barY + barHeight}
-                 L ${barX + barWidth - radius},${barY + barHeight}
-                 Q ${barX + barWidth},${barY + barHeight} ${barX + barWidth},${
-                   barY + barHeight - radius
+                 M ${barX},${barY + actualBarHeight}
+                 L ${barX + barLength - radius},${barY + actualBarHeight}
+                 Q ${barX + barLength},${barY + actualBarHeight} ${barX + barLength},${
+                   barY + actualBarHeight - radius
                  }
-                 L ${barX + barWidth},${barY + radius}
-                 Q ${barX + barWidth},${barY} ${barX + barWidth - radius},${barY}
+                 L ${barX + barLength},${barY + radius}
+                 Q ${barX + barLength},${barY} ${barX + barLength - radius},${barY}
                  L ${barX},${barY}
                  Z
                `;
@@ -334,8 +339,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                 key={`bar-${d.label}`}
                 x={barX}
                 y={barY}
-                width={barWidth}
-                height={barHeight}
+                width={barLength}
+                height={actualBarHeight}
                 fill={barColor}
                 isLoading={isLoading}
                 opacity={barOpacity}

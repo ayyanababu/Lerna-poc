@@ -38,6 +38,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   colors: _colors,
   titleProps,
   isLoading = false,
+  barWidth,
   tooltipProps,
   legendsProps,
   showTicks = false,
@@ -158,14 +159,20 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
   // Calculate circle radius based on bar width
   const defaultBarWidth = xScale.bandwidth();
-  const barWidth = Math.min(MAX_BAR_WIDTH, defaultBarWidth);
+  // Use custom barWidth if provided, otherwise use default with maximum limit
+  const actualBarWidth =
+    barWidth !== undefined
+      ? barWidth
+      : Math.min(defaultBarWidth, MAX_BAR_WIDTH);
 
   // Center the bar if it's smaller than the available space
   const xOffset =
-    barWidth < defaultBarWidth ? (defaultBarWidth - barWidth) / 2 : 0;
+    actualBarWidth < defaultBarWidth
+      ? (defaultBarWidth - actualBarWidth) / 2
+      : 0;
 
   // Calculate circle radius for line points - proportional to bar width
-  const circleRadius = Math.min(4, barWidth / 4);
+  const circleRadius = Math.min(4, actualBarWidth / 4);
 
   if (chartData.length === 0) return <div>No data to display.</div>;
 
@@ -252,7 +259,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
                 const dynamicRadius = Math.min(
                   DEFAULT_BAR_RADIUS,
-                  barWidth / 2,
+                  actualBarWidth / 2,
                 );
 
                 return (
@@ -260,7 +267,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                     key={`bar-${bottomLabel}`}
                     x={barX}
                     y={barY}
-                    width={barWidth}
+                    width={actualBarWidth}
                     height={barHeight}
                     fill={isLoading ? `url(#${shimmerGradientId})` : colors.bar}
                     opacity={barOpacity}
@@ -269,9 +276,9 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                     pathProps={{
                       d: `
                         M ${barX},${barY + barHeight}
-                        L ${barX + barWidth},${barY + barHeight}
-                        L ${barX + barWidth},${barY + dynamicRadius}
-                        Q ${barX + barWidth},${barY} ${barX + barWidth - dynamicRadius},${barY}
+                        L ${barX + actualBarWidth},${barY + barHeight}
+                        L ${barX + actualBarWidth},${barY + dynamicRadius}
+                        Q ${barX + actualBarWidth},${barY} ${barX + actualBarWidth - dynamicRadius},${barY}
                         L ${barX + dynamicRadius},${barY}
                         Q ${barX},${barY} ${barX},${barY + dynamicRadius}
                         L ${barX},${barY + barHeight}

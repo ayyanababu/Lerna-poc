@@ -51,6 +51,11 @@ export interface BarLineChartProps {
   height?: number;
 
   /**
+   * Width of the bars
+   */
+  barWidth?: number;
+
+  /**
    * Custom colors for the chart
    */
   colors?: {

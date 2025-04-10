@@ -33,6 +33,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   margin: initialMargin = DEFAULT_MARGIN,
   colors = [],
   isLoading = false,
+  barWidth,
   titleProps,
   legendsProps,
   tooltipProps,
@@ -225,12 +226,17 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
             // Calculate bar width with maximum limit
             const calculatedBarWidth = xScale.bandwidth();
-            const barWidth = Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
+            // Use custom barWidth if provided, otherwise use calculated width with MAX_BAR_WIDTH limit
+            const actualBarWidth =
+              barWidth !== undefined
+                ? barWidth
+                : Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
 
             // If the bar width is limited, center it
             const barX =
-              barWidth < calculatedBarWidth
-                ? (xScale(d.label) || 0) + (calculatedBarWidth - barWidth) / 2
+              actualBarWidth < calculatedBarWidth
+                ? (xScale(d.label) || 0) +
+                  (calculatedBarWidth - actualBarWidth) / 2
                 : xScale(d.label) || 0;
 
             const barHeight = innerHeight - yScale(value);
@@ -242,7 +248,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 : DEFAULT_OPACITY;
             const radius = Math.min(
               DEFAULT_BAR_RADIUS,
-              barWidth / 2,
+              actualBarWidth / 2,
               barHeight > 0 ? barHeight : 0,
             );
             const barColor = d.color || colorScale(index);
@@ -252,22 +258,22 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 key={`bar-${d.label}`}
                 x={barX}
                 y={barY}
-                width={barWidth}
+                width={actualBarWidth}
                 height={barHeight}
                 fill={barColor}
                 isLoading={isLoading}
                 opacity={barOpacity}
                 pathProps={{
                   d: `
-                                    M ${barX},${barY + barHeight}
-                                    L ${barX + barWidth},${barY + barHeight}
-                                    L ${barX + barWidth},${barY + radius}
-                                    Q ${barX + barWidth},${barY} ${barX + barWidth - radius},${barY}
-                                    L ${barX + DEFAULT_BAR_RADIUS},${barY}
-                                    Q ${barX},${barY} ${barX},${barY + radius}
-                                    L ${barX},${barY + barHeight}
-                                    Z
-                                  `,
+                    M ${barX},${barY + barHeight}
+                    L ${barX + actualBarWidth},${barY + barHeight}
+                    L ${barX + actualBarWidth},${barY + radius}
+                    Q ${barX + actualBarWidth},${barY} ${barX + actualBarWidth - radius},${barY}
+                    L ${barX + DEFAULT_BAR_RADIUS},${barY}
+                    Q ${barX},${barY} ${barX},${barY + radius}
+                    L ${barX},${barY + barHeight}
+                    Z
+                  `,
                 }}
                 onMouseMove={handleBarMouseMove(value, barColor, index)}
                 onMouseLeave={handleBarMouseLeave}
