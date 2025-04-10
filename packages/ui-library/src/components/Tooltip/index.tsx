@@ -159,7 +159,6 @@ function TooltipBase({
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
-              justifyContent: "space-between",
               width: "100%",
             }}
           >
@@ -171,6 +170,7 @@ function TooltipBase({
                 borderRadius: "50%",
                 marginRight: "8px",
                 aspectRatio: "1 / 1",
+                flexShrink: 0,
               }}
             />
             <Typography
@@ -184,6 +184,7 @@ function TooltipBase({
                 fontWeight: 400,
                 lineHeight: "143%",
                 letterSpacing: "0.4px",
+                flexGrow: 1,
               }}
             >
               {item.label}
@@ -200,6 +201,7 @@ function TooltipBase({
                 lineHeight: "150%",
                 letterSpacing: "0.25px",
                 marginLeft: "16px",
+                flexShrink: 0,
               }}
             >
               {item.value}
