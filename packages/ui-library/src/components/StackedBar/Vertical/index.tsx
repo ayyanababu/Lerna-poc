@@ -299,19 +299,6 @@ function VerticalStackedBar({
                   }
                 }}
               />
-              {/* Show value when legend is hovered */}
-              {legendHoveredGroupKey === groupKey && !isLoading && (
-                <text
-                  x={barX + barWidth / 2}
-                  y={barY - 5}
-                  fontSize="11px"
-                  fontWeight="bold"
-                  fill={theme.colors.common.text}
-                  textAnchor="middle"
-                >
-                  {value.toLocaleString()}
-                </text>
-              )}
             </React.Fragment>
           );
         });

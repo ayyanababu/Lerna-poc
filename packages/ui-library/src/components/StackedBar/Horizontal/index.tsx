@@ -381,19 +381,6 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                 }
               }}
             />
-            {/* Show value when legend is hovered */}
-            {legendHoveredGroupKey === groupKey && !isLoading && (
-              <text
-                x={barX + barWidth + 5}
-                y={barY + barHeight / 2 + 4}
-                fontSize="11px"
-                fontWeight="bold"
-                fill={theme.colors.common.text}
-                textAnchor="start"
-              >
-                {value.toLocaleString()}
-              </text>
-            )}
           </React.Fragment>
         );
       });
