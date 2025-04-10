@@ -127,7 +127,7 @@ function App() {
             {
                 <Sortable className="my-cards">
                     <SortableCard height={400} width={1000}>
-                    <TreeMapChart
+                        <TreeMapChart
                             data={{
                                 id: 'portfolio',
                                 name: 'Portfolio',
@@ -147,7 +147,7 @@ function App() {
                                                 id: 'health',
                                                 name: 'Healthcare',
                                                 value: 120,
-                                            }
+                                            },
                                         ],
                                     },
                                     {
@@ -175,7 +175,12 @@ function App() {
                                 ],
                             }}
                             title="Investment Portfolio Allocation"
-                            colors={['rgba(232, 134, 97,0.50)', 'rgba(232, 134, 97,0.30)','rgba(232, 134, 97,0.15)', '#4E7AC2']}
+                            colors={[
+                                'rgba(232, 134, 97,0.50)',
+                                'rgba(232, 134, 97,0.30)',
+                                'rgba(232, 134, 97,0.15)',
+                                '#4E7AC2',
+                            ]}
                             isLoading={isLoading}
                             legendsProps={{
                                 position: 'bottom',
@@ -364,8 +369,6 @@ function App() {
                                     value: Math.floor(Math.random() * 100),
                                 })),
                             ]}
-                            title="Product Sales Distribution"
-                            timestamp={new Date().toISOString()}
                             isLoading={isLoading}
                             titleProps={{
                                 variant: 'h6',
@@ -374,7 +377,7 @@ function App() {
                             legendsProps={{
                                 position: Legends.Position.TOP,
                                 doStrike: true,
-                                isVisible: false,
+                                isVisible: true,
                             }}
                             tooltipProps={{}}
                         />

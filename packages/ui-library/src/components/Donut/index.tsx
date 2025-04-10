@@ -43,6 +43,7 @@ function DonutChart({
     tooltipOpen,
   } = useTooltip<TooltipData[]>();
   const [hoveredArc, setHoveredArc] = useState<string | null>(null);
+  const [legendHoveredArc, setLegendHoveredArc] = useState<string | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const radius = useMemo(
     () => Math.min(width, height) / (type === "semi" ? 2 : 2.5),
@@ -57,8 +58,13 @@ function DonutChart({
   }, [isLoading, _data, type]);
 
   const filteredData = useMemo(
-    () => data.filter((_, i) => !hideIndex.includes(i)),
-    [hideIndex, data],
+    () =>
+      data.filter((_, i) =>
+        legendHoveredArc
+          ? legendHoveredArc === data[i].label
+          : !hideIndex.includes(i),
+      ),
+    [legendHoveredArc, hideIndex, data],
   );
 
   const colorScale = scaleOrdinal<string, string>({
@@ -76,8 +82,8 @@ function DonutChart({
         colorScale,
         hideIndex,
         setHideIndex,
-        hovered: hoveredArc,
-        setHovered: setHoveredArc,
+        hovered: legendHoveredArc,
+        setHovered: setLegendHoveredArc,
         isLoading,
         ...legendsProps,
       }}
@@ -94,6 +100,26 @@ function DonutChart({
         {isLoading ? <SvgShimmer /> : null}
 
         <Group top={height / (type === "semi" ? 1.5 : 2)} left={width / 2}>
+          {legendHoveredArc && filteredData.length > 0 && !isLoading && (
+            <text
+              textAnchor="middle"
+              dy={type === "semi" ? "-0.35em" : "0.35em"}
+              fontSize={16}
+              fontWeight="bold"
+              fill={theme.colors.common.text}
+              style={{
+                animation: "fadeIn 0.3s ease-in-out forwards",
+              }}
+            >
+              <style>{`
+              @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+              }
+              `}</style>
+              {filteredData[0].value}
+            </text>
+          )}
           <Pie
             data={filteredData}
             pieValue={(d) => d.value}

@@ -57,6 +57,9 @@ function VerticalStackedBar({
   const innerHeight = height - margin.top - margin.bottom;
 
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
+  const [legendHoveredGroupKey, setLegendHoveredGroupKey] = useState<
+    string | null
+  >(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
 
   const {
@@ -87,9 +90,15 @@ function VerticalStackedBar({
             }
           });
         }
+        if (legendHoveredGroupKey) {
+          const groupKey = legendHoveredGroupKey;
+          d.data = {
+            [groupKey]: d.data[groupKey],
+          };
+        }
         return d;
       }),
-    [data, hideIndex, groupKeys],
+    [data, hideIndex, groupKeys, legendHoveredGroupKey],
   );
 
   const legendData = useMemo(
@@ -162,9 +171,9 @@ function VerticalStackedBar({
     () =>
       scaleOrdinal<string, string>({
         domain: groupKeys,
-        range: colors?.length ? colors : theme.colors.charts.bar,
+        range: colors?.length ? colors : theme.colors.charts.stackedBar,
       }),
-    [groupKeys, colors, theme.colors.charts.bar],
+    [groupKeys, colors, theme.colors.charts.stackedBar],
   );
 
   const handleMouseMove = useCallback(
@@ -246,20 +255,23 @@ function VerticalStackedBar({
             }, activeKeys[0]);
 
           return (
-            <CustomBar
-              key={`stacked-${category}-${groupKey}`}
-              x={barX}
-              y={barY}
-              width={barWidth}
-              height={barHeight}
-              fill={
-                isLoading ? `url(#${shimmerGradientId})` : colorScale(groupKey)
-              }
-              opacity={barOpacity}
-              pathProps={
-                isTopBar
-                  ? {
-                      d: `
+            <React.Fragment key={`stacked-${category}-${groupKey}`}>
+              <CustomBar
+                key={`stacked-${category}-${groupKey}`}
+                x={barX}
+                y={barY}
+                width={barWidth}
+                height={barHeight}
+                fill={
+                  isLoading
+                    ? `url(#${shimmerGradientId})`
+                    : colorScale(groupKey)
+                }
+                opacity={barOpacity}
+                pathProps={
+                  isTopBar
+                    ? {
+                        d: `
                                     M ${barX},${barY + barHeight}
                                     L ${barX + barWidth},${barY + barHeight}
                                     L ${barX + barWidth},${barY + dynamicRadius}
@@ -271,24 +283,36 @@ function VerticalStackedBar({
                                     L ${barX},${barY + barHeight}
                                     Z
                                 `,
-                    }
-                  : undefined
-              }
-              rx={0}
-              // value={value}
-              // label={groupKey}
-              onMouseMove={handleMouseMove(groupKey, value)}
-              onMouseLeave={handleMouseLeave}
-              {...barProps}
-              onClick={(event) => {
-                if (barProps?.onClick) {
-                  barProps.onClick(event);
+                      }
+                    : undefined
                 }
-                if (onClick) {
-                  onClick(event, filteredData[index], [index, groupIndex]);
-                }
-              }}
-            />
+                rx={0}
+                onMouseMove={handleMouseMove(groupKey, value)}
+                onMouseLeave={handleMouseLeave}
+                {...barProps}
+                onClick={(event) => {
+                  if (barProps?.onClick) {
+                    barProps.onClick(event);
+                  }
+                  if (onClick) {
+                    onClick(event, filteredData[index], [index, groupIndex]);
+                  }
+                }}
+              />
+              {/* Show value when legend is hovered */}
+              {legendHoveredGroupKey === groupKey && !isLoading && (
+                <text
+                  x={barX + barWidth / 2}
+                  y={barY - 5}
+                  fontSize="11px"
+                  fontWeight="bold"
+                  fill={theme.colors.common.text}
+                  textAnchor="middle"
+                >
+                  {value.toLocaleString()}
+                </text>
+              )}
+            </React.Fragment>
           );
         });
       }),
@@ -304,6 +328,8 @@ function VerticalStackedBar({
       handleMouseMove,
       handleMouseLeave,
       barProps,
+      legendHoveredGroupKey,
+      theme.colors.common.text,
     ],
   );
 
@@ -325,8 +351,8 @@ function VerticalStackedBar({
         colorScale,
         hideIndex,
         setHideIndex,
-        hovered: hoveredGroupKey,
-        setHovered: setHoveredGroupKey,
+        hovered: legendHoveredGroupKey,
+        setHovered: setLegendHoveredGroupKey,
         isLoading,
         ...legendsProps,
       }}

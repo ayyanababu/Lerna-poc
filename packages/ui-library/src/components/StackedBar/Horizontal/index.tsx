@@ -94,6 +94,9 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
 
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
+  const [legendHoveredGroupKey, setLegendHoveredGroupKey] = useState<
+    string | null
+  >(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
 
   // Tooltip
@@ -126,9 +129,16 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
             }
           });
         }
+        // If a legend item is hovered, only show that group
+        if (legendHoveredGroupKey) {
+          const groupKey = legendHoveredGroupKey;
+          d.data = {
+            [groupKey]: d.data[groupKey],
+          };
+        }
         return d;
       }),
-    [data, hideIndex, groupKeys],
+    [data, hideIndex, groupKeys, legendHoveredGroupKey],
   );
 
   const labels = useMemo(
@@ -249,9 +259,9 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     () =>
       scaleOrdinal<string, string>({
         domain: groupKeys,
-        range: colors?.length ? colors : theme.colors.charts.bar,
+        range: colors?.length ? colors : theme.colors.charts.stackedBar,
       }),
-    [groupKeys, colors, theme.colors.charts.bar],
+    [groupKeys, colors, theme.colors.charts.stackedBar],
   );
 
   // Tooltip handlers
@@ -343,34 +353,48 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
           : undefined;
 
         return (
-          <CustomBar
-            key={`stacked-${category}-${groupKey}`}
-            x={barX}
-            y={barY}
-            width={barWidth}
-            height={barHeight}
-            fill={
-              isLoading
-                ? `url(#${shimmerGradientId})`
-                : groupColorScale(groupKey)
-            }
-            opacity={barOpacity}
-            pathProps={pathProps}
-            onMouseMove={handleMouseMove(groupKey, value)}
-            onMouseLeave={handleMouseLeave}
-            {...barProps}
-            onClick={(event) => {
-              if (barProps?.onClick) {
-                barProps.onClick(event);
+          <React.Fragment key={`stacked-${category}-${groupKey}`}>
+            <CustomBar
+              x={barX}
+              y={barY}
+              width={barWidth}
+              height={barHeight}
+              fill={
+                isLoading
+                  ? `url(#${shimmerGradientId})`
+                  : groupColorScale(groupKey)
               }
-              if (onClick) {
-                onClick(event, filteredData[categoryIndex], [
-                  categoryIndex,
-                  groupIndex,
-                ]);
-              }
-            }}
-          />
+              opacity={barOpacity}
+              pathProps={pathProps}
+              onMouseMove={handleMouseMove(groupKey, value)}
+              onMouseLeave={handleMouseLeave}
+              {...barProps}
+              onClick={(event) => {
+                if (barProps?.onClick) {
+                  barProps.onClick(event);
+                }
+                if (onClick) {
+                  onClick(event, filteredData[categoryIndex], [
+                    categoryIndex,
+                    groupIndex,
+                  ]);
+                }
+              }}
+            />
+            {/* Show value when legend is hovered */}
+            {legendHoveredGroupKey === groupKey && !isLoading && (
+              <text
+                x={barX + barWidth + 5}
+                y={barY + barHeight / 2 + 4}
+                fontSize="11px"
+                fontWeight="bold"
+                fill={theme.colors.common.text}
+                textAnchor="start"
+              >
+                {value.toLocaleString()}
+              </text>
+            )}
+          </React.Fragment>
         );
       });
     });
@@ -389,8 +413,8 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         colorScale: groupColorScale,
         hideIndex,
         setHideIndex,
-        hovered: hoveredGroupKey,
-        setHovered: setHoveredGroupKey,
+        hovered: legendHoveredGroupKey,
+        setHovered: setLegendHoveredGroupKey,
         isLoading,
         ...legendsProps,
       }}
