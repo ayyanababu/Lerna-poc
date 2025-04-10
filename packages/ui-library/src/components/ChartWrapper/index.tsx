@@ -144,11 +144,13 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
         ) : (
           <p> Cannot Render the chart under this size</p>
         )}
-        <Tooltip
-          {...tooltipProps}
-          data={toolTipData}
-          containerRef={containerRef}
-        />
+        {toolTipData && (
+          <Tooltip
+            {...tooltipProps}
+            data={toolTipData}
+            containerRef={containerRef}
+          />
+        )}
       </Stack>
     );
   },
