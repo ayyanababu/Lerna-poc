@@ -5,6 +5,7 @@ import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
 import { useTooltip } from "@visx/tooltip";
 
 import useTheme from "../../hooks/useTheme";
+import { formatNumberWithSuffix, isNumeric } from "../../utils/number";
 import { ChartWrapper } from "../ChartWrapper";
 import CustomBar from "../CustomBar";
 import Grid from "../Grid";
@@ -15,17 +16,27 @@ import YAxis from "../YAxis";
 import mockVerticalBarChartData from "./mockdata";
 import { DataPoint, VerticalBarChartProps } from "./types";
 
+// Adjusted constants for better space utilization
 const DEFAULT_MARGIN = {
-  top: 20,
-  right: 30,
-  bottom: 50,
-  left: 50,
+  top: 5, // Further reduced from 10
+  right: 5, // Further reduced from 15
+  bottom: 25, // Further reduced from 40
+  left: 25, // Further reduced from 40
 };
-const MAX_BAR_WIDTH = 16;
+const DEFAULT_MAX_BAR_WIDTH = 16;
 const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
-const SCALE_PADDING = 1.2;
+const SCALE_PADDING = 1.02; // Further reduced from 1.05 to use more vertical space
+
+const getEstimatedYAxisWidth = (maxValue, averageCharWidth = 7) => {
+  const absValue = Math.abs(maxValue);
+  const formattedValue = formatNumberWithSuffix(maxValue);
+  const commasCount = Math.floor(
+    Math.max(0, absValue.toString().length - 3) / 3,
+  );
+  return formattedValue.length * averageCharWidth + commasCount * 3 + 10;
+};
 
 const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   data: _data,
@@ -41,6 +52,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   gridProps,
   timestampProps,
   barProps,
+  maxBarWidth = DEFAULT_MAX_BAR_WIDTH,
 }) => {
   const { theme } = useTheme();
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -60,22 +72,46 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     [data, hideIndex],
   );
 
-  // We'll calculate a dynamic bottom margin based on whether labels need rotation
-  // Add extra margin if there are many labels that will likely be rotated
   const margin = useMemo(() => {
     if (!width) return initialMargin;
-
+    const calculateAverageCharWidth = (strings) => {
+      if (!strings || strings.length === 0) return 7;
+      const totalChars = strings.join("").split("");
+      let totalEstimatedWidth = 0;
+      totalChars.forEach((char) => {
+        if ("mwWM".includes(char)) totalEstimatedWidth += 9;
+        else if ("ilIj.,'".includes(char)) totalEstimatedWidth += 4;
+        else if ("0123456789".includes(char)) totalEstimatedWidth += 7;
+        else totalEstimatedWidth += 7; // Default width for other characters
+      });
+      return totalEstimatedWidth / totalChars.length || 7;
+    };
     const innerWidth = width - initialMargin.left - initialMargin.right;
-    const labels = filteredData.map((d) => String(d.label));
-
-    // Estimate if we'll need extra margin for rotated labels
-    const averageCharWidth = 7;
-    const totalLabelWidth = labels.join("").length * averageCharWidth;
-    const needsRotation = labels.length > 5 || totalLabelWidth >= innerWidth;
+    const xLabels = filteredData.map((d) => String(d.label));
+    const averageCharWidth = calculateAverageCharWidth(xLabels);
+    const totalLabelWidth = xLabels.join("").length * averageCharWidth;
+    const needsRotation = xLabels.length > 5 || totalLabelWidth >= innerWidth;
+    const maxXLabelLength = Math.max(
+      ...xLabels.map((label) => label.length),
+      0,
+    );
+    const rotationAdjustment = needsRotation
+      ? Math.min(
+          5 + (maxXLabelLength > 10 ? (maxXLabelLength - 10) * 1.5 : 0),
+          35,
+        )
+      : 0;
+    const maxValue = Math.max(
+      0,
+      ...filteredData.map((d) => Number(d.value) || 0),
+    );
+    const yAxisWidth = getEstimatedYAxisWidth(maxValue, averageCharWidth);
 
     return {
-      ...initialMargin,
-      bottom: initialMargin.bottom + (needsRotation ? 30 : 0),
+      top: initialMargin.top,
+      right: initialMargin.right,
+      bottom: initialMargin.bottom + rotationAdjustment,
+      left: Math.max(initialMargin.left, yAxisWidth),
     };
   }, [initialMargin, width, filteredData]);
 
@@ -91,7 +127,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     tooltipOpen,
   } = useTooltip<TooltipData[]>();
 
-  // Calculate the maximum value for the y-axis scale
+  // Calculate the maximum value for the y-axis scale - using less padding to use more space
   const maxValue = useMemo(
     () =>
       Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) *
@@ -99,13 +135,13 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     [filteredData],
   );
 
-  // Create scales
+  // Create scales with optimized padding for better space usage
   const xScale = useMemo(
     () =>
       scaleBand<string>({
         domain: filteredData.map((d) => String(d.label)),
         range: [0, innerWidth],
-        padding: 0.6, // Increased padding for thinner bars
+        padding: 0.2, // Reduced padding for wider bars (from 0.3)
         round: true,
       }),
     [filteredData, innerWidth],
@@ -167,6 +203,16 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     return <div>No data to display.</div>;
   }
 
+  // Calculate optimal bar width based on available space
+  const getOptimalBarWidth = (calculatedWidth) => {
+    // For few bars, limit maximum width
+    if (filteredData.length <= 3) {
+      return Math.min(calculatedWidth, maxBarWidth);
+    }
+    // For many bars, use more of the available width
+    return Math.min(calculatedWidth, maxBarWidth * 1.5);
+  };
+
   return (
     <ChartWrapper
       ref={parentRef}
@@ -199,7 +245,12 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         {isLoading && <SvgShimmer />}
 
         <Group top={margin.top} left={margin.left}>
-          <YAxis scale={yScale} isLoading={isLoading} {...yAxisProps} />
+          <YAxis
+            scale={yScale}
+            isLoading={isLoading}
+            showAxisLine={true}
+            {...yAxisProps}
+          />
 
           <Grid
             width={innerWidth}
@@ -214,6 +265,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             isLoading={isLoading}
             availableWidth={innerWidth}
             forceFullLabels
+            showAxisLine={true}
             {...xAxisProps}
           />
 
@@ -222,9 +274,9 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             const value = Number(d.value);
             if (Number.isNaN(value)) return null;
 
-            // Calculate bar width with maximum limit
+            // Calculate bar width with optimized usage of space
             const calculatedBarWidth = xScale.bandwidth();
-            const barWidth = Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
+            const barWidth = getOptimalBarWidth(calculatedBarWidth);
 
             // If the bar width is limited, center it
             const barX =
@@ -258,15 +310,15 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 opacity={barOpacity}
                 pathProps={{
                   d: `
-                                    M ${barX},${barY + barHeight}
-                                    L ${barX + barWidth},${barY + barHeight}
-                                    L ${barX + barWidth},${barY + radius}
-                                    Q ${barX + barWidth},${barY} ${barX + barWidth - radius},${barY}
-                                    L ${barX + DEFAULT_BAR_RADIUS},${barY}
-                                    Q ${barX},${barY} ${barX},${barY + radius}
-                                    L ${barX},${barY + barHeight}
-                                    Z
-                                  `,
+                    M ${barX},${barY + barHeight}
+                    L ${barX + barWidth},${barY + barHeight}
+                    L ${barX + barWidth},${barY + radius}
+                    Q ${barX + barWidth},${barY} ${barX + barWidth - radius},${barY}
+                    L ${barX + DEFAULT_BAR_RADIUS},${barY}
+                    Q ${barX},${barY} ${barX},${barY + radius}
+                    L ${barX},${barY + barHeight}
+                    Z
+                  `,
                 }}
                 onMouseMove={handleBarMouseMove(value, barColor, index)}
                 onMouseLeave={handleBarMouseLeave}

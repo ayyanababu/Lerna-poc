@@ -86,104 +86,43 @@ function App() {
                 </div>
             </>
 
-            {/* <div
-        style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <div
-          style={{
-            height: 500,
-            width: 500,
-          }}>
-          <VerticalBarChart
-            data={[
-              { label: 'January', value: 45, color: '#9bc5ef' },
-              { label: 'February', value: 60, color: '#50c1c2' },
-              { label: 'March', value: 35, color: '#fad176' },
-              { label: 'April', value: 70, color: '#407abc' },
-              { label: 'May', value: 55, color: '#93a3bc' },
-              { label: 'Jun', value: 40, color: 'orange' },
-            ]}
-            title="Monthly Trade Volume"
-            timestamp={new Date().toISOString()}
-            isLoading={isLoading}
-            titleProps={{
-              variant: 'h6',
-              align: 'left',
-            }}
-            legendsProps={{
-              position: Legends.Position.TOP,
-
-              doStrike: true,
-            }}
-            tooltipProps={{}}
-          />
-        </div>
-      </div> */}
-
             {
                 <Sortable className="my-cards">
-                    <SortableCard height={400} width={1000}>
-                    <TreeMapChart
-                            data={{
-                                id: 'portfolio',
-                                name: 'Portfolio',
-                                value: 1000,
-                                children: [
-                                    {
-                                        id: 'equities',
-                                        name: 'Equities',
-                                        value: 450,
-                                        children: [
-                                            {
-                                                id: 'tech',
-                                                name: 'Technology',
-                                                value: 180,
-                                            },
-                                            {
-                                                id: 'health',
-                                                name: 'Healthcare',
-                                                value: 120,
-                                            }
-                                        ],
-                                    },
-                                    {
-                                        id: 'fixed-income',
-                                        name: 'Fixed Income',
-                                        value: 300,
-                                        children: [
-                                            {
-                                                id: 'treasury',
-                                                name: 'Treasury',
-                                                value: 120,
-                                            },
-                                            {
-                                                id: 'corporate',
-                                                name: 'Corporate',
-                                                value: 100,
-                                            },
-                                        ],
-                                    },
-                                    {
-                                        id: 'cash',
-                                        name: 'Cash',
-                                        value: 400,
-                                    },
-                                ],
-                            }}
-                            title="Investment Portfolio Allocation"
-                            colors={['rgba(232, 134, 97,0.50)', 'rgba(232, 134, 97,0.30)','rgba(232, 134, 97,0.15)', '#4E7AC2']}
+                    <SortableCard height={400} width={'100%'}>
+                        <VerticalBarChart
+                            data={[
+                                {
+                                    label: 'January',
+                                    value: 450000000,
+                                    color: '#9bc5ef',
+                                },
+                                {
+                                    label: 'February',
+                                    value: 600000000,
+                                    color: '#50c1c2',
+                                },
+                                { label: 'March', value: 350000000, color: '#fad176' },
+                                { label: 'April', value: 700000000, color: '#407abc' },
+                                { label: 'May', value: 550000000, color: '#93a3bc' },
+                                { label: 'Jun', value: 400000000, color: 'orange' },
+                            ]}
+                            title="Monthly Trade Volume"
                             isLoading={isLoading}
+                            titleProps={{
+                                variant: 'h6',
+                                align: 'left',
+                            }}
                             legendsProps={{
-                                position: 'bottom',
-                                doStrike: false,
+                                position: Legends.Position.BOTTOM,
+                                doStrike: true,
+                            }}
+                            xAxisProps={{
+                                showAxisLine: false,
+                            }}
+                            yAxisProps={{
+                                showAxisLine: false
                             }}
                             tooltipProps={{}}
-                            tilePadding={2}
-                            borderRadius={5}
                         />
                     </SortableCard>
                     <SortableCard title="SemiDonut" height={400} width={400}>
@@ -322,10 +261,7 @@ function App() {
                     </SortableCard>
 
                     {/* VerticalBarChart example */}
-                    <SortableCard
-                        title="VerticalBarChart"
-                        height={400}
-                        width={'100%'}>
+                    <SortableCard height={400} width={'100%'}>
                         <VerticalBarChart
                             data={[
                                 { label: 'Not Priced', value: 30 },

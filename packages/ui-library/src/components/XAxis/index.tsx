@@ -87,24 +87,20 @@ function XAxis({
 
     // Calculate available width per label
     const availableWidthPerLabel = availableWidth / scaleLabels.length;
-    const averageCharWidth = 6; // Approximate width per character
+    const averageCharWidth = 6;
 
     const maxLabelLength = Math.max(
       ...scaleLabels.map((label) => String(label).length),
     );
     const estimatedMaxLabelWidth = maxLabelLength * averageCharWidth;
 
-    // Improved spacing calculation for horizontal labels
-    const horizontalSpaceFactor = 1.5; // Increased from previous value
-
-    // If we have enough space or few labels, display all labels flat
+    const horizontalSpaceFactor = 1.5;
     if (
       scaleLabels.length <= dynamicNumTicks ||
       (availableWidthPerLabel >
         estimatedMaxLabelWidth * horizontalSpaceFactor &&
         !autoRotate)
     ) {
-      // Added adaptive character limit based on available width
       const horizontalCharLimit = Math.min(
         100,
         Math.floor((availableWidthPerLabel / averageCharWidth) * 0.9),
@@ -130,15 +126,12 @@ function XAxis({
       };
     }
 
-    // If rotating helps fit the labels, use rotation
-    // Improved rotation angle and positioning
     if (
       autoRotate ||
       scaleLabels.length <= dynamicNumTicks * 2 ||
       availableWidthPerLabel > estimatedMaxLabelWidth * 0.6
     ) {
-      // Improved space calculation for rotated labels
-      const rotatedSpaceFactor = 2.0; // Increased from previous value
+      const rotatedSpaceFactor = 2.0;
       const rotatedCharLimit = Math.min(
         forceFullLabels ? 100 : MAX_LABEL_CHARS + 8,
         Math.floor(
@@ -162,7 +155,6 @@ function XAxis({
       };
     }
 
-    // For crowded axes, show select labels (always first and last, distribute rest)
     const indicesToShow: number[] = [0, scaleLabels.length - 1]; // Always show first and last
 
     const optimalLabelCount = Math.min(dynamicNumTicks, scaleLabels.length);
@@ -185,8 +177,7 @@ function XAxis({
     const labelCount = indicesToShow.length;
 
     if (labelCount > 1) {
-      // Improved spacing with better margins
-      const effectiveWidth = availableWidth * 0.95; // Use 95% of available width
+      const effectiveWidth = availableWidth * 0.95;
       const spacing = effectiveWidth / (labelCount - 1);
       indicesToShow.forEach((index, i) => {
         positions.set(scaleLabels[index], availableWidth * 0.025 + i * spacing);
@@ -195,7 +186,6 @@ function XAxis({
       positions.set(scaleLabels[indicesToShow[0]], availableWidth / 2);
     }
 
-    // Calculate how many characters we can show based on available space
     const filteredSpaceFactor = 2.2; // Increased for better readability
     const maxCharsPerLabel = Math.floor(
       (availableWidthPerLabel * filteredSpaceFactor) / averageCharWidth,
@@ -253,7 +243,6 @@ function XAxis({
         ? evenPositionsMap.get(formattedValue)
         : tickProps.x;
 
-    // Adjusted y-offset for better positioning
     const yOffset = showAxisLine
       ? labelOffset + (rotate ? ROTATED_LABEL_PADDING : 0)
       : labelOffset / 2;
