@@ -5,6 +5,7 @@ import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
 import { useTooltip } from "@visx/tooltip";
 
 import useTheme from "../../hooks/useTheme";
+import { formatNumberWithSuffix } from "../../utils/number";
 import { ChartWrapper } from "../ChartWrapper";
 import CustomBar from "../CustomBar";
 import Grid from "../Grid";
@@ -16,16 +17,26 @@ import mockVerticalBarChartData from "./mockdata";
 import { DataPoint, VerticalBarChartProps } from "./types";
 
 const DEFAULT_MARGIN = {
-  top: 20,
-  right: 30,
-  bottom: 50,
-  left: 50,
+  top: 5,
+  right: 0,
+  bottom: 25,
+  left: 25,
 };
-const MAX_BAR_WIDTH = 16;
+
+const DEFAULT_MAX_BAR_WIDTH = 16;
 const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
-const SCALE_PADDING = 1.2;
+const SCALE_PADDING = 1.02;
+
+const getEstimatedYAxisWidth = (maxValue, averageCharWidth = 7) => {
+  const absValue = Math.abs(maxValue);
+  const formattedValue = formatNumberWithSuffix(maxValue);
+  const commasCount = Math.floor(
+    Math.max(0, absValue.toString().length - 3) / 3,
+  );
+  return formattedValue.length * averageCharWidth + commasCount * 3 + 10;
+};
 
 const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   data: _data,
@@ -43,6 +54,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   timestampProps,
   barProps,
   onClick,
+  maxBarWidth = DEFAULT_MAX_BAR_WIDTH,
 }) => {
   const { theme } = useTheme();
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -62,22 +74,46 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     [data, hideIndex],
   );
 
-  // We'll calculate a dynamic bottom margin based on whether labels need rotation
-  // Add extra margin if there are many labels that will likely be rotated
   const margin = useMemo(() => {
     if (!width) return initialMargin;
-
+    const calculateAverageCharWidth = (strings) => {
+      if (!strings || strings.length === 0) return 7;
+      const totalChars = strings.join("").split("");
+      let totalEstimatedWidth = 0;
+      totalChars.forEach((char) => {
+        if ("mwWM".includes(char)) totalEstimatedWidth += 9;
+        else if ("ilIj.,'".includes(char)) totalEstimatedWidth += 4;
+        else if ("0123456789".includes(char)) totalEstimatedWidth += 7;
+        else totalEstimatedWidth += 7; // Default width for other characters
+      });
+      return totalEstimatedWidth / totalChars.length || 7;
+    };
     const innerWidth = width - initialMargin.left - initialMargin.right;
-    const labels = filteredData.map((d) => String(d.label));
-
-    // Estimate if we'll need extra margin for rotated labels
-    const averageCharWidth = 7;
-    const totalLabelWidth = labels.join("").length * averageCharWidth;
-    const needsRotation = labels.length > 5 || totalLabelWidth >= innerWidth;
+    const xLabels = filteredData.map((d) => String(d.label));
+    const averageCharWidth = calculateAverageCharWidth(xLabels);
+    const totalLabelWidth = xLabels.join("").length * averageCharWidth;
+    const needsRotation = xLabels.length > 5 || totalLabelWidth >= innerWidth;
+    const maxXLabelLength = Math.max(
+      ...xLabels.map((label) => label.length),
+      0,
+    );
+    const rotationAdjustment = needsRotation
+      ? Math.min(
+          5 + (maxXLabelLength > 10 ? (maxXLabelLength - 10) * 1.5 : 0),
+          35,
+        )
+      : 0;
+    const maxValue = Math.max(
+      0,
+      ...filteredData.map((d) => Number(d.value) || 0),
+    );
+    const yAxisWidth = getEstimatedYAxisWidth(maxValue, averageCharWidth);
 
     return {
-      ...initialMargin,
-      bottom: initialMargin.bottom + (needsRotation ? 30 : 0),
+      top: initialMargin.top,
+      right: initialMargin.right,
+      bottom: initialMargin.bottom + rotationAdjustment,
+      left: Math.max(initialMargin.left, yAxisWidth),
     };
   }, [initialMargin, width, filteredData]);
 
@@ -165,6 +201,13 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     }
   };
 
+  const getOptimalBarWidth = (calculatedWidth) => {
+    if (filteredData.length <= 3) {
+      return Math.min(calculatedWidth, maxBarWidth);
+    }
+    return Math.min(calculatedWidth, maxBarWidth * 1.5);
+  };
+
   if (!_data || _data.length === 0) {
     return <div>No data to display.</div>;
   }
@@ -224,19 +267,12 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             const value = Number(d.value);
             if (Number.isNaN(value)) return null;
 
-            // Calculate bar width with maximum limit
+            // Calculate bar width with optimized usage of space
             const calculatedBarWidth = xScale.bandwidth();
-            // Use custom barWidth if provided, otherwise use calculated width with MAX_BAR_WIDTH limit
-            const actualBarWidth =
-              barWidth !== undefined
-                ? barWidth
-                : Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
-
-            // If the bar width is limited, center it
+            const barWidth = getOptimalBarWidth(calculatedBarWidth);
             const barX =
-              actualBarWidth < calculatedBarWidth
-                ? (xScale(d.label) || 0) +
-                  (calculatedBarWidth - actualBarWidth) / 2
+              barWidth < calculatedBarWidth
+                ? (xScale(d.label) || 0) + (calculatedBarWidth - barWidth) / 2
                 : xScale(d.label) || 0;
 
             const barHeight = innerHeight - yScale(value);
@@ -248,7 +284,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 : DEFAULT_OPACITY;
             const radius = Math.min(
               DEFAULT_BAR_RADIUS,
-              actualBarWidth / 2,
+              barWidth / 2,
               barHeight > 0 ? barHeight : 0,
             );
             const barColor = d.color || colorScale(index);
@@ -258,7 +294,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 key={`bar-${d.label}`}
                 x={barX}
                 y={barY}
-                width={actualBarWidth}
+                width={barWidth}
                 height={barHeight}
                 fill={barColor}
                 isLoading={isLoading}
@@ -266,9 +302,9 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 pathProps={{
                   d: `
                     M ${barX},${barY + barHeight}
-                    L ${barX + actualBarWidth},${barY + barHeight}
-                    L ${barX + actualBarWidth},${barY + radius}
-                    Q ${barX + actualBarWidth},${barY} ${barX + actualBarWidth - radius},${barY}
+                    L ${barX + barWidth},${barY + barHeight}
+                    L ${barX + barWidth},${barY + radius}
+                    Q ${barX + barWidth},${barY} ${barX + barWidth - radius},${barY}
                     L ${barX + DEFAULT_BAR_RADIUS},${barY}
                     Q ${barX},${barY} ${barX},${barY + radius}
                     L ${barX},${barY + barHeight}

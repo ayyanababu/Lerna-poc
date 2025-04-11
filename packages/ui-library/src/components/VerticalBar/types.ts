@@ -28,6 +28,7 @@ export interface VerticalBarChartProps {
   gridProps?: Partial<GridProps>;
   timestampProps?: Partial<TimestampProps>;
   barProps?: Partial<CustomBarProps>;
+  maxBarWidth?: number;
   onClick?: (
     event: React.MouseEvent<SVGGElement, MouseEvent>,
     data: DataPoint,
