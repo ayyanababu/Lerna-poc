@@ -44,7 +44,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   margin: initialMargin = DEFAULT_MARGIN,
   colors = [],
   isLoading = false,
-  barWidth,
   titleProps,
   legendsProps,
   tooltipProps,
@@ -202,10 +201,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   };
 
   const getOptimalBarWidth = (calculatedWidth) => {
-    if (filteredData.length <= 3) {
-      return Math.min(calculatedWidth, maxBarWidth);
-    }
-    return Math.min(calculatedWidth, maxBarWidth * 1.5);
+    return Math.min(calculatedWidth, maxBarWidth);
   };
 
   if (!_data || _data.length === 0) {
