@@ -30,7 +30,7 @@
 import { ReactNode } from "react";
 
 import { LegendsProps } from "../Legends/types";
-import { TimestampProps } from "../TimeStamp/types";
+import { TimestampProps } from "../Timestamp/types";
 import { TitleProps } from "../Title/types";
 import { TooltipProps } from "../Tooltip/types";
 

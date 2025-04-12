@@ -75,7 +75,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     tooltipLeft,
     tooltipTop,
     tooltipOpen,
-  } = useTooltip<TooltipData>();
+  } = useTooltip<TooltipData[]>();
 
   // Process data
   const { data, groupKeys } = useMemo<{
@@ -227,10 +227,12 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     (groupKey: string, value: number) => (event: React.MouseEvent) => {
       if (!isLoading) {
         showTooltip({
-          tooltipData: {
-            label: capitalize(lowerCase(groupKey)),
-            value,
-          },
+          tooltipData: [
+            {
+              label: capitalize(lowerCase(groupKey)),
+              value,
+            },
+          ],
           tooltipLeft: event.clientX,
           tooltipTop: event.clientY,
         });
