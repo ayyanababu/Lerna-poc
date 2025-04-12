@@ -67,7 +67,7 @@ export default function SortableComponent({
       sx={{
         gap: "16px",
         display: "grid",
-        gridTemplateColumns: "repeat(1, minmax(0, 1fr))",
+        gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
         "& .sortable-ghost": {
           backgroundColor: "#8fc5ff",
           borderRadius: "8px",

@@ -8,7 +8,7 @@ import Title from "../Title";
 import { SortableCardProps } from "./types";
 
 const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
-  ({ children, title, height, width }, ref) => {
+  ({ children, title, height, width, ...props }, ref) => {
     const { theme } = useTheme();
     return (
       <Card
@@ -23,21 +23,24 @@ const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
           boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.05)",
           border: `1px solid ${theme.colors.common.border}`,
           transition: "all 0.2s ease-in-out",
+          minHeight: "400px",
           "&:hover": {
             transform: "translateY(-2px)",
           },
         }}
+        {...props}
       >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: 1,
-            padding: "8px",
-          }}
-        >
-          <Title title={title} />
-          {/* <Box
+        {title && (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 1,
+              padding: "8px",
+            }}
+          >
+            <Title title={title} />
+            {/* <Box
                         sx={{
                             display: 'flex',
                             cursor: 'pointer',
@@ -52,12 +55,13 @@ const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
                     >
                         <RxDragHandleDots2 />
                     </Box> */}
-        </Box>
+          </Box>
+        )}
 
         <CardContent
           sx={{
             display: "flex",
-            padding: "8px",
+            padding: "4px",
             height,
             width,
           }}
