@@ -75,7 +75,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     tooltipLeft,
     tooltipTop,
     tooltipOpen,
-  } = useTooltip<TooltipData>();
+  } = useTooltip<TooltipData[]>();
 
   // Process data
   const { data, groupKeys } = useMemo<{
@@ -226,10 +226,12 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     (groupKey: string, value: number) => (event: React.MouseEvent) => {
       if (!isLoading) {
         showTooltip({
-          tooltipData: {
-            label: capitalize(lowerCase(groupKey)),
-            value,
-          },
+          tooltipData: [
+            {
+              label: capitalize(lowerCase(groupKey)),
+              value,
+            },
+          ],
           tooltipLeft: event.clientX,
           tooltipTop: event.clientY,
         });
