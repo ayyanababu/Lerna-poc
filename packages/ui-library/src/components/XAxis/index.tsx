@@ -7,9 +7,9 @@ import { shimmerClassName } from "../Shimmer/Shimmer";
 import { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { XAxisProps } from "./types";
 
+
 const MAX_LABEL_CHARS = 15;
-const MIN_SPACE_BETWEEN_TICKS = 45;
-const ROTATED_LABEL_PADDING = 20;
+const FIXED_CLASSNAME_XLABELS = 'fixed-classname-xlabels';
 
 function XAxis({
   availableWidth = 0,
@@ -26,20 +26,64 @@ function XAxis({
   tickLabelProps: externalTickLabelProps,
   tickLength = 5,
   labelOffset = 8,
-  autoRotate = false,
-  forceFullLabels = false,
   ...props
 }: XAxisProps): JSX.Element | null {
-  const theme = useTheme()?.theme || {
-    colors: { axis: { label: "#888", title: "#555", line: "#ddd" } },
-  };
+  const { theme } = useTheme();
+  const axisRef = useRef<SVGGElement>(null);
+  const [isOverlapping, setIsOverlapping] = useState(false);
+  const [averageWidthPerChar, setAverageWidthPerChar] = useState(6);
 
+  const calculateLabelWidths = useCallback((ref: React.RefObject<SVGGElement>) => {
+    requestAnimationFrame(() => {
+      if (!ref.current) return;
+
+      const nodeList = ref.current.querySelectorAll(`.${FIXED_CLASSNAME_XLABELS}`);
+
+      if (!nodeList.length) {
+        calculateLabelWidths(ref);
+        return;
+      }
+      
+      let lastRight = 0;
+      let overlapping = false;
+      let widthSum = 0;
+      let totalChars = 0;
+
+      nodeList.forEach((node) => {
+        const { width, left, right } = node.getBoundingClientRect();
+        const chars = node.innerHTML.length;
+
+        if (lastRight > left) overlapping = true;
+        
+        lastRight = right;
+        widthSum += width;
+        totalChars += chars;
+      });
+
+      if (overlapping) {
+        setIsOverlapping(true);
+        setAverageWidthPerChar(Math.ceil(widthSum/totalChars))
+      }
+    });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (axisRef.current) calculateLabelWidths(axisRef);
+  }, [calculateLabelWidths]);
+
+  useLayoutEffect(() => {
+    const resizeObserver = new ResizeObserver(() => calculateLabelWidths(axisRef));
+
+    if (axisRef.current) resizeObserver.observe(axisRef.current);
+
+    return resizeObserver.unobserve(axisRef.current!);
+  }, [])
+  
   const overLineStyles = {
-    fontSize: "10px",
-    fontWeight: "normal",
-    lineHeight: "165%",
-    letterSpacing: "0.4px",
-    fontFamily: "Roboto",
+    fontSize: '10px',
+    fontWeight: 'normal',
+    lineHeight: '165%',
+    letterSpacing: '0.4px'
   };
 
   const tickFormat = (value: number | string) => {
@@ -51,118 +95,89 @@ function XAxis({
 
   const dynamicNumTicks = useMemo(() => {
     if (availableWidth <= 0) return numTicks;
-    return Math.max(2, Math.floor(availableWidth / MIN_SPACE_BETWEEN_TICKS));
-  }, [availableWidth, numTicks]);
+  
+    let scaleLabels: string[] = [];
+  
+    if (providedLabels?.length) {
+      scaleLabels = [...providedLabels];
+    } else if (scale.domain && typeof scale.domain === 'function') {
+      scaleLabels = scale.domain().map(String);
+    }
 
-  const {
-    angle,
-    evenPositionsMap,
-    formatLabel,
-    rotate,
-    textAnchor,
-    tickValues,
-  } = useMemo(() => {
+    while (scaleLabels.length > 0 && (availableWidth / (scaleLabels.join(' ').length * averageWidthPerChar)) < .9) {
+      scaleLabels.pop();
+    }
+    
+    return Math.max(4, scaleLabels.length);
+  }, [availableWidth, numTicks, scale, providedLabels, averageWidthPerChar]);
+
+  const { angle, evenPositionsMap, formatLabel, rotate, textAnchor, tickValues } = useMemo(() => {
     const scaleLabels =
       providedLabels ||
-      (scale.domain && typeof scale.domain === "function"
-        ? scale.domain().map(String)
-        : []);
+      (scale.domain && typeof scale.domain === 'function' ? scale.domain().map(String) : []);
+    // Calculate available width per label
+    const availableWidthPerLabel = availableWidth / scaleLabels.length;
+    const maxLabelChars = Math.floor(availableWidthPerLabel / averageWidthPerChar);
+    const maxLabelLength = Math.max(...scaleLabels.map((label) => String(label).length));
+    const estimatedMaxLabelWidth = maxLabelLength * averageWidthPerChar;
 
     if (scaleLabels.length <= 1) {
       return {
         angle: 0,
         evenPositionsMap: null,
         formatLabel: (label: string): string => {
-          if (typeof label !== "string") return String(label);
-          if (forceFullLabels) return label;
+          if (typeof label !== 'string') return String(label);
           return label.length > MAX_LABEL_CHARS
             ? `${label.substring(0, MAX_LABEL_CHARS - 3)}...`
             : label;
         },
         rotate: false,
-        textAnchor: "middle" as const,
-        tickValues: [],
+        textAnchor: 'middle',
+        tickValues: []
       };
     }
-
-    // Calculate available width per label
-    const availableWidthPerLabel = availableWidth / scaleLabels.length;
-    const averageCharWidth = 6; // Approximate width per character
-
-    const maxLabelLength = Math.max(
-      ...scaleLabels.map((label) => String(label).length),
-    );
-    const estimatedMaxLabelWidth = maxLabelLength * averageCharWidth;
-
-    // Improved spacing calculation for horizontal labels
-    const horizontalSpaceFactor = 1.5; // Increased from previous value
-
-    // If we have enough space or few labels, display all labels flat
-    if (
-      scaleLabels.length <= dynamicNumTicks ||
-      (availableWidthPerLabel >
-        estimatedMaxLabelWidth * horizontalSpaceFactor &&
-        !autoRotate)
-    ) {
-      // Added adaptive character limit based on available width
-      const horizontalCharLimit = Math.min(
-        100,
-        Math.floor((availableWidthPerLabel / averageCharWidth) * 0.9),
-      );
-
-      const effectiveCharLimit = forceFullLabels
-        ? 100
-        : Math.max(8, Math.min(MAX_LABEL_CHARS + 5, horizontalCharLimit));
-
+    console.log(dynamicNumTicks, 'dynamicNumTicks')
+    if (scaleLabels.length <= dynamicNumTicks) {
       return {
         angle: 0,
         evenPositionsMap: null,
-        formatLabel: (label: string): string => {
-          if (typeof label !== "string") return String(label);
-          if (forceFullLabels) return label;
-          return label.length > effectiveCharLimit
-            ? `${label.substring(0, effectiveCharLimit - 3)}...`
+        formatLabel: (label: string): string => { 
+          if (typeof label !== 'string') return String(label);
+
+          return label.length > maxLabelChars && isOverlapping
+            ? `${label.substring(0, maxLabelChars - 3)}...`
             : label;
         },
         rotate: false,
-        textAnchor: "middle" as const,
-        tickValues: null,
+        textAnchor: 'middle',
+        tickValues: null
       };
     }
 
-    // If rotating helps fit the labels, use rotation
-    // Improved rotation angle and positioning
     if (
-      autoRotate ||
       scaleLabels.length <= dynamicNumTicks * 2 ||
       availableWidthPerLabel > estimatedMaxLabelWidth * 0.6
     ) {
-      // Improved space calculation for rotated labels
-      const rotatedSpaceFactor = 2.0; // Increased from previous value
       const rotatedCharLimit = Math.min(
-        forceFullLabels ? 100 : MAX_LABEL_CHARS + 8,
-        Math.floor(
-          (availableWidthPerLabel * rotatedSpaceFactor) / averageCharWidth,
-        ),
+        MAX_LABEL_CHARS,
+        Math.floor((availableWidthPerLabel * 1.5) / averageWidthPerChar)
       );
 
       return {
         angle: -45,
         evenPositionsMap: null,
         formatLabel: (label: string): string => {
-          if (typeof label !== "string") return String(label);
-          if (forceFullLabels) return label;
+          if (typeof label !== 'string') return String(label);
           return label.length > rotatedCharLimit
             ? `${label.substring(0, rotatedCharLimit - 3)}...`
             : label;
         },
         rotate: true,
-        textAnchor: "end" as const,
-        tickValues: null,
+        textAnchor: 'end',
+        tickValues: null
       };
     }
 
-    // For crowded axes, show select labels (always first and last, distribute rest)
     const indicesToShow: number[] = [0, scaleLabels.length - 1]; // Always show first and last
 
     const optimalLabelCount = Math.min(dynamicNumTicks, scaleLabels.length);
@@ -180,63 +195,48 @@ function XAxis({
 
     indicesToShow.sort((a, b) => a - b);
 
-    // Create a map for positioning the labels evenly
     const positions = new Map();
     const labelCount = indicesToShow.length;
 
     if (labelCount > 1) {
-      // Improved spacing with better margins
-      const effectiveWidth = availableWidth * 0.95; // Use 95% of available width
-      const spacing = effectiveWidth / (labelCount - 1);
+      const spacing = availableWidth / labelCount;
       indicesToShow.forEach((index, i) => {
-        positions.set(scaleLabels[index], availableWidth * 0.025 + i * spacing);
+        positions.set(scaleLabels[index], i * spacing);
       });
     } else if (labelCount === 1) {
       positions.set(scaleLabels[indicesToShow[0]], availableWidth / 2);
     }
 
     // Calculate how many characters we can show based on available space
-    const filteredSpaceFactor = 2.2; // Increased for better readability
+
+    const rotatedSpaceFactor = 1.8;
     const maxCharsPerLabel = Math.floor(
-      (availableWidthPerLabel * filteredSpaceFactor) / averageCharWidth,
+      (availableWidthPerLabel * rotatedSpaceFactor) / averageWidthPerChar
     );
 
-    const charLimit = forceFullLabels
-      ? 100
-      : Math.min(MAX_LABEL_CHARS + 5, Math.max(8, maxCharsPerLabel));
+    const charLimit = Math.min(MAX_LABEL_CHARS, Math.max(8, maxCharsPerLabel));
 
     return {
       angle: -45,
       evenPositionsMap: positions,
       formatLabel: (label: string): string => {
-        if (typeof label !== "string") return String(label);
-        if (forceFullLabels) return label;
-        return label.length > charLimit
-          ? `${label.substring(0, charLimit - 3)}...`
-          : label;
+        if (typeof label !== 'string') return String(label);
+
+        return label.length > charLimit ? `${label.substring(0, charLimit - 3)}...` : label;
       },
       rotate: true,
-      textAnchor: "end" as const,
-      tickValues: indicesToShow.map((i) => scaleLabels[i]),
+      textAnchor: 'end',
+      tickValues: indicesToShow.map((i) => scaleLabels[i])
     };
-  }, [
-    availableWidth,
-    providedLabels,
-    scale,
-    dynamicNumTicks,
-    forceFullLabels,
-    autoRotate,
-  ]);
+  }, [availableWidth, providedLabels, scale, dynamicNumTicks, averageWidthPerChar, isOverlapping]);
 
   const renderAxisLabel = (
     formattedValue: string | undefined,
-    tickProps: React.SVGProps<SVGTextElement>,
+    tickProps: React.SVGProps<SVGTextElement>
   ): JSX.Element => {
-    let label = "";
+    let label = '';
     if (!isLoading) {
-      label = formatLabel
-        ? formatLabel(formattedValue || "")
-        : formattedValue || "";
+      label = formatLabel ? formatLabel(formattedValue || '') : formattedValue || '';
 
       if (isNumeric(label)) {
         label = formatNumberWithSuffix(Number(label));
@@ -253,19 +253,14 @@ function XAxis({
         ? evenPositionsMap.get(formattedValue)
         : tickProps.x;
 
-    // Adjusted y-offset for better positioning
-    const yOffset = showAxisLine
-      ? labelOffset + (rotate ? ROTATED_LABEL_PADDING : 0)
-      : labelOffset / 2;
+    const yOffset = showAxisLine ? labelOffset : labelOffset / 2;
 
     if (rotate) {
       return (
         <g transform={`translate(${xPos},${tickProps.y})`}>
           <text
-            className={isLoading ? shimmerClassName : ""}
-            fill={
-              isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label
-            }
+            className={isLoading ? shimmerClassName : ''}
+            fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
             style={textStyle}
             textAnchor={textAnchor}
             transform={`rotate(${angle})`}
@@ -281,62 +276,58 @@ function XAxis({
     return (
       <g transform={`translate(${xPos},${tickProps.y})`}>
         <text
-          className={isLoading ? shimmerClassName : ""}
-          fill={
-            isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label
-          }
+          className={isLoading ? shimmerClassName : FIXED_CLASSNAME_XLABELS}
+          fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
           style={textStyle}
           textAnchor="middle"
-          dy={`${yOffset}px`}
+          dy={`${yOffset  }px`}
         >
           {label}
         </text>
       </g>
     );
   };
-
+  
   const mergedLabelProps = {
     ...externalLabelProps,
     ...overLineStyles,
     color: theme.colors.axis.title,
     fill: theme.colors.axis.title,
-    dy: showAxisLine
-      ? `${labelOffset + 4 + (rotate ? ROTATED_LABEL_PADDING : 0)}px`
-      : `${labelOffset + 23}px`,
+    dy: showAxisLine ? `${labelOffset + 4  }px` : `${labelOffset + 10 }px`
   };
 
-  // Fixed the tickLabelProps function to return proper typing
-  const mergedTickLabelProps = () => ({
+  const mergedTickLabelProps = {
     ...externalTickLabelProps,
     ...overLineStyles,
     color: theme.colors.axis.label,
-    fill: theme.colors.axis.label,
-    textAnchor: "middle" as const,
-  });
+    fill: theme.colors.axis.label
+  };
 
   if (!isVisible) {
     return null;
   }
 
   return (
-    <AxisBottom
-      scale={scale}
-      top={top}
-      stroke={theme.colors.axis.line}
-      tickStroke={theme.colors.axis.line}
-      tickValues={tickValues === null ? undefined : tickValues}
-      tickLabelProps={mergedTickLabelProps}
-      numTicks={dynamicNumTicks}
-      hideAxisLine={!showAxisLine}
-      hideTicks={hideAllTicks || !showTicks}
-      tickLength={showTicks ? tickLength : 0}
-      tickComponent={({ formattedValue, ...tickProps }) =>
-        renderAxisLabel(formattedValue, tickProps)
-      }
-      tickFormat={tickFormat}
-      labelProps={mergedLabelProps}
-      {...props}
-    />
+    <g ref={axisRef}>
+      <AxisBottom
+        scale={scale}
+        top={top}
+        stroke={theme.colors.axis.line}
+        tickStroke={theme.colors.axis.line}
+        tickValues={tickValues === null ? undefined : tickValues}
+        tickLabelProps={mergedTickLabelProps}
+        numTicks={dynamicNumTicks}
+        hideAxisLine={!showAxisLine}
+        hideTicks={hideAllTicks || !showTicks}
+        tickLength={showTicks ? tickLength : 0}
+        tickComponent={({ formattedValue, ...tickProps }) =>
+          renderAxisLabel(formattedValue, tickProps)
+        }
+        tickFormat={tickFormat}
+        labelProps={mergedLabelProps}
+        {...props}
+      />
+    </g>
   );
 }
 
