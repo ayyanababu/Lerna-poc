@@ -4,7 +4,7 @@ import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
 import { useTooltip } from "@visx/tooltip";
 
-import useTheme from "../../hooks/useTheme";
+import useTheme from "../../hooks/useTheme";     
 import { ChartWrapper } from "../ChartWrapper";
 import CustomBar from "../CustomBar";
 import Grid from "../Grid";
