@@ -20,7 +20,7 @@ export default function SortableComponent({
   }, [childrenArray]);
 
   useEffect(() => {
-    if (!containerRef.current) return () => {};
+    if (!containerRef.current) return () => { };
 
     const sortable = Sortable.create(containerRef.current, {
       handle: ".drag-handle",
@@ -67,7 +67,7 @@ export default function SortableComponent({
       sx={{
         gap: "16px",
         display: "grid",
-        gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+        gridTemplateColumns: "repeat(1, minmax(0, 1fr))",
         "& .sortable-ghost": {
           backgroundColor: "#8fc5ff",
           borderRadius: "8px",

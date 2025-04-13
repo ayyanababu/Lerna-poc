@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
@@ -17,58 +17,33 @@ import { DataPoint, HorizontalBarChartProps } from "./types";
 
 const DEFAULT_MARGIN = {
   top: 20,
-  right: 20, // Reduced from 50 to 20
-  bottom: 20,
-  left: 70, // Increased from 50 to 70
+  right: 20,
+  bottom: 0,
+  left: 10,
 };
 const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
-const SCALE_PADDING = 1.02; // Reduced from 1.1 to 1.02
-const MAX_BAR_HEIGHT = 16; // Bar thickness
+const SCALE_PADDING = 1.02;
+const MAX_BAR_HEIGHT = 16;
 
-interface DynamicMargin {
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-}
-
-/**
- * Helper: measure the widest label in pixels using a hidden <canvas>
- */
 function getMaxLabelWidth(labels: string[], font = "10px sans-serif") {
-  if (labels.length === 0) return 0;
-  // Create an offscreen canvas to measure text
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
   if (!ctx) return 0;
-
   ctx.font = font;
-  let maxWidth = 0;
-  labels.forEach((label) => {
-    const { width } = ctx.measureText(label);
-    if (width > maxWidth) maxWidth = width;
-  });
-  return maxWidth;
+  return Math.max(...labels.map((label) => ctx.measureText(label).width));
 }
 
-/**
- * Truncate label to 15 chars (same logic as YAxis uses),
- * so we measure the same truncated version.
- */
 function truncateLabel(rawLabel: string, maxChars = 15) {
-  if (rawLabel.length <= maxChars) return rawLabel;
-  return `${rawLabel.substring(0, maxChars)}…`;
+  return rawLabel.length <= maxChars
+    ? rawLabel
+    : `${rawLabel.substring(0, maxChars)}…`;
 }
 
-/**
- * HorizontalBarChart component that renders a simple horizontal bar chart
- */
 const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   data: _data,
   title,
-  margin: initialMargin = DEFAULT_MARGIN,
   colors = [],
   isLoading = false,
   barWidth,
@@ -83,9 +58,13 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   onClick,
 }) => {
   const { theme } = useTheme();
-  const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
+  const { parentRef, width = 0, height = 0 } = useParentSize({ debounceTime: 150 });
+
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
+  const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(null);
+  const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(null);
+  const chartSvgRef = useRef<SVGSVGElement | null>(null);
 
   const {
     showTooltip,
@@ -96,21 +75,19 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     tooltipOpen,
   } = useTooltip<TooltipData[]>();
 
-  // Use the provided data, or mock data if loading
   const data = useMemo<DataPoint[]>(
     () => (isLoading ? mockHorizontalBarChartData : _data),
-    [isLoading, _data],
+    [isLoading, _data]
   );
 
-  // Filter out hidden data points
   const filteredData = useMemo(
     () => data.filter((_, index) => !hideIndex.includes(index)),
-    [data, hideIndex],
+    [data, hideIndex]
   );
 
   const truncatedLabels = useMemo(
     () => filteredData.map((d) => truncateLabel(String(d.label), 15)),
-    [filteredData],
+    [filteredData]
   );
 
   const maxLabelPx = useMemo(() => {
@@ -118,80 +95,60 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     return getMaxLabelWidth(truncatedLabels, "10px sans-serif");
   }, [truncatedLabels]);
 
-  // We'll define a dynamic margin so the Y axis fits well
-  const margin = useMemo<DynamicMargin>(() => {
-    if (!width) return initialMargin;
-
-    // Calculate the desired left margin based on the widest label
-    let desiredLeft = maxLabelPx + 20; // Increased padding from 10 to 20
-
-    // Ensure it's not excessively wide
-    if (desiredLeft > width / 3) {
-      desiredLeft = width / 3;
-    }
-
-    // Ensure the margin is at least as large as the provided initialMargin
-    desiredLeft = Math.max(desiredLeft, initialMargin.left);
-
+  const margin = useMemo(() => {
+    if (!width) return DEFAULT_MARGIN;
+    let desiredLeft = maxLabelPx + 20;
+    if (desiredLeft > width / 3) desiredLeft = width / 3;
+    desiredLeft = Math.max(desiredLeft, DEFAULT_MARGIN.left);
     const showingXAxis = xAxisProps?.isVisible !== false;
-
     const bottomMargin = showingXAxis
-      ? initialMargin.bottom
-      : Math.max(initialMargin.bottom - 10, 10);
-
-    // Use a smaller right margin to give more space to the chart itself
-    const rightMargin = Math.min(initialMargin.right, 20);
-
+      ? DEFAULT_MARGIN.bottom
+      : Math.max(DEFAULT_MARGIN.bottom - 10, 10);
+    const rightMargin = Math.min(DEFAULT_MARGIN.right, 20);
     return {
-      ...initialMargin,
+      ...DEFAULT_MARGIN,
       left: desiredLeft,
       bottom: bottomMargin,
       right: rightMargin,
     };
-  }, [initialMargin, maxLabelPx, width, xAxisProps]);
+  }, [maxLabelPx, width, xAxisProps]);
 
-  // Chart's inner dimensions
-  const innerWidth = width - margin.left - margin.right;
-  const innerHeight = height - margin.top - margin.bottom;
+  const drawableChartWidth = width - margin.left - margin.right;
+  const drawableChartHeight = height - margin.top - margin.bottom;
 
-  // Calculate the maximum value for the x-axis scale
   const maxValue = useMemo(
     () =>
       Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) *
       SCALE_PADDING,
-    [filteredData],
+    [filteredData]
   );
 
-  // Create scales
-  // For horizontal bars, yScale uses band and xScale uses linear
   const yScale = useMemo(
     () =>
       scaleBand<string>({
         domain: filteredData.map((d) => String(d.label)),
-        range: [0, innerHeight],
+        range: [0, drawableChartHeight],
         padding: 0.4,
         round: true,
       }),
-    [filteredData, innerHeight],
+    [filteredData, drawableChartHeight]
   );
 
   const xScale = useMemo(
     () =>
       scaleLinear<number>({
         domain: [0, maxValue],
-        range: [0, innerWidth],
+        range: [0, drawableChartWidth],
         nice: true,
       }),
-    [innerWidth, maxValue],
+    [maxValue, drawableChartWidth]
   );
 
-  // Prepare legend data
   const legendData = useMemo(
     () => data.map((d) => ({ label: d.label, value: d.value })),
-    [data],
+    [data]
   );
 
-  // Color scale for the bars
   const colorScale = useMemo(() => {
     if (colors?.length) {
       return (index: number) => colors[index % colors.length];
@@ -200,25 +157,24 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       theme.colors.charts.bar[index % theme.colors.charts.bar.length];
   }, [colors, theme.colors.charts.bar]);
 
-  // Handle mouse events
   const handleBarMouseMove =
     (value: number, color: string, index: number) =>
-    (event: React.MouseEvent) => {
-      if (!isLoading) {
-        showTooltip({
-          tooltipData: [
-            {
-              label: filteredData[index].label,
-              value,
-              color,
-            },
-          ],
-          tooltipLeft: event.clientX,
-          tooltipTop: event.clientY,
-        });
-        setHoveredBar(index);
-      }
-    };
+      (event: React.MouseEvent) => {
+        if (!isLoading) {
+          showTooltip({
+            tooltipData: [
+              {
+                label: filteredData[index].label,
+                value,
+                color,
+              },
+            ],
+            tooltipLeft: event.clientX,
+            tooltipTop: event.clientY,
+          });
+          setHoveredBar(index);
+        }
+      };
 
   const handleBarMouseLeave = () => {
     if (!isLoading) {
@@ -226,6 +182,30 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       setHoveredBar(null);
     }
   };
+
+  useEffect(() => {
+    if (!chartSvgRef.current || !width || !height) return;
+
+    const svg = chartSvgRef.current;
+    const bbox = svg.getBBox();
+
+    const titleEl = document.querySelector(".chart-title") as HTMLElement | null;
+    const legendEl = document.querySelector(".chart-legend") as HTMLElement | null;
+
+    const titleHeight = titleEl?.getBoundingClientRect().height || 0;
+    const legendHeight = legendEl?.getBoundingClientRect().height || 0;
+
+    const totalTop = margin.top + titleHeight;
+    const totalBottom = margin.bottom + legendHeight;
+    const requiredHeight = totalTop + bbox.height + totalBottom;
+    const requiredWidth = margin.left + drawableChartWidth + margin.right;
+
+    const updatedHeight = Math.max(requiredHeight, height) + 5;
+    const updatedWidth = Math.max(requiredWidth, width);
+
+    setAdjustedChartHeight(updatedHeight);
+    setAdjustedChartWidth(updatedWidth);
+  }, [data, width, height, margin, drawableChartWidth]);
 
   if (!_data || _data.length === 0) {
     return <div>No data to display.</div>;
@@ -235,8 +215,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     <ChartWrapper
       ref={parentRef}
       title={title}
-      titleProps={titleProps}
+      titleProps={{ className: "chart-title", ...titleProps }}
       legendsProps={{
+        ...legendsProps,
         data: legendData,
         colorScale: scaleOrdinal({
           domain: legendData.map((d) => d.label),
@@ -248,7 +229,6 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         setHovered: (label) =>
           setHoveredBar(legendData.findIndex((item) => item.label === label)),
         isLoading,
-        ...legendsProps,
       }}
       tooltipProps={{
         data: tooltipData,
@@ -259,9 +239,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       }}
       timestampProps={{ isLoading, ...timestampProps }}
     >
-      <svg width={width} height={height}>
+      <svg
+        ref={chartSvgRef}
+        width={adjustedChartWidth || width}
+        height={adjustedChartHeight || height}
+      >
         {isLoading && <SvgShimmer />}
-
         <Group top={margin.top} left={margin.left}>
           <YAxis
             scale={yScale}
@@ -270,70 +253,54 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             showTicks={false}
             {...yAxisProps}
           />
-
           <Grid
-            height={innerHeight}
+            height={drawableChartHeight}
             xScale={xScale}
             showHorizontal={false}
             showVertical
             isLoading={isLoading}
             {...gridProps}
           />
-
           <XAxis
             scale={xScale}
-            top={innerHeight}
+            top={drawableChartHeight}
             isLoading={isLoading}
-            availableWidth={innerWidth}
+            availableWidth={drawableChartWidth}
             tickLength={0}
             {...xAxisProps}
           />
-
-          {/* Bars */}
           {filteredData.map((d, index) => {
             const value = Number(d.value);
             if (Number.isNaN(value)) return null;
-
-            // Calculate bar "thickness"
             const rawBarHeight = yScale.bandwidth();
-            // Use custom barWidth for the bar height (thickness) if provided
             const actualBarHeight =
               barWidth !== undefined
                 ? barWidth
                 : Math.min(rawBarHeight, MAX_BAR_HEIGHT);
-            // Center if we clamped
             const bandY = yScale(d.label) || 0;
             const barY = bandY + (rawBarHeight - actualBarHeight) / 2;
-
-            // Bar length
             const barLength = xScale(value);
             const barX = 0;
-
             const isHovered = hoveredBar === index;
             const barOpacity =
               hoveredBar !== null && !isHovered
                 ? REDUCED_OPACITY
                 : DEFAULT_OPACITY;
-
-            // Rounded right corners
             const radius = Math.min(
               DEFAULT_BAR_RADIUS,
               actualBarHeight / 2,
-              barLength,
+              barLength
             );
             const pathD = `
-                 M ${barX},${barY + actualBarHeight}
-                 L ${barX + barLength - radius},${barY + actualBarHeight}
-                 Q ${barX + barLength},${barY + actualBarHeight} ${barX + barLength},${
-                   barY + actualBarHeight - radius
-                 }
-                 L ${barX + barLength},${barY + radius}
-                 Q ${barX + barLength},${barY} ${barX + barLength - radius},${barY}
-                 L ${barX},${barY}
-                 Z
-               `;
+              M ${barX},${barY + actualBarHeight}
+              L ${barX + barLength - radius},${barY + actualBarHeight}
+              Q ${barX + barLength},${barY + actualBarHeight} ${barX + barLength},${barY + actualBarHeight - radius}
+              L ${barX + barLength},${barY + radius}
+              Q ${barX + barLength},${barY} ${barX + barLength - radius},${barY}
+              L ${barX},${barY}
+              Z
+            `;
             const barColor = d.color || colorScale(index);
-
             return (
               <CustomBar
                 key={`bar-${d.label}`}
@@ -349,12 +316,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
                 onMouseLeave={handleBarMouseLeave}
                 {...barProps}
                 onClick={(event) => {
-                  if (barProps?.onClick) {
-                    barProps.onClick(event);
-                  }
-                  if (onClick) {
-                    onClick(event, d, index);
-                  }
+                  if (barProps?.onClick) barProps.onClick(event);
+                  if (onClick) onClick(event, d, index);
                 }}
               />
             );

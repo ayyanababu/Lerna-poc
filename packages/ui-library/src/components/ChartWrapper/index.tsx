@@ -72,20 +72,21 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
               flex: "1 1 auto",
               minHeight: 0,
               // Gap between chart and legends based on position
+              // commented by VNS
               gap: position === LegendPosition.BOTTOM ? "12px" : "20px",
               marginTop: title ? "12px" : "0px", // Add 12px gap only if title exists
               ...(position === LegendPosition.LEFT ||
-              position === LegendPosition.RIGHT
+                position === LegendPosition.RIGHT
                 ? {
-                    flexDirection:
-                      position === LegendPosition.LEFT ? "row" : "row-reverse",
-                  }
+                  flexDirection:
+                    position === LegendPosition.LEFT ? "row" : "row-reverse",
+                }
                 : {
-                    flexDirection:
-                      position === LegendPosition.TOP
-                        ? "column"
-                        : "column-reverse",
-                  }),
+                  flexDirection:
+                    position === LegendPosition.TOP
+                      ? "column"
+                      : "column-reverse",
+                }),
             }}
           >
             <Legends
