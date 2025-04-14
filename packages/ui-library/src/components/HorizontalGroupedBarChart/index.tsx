@@ -370,7 +370,8 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     return renderGroupedBars();
   };
 
-  if (!_data || _data.length === 0) {
+
+  if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;
   }
   return (
