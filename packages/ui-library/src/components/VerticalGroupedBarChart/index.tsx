@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { AxisBottom, AxisLeft } from "@visx/axis";
+import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
+import { AxisBottom, AxisLeft } from "@visx/axis";   
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
@@ -16,40 +16,22 @@ import { TooltipData } from "../Tooltip/types";
 import { mockVerticalGroupedBarChartData } from "./mockdata";
 import { DataPoint, VerticalGroupedBarChartProps } from "./types";
 
-interface CustomBarProps {
-  key: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fill: string;
-  opacity: number;
-  rx?: number;
-  value: number;
-  label: string;
-  onMouseMove: (event: React.MouseEvent) => void;
-  onMouseLeave: () => void;
-}
-
 const DEFAULT_MARGIN = {
   top: 20,
   right: 30,
   bottom: 30,
   left: 40,
 };
+
 const DEFAULT_BAR_RADIUS = 5;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
 
-/**
- * VerticalGroupedBarChart component that renders either grouped or stacked bar charts vertically
- */
 const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   data: _data,
   groupKeys: _groupKeys,
   type = "grouped",
-  margin = DEFAULT_MARGIN,
   title,
   timestamp,
   colors = [],
@@ -60,13 +42,16 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   showTicks = false,
 }) => {
   const { theme } = useTheme();
-  const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
-  const innerWidth = width - margin.left - margin.right;
-  const innerHeight = height - margin.top - margin.bottom;
+  const { parentRef, width = 0, height = 0 } = useParentSize({ debounceTime: 150 });
 
-  // State hooks
+  const drawableChartWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
+  const drawableChartHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
+
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
+  const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(null);
+  const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(null);
+  const chartSvgRef = useRef<SVGSVGElement | null>(null);
 
   const {
     showTooltip,
@@ -77,307 +62,109 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     tooltipOpen,
   } = useTooltip<TooltipData[]>();
 
-  // Process data
-  const { data, groupKeys } = useMemo<{
-    data: DataPoint[];
-    groupKeys: string[];
-  }>(
-    () =>
-      isLoading
-        ? mockVerticalGroupedBarChartData
-        : { data: _data, groupKeys: _groupKeys },
-    [isLoading, _data, _groupKeys],
+  const { data, groupKeys } = useMemo(() =>
+    isLoading ? mockVerticalGroupedBarChartData : { data: _data, groupKeys: _groupKeys },
+    [isLoading, _data, _groupKeys]
   );
 
-  // Filter data based on hidden groups
-  const filteredData = useMemo(
-    () =>
-      data.map((categoryData) => {
-        const d = cloneDeep(categoryData);
+  const filteredData = useMemo(() =>
+    data.map((categoryData) => {
+      const d = cloneDeep(categoryData);
+      groupKeys.forEach((groupKey, index) => {
+        if (hideIndex.includes(index)) delete d.data?.[groupKey];
+      });
+      return d;
+    }), [data, hideIndex, groupKeys]);
 
-        if (hideIndex.length > 0) {
-          groupKeys.forEach((groupKey, index) => {
-            if (hideIndex.includes(index) && d.data) {
-              delete d.data[groupKey];
-            }
-          });
-        }
+  const legendData = useMemo(() =>
+    groupKeys.map((key) => ({
+      label: capitalize(lowerCase(key)),
+      value: data.reduce((total, d) => total + Number(d.data[key] || 0), 0),
+    })), [groupKeys, data]);
 
-        return d;
-      }),
-    [data, hideIndex, groupKeys],
-  );
+  const activeKeys = useMemo(() => groupKeys.filter((_, i) => !hideIndex.includes(i)), [groupKeys, hideIndex]);
 
-  // Prepare legend data
-  const legendData = useMemo(
-    () =>
-      groupKeys.map((key) => ({
-        label: capitalize(lowerCase(key)),
-        value: data.reduce(
-          (total, categoryData) => total + Number(categoryData.data[key] || 0),
-          0,
-        ),
-      })),
-    [groupKeys, data],
-  );
-
-  // Get active keys (not hidden)
-  const activeKeys = useMemo(
-    () => groupKeys.filter((_, index) => !hideIndex.includes(index)),
-    [groupKeys, hideIndex],
-  );
-
-  // Generate stacked data if chart type is stacked
   const stackedData = useMemo(() => {
     if (type !== "stacked") return null;
-
     try {
-      // Convert data to the format expected by stack generator
       const prepared = filteredData.map((item) => {
-        const result = { label: item.label };
+        const result: Record<string, number | string> = { label: item.label };
         activeKeys.forEach((key) => {
           result[key] = Number(item.data[key]) || 0;
         });
         return result;
       });
-
-      // Create stack generator with the active keys
       const stackGenerator = stack({ keys: activeKeys });
       return stackGenerator(prepared);
-    } catch (error) {
-      console.error("Error generating stack data:", error);
+    } catch (e) {
+      console.error("Stack error:", e);
       return [];
     }
   }, [type, activeKeys, filteredData]);
 
-  // Calculate max value for y-axis scale
   const maxValue = useMemo(() => {
     if (type === "stacked") {
-      // For stacked charts, sum all values in each category
       return Math.max(
         0,
         ...filteredData.map((d) =>
-          Object.entries(d.data)
-            .filter(([key]) => activeKeys.includes(key))
-            .reduce((sum, [, value]) => sum + Number(value || 0), 0),
-        ),
+          activeKeys.reduce((sum, key) => sum + Number(d.data[key] || 0), 0)
+        )
       );
     }
-
-    // For grouped charts, find max individual value
     return Math.max(
       0,
-      ...filteredData.reduce((values, categoryData) => {
-        activeKeys.forEach((key) => {
-          const value = Number(categoryData.data?.[key]);
-          if (!Number.isNaN(value)) {
-            values.push(value);
-          }
-        });
-        return values;
-      }, [] as number[]),
+      ...filteredData.flatMap((d) =>
+        activeKeys.map((key) => Number(d.data[key]) || 0)
+      )
     );
   }, [filteredData, activeKeys, type]);
 
-  // Create scales
-  const categoryScale = useMemo(
-    () =>
-      scaleBand<string>({
-        domain: filteredData.map((d) => String(d.label)),
-        range: [0, innerWidth],
-        padding: 0.4, // Increased padding for thinner bars
-      }),
-    [filteredData, innerWidth],
-  );
+  const categoryScale = useMemo(() =>
+    scaleBand<string>({
+      domain: filteredData.map((d) => String(d.label)),
+      range: [0, drawableChartWidth],
+      padding: 0.4,
+    }), [filteredData, drawableChartWidth]);
 
-  const groupScale = useMemo(
-    () =>
-      scaleBand<string>({
-        domain: activeKeys,
-        range: [0, categoryScale.bandwidth()],
-        padding: 0.3, // Increased padding for thinner bars
-      }),
-    [activeKeys, categoryScale],
-  );
+  const groupScale = useMemo(() =>
+    scaleBand<string>({
+      domain: activeKeys,
+      range: [0, categoryScale.bandwidth()],
+      padding: 0.3,
+    }), [activeKeys, categoryScale]);
 
-  const valueScale = useMemo(
-    () =>
-      scaleLinear<number>({
-        domain: [0, maxValue * SCALE_PADDING],
-        range: [innerHeight, 0],
-      }),
-    [innerHeight, maxValue],
-  );
+  const valueScale = useMemo(() =>
+    scaleLinear<number>({
+      domain: [0, maxValue * SCALE_PADDING],
+      range: [drawableChartHeight, 0],
+    }), [drawableChartHeight, maxValue]);
 
-  const groupColorScale = useMemo(
-    () =>
-      scaleOrdinal<string, string>({
-        domain: groupKeys,
-        range: colors?.length ? colors : theme.colors.charts.bar,
-      }),
-    [groupKeys, colors, theme.colors.charts.bar],
-  );
+  const groupColorScale = useMemo(() =>
+    scaleOrdinal<string, string>({
+      domain: groupKeys,
+      range: colors?.length ? colors : theme.colors.charts.bar,
+    }), [groupKeys, colors, theme.colors.charts.bar]);
 
-  // Helper function to create bars
-  const renderBar = (props: CustomBarProps) => <CustomBar {...props} />;
+  useEffect(() => {
+    if (!chartSvgRef.current || !width || !height) return;
 
-  // Handler for mouse events
-  const handleMouseMove = useCallback(
-    (groupKey: string, value: number) => (event: React.MouseEvent) => {
-      if (!isLoading) {
-        showTooltip({
-          tooltipData: [
-            {
-              label: capitalize(lowerCase(groupKey)),
-              value,
-            },
-          ],
-          tooltipLeft: event.clientX,
-          tooltipTop: event.clientY,
-        });
-        setHoveredGroupKey(groupKey);
-      }
-    },
-    [isLoading, showTooltip],
-  );
+    const svg = chartSvgRef.current;
+    const bbox = svg.getBBox();
 
-  const handleMouseLeave = useCallback(() => {
-    if (!isLoading) {
-      hideTooltip();
-      setHoveredGroupKey(null);
-    }
-  }, [isLoading, hideTooltip]);
+    const titleEl = document.querySelector(".chart-title") as HTMLElement | null;
+    const legendEl = document.querySelector(".chart-legend") as HTMLElement | null;
 
-  // Render stacked bars
-  const renderStackedBars = useCallback(() => {
-    if (!stackedData) return null;
+    const titleHeight = titleEl?.getBoundingClientRect().height || 0;
+    const legendHeight = legendEl?.getBoundingClientRect().height || 0;
 
-    return filteredData.map((categoryData, categoryIndex) => {
-      const category = String(categoryData.label);
-      const barX = categoryScale(category) || 0;
-      const barWidth = categoryScale.bandwidth();
+    const totalTop = DEFAULT_MARGIN.top + titleHeight;
+    const totalBottom = DEFAULT_MARGIN.bottom + legendHeight;
+    const requiredHeight = totalTop + bbox.height + totalBottom;
+    const requiredWidth = DEFAULT_MARGIN.left + bbox.width + DEFAULT_MARGIN.right;
 
-      return activeKeys.map((groupKey) => {
-        // Find the corresponding stack data
-        const seriesData = stackedData.find((s) => s.key === groupKey);
-        if (!seriesData || !seriesData[categoryIndex]) return null;
-
-        const [y0, y1] = seriesData[categoryIndex];
-        const barHeight = valueScale(y0) - valueScale(y1);
-        const barY = valueScale(y1);
-        const value = y1 - y0;
-
-        if (!value) return null;
-
-        const isHoveredGroup = hoveredGroupKey === groupKey;
-        const barOpacity =
-          hoveredGroupKey && !isHoveredGroup
-            ? REDUCED_OPACITY
-            : DEFAULT_OPACITY;
-
-        return renderBar({
-          key: `stacked-${category}-${groupKey}`,
-          x: barX,
-          y: barY,
-          width: barWidth,
-          height: barHeight,
-          fill: isLoading
-            ? `url(#${shimmerGradientId})`
-            : groupColorScale(groupKey),
-          opacity: barOpacity,
-          rx: 0, // Always set to 0 for stacked bars
-          value,
-          label: groupKey,
-          onMouseMove: handleMouseMove(groupKey, value),
-          onMouseLeave: handleMouseLeave,
-        });
-      });
-    });
-  }, [
-    stackedData,
-    filteredData,
-    categoryScale,
-    activeKeys,
-    valueScale,
-    hoveredGroupKey,
-    isLoading,
-    groupColorScale,
-    handleMouseMove,
-    handleMouseLeave,
-  ]);
-
-  // Render grouped bars
-  const renderGroupedBars = useCallback(
-    () =>
-      filteredData.map((categoryData) => {
-        const category = String(categoryData.label);
-        const categoryX = categoryScale(category) || 0;
-
-        return groupKeys.map((groupKey, groupIndex) => {
-          const value = Number(categoryData.data?.[groupKey]);
-          if (Number.isNaN(value)) return null;
-
-          const barX = categoryX + (groupScale(groupKey) || 0);
-          const barWidth = groupScale.bandwidth();
-          const barHeight = innerHeight - valueScale(value);
-          const barY = valueScale(value);
-
-          const isHoveredGroup = hoveredGroupKey === groupKey;
-          const barOpacity =
-            hoveredGroupKey && !isHoveredGroup
-              ? REDUCED_OPACITY
-              : DEFAULT_OPACITY;
-
-          const getBarFill = () => {
-            if (isLoading) return `url(#${shimmerGradientId})`;
-            if (hideIndex.includes(groupIndex)) return "#eee";
-            return groupColorScale(groupKey);
-          };
-          const barFill = getBarFill();
-
-          return (
-            <g key={`${category}-${groupKey}`}>
-              {renderBar({
-                key: `grouped-${category}-${groupKey}`,
-                x: barX,
-                y: barY,
-                width: barWidth,
-                height: barHeight,
-                fill: barFill,
-                opacity: barOpacity,
-                rx: DEFAULT_BAR_RADIUS,
-                value,
-                label: groupKey,
-                onMouseMove: handleMouseMove(groupKey, value),
-                onMouseLeave: handleMouseLeave,
-              })}
-            </g>
-          );
-        });
-      }),
-    [
-      filteredData,
-      categoryScale,
-      groupKeys,
-      groupScale,
-      innerHeight,
-      valueScale,
-      hoveredGroupKey,
-      isLoading,
-      hideIndex,
-      groupColorScale,
-      handleMouseMove,
-      handleMouseLeave,
-    ],
-  );
-
-  // Render bars based on chart type
-  const renderBars = useCallback(() => {
-    if (type === "stacked" && stackedData) {
-      return renderStackedBars();
-    }
-    return renderGroupedBars();
-  }, [type, stackedData, renderStackedBars, renderGroupedBars]);
+    setAdjustedChartHeight(Math.max(requiredHeight, height) + 5);
+    setAdjustedChartWidth(Math.max(requiredWidth, width));
+  }, [data, width, height, DEFAULT_MARGIN]);
 
   // Hide axis labels when loading
   const renderAxisLabel = (
@@ -424,38 +211,44 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       }}
       timestampProps={{ timestamp, isLoading }}
     >
-      <svg width={width} height={height}>
+      <svg
+        ref={chartSvgRef}
+        width={adjustedChartWidth || width}
+        height={adjustedChartHeight || height}
+      >
         {isLoading && <SvgShimmer />}
-
-        <Group top={margin.top} left={margin.left}>
-          {/* Y-Axis */}
-          {hideIndex.length !== groupKeys.length && (
-            <AxisLeft
-              scale={valueScale}
-              tickFormat={(value) => `${value}`}
-              stroke={theme.colors.axis.line}
-              tickStroke={theme.colors.axis.line}
-              tickLabelProps={{
-                fill: theme.colors.axis.label,
-                fontSize: "12px",
-                textAnchor: "end",
-                dy: "0.33em",
-              }}
-              tickComponent={({ formattedValue, ...tickProps }) =>
-                renderAxisLabel(formattedValue, tickProps)
-              }
-              numTicks={5}
-              hideTicks={!showTicks}
-            />
-          )}
-
-          {/* Grid Lines */}
+        <Group top={DEFAULT_MARGIN.top} left={DEFAULT_MARGIN.left}>
+          <AxisLeft
+            scale={valueScale}
+            stroke={theme.colors.axis.line}
+            tickStroke={theme.colors.axis.line}
+            tickLabelProps={{
+              fill: theme.colors.axis.label,
+              fontSize: "12px",
+              textAnchor: "end",
+              dy: "0.33em",
+            }}
+            hideTicks={!showTicks}
+          />
+          <AxisBottom
+            scale={categoryScale}
+            top={drawableChartHeight}
+            stroke={theme.colors.axis.line}
+            tickStroke={theme.colors.axis.line}
+            tickLabelProps={{
+              fill: theme.colors.axis.label,
+              fontSize: "12px",
+              textAnchor: "middle",
+              dy: "0.33em",
+            }}
+            hideTicks={hideIndex.length === groupKeys.length || !showTicks}
+          />
           <g>
             {valueScale.ticks(5).map((tick) => (
               <line
                 key={tick}
                 x1={0}
-                x2={innerWidth}
+                x2={drawableChartWidth}
                 y1={valueScale(tick)}
                 y2={valueScale(tick)}
                 stroke={theme.colors.axis.grid}
@@ -464,30 +257,59 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
               />
             ))}
           </g>
-
-          {/* X-Axis */}
-          <AxisBottom
-            scale={categoryScale}
-            top={innerHeight}
-            stroke={theme.colors.axis.line}
-            tickStroke={theme.colors.axis.line}
-            tickFormat={(value) =>
-              hideIndex.length !== groupKeys.length ? `${value}` : ""
-            }
-            tickLabelProps={{
-              fill: theme.colors.axis.label,
-              fontSize: "12px",
-              textAnchor: "middle",
-              dy: "0.33em",
-            }}
-            tickComponent={({ formattedValue, ...tickProps }) =>
-              renderAxisLabel(formattedValue, tickProps)
-            }
-            hideTicks={hideIndex.length === groupKeys.length || !showTicks}
-          />
-
-          {/* Bars */}
-          {renderBars()}
+          {type === "stacked" && stackedData
+            ? stackedData.map((series) =>
+              series.map((bar, i) => {
+                const category = String(filteredData[i].label);
+                const barX = categoryScale(category) || 0;
+                const barWidth = categoryScale.bandwidth();
+                const barY = valueScale(bar[1]);
+                const barHeight = valueScale(bar[0]) - valueScale(bar[1]);
+                return (
+                  <CustomBar
+                    key={`stacked-${series.key}-${category}`}
+                    x={barX}
+                    y={barY}
+                    width={barWidth}
+                    height={barHeight}
+                    fill={groupColorScale(series.key)}
+                    opacity={DEFAULT_OPACITY}
+                    value={bar[1] - bar[0]}
+                    label={series.key}
+                    onMouseMove={() => { }}
+                    onMouseLeave={() => { }}
+                  />
+                );
+              })
+            )
+            : filteredData.map((categoryData) => {
+              const category = String(categoryData.label);
+              const categoryX = categoryScale(category) || 0;
+              return groupKeys.map((groupKey, index) => {
+                const value = Number(categoryData.data?.[groupKey]);
+                if (Number.isNaN(value)) return null;
+                const barX = categoryX + (groupScale(groupKey) || 0);
+                const barWidth = groupScale.bandwidth();
+                const barHeight = drawableChartHeight - valueScale(value);
+                const barY = valueScale(value);
+                return (
+                  <CustomBar
+                    key={`grouped-${category}-${groupKey}`}
+                    x={barX}
+                    y={barY}
+                    width={barWidth}
+                    height={barHeight}
+                    fill={groupColorScale(groupKey)}
+                    opacity={DEFAULT_OPACITY}
+                    rx={DEFAULT_BAR_RADIUS}
+                    value={value}
+                    label={groupKey}
+                    onMouseMove={() => { }}
+                    onMouseLeave={() => { }}
+                  />
+                );
+              });
+            })}
         </Group>
       </svg>
     </ChartWrapper>

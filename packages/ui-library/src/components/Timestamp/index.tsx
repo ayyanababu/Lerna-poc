@@ -17,7 +17,7 @@ function Timestamp({
       sx={{
         marginLeft: "auto",
         marginRight: "10px",
-        marginBottom: "10px",
+        marginBottom: "-30px",
         color: "#aaa",
       }}
       className={isLoading ? shimmerClassName : ""}

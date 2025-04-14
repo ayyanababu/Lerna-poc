@@ -60,6 +60,73 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
       };
     }, []);
 
+    const renderContent = React.useCallback(
+      () => (
+        <>
+          {/* Only render title if it exists */}
+          {title && <Title title={title} {...titleProps} />}
+          <Box
+            sx={{
+              position: "relative",
+              display: "flex",
+              flex: "1 1 auto",
+              minHeight: 0,
+              // Gap between chart and legends based on position
+              // commented by VNS
+              gap: position === LegendPosition.BOTTOM ? "12px" : "20px",
+              marginTop: title ? "12px" : "0px", // Add 12px gap only if title exists
+              ...(position === LegendPosition.LEFT ||
+                position === LegendPosition.RIGHT
+                ? {
+                  flexDirection:
+                    position === LegendPosition.LEFT ? "row" : "row-reverse",
+                }
+                : {
+                  flexDirection:
+                    position === LegendPosition.TOP
+                      ? "column"
+                      : "column-reverse",
+                }),
+            }}
+          >
+            <Legends
+              {...legendsProps}
+              position={position}
+              colorScale={colorScale}
+              data={legendData}
+            />
+            <Box
+              ref={ref}
+              sx={{
+                position: "relative",
+                height: "100%",
+                width: "100%",
+                display: "flex",
+                flex: "1 1 100%",
+                minHeight: 0,
+              }}
+            >
+              {children}
+            </Box>
+          </Box>
+          {timestampProps?.timestamp && <Timestamp {...timestampProps} />}
+        </>
+      ),
+      [
+        title,
+        titleProps,
+        legendsProps,
+        tooltipProps,
+        timestampProps,
+        position,
+        colorScale,
+        legendData,
+        toolTipData,
+        children,
+        ref,
+      ],
+    );
+
     return (
       <Stack
         sx={{
@@ -73,58 +140,10 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
         }}
         ref={containerRef}
       >
-        {canRender && title && <Title title={title} {...titleProps} />}
-        <Box
-          sx={{
-            position: "relative",
-            display: "flex",
-            flex: "1 1 auto",
-            minHeight: 0,
-            // Gap between chart and legends based on position
-            gap: position === LegendPosition.BOTTOM ? "12px" : "20px",
-            marginTop: title ? "12px" : "0px", // Add 12px gap only if title exists
-            ...(position === LegendPosition.LEFT ||
-            position === LegendPosition.RIGHT
-              ? {
-                  flexDirection:
-                    position === LegendPosition.LEFT ? "row" : "row-reverse",
-                }
-              : {
-                  flexDirection:
-                    position === LegendPosition.TOP
-                      ? "column"
-                      : "column-reverse",
-                }),
-          }}
-        >
-          <Legends
-            {...legendsProps}
-            position={position}
-            colorScale={colorScale}
-            data={legendData}
-            isVisible={canRender ? (legendsProps?.isVisible ?? true) : false}
-          />
-          <Box
-            ref={ref}
-            sx={{
-              position: "relative",
-              height: "100%",
-              width: "100%",
-              display: "flex",
-              flex: "1 1 100%",
-              minHeight: 0,
-            }}
-          >
-            {canRender ? (
-              children
-            ) : (
-              <p> Cannot Render the chart under this size</p>
-            )}
-          </Box>
-        </Box>
-
-        {canRender && timestampProps?.timestamp && (
-          <Timestamp {...timestampProps} />
+        {canRender ? (
+          renderContent()
+        ) : (
+          <p> Cannot Render the chart under this size</p>
         )}
         {toolTipData && (
           <Tooltip
