@@ -15,14 +15,510 @@ import {
 } from '@my-org/ui-library';
 import { useEffect, useState } from 'react';
 
+// Define types for our chart data
+type DonutDataItem = {
+    label: string;
+    value: number;
+    color: string;
+};
+
+type TreeMapNode = {
+    id: string;
+    name: string;
+    value: number;
+    children?: TreeMapNode[];
+};
+
+type StackedBarItem = {
+    label: string;
+    data: Record<string, number>;
+};
+
+type BarLineDataItem = {
+    xAxis: string;
+    yAxisLeft: number;
+    yAxisRight: number;
+};
+
+type BarLineData = {
+    xAxislabel: string;
+    yAxisLeftLabel: string;
+    yAxisRightLabel: string;
+    chartData: BarLineDataItem[];
+};
+
+type VerticalBarItem = {
+    label: string;
+    value: number;
+};
+
+// Mock API functions to simulate data fetching
+const fetchDonutData = (): Promise<DonutDataItem[]> => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve([
+            {
+                label: 'Successful',
+                value: Math.floor(Math.random() * 30000) + 20000,
+                color: '#56b9b8',
+            },
+            {
+                label: 'Failed',
+                value: Math.floor(Math.random() * 500) + 100,
+                color: '#ea8660',
+            },
+        ]);
+    }, 5000);
+});
+
+const fetchSemiDonutData = (): Promise<DonutDataItem[]> => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve([
+            {
+                label: 'Successful Trades',
+                value: Math.floor(Math.random() * 30) + 70, // 70-100% success rate
+                color: 'orange',
+            },
+            {
+                label: 'Failed Trades',
+                value: Math.floor(Math.random() * 30), // 0-30% failure rate
+                color: '#50c1c2',
+            },
+        ]);
+    }, 1200);
+});
+
+const fetchTreeMapData = (): Promise<TreeMapNode> => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve({
+            id: 'portfolio',
+            name: 'Portfolio',
+            value: 1000,
+            children: [
+                {
+                    id: 'equities',
+                    name: 'Equities',
+                    value: Math.floor(Math.random() * 200) + 350, // 350-550
+                    children: [
+                        {
+                            id: 'tech',
+                            name: 'Technology',
+                            value: Math.floor(Math.random() * 80) + 140, // 140-220
+                        },
+                        {
+                            id: 'health',
+                            name: 'Healthcare',
+                            value: Math.floor(Math.random() * 50) + 100, // 100-150
+                        },
+                    ],
+                },
+                {
+                    id: 'fixed-income',
+                    name: 'Fixed Income',
+                    value: Math.floor(Math.random() * 100) + 250, // 250-350
+                    children: [
+                        {
+                            id: 'treasury',
+                            name: 'Treasury',
+                            value: Math.floor(Math.random() * 50) + 100, // 100-150
+                        },
+                        {
+                            id: 'corporate',
+                            name: 'Corporate',
+                            value: Math.floor(Math.random() * 40) + 80, // 80-120
+                        },
+                    ],
+                },
+                {
+                    id: 'cash',
+                    name: 'Cash',
+                    value: Math.floor(Math.random() * 150) + 300, // 300-450
+                },
+            ],
+        });
+    }, 2000);
+});
+
+const fetchStackedBarData = (): Promise<StackedBarItem[]> => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve([
+            {
+                label: 'Not Priced',
+                data: {
+                    notPriced: Math.floor(Math.random() * 1000) + 2000,
+                },
+            },
+            {
+                label: 'Stale Priced',
+                data: {
+                    stalePriced: Math.floor(Math.random() * 1000) + 2500,
+                },
+            },
+            {
+                label: 'Priced',
+                data: {
+                    'priced:Auto': Math.floor(Math.random() * 200) + 200,
+                    'priced:Manual': Math.floor(Math.random() * 50) + 30,
+                },
+            },
+        ]);
+    }, 1800);
+});
+
+const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve([
+            ...new Array(3).fill(0).map(() => {
+                const randomDate = new Date(
+                    2020 + Math.floor(Math.random() * 4),
+                    Math.floor(Math.random() * 12),
+                    Math.floor(Math.random() * 28) + 1,
+                );
+                const formattedDate = `${String(randomDate.getDate()).padStart(2, '0')}-${String(randomDate.getMonth() + 1).padStart(2, '0')}-${randomDate.getFullYear()}`;
+
+                return {
+                    label: `${formattedDate}`,
+                    data: {
+                        futures: Math.floor(Math.random() * 50000) + 20000,
+                        options: Math.floor(Math.random() * 50000) + 20000,
+                        forwards: Math.floor(Math.random() * 15000) + 5000,
+                        fixedIncome: Math.floor(Math.random() * 10000) + 3000,
+                        others: Math.floor(Math.random() * 6000) + 2000,
+                    },
+                };
+            }),
+        ]);
+    }, 1700);
+});
+
+const fetchBarLineData = (): Promise<BarLineData> => new Promise((resolve) => {
+    setTimeout(() => {
+        const actionTypes = ['Dividend (NNA)', 'Dividend (NCA)', 'Dividend (NEA)', 'Stock Split (NCA)', 'Rights Issue (NCA)', 'Merger (NEA)', 'Tender Offer (NCA)'];
+        
+        resolve({
+            xAxislabel: 'Corporate Action',
+            yAxisLeftLabel: 'Number of Actions',
+            yAxisRightLabel: 'Positions Impacted',
+            chartData: actionTypes.map(action => ({
+                xAxis: action,
+                yAxisLeft: Math.floor(Math.random() * 30) + 15, // 15-45
+                yAxisRight: Math.floor(Math.random() * 35) + 20, // 20-55
+            })),
+        });
+    }, 2200);
+});
+
+const fetchVerticalBarData = (): Promise<VerticalBarItem[]> => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve([
+            { label: 'Not Priced', value: Math.floor(Math.random() * 20) + 20 }, // 20-40
+            { label: 'Stale Price', value: Math.floor(Math.random() * 25) + 35 }, // 35-60
+            { label: 'Priced/Auto', value: Math.floor(Math.random() * 10) + 10 }, // 10-20
+            { label: 'Priced/Manual', value: Math.floor(Math.random() * 8) + 5 }, // 5-13
+        ]);
+    }, 1300);
+});
+
+const fetchHorizontalBarData = (): Promise<VerticalBarItem[]> => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve(
+            Array.from({ length: 10 }, (_, index) => ({
+                label: `${index + 1} asdf adfasdf a`,
+                value: Math.floor(Math.random() * 100),
+            }))
+        );
+    }, 1600);
+});
+
+const fetchVerticalGroupedBarData = (): Promise<StackedBarItem[]> => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve([
+            ...new Array(10).fill(0).map((_, index) => ({
+                label: `Q${index + 1} 2024`,
+                data: {
+                    future: Math.floor(Math.random() * 100) + 20,
+                    options: Math.floor(Math.random() * 100) + 20,
+                    forwards: Math.floor(Math.random() * 100) + 20,
+                    fixedIncome: Math.floor(Math.random() * 100) + 20,
+                    others: Math.floor(Math.random() * 100) + 20,
+                },
+            }))
+        ]);
+    }, 1900);
+});
+
+const fetchHorizontalGroupedBarData = (): Promise<StackedBarItem[]> => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve([
+            {
+                label: 'Sales',
+                data: {
+                    q1: Math.floor(Math.random() * 30) + 30, // 30-60
+                    q2: Math.floor(Math.random() * 30) + 40, // 40-70
+                    q3: Math.floor(Math.random() * 30) + 30, // 30-60
+                    q4: Math.floor(Math.random() * 30) + 60, // 60-90
+                },
+            },
+            {
+                label: 'Marketing',
+                data: {
+                    q1: Math.floor(Math.random() * 20) + 25, // 25-45
+                    q2: Math.floor(Math.random() * 20) + 35, // 35-55
+                    q3: Math.floor(Math.random() * 20) + 45, // 45-65
+                    q4: Math.floor(Math.random() * 20) + 40, // 40-60
+                },
+            },
+            {
+                label: 'Operations',
+                data: {
+                    q1: Math.floor(Math.random() * 20) + 40, // 40-60
+                    q2: Math.floor(Math.random() * 20) + 40, // 40-60
+                    q3: Math.floor(Math.random() * 20) + 40, // 40-60
+                    q4: Math.floor(Math.random() * 20) + 50, // 50-70
+                },
+            },
+            {
+                label: 'Finance',
+                data: {
+                    q1: Math.floor(Math.random() * 15) + 25, // 25-40
+                    q2: Math.floor(Math.random() * 15) + 25, // 25-40
+                    q3: Math.floor(Math.random() * 15) + 30, // 30-45
+                    q4: Math.floor(Math.random() * 15) + 35, // 35-50
+                },
+            },
+        ]);
+    }, 1400);
+});
+
+const fetchMarketTreeMapData = (): Promise<TreeMapNode> => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve({
+            id: 'markets',
+            name: 'Global Markets',
+            value: 1000,
+            children: [
+                {
+                    id: 'north-america',
+                    name: 'North America',
+                    value: Math.floor(Math.random() * 100) + 400, // 400-500
+                    children: [
+                        {
+                            id: 'us',
+                            name: 'United States',
+                            value: Math.floor(Math.random() * 50) + 300, // 300-350
+                        },
+                        {
+                            id: 'canada',
+                            name: 'Canada',
+                            value: Math.floor(Math.random() * 20) + 70, // 70-90
+                        },
+                        {
+                            id: 'mexico',
+                            name: 'Mexico',
+                            value: Math.floor(Math.random() * 10) + 15, // 15-25
+                        },
+                    ],
+                },
+                {
+                    id: 'europe',
+                    name: 'Europe',
+                    value: Math.floor(Math.random() * 50) + 300, // 300-350
+                    children: [
+                        {
+                            id: 'uk',
+                            name: 'United Kingdom',
+                            value: Math.floor(Math.random() * 30) + 85, // 85-115
+                        },
+                        {
+                            id: 'germany',
+                            name: 'Germany',
+                            value: Math.floor(Math.random() * 20) + 80, // 80-100
+                        },
+                        {
+                            id: 'france',
+                            name: 'France',
+                            value: Math.floor(Math.random() * 20) + 70, // 70-90
+                        },
+                        {
+                            id: 'others-eu',
+                            name: 'Others',
+                            value: Math.floor(Math.random() * 20) + 70, // 70-90
+                        },
+                    ],
+                },
+                {
+                    id: 'asia',
+                    name: 'Asia',
+                    value: Math.floor(Math.random() * 50) + 250, // 250-300
+                    children: [
+                        {
+                            id: 'china',
+                            name: 'China',
+                            value: Math.floor(Math.random() * 30) + 115, // 115-145
+                        },
+                        {
+                            id: 'japan',
+                            name: 'Japan',
+                            value: Math.floor(Math.random() * 20) + 80, // 80-100
+                        },
+                        {
+                            id: 'india',
+                            name: 'India',
+                            value: Math.floor(Math.random() * 15) + 40, // 40-55
+                        },
+                        {
+                            id: 'others-asia',
+                            name: 'Others',
+                            value: Math.floor(Math.random() * 10) + 25, // 25-35
+                        },
+                    ],
+                },
+                {
+                    id: 'rest-world',
+                    name: 'Rest of World',
+                    value: Math.floor(Math.random() * 30) + 85, // 85-115
+                    children: [
+                        {
+                            id: 'latam',
+                            name: 'Latin America',
+                            value: Math.floor(Math.random() * 15) + 35, // 35-50
+                        },
+                        {
+                            id: 'africa',
+                            name: 'Africa',
+                            value: Math.floor(Math.random() * 10) + 25, // 25-35
+                        },
+                        {
+                            id: 'oceania',
+                            name: 'Oceania',
+                            value: Math.floor(Math.random() * 10) + 20, // 20-30
+                        },
+                    ],
+                },
+            ],
+        });
+    }, 2500);
+});
+
 function DashboardPage() {
-    const [isLoading, setIsLoading] = useState(true);
     const [activeMode, setActiveMode] = useState<'light' | 'dark'>('light');
 
+    // State for chart data with proper typing
+    const [donutData, setDonutData] = useState<DonutDataItem[]>([]);
+    const [semiDonutData, setSemiDonutData] = useState<DonutDataItem[]>([]);
+    const [treeMapData, setTreeMapData] = useState<TreeMapNode>({
+        id: 'portfolio',
+        name: 'Portfolio',
+        value: 1000,
+        children: [],
+    });
+    const [marketTreeMapData, setMarketTreeMapData] = useState<TreeMapNode>({
+        id: 'markets',
+        name: 'Global Markets',
+        value: 1000,
+        children: [],
+    });
+    const [stackedBarData, setStackedBarData] = useState<StackedBarItem[]>([]);
+    const [horizontalStackedData, setHorizontalStackedData] = useState<
+        StackedBarItem[]
+    >([]);
+    const [barLineData, setBarLineData] = useState<BarLineData>({
+        xAxislabel: 'Corporate Action',
+        yAxisLeftLabel: 'Number of Actions',
+        yAxisRightLabel: 'Positions Impacted',
+        chartData: [],
+    });
+    const [verticalBarData, setVerticalBarData] = useState<VerticalBarItem[]>(
+        [],
+    );
+    const [horizontalBarData, setHorizontalBarData] = useState<
+        VerticalBarItem[]
+    >([]);
+    const [verticalGroupedBarData, setVerticalGroupedBarData] = useState<
+        StackedBarItem[]
+    >([]);
+    const [horizontalGroupedBarData, setHorizontalGroupedBarData] = useState<
+        StackedBarItem[]
+    >([]);
+
+    // Track loading state for each chart
+    const [dataLoading, setDataLoading] = useState({
+        donut: true,
+        semiDonut: true,
+        treeMap: true,
+        marketTreeMap: true,
+        stackedBar: true,
+        horizontalStacked: true,
+        barLine: true,
+        verticalBar: true,
+        horizontalBar: true,
+        verticalGroupedBar: true,
+        horizontalGroupedBar: true,
+    });
+
+    // Fetch data when component mounts
     useEffect(() => {
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 2000);
+        const fetchData = async () => {
+            try {
+                // Fetch data for all charts in parallel
+                const [
+                    donutResult,
+                    semiDonutResult,
+                    treeMapResult,
+                    marketTreeMapResult,
+                    stackedBarResult,
+                    horizontalStackedResult,
+                    barLineResult,
+                    verticalBarResult,
+                    horizontalBarResult,
+                    verticalGroupedBarResult,
+                    horizontalGroupedBarResult,
+                ] = await Promise.all([
+                    fetchDonutData(),
+                    fetchSemiDonutData(),
+                    fetchTreeMapData(),
+                    fetchMarketTreeMapData(),
+                    fetchStackedBarData(),
+                    fetchHorizontalStackedData(),
+                    fetchBarLineData(),
+                    fetchVerticalBarData(),
+                    fetchHorizontalBarData(),
+                    fetchVerticalGroupedBarData(),
+                    fetchHorizontalGroupedBarData(),
+                ]);
+
+                // Update state with fetched data
+                setDonutData(donutResult);
+                setSemiDonutData(semiDonutResult);
+                setTreeMapData(treeMapResult);
+                setMarketTreeMapData(marketTreeMapResult);
+                setStackedBarData(stackedBarResult);
+                setHorizontalStackedData(horizontalStackedResult);
+                setBarLineData(barLineResult);
+                setVerticalBarData(verticalBarResult);
+                setHorizontalBarData(horizontalBarResult);
+                setVerticalGroupedBarData(verticalGroupedBarResult);
+                setHorizontalGroupedBarData(horizontalGroupedBarResult);
+            } catch (error) {
+                console.error('Error fetching chart data:', error);
+            } finally {
+                // Set all loading states to false
+                setDataLoading({
+                    donut: false,
+                    semiDonut: false,
+                    treeMap: false,
+                    marketTreeMap: false,
+                    stackedBar: false,
+                    horizontalStacked: false,
+                    barLine: false,
+                    verticalBar: false,
+                    horizontalBar: false,
+                    verticalGroupedBar: false,
+                    horizontalGroupedBar: false,
+                });
+            }
+        };
+
+        fetchData();
     }, []);
 
     useEffect(() => {
@@ -158,94 +654,22 @@ body:not(.dark) {
                 <div className="blur-circle bottom"></div>
             </>
 
-            {/* <div
-        style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <div
-          style={{
-            height: 500,
-            width: 500,
-          }}>
-          <VerticalBarChart
-            data={[
-              { label: 'January', value: 45, color: '#9bc5ef' },
-              { label: 'February', value: 60, color: '#50c1c2' },
-              { label: 'March', value: 35, color: '#fad176' },
-              { label: 'April', value: 70, color: '#407abc' },
-              { label: 'May', value: 55, color: '#93a3bc' },
-              { label: 'Jun', value: 40, color: 'orange' },
-            ]}
-            title="Monthly Trade Volume"
-            timestamp={new Date().toISOString()}
-            isLoading={isLoading}
-            titleProps={{
-              variant: 'h6',
-              align: 'left',
-            }}
-            legendsProps={{
-              position: Legends.Position.TOP,
-
-              doStrike: true,
-            }}
-            tooltipProps={{}}
-          />
-        </div>
-      </div> */}
-
             <div className="main-container">
                 <div className="container">
                     {
                         <Sortable className="my-cards">
-                            <SortableCard
-                                // title="DonutChart"
-                                height={400}
-                                width={'100%'}>
+                            <SortableCard height={400} width={'100%'}>
                                 <DonutChart
-                                    data={[
-                                        {
-                                            label: 'Successful',
-                                            value: 25_000,
-                                            color: '#56b9b8',
-                                        },
-                                        {
-                                            label: 'Failed',
-                                            value: 250,
-                                            color: '#ea8660',
-                                        },
-                                    ]}
+                                    data={donutData}
                                     type="full"
                                     title="Transaction Capture"
-                                    isLoading={isLoading}
+                                    isLoading={dataLoading.donut}
                                 />
                             </SortableCard>
 
                             <SortableCard height={400} width={'100%'}>
                                 <VerticalStackedBarChart
-                                    data={[
-                                        {
-                                            label: 'Not Priced',
-                                            data: {
-                                                notPriced: 2_800,
-                                            },
-                                        },
-                                        {
-                                            label: 'Stale Priced',
-                                            data: {
-                                                stalePriced: 3_200,
-                                            },
-                                        },
-                                        {
-                                            label: 'Priced',
-                                            data: {
-                                                'priced:Auto': 300,
-                                                'priced:Manual': 50,
-                                            },
-                                        },
-                                    ]}
+                                    data={stackedBarData}
                                     groupKeys={[
                                         'notPriced',
                                         'stalePriced',
@@ -259,7 +683,7 @@ body:not(.dark) {
                                         '#4774b9',
                                         '#9ac7ea',
                                     ]}
-                                    isLoading={isLoading}
+                                    isLoading={dataLoading.stackedBar}
                                     showYAxis={false}
                                     showXAxis={false}
                                 />
@@ -267,52 +691,7 @@ body:not(.dark) {
 
                             <SortableCard height={400} width={'100%'}>
                                 <HorizontalStackedBarChart
-                                    data={[
-                                        ...new Array(3).fill(0).map(() => {
-                                            const randomDate = new Date(
-                                                2020 +
-                                                    Math.floor(
-                                                        Math.random() * 4,
-                                                    ),
-                                                Math.floor(Math.random() * 12),
-                                                Math.floor(Math.random() * 28) +
-                                                    1,
-                                            );
-                                            const formattedDate = `${String(randomDate.getDate()).padStart(2, '0')}-${String(randomDate.getMonth() + 1).padStart(2, '0')}-${randomDate.getFullYear()}`;
-
-                                            return {
-                                                label: `${formattedDate}`,
-                                                data: {
-                                                    futures:
-                                                        Math.floor(
-                                                            Math.random() *
-                                                                50000,
-                                                        ) + 20000,
-
-                                                    options:
-                                                        Math.floor(
-                                                            Math.random() *
-                                                                50000,
-                                                        ) + 20000,
-                                                    forwards:
-                                                        Math.floor(
-                                                            Math.random() *
-                                                                15000,
-                                                        ) + 5000,
-                                                    fixedIncome:
-                                                        Math.floor(
-                                                            Math.random() *
-                                                                10000,
-                                                        ) + 3000,
-                                                    others:
-                                                        Math.floor(
-                                                            Math.random() *
-                                                                6000,
-                                                        ) + 2000,
-                                                },
-                                            };
-                                        }),
-                                    ]}
+                                    data={horizontalStackedData}
                                     groupKeys={[
                                         'futures',
                                         'options',
@@ -328,58 +707,13 @@ body:not(.dark) {
                                         '#4e79bb',
                                         '#9aa4b3',
                                     ]}
-                                    isLoading={isLoading}
+                                    isLoading={dataLoading.horizontalStacked}
                                 />
                             </SortableCard>
 
                             <SortableCard height={400} width={'100%'}>
                                 <TreeMapChart
-                                    data={{
-                                        id: 'portfolio',
-                                        name: 'Portfolio',
-                                        value: 1000,
-                                        children: [
-                                            {
-                                                id: 'equities',
-                                                name: 'Equities',
-                                                value: 450,
-                                                children: [
-                                                    {
-                                                        id: 'tech',
-                                                        name: 'Technology',
-                                                        value: 180,
-                                                    },
-                                                    {
-                                                        id: 'health',
-                                                        name: 'Healthcare',
-                                                        value: 120,
-                                                    },
-                                                ],
-                                            },
-                                            {
-                                                id: 'fixed-income',
-                                                name: 'Fixed Income',
-                                                value: 300,
-                                                children: [
-                                                    {
-                                                        id: 'treasury',
-                                                        name: 'Treasury',
-                                                        value: 120,
-                                                    },
-                                                    {
-                                                        id: 'corporate',
-                                                        name: 'Corporate',
-                                                        value: 100,
-                                                    },
-                                                ],
-                                            },
-                                            {
-                                                id: 'cash',
-                                                name: 'Cash',
-                                                value: 400,
-                                            },
-                                        ],
-                                    }}
+                                    data={treeMapData}
                                     title="Investment Portfolio Allocation"
                                     colors={[
                                         'rgba(232, 134, 97,0.50)',
@@ -387,7 +721,7 @@ body:not(.dark) {
                                         'rgba(232, 134, 97,0.15)',
                                         '#4E7AC2',
                                     ]}
-                                    isLoading={isLoading}
+                                    isLoading={dataLoading.treeMap}
                                     legendsProps={{
                                         position: 'bottom',
                                         doStrike: false,
@@ -398,29 +732,15 @@ body:not(.dark) {
                                 />
                             </SortableCard>
 
-                            <SortableCard
-                                title="SemiDonut"
-                                height={400}
-                                width={'100%'}>
+                            <SortableCard height={400} width={'100%'}>
                                 <DonutChart
-                                    data={[
-                                        {
-                                            label: 'Successful Trades',
-                                            value: 85,
-                                            color: 'orange',
-                                        },
-                                        {
-                                            label: 'Failed Trades',
-                                            value: 15,
-                                            color: '#50c1c2',
-                                        },
-                                    ]}
+                                    data={semiDonutData}
                                     type="semi"
                                     hideLabels
                                     title="Trade Success Rate"
                                     timestamp={new Date().toISOString()}
                                     colors={['orange', '#50c1c2']}
-                                    isLoading={isLoading}
+                                    isLoading={dataLoading.semiDonut}
                                     titleProps={{
                                         variant: 'h6',
                                         gutterBottom: true,
@@ -439,56 +759,12 @@ body:not(.dark) {
                                 />
                             </SortableCard>
 
-                            <SortableCard
-                                title="BarLineChart"
-                                height={400}
-                                width={'100%'}>
+                            <SortableCard height={400} width={'100%'}>
                                 <BarLineChart
-                                    data={{
-                                        xAxislabel: 'Corporate Action',
-                                        yAxisLeftLabel: 'Number of Actions',
-                                        yAxisRightLabel: 'Positions Impacted',
-                                        chartData: [
-                                            {
-                                                xAxis: 'Dividend (NNA)',
-                                                yAxisLeft: 25,
-                                                yAxisRight: 35,
-                                            },
-                                            {
-                                                xAxis: 'Dividend (NCA)',
-                                                yAxisLeft: 15,
-                                                yAxisRight: 22,
-                                            },
-                                            {
-                                                xAxis: 'Dividend (NEA)',
-                                                yAxisLeft: 18,
-                                                yAxisRight: 45,
-                                            },
-                                            {
-                                                xAxis: 'Stock Split (NCA)',
-                                                yAxisLeft: 22,
-                                                yAxisRight: 28,
-                                            },
-                                            {
-                                                xAxis: 'Rights Issue (NCA)',
-                                                yAxisLeft: 30,
-                                                yAxisRight: 40,
-                                            },
-                                            {
-                                                xAxis: 'Merger (NEA)',
-                                                yAxisLeft: 35,
-                                                yAxisRight: 25,
-                                            },
-                                            {
-                                                xAxis: 'Tender Offer (NCA)',
-                                                yAxisLeft: 42,
-                                                yAxisRight: 55,
-                                            },
-                                        ],
-                                    }}
+                                    data={barLineData}
                                     title="Monthly Trade Volume"
                                     timestamp={new Date().toISOString()}
-                                    isLoading={isLoading}
+                                    isLoading={dataLoading.barLine}
                                     titleProps={{
                                         variant: 'h6',
                                         align: 'left',
@@ -503,20 +779,9 @@ body:not(.dark) {
                             </SortableCard>
 
                             {/* VerticalBarChart example */}
-                            <SortableCard
-                                title="VerticalBarChart"
-                                height={400}
-                                width={'100%'}>
+                            <SortableCard height={400} width={'100%'}>
                                 <VerticalBarChart
-                                    data={[
-                                        { label: 'Not Priced', value: 30 },
-                                        { label: 'Stale Price', value: 45 },
-                                        {
-                                            label: 'Priced/Auto s asdf asdf adfasdfa sdfasdf asdf',
-                                            value: 15,
-                                        },
-                                        { label: 'Priced/Manual', value: 10 },
-                                    ]}
+                                    data={verticalBarData}
                                     title="Valuation"
                                     colors={[
                                         '#AC48C6',
@@ -524,6 +789,7 @@ body:not(.dark) {
                                         '#9FC7E9',
                                         '#93a3bc',
                                     ]}
+                                    isLoading={dataLoading.verticalBar}
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,
                                         isVisible: true,
@@ -533,24 +799,10 @@ body:not(.dark) {
                             </SortableCard>
 
                             {/* HorizontalBarChart example */}
-                            <SortableCard
-                                title="HorizontalBarChart"
-                                height={400}
-                                width={'100%'}>
+                            <SortableCard height={400} width={'100%'}>
                                 <HorizontalBarChart
-                                    data={[
-                                        // Array of 30 values with 30 labels
-                                        ...Array.from(
-                                            { length: 10 },
-                                            (_, index) => ({
-                                                label: `${index + 1} asdf adfasdf a`,
-                                                value: Math.floor(
-                                                    Math.random() * 100,
-                                                ),
-                                            }),
-                                        ),
-                                    ]}
-                                    isLoading={isLoading}
+                                    data={horizontalBarData}
+                                    isLoading={dataLoading.horizontalBar}
                                     titleProps={{
                                         variant: 'h6',
                                         align: 'left',
@@ -564,42 +816,11 @@ body:not(.dark) {
                                 />
                             </SortableCard>
 
-                            <SortableCard
-                                title="VerticalGroupedBarChart"
-                                height={400}
-                                width={'100%'}>
+                            <SortableCard height={400} width={'100%'}>
                                 <VerticalGroupedBarChart
                                     width={600}
                                     height={200}
-                                    data={[
-                                        ...new Array(100)
-                                            .fill(0)
-                                            .map((_, index) => ({
-                                                label: `Q${index + 1} 2024 asfd asdf asdf asdf asdfa sdf `,
-                                                data: {
-                                                    future:
-                                                        Math.floor(
-                                                            Math.random() * 100,
-                                                        ) + 20,
-                                                    options:
-                                                        Math.floor(
-                                                            Math.random() * 100,
-                                                        ) + 20,
-                                                    forwards:
-                                                        Math.floor(
-                                                            Math.random() * 100,
-                                                        ) + 20,
-                                                    fixedIncome:
-                                                        Math.floor(
-                                                            Math.random() * 100,
-                                                        ) + 20,
-                                                    others:
-                                                        Math.floor(
-                                                            Math.random() * 100,
-                                                        ) + 20,
-                                                },
-                                            })),
-                                    ]}
+                                    data={verticalGroupedBarData}
                                     groupKeys={[
                                         'future',
                                         'options',
@@ -623,7 +844,7 @@ body:not(.dark) {
                                         '#407abc',
                                         '#93a3bc',
                                     ]}
-                                    isLoading={isLoading}
+                                    isLoading={dataLoading.verticalGroupedBar}
                                     titleProps={{
                                         variant: 'h6',
                                         align: 'left',
@@ -642,52 +863,12 @@ body:not(.dark) {
                             </SortableCard>
 
                             {/* HorizontalGroupedBarChart with grouped type */}
-                            <SortableCard
-                                title="Department Performance"
-                                height={400}
-                                width={'100%'}>
+                            <SortableCard height={400} width={'100%'}>
                                 <HorizontalGroupedBarChart
                                     width={600}
                                     height={200}
                                     type="grouped"
-                                    data={[
-                                        {
-                                            label: 'Sales',
-                                            data: {
-                                                q1: 45,
-                                                q2: 60,
-                                                q3: 38,
-                                                q4: 72,
-                                            },
-                                        },
-                                        {
-                                            label: 'Marketing',
-                                            data: {
-                                                q1: 35,
-                                                q2: 42,
-                                                q3: 53,
-                                                q4: 48,
-                                            },
-                                        },
-                                        {
-                                            label: 'Operations',
-                                            data: {
-                                                q1: 52,
-                                                q2: 48,
-                                                q3: 45,
-                                                q4: 60,
-                                            },
-                                        },
-                                        {
-                                            label: 'Finance',
-                                            data: {
-                                                q1: 30,
-                                                q2: 32,
-                                                q3: 36,
-                                                q4: 40,
-                                            },
-                                        },
-                                    ]}
+                                    data={horizontalGroupedBarData}
                                     groupKeys={['q1', 'q2', 'q3', 'q4']}
                                     margin={{
                                         top: 20,
@@ -703,7 +884,7 @@ body:not(.dark) {
                                         '#fad176',
                                         '#407abc',
                                     ]}
-                                    isLoading={isLoading}
+                                    isLoading={dataLoading.horizontalGroupedBar}
                                     titleProps={{
                                         variant: 'h6',
                                         align: 'left',
@@ -721,96 +902,9 @@ body:not(.dark) {
                                 />
                             </SortableCard>
 
-                            {/* HorizontalStackedBarChart with stacked type */}
-
-                            <SortableCard
-                                title="Asset Allocation"
-                                height={400}
-                                width={'100%'}>
+                            <SortableCard height={400} width={'100%'}>
                                 <TreeMapChart
-                                    data={{
-                                        id: 'portfolio',
-                                        name: 'Portfolio',
-                                        value: 1000,
-                                        children: [
-                                            {
-                                                id: 'equities',
-                                                name: 'Equities',
-                                                value: 450,
-                                                children: [
-                                                    {
-                                                        id: 'tech',
-                                                        name: 'Technology',
-                                                        value: 180,
-                                                    },
-                                                    {
-                                                        id: 'health',
-                                                        name: 'Healthcare',
-                                                        value: 120,
-                                                    },
-                                                    {
-                                                        id: 'finance',
-                                                        name: 'Financial',
-                                                        value: 90,
-                                                    },
-                                                    {
-                                                        id: 'consumer',
-                                                        name: 'Consumer',
-                                                        value: 60,
-                                                    },
-                                                ],
-                                            },
-                                            {
-                                                id: 'fixed-income',
-                                                name: 'Fixed Income',
-                                                value: 300,
-                                                children: [
-                                                    {
-                                                        id: 'treasury',
-                                                        name: 'Treasury',
-                                                        value: 120,
-                                                    },
-                                                    {
-                                                        id: 'corporate',
-                                                        name: 'Corporate',
-                                                        value: 100,
-                                                    },
-                                                    {
-                                                        id: 'municipal',
-                                                        name: 'Municipal',
-                                                        value: 80,
-                                                    },
-                                                ],
-                                            },
-                                            {
-                                                id: 'alternatives',
-                                                name: 'Alternatives',
-                                                value: 200,
-                                                children: [
-                                                    {
-                                                        id: 'realestate',
-                                                        name: 'Real Estate',
-                                                        value: 100,
-                                                    },
-                                                    {
-                                                        id: 'commodities',
-                                                        name: 'Commodities',
-                                                        value: 60,
-                                                    },
-                                                    {
-                                                        id: 'hedge',
-                                                        name: 'Hedge Funds',
-                                                        value: 40,
-                                                    },
-                                                ],
-                                            },
-                                            {
-                                                id: 'cash',
-                                                name: 'Cash',
-                                                value: 50,
-                                            },
-                                        ],
-                                    }}
+                                    data={treeMapData}
                                     title="Investment Portfolio Allocation"
                                     timestamp={new Date().toISOString()}
                                     colors={Array.from(
@@ -818,7 +912,7 @@ body:not(.dark) {
                                         () =>
                                             `hsl(${Math.random() * 360}, 100%, 45%)`,
                                     )}
-                                    isLoading={isLoading}
+                                    isLoading={dataLoading.treeMap}
                                     titleProps={{
                                         variant: 'h6',
                                         align: 'left',
@@ -834,116 +928,9 @@ body:not(.dark) {
                             </SortableCard>
 
                             {/* Second TreeMapChart example */}
-                            <SortableCard
-                                title="Market Analysis"
-                                height={400}
-                                width={'100%'}>
+                            <SortableCard height={400} width={'100%'}>
                                 <TreeMapChart
-                                    data={{
-                                        id: 'markets',
-                                        name: 'Global Markets',
-                                        value: 1000,
-                                        children: [
-                                            {
-                                                id: 'north-america',
-                                                name: 'North America',
-                                                value: 450,
-                                                children: [
-                                                    {
-                                                        id: 'us',
-                                                        name: 'United States',
-                                                        value: 350,
-                                                    },
-                                                    {
-                                                        id: 'canada',
-                                                        name: 'Canada',
-                                                        value: 80,
-                                                    },
-                                                    {
-                                                        id: 'mexico',
-                                                        name: 'Mexico',
-                                                        value: 20,
-                                                    },
-                                                ],
-                                            },
-                                            {
-                                                id: 'europe',
-                                                name: 'Europe',
-                                                value: 350,
-                                                children: [
-                                                    {
-                                                        id: 'uk',
-                                                        name: 'United Kingdom',
-                                                        value: 100,
-                                                    },
-                                                    {
-                                                        id: 'germany',
-                                                        name: 'Germany',
-                                                        value: 90,
-                                                    },
-                                                    {
-                                                        id: 'france',
-                                                        name: 'France',
-                                                        value: 80,
-                                                    },
-                                                    {
-                                                        id: 'others-eu',
-                                                        name: 'Others',
-                                                        value: 80,
-                                                    },
-                                                ],
-                                            },
-                                            {
-                                                id: 'asia',
-                                                name: 'Asia',
-                                                value: 300,
-                                                children: [
-                                                    {
-                                                        id: 'china',
-                                                        name: 'China',
-                                                        value: 130,
-                                                    },
-                                                    {
-                                                        id: 'japan',
-                                                        name: 'Japan',
-                                                        value: 90,
-                                                    },
-                                                    {
-                                                        id: 'india',
-                                                        name: 'India',
-                                                        value: 50,
-                                                    },
-                                                    {
-                                                        id: 'others-asia',
-                                                        name: 'Others',
-                                                        value: 30,
-                                                    },
-                                                ],
-                                            },
-                                            {
-                                                id: 'rest-world',
-                                                name: 'Rest of World',
-                                                value: 100,
-                                                children: [
-                                                    {
-                                                        id: 'latam',
-                                                        name: 'Latin America',
-                                                        value: 45,
-                                                    },
-                                                    {
-                                                        id: 'africa',
-                                                        name: 'Africa',
-                                                        value: 30,
-                                                    },
-                                                    {
-                                                        id: 'oceania',
-                                                        name: 'Oceania',
-                                                        value: 25,
-                                                    },
-                                                ],
-                                            },
-                                        ],
-                                    }}
+                                    data={marketTreeMapData}
                                     title="Global Market Exposure"
                                     timestamp={new Date().toISOString()}
                                     colors={[
@@ -952,7 +939,7 @@ body:not(.dark) {
                                         '#fad176',
                                         '#93a3bc',
                                     ]}
-                                    isLoading={isLoading}
+                                    isLoading={dataLoading.marketTreeMap}
                                     titleProps={{
                                         variant: 'h6',
                                         align: 'left',

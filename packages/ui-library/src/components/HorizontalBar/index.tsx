@@ -227,7 +227,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     }
   };
 
-  if (!_data || _data.length === 0) {
+  if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;
   }
 
