@@ -228,8 +228,9 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     setAdjustedChartWidth(width);
   }, [data, width, height, margin]);
 
-  if (!_data || _data.length === 0) return <div>No data to display.</div>;
-
+  if (!isLoading && (!_data || _data.length === 0)) {
+    return <div>No data to display.</div>;
+  }
   return (
     <ChartWrapper
       ref={parentRef}

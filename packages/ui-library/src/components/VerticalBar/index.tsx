@@ -174,7 +174,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const getOptimalBarWidth = (calculatedWidth: number) =>
     Math.min(calculatedWidth, maxBarWidth);
 
-  if (!_data || _data.length === 0) {
+  if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;
   }
 
