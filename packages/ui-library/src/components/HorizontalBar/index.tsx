@@ -183,6 +183,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     }
   };
 
+  
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
 
@@ -206,8 +207,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
   }, [data, width, height, margin, drawableChartWidth]);
-
-  if (!_data || _data.length === 0) {
+  
+  if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;
   }
 
