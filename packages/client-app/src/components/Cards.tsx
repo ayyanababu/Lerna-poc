@@ -15,6 +15,7 @@ import {
     Newspaper as NewspaperIcon,
     ChevronLeft as ChevronLeftIcon,
     ChevronRight as ChevronRightIcon,
+    ArrowForward,
 } from '@mui/icons-material';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 
@@ -260,6 +261,11 @@ const styles = `
     overflow: hidden;
 }
 
+.announcementCard:hover .cardArrow {
+    margin-left: 4px;
+    opacity: 1;
+}
+
 .cardContentContainer {
     display: flex;
     flex-direction: column;
@@ -332,6 +338,15 @@ const styles = `
     box-shadow: var(--Card-Shadow) !important;
 }
 
+.announcementListItem:hover .cardArrow {
+    margin-left: -6px;
+    opacity: 1;
+}
+
+.announcementListItem:hover, .announcementCard:hover {
+    filter: brightness(1.2);
+}
+
 .listItemContentContainer {
     display: flex;
     flex-direction: column;
@@ -378,11 +393,24 @@ const styles = `
     height: 10px;
     min-width: 10px;
     border-radius: 9999px;
-    right: 10px !important;
-    top: 50% !important;
+    // right: 10px !important;
+    // top: 50% !important;
     margin-left: auto !important;
     margin-bottom: auto !important;
-} 
+}
+.cardArrow {
+    width: 12px;
+    height: 12px;
+    margin-left: -16px;
+    opacity: 0;
+    transform: translateY(-1px);
+    transition: all 0.2s ease-in-out;
+    color: var(--Green-dark-50);
+}
+
+.announcementListItem .cardArrow {
+    transform: translateY(-7px);
+}
 
 .actionLink {
     font-size: 12px !important;
@@ -495,6 +523,8 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                     <motion.div
                         layoutId={`badge-${announcement.id}`}
                         className="badge"></motion.div>
+
+                    <ArrowForward className="cardArrow" />
                 </motion.div>
                 <MotionTypography
                     variant="subtitle2"
@@ -568,6 +598,8 @@ const AnnouncementListItem: React.FC<AnnouncementListItemProps> = ({
                 <motion.div
                     layoutId={`badge-${announcement.id}`}
                     className="badge"></motion.div>
+
+                <ArrowForward className="cardArrow" />
             </Box>
             <Box className="listItemContentContainer">
                 <MotionTypography
