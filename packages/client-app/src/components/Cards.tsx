@@ -582,7 +582,16 @@ const AnnouncementListItem: React.FC<AnnouncementListItemProps> = ({
 };
 
 // Main Widget Component
-export const AnnouncementsWidget: React.FC = () => {
+export const AnnouncementsWidget: React.FC = ({
+    onClick,
+}: {
+    onClick?: (
+        event: React.MouseEvent<HTMLDivElement>,
+        announcement: ProcessedAnnouncement,
+        index: number,
+        data: ProcessedAnnouncement[],
+    ) => void;
+}) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [processedData, setProcessedData] = useState<ProcessedAnnouncement[]>(
         [],
@@ -729,6 +738,16 @@ export const AnnouncementsWidget: React.FC = () => {
                                 transition={{ duration: 0.3 }}
                                 whileHover={{
                                     y: -2,
+                                }}
+                                onClick={(e) => {
+                                    if (onClick) {
+                                        onClick(
+                                            e,
+                                            announcement,
+                                            index,
+                                            displayData,
+                                        );
+                                    }
                                 }}>
                                 {isExpanded ? (
                                     <AnnouncementListItem
