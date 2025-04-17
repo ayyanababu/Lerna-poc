@@ -1,15 +1,24 @@
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { ThemeProvider } from '@mui/material';
+import { useContext } from 'react';
+import { ThemeContext } from '../App';
+import Announcements from '../components/announcements/Announcements';
+import darkTheme from '../themeUtils/colors/default/dark';
+import lightTheme from '../themeUtils/colors/default/light';
 import { AnnouncementsWidget } from '../components/Cards';
-const theme = createTheme({
-    /* your theme options */
-});
 
 const ComponentsPage = () => {
+    const { mode } = useContext(ThemeContext);
+
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <AnnouncementsWidget />
-        </ThemeProvider>
+        <>
+            <ThemeProvider theme={mode === 'dark' ? darkTheme : lightTheme}>
+                <Announcements />
+            </ThemeProvider>
+
+            <ThemeProvider theme={mode === 'dark' ? darkTheme : lightTheme}>
+                <AnnouncementsWidget />
+            </ThemeProvider>
+        </>
     );
 };
 export default ComponentsPage;
