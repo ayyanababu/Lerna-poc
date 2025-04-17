@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AxisBottom, AxisLeft } from "@visx/axis";
-import { Group } from "@visx/group";   
+import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
 import { stack } from "@visx/shape";
@@ -43,40 +43,66 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
   showTicks = false,
 }) => {
   const { theme } = useTheme();
-  const { parentRef, width = 0, height = 0 } = useParentSize({ debounceTime: 150 });
+  const {
+    parentRef,
+    width = 0,
+    height = 0,
+  } = useParentSize({ debounceTime: 150 });
 
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
   const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
-  const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(null);
-  const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(null);
+  const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(
+    null,
+  );
+  const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(
+    null,
+  );
   const margin = DEFAULT_MARGIN;
 
-  const { showTooltip, hideTooltip, tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
-    useTooltip<TooltipData[]>();
+  const {
+    showTooltip,
+    hideTooltip,
+    tooltipData,
+    tooltipLeft,
+    tooltipTop,
+    tooltipOpen,
+  } = useTooltip<TooltipData[]>();
 
-  const { data, groupKeys } = useMemo(() =>
-    isLoading ? mockVerticalGroupedBarChartData : { data: _data, groupKeys: _groupKeys },
-    [isLoading, _data, _groupKeys]
+  const { data, groupKeys } = useMemo(
+    () =>
+      isLoading
+        ? mockVerticalGroupedBarChartData
+        : { data: _data, groupKeys: _groupKeys },
+    [isLoading, _data, _groupKeys],
   );
 
-  const filteredData = useMemo(() =>
-    data.map((categoryData) => {
-      const d = cloneDeep(categoryData);
-      groupKeys.forEach((groupKey, index) => {
-        if (hideIndex.includes(index)) delete d.data?.[groupKey];
-      });
-      return d;
-    }), [data, hideIndex, groupKeys]);
+  const filteredData = useMemo(
+    () =>
+      data.map((categoryData) => {
+        const d = cloneDeep(categoryData);
+        groupKeys.forEach((groupKey, index) => {
+          if (hideIndex.includes(index)) delete d.data?.[groupKey];
+        });
+        return d;
+      }),
+    [data, hideIndex, groupKeys],
+  );
 
-  const legendData = useMemo(() =>
-    groupKeys.map((key) => ({
-      label: capitalize(lowerCase(key)),
-      value: data.reduce((total, d) => total + Number(d.data[key] || 0), 0),
-    })), [groupKeys, data]);
+  const legendData = useMemo(
+    () =>
+      groupKeys.map((key) => ({
+        label: capitalize(lowerCase(key)),
+        value: data.reduce((total, d) => total + Number(d.data[key] || 0), 0),
+      })),
+    [groupKeys, data],
+  );
 
-  const activeKeys = useMemo(() => groupKeys.filter((_, i) => !hideIndex.includes(i)), [groupKeys, hideIndex]);
+  const activeKeys = useMemo(
+    () => groupKeys.filter((_, i) => !hideIndex.includes(i)),
+    [groupKeys, hideIndex],
+  );
 
   const stackedData = useMemo(() => {
     if (type !== "stacked") return null;
@@ -101,34 +127,41 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
       return Math.max(
         0,
         ...filteredData.map((d) =>
-          activeKeys.reduce((sum, key) => sum + Number(d.data[key] || 0), 0)
-        )
+          activeKeys.reduce((sum, key) => sum + Number(d.data[key] || 0), 0),
+        ),
       );
     }
     return Math.max(
       0,
       ...filteredData.flatMap((d) =>
-        activeKeys.map((key) => Number(d.data[key]) || 0)
-      )
+        activeKeys.map((key) => Number(d.data[key]) || 0),
+      ),
     );
   }, [filteredData, activeKeys, type]);
 
-  const categoryScale = useMemo(() =>
-    scaleBand<string>({
-      domain: filteredData.map((d) => d.label),
-      range: [0, height - margin.top - margin.bottom],
-      padding: 0.4,
-    }), [filteredData, height, margin.top, margin.bottom]);
+  const categoryScale = useMemo(
+    () =>
+      scaleBand<string>({
+        domain: filteredData.map((d) => d.label),
+        range: [0, height - margin.top - margin.bottom],
+        padding: 0.4,
+      }),
+    [filteredData, height, margin.top, margin.bottom],
+  );
 
-  const groupScale = useMemo(() =>
-    scaleBand<string>({
-      domain: activeKeys,
-      range: [0, categoryScale.bandwidth()],
-      padding: 0.3,
-    }), [activeKeys, categoryScale]);
+  const groupScale = useMemo(
+    () =>
+      scaleBand<string>({
+        domain: activeKeys,
+        range: [0, categoryScale.bandwidth()],
+        padding: 0.3,
+      }),
+    [activeKeys, categoryScale],
+  );
 
   const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
-  const drawableChartWidth = width - margin.left - margin.right - yAxisLabelWidth;
+  const drawableChartWidth =
+    width - margin.left - margin.right - yAxisLabelWidth;
 
   const valueScale = scaleLinear<number>({
     domain: [0, maxValue * SCALE_PADDING],
@@ -136,24 +169,28 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     nice: true,
   });
 
-  const groupColorScale = useMemo(() =>
-    scaleOrdinal<string, string>({
-      domain: groupKeys,
-      range: colors.length ? colors : theme.colors.charts.bar,
-    }), [groupKeys, colors, theme.colors.charts.bar]);
+  const groupColorScale = useMemo(
+    () =>
+      scaleOrdinal<string, string>({
+        domain: groupKeys,
+        range: colors.length ? colors : theme.colors.charts.bar,
+      }),
+    [groupKeys, colors, theme.colors.charts.bar],
+  );
 
   const renderBar = (props: any) => <CustomBar {...props} />;
 
-  const handleMouseMove = (groupKey: string, value: number) => (e: React.MouseEvent) => {
-    if (!isLoading) {
-      showTooltip({
-        tooltipData: [{ label: capitalize(lowerCase(groupKey)), value }],
-        tooltipLeft: e.clientX,
-        tooltipTop: e.clientY,
-      });
-      setHoveredGroupKey(groupKey);
-    }
-  };
+  const handleMouseMove =
+    (groupKey: string, value: number) => (e: React.MouseEvent) => {
+      if (!isLoading) {
+        showTooltip({
+          tooltipData: [{ label: capitalize(lowerCase(groupKey)), value }],
+          tooltipLeft: e.clientX,
+          tooltipTop: e.clientY,
+        });
+        setHoveredGroupKey(groupKey);
+      }
+    };
 
   const handleMouseLeave = () => {
     if (!isLoading) {
@@ -176,7 +213,8 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
         const barX = 0;
 
         const isHovered = hoveredGroupKey === groupKey;
-        const barOpacity = hoveredGroupKey && !isHovered ? REDUCED_OPACITY : DEFAULT_OPACITY;
+        const barOpacity =
+          hoveredGroupKey && !isHovered ? REDUCED_OPACITY : DEFAULT_OPACITY;
         const fill = isLoading
           ? `url(#${shimmerGradientId})`
           : hideIndex.includes(index)
@@ -203,8 +241,8 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
   useEffect(() => {
     if (!chartSvgRef.current) return;
     const labels = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
-    const widths = Array.from(labels).map((node) =>
-      (node as SVGGraphicsElement).getBBox().width
+    const widths = Array.from(labels).map(
+      (node) => (node as SVGGraphicsElement).getBBox().width,
     );
     setMaxLabelWidth(Math.max(...widths, 0));
   }, [data, width, height]);
@@ -214,8 +252,12 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
 
-    const titleEl = document.querySelector(".chart-title") as HTMLElement | null;
-    const legendEl = document.querySelector(".chart-legend") as HTMLElement | null;
+    const titleEl = document.querySelector(
+      ".chart-title",
+    ) as HTMLElement | null;
+    const legendEl = document.querySelector(
+      ".chart-legend",
+    ) as HTMLElement | null;
 
     const titleHeight = titleEl?.getBoundingClientRect().height || 0;
     const legendHeight = legendEl?.getBoundingClientRect().height || 0;
@@ -255,7 +297,11 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
       }}
       timestampProps={{ timestamp, isLoading }}
     >
-      <svg ref={chartSvgRef} width={adjustedChartWidth || width} height={adjustedChartHeight || height}>
+      <svg
+        ref={chartSvgRef}
+        width={adjustedChartWidth || width}
+        height={adjustedChartHeight || height}
+      >
         {isLoading && <SvgShimmer />}
         <Group top={margin.top} left={margin.left + yAxisLabelWidth}>
           <AxisLeft

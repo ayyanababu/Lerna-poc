@@ -32,7 +32,7 @@ const SCALE_PADDING = 1.02;
 const getEstimatedYAxisWidth = (maxValue: number, averageCharWidth = 7) => {
   const formattedValue = formatNumberWithSuffix(maxValue);
   const commasCount = Math.floor(
-    Math.max(0, Math.abs(maxValue).toString().length - 3) / 3
+    Math.max(0, Math.abs(maxValue).toString().length - 3) / 3,
   );
   return formattedValue.length * averageCharWidth + commasCount * 3 + 12;
 };
@@ -54,11 +54,15 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   maxBarWidth = DEFAULT_MAX_BAR_WIDTH,
 }) => {
   const { theme } = useTheme();
-  const { parentRef, width = 0, height = 0 } = useParentSize({ debounceTime: 150 });
+  const {
+    parentRef,
+    width = 0,
+    height = 0,
+  } = useParentSize({ debounceTime: 150 });
 
   const data = useMemo<DataPoint[]>(
     () => (isLoading ? mockVerticalBarChartData : _data),
-    [isLoading, _data]
+    [isLoading, _data],
   );
 
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
@@ -66,23 +70,32 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
   const filteredData = useMemo(
     () => data.filter((_, index) => !hideIndex.includes(index)),
-    [data, hideIndex]
+    [data, hideIndex],
   );
 
   const margin = useMemo(() => {
     if (!width) return DEFAULT_MARGIN;
 
-    const maxValue = Math.max(0, ...filteredData.map((d) => Number(d.value) || 0));
+    const maxValue = Math.max(
+      0,
+      ...filteredData.map((d) => Number(d.value) || 0),
+    );
     const averageCharWidth = 7;
     const yAxisWidth = getEstimatedYAxisWidth(maxValue, averageCharWidth);
 
     const xLabels = filteredData.map((d) => String(d.label));
     const totalLabelWidth = xLabels.join("").length * averageCharWidth;
     const needsRotation = xLabels.length > 5 || totalLabelWidth >= width;
-    const maxXLabelLength = Math.max(...xLabels.map((label) => label.length), 0);
+    const maxXLabelLength = Math.max(
+      ...xLabels.map((label) => label.length),
+      0,
+    );
 
     const rotationAdjustment = needsRotation
-      ? Math.min(5 + (maxXLabelLength > 10 ? (maxXLabelLength - 10) * 1.5 : 0), 35)
+      ? Math.min(
+          5 + (maxXLabelLength > 10 ? (maxXLabelLength - 10) * 1.5 : 0),
+          35,
+        )
       : 0;
 
     return {
@@ -107,8 +120,9 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
   const maxValue = useMemo(
     () =>
-      Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) * SCALE_PADDING,
-    [filteredData]
+      Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) *
+      SCALE_PADDING,
+    [filteredData],
   );
 
   const xScale = useMemo(
@@ -119,7 +133,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         padding: 0.6,
         round: true,
       }),
-    [filteredData, innerWidth]
+    [filteredData, innerWidth],
   );
 
   const yScale = useMemo(
@@ -129,12 +143,12 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         range: [innerHeight, 0],
         nice: true,
       }),
-    [innerHeight, maxValue]
+    [innerHeight, maxValue],
   );
 
   const legendData = useMemo(
     () => data.map((d) => ({ label: d.label, value: d.value })),
-    [data]
+    [data],
   );
 
   const colorScale = useMemo(() => {
@@ -147,22 +161,22 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
   const handleBarMouseMove =
     (value: number, color: string, index: number) =>
-      (event: React.MouseEvent) => {
-        if (!isLoading) {
-          showTooltip({
-            tooltipData: [
-              {
-                label: filteredData[index].label,
-                value,
-                color,
-              },
-            ],
-            tooltipLeft: event.clientX,
-            tooltipTop: event.clientY,
-          });
-          setHoveredBar(index);
-        }
-      };
+    (event: React.MouseEvent) => {
+      if (!isLoading) {
+        showTooltip({
+          tooltipData: [
+            {
+              label: filteredData[index].label,
+              value,
+              color,
+            },
+          ],
+          tooltipLeft: event.clientX,
+          tooltipTop: event.clientY,
+        });
+        setHoveredBar(index);
+      }
+    };
 
   const handleBarMouseLeave = () => {
     if (!isLoading) {
@@ -245,7 +259,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             const radius = Math.min(
               DEFAULT_BAR_RADIUS,
               barWidth / 2,
-              barHeight > 0 ? barHeight : 0
+              barHeight > 0 ? barHeight : 0,
             );
             const barColor = d.color || colorScale(index);
 
