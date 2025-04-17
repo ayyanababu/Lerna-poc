@@ -162,6 +162,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     setMaxLabelWidth(Math.max(...widths, 0));
   }, [data, width, height]);
 
+  
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
@@ -303,6 +304,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         setAdjustedChartWidth(updatedWidth);
       }
     }, 200)
+  }, [data, width, height, margin, drawableChartWidth]);
+  
+  if (!isLoading && (!_data || _data.length === 0)) {
+    return <div>No data to display.</div>;
   }
 
 

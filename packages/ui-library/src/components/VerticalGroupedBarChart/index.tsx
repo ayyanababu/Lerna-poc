@@ -243,7 +243,26 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
 
 
 
-  if (!_data || _data.length === 0) return <div>No data to display.</div>;
+  // Hide axis labels when loading
+  const renderAxisLabel = (
+    formattedValue: string,
+    tickProps: React.SVGProps<SVGTextElement>,
+  ) => (
+    <text
+      {...tickProps}
+      className={`${isLoading ? shimmerClassName : ""}`}
+      fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+      style={{
+        fontSize: "12px",
+      }}
+    >
+      {isLoading ? "" : formattedValue}
+    </text>
+  );
+
+  if (!isLoading && (!_data || _data.length === 0)) {
+    return <div>No data to display.</div>;
+  }
 
   return (
     <ChartWrapper

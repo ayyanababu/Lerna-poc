@@ -1,0 +1,219 @@
+.announcementsHeading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: stretch;
+}
+
+.widgetContainer {
+  padding: 12px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: Roboto, sans-serif;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 4px;
+  box-sizing: border-box;
+}
+
+.headerActionsContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.headerTitleContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--Semantic-Colors-Primary-Text);
+  flex-shrink: 1; /* Allow title to shrink if needed */
+  overflow: hidden;
+}
+
+.headerTitleText {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 19.5px;
+  letter-spacing: 0.25px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerActionsContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0; /* Prevent buttons shrinking */
+}
+
+.announcementListItemMotionWrapper {
+  width: 100%; /* Ensures list item takes full width */
+}
+
+.cardList {
+  display: flex;
+  gap: 8px;
+  margin: 0 -12px;
+  padding: 8px 0px;
+  box-sizing: border-box;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+
+  /* Hide scrollbar */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.announcementCardMotionWrapper:nth-child(1) {
+  padding-left: 12px;
+}
+.announcementCardMotionWrapper:nth-last-child(1) {
+  padding-right: 12px;
+}
+.announcementCardMotionWrapper {
+  scroll-margin: 0 0 0 12px; /* Align first card with header */
+  transition: all 0.2s ease-in-out;
+}
+.cardList::-webkit-scrollbar {
+  display: none;
+}
+
+/* List Container (Expanded View) */
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0px;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+.listContainer::-webkit-scrollbar {
+  width: 4px;
+  display: block;
+}
+.listContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+.listContainer::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.announcementCardMotionWrapper {
+  flex-shrink: 0;
+  scroll-snap-align: start; /* Optional: Snap alignment */
+}
+.announcementListItemMotionWrapper {
+  width: 100%; /* Ensures list item takes full width */
+}
+
+/* Announcement Card (Carousel Item) */
+.announcementCard {
+  width: 164px;
+  min-width: 164px;
+  height: 140px;
+  border-radius: 12px !important;
+  padding: 12px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 8px;
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.cardContentContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.cardTitle {
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  max-height: 37.18px;
+}
+
+.cardDescription {
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  max-height: 49.5px;
+  flex-grow: 1;
+}
+
+/* Announcement List Item (Expanded View) */
+.announcementListItem {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+  border-radius: 12px;
+}
+
+.listItemContentContainer {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.listItemTitle {
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.25px !important;
+  color: var(--Green-dark-50) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.listItemDescription {
+  font-size: 10px !important;
+  font-weight: 400 !important;
+  line-height: 16.5px !important;
+  letter-spacing: 0.4px !important;
+  color: var(--Semantic-Colors-Primary-Text) !important;
+}
+
+.actionLink {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 17.16px !important;
+  letter-spacing: 0.4px !important;
+  color: var(--Semantic-Colors-Primary-dark-Hover) !important;
+  cursor: pointer;
+  align-self: flex-start;
+  text-decoration: none !important;
+  padding: 0 4px; /* Align with header buttons */
+}
+.actionLink:hover {
+  text-decoration: underline !important;
+}
