@@ -804,9 +804,9 @@ body:not(.dark) {
                                         align: 'left',
                                     }}
                                     legendsProps={{
-                                        position: Legends.Position.TOP,
+                                        position: Legends.Position.BOTTOM,
                                         doStrike: true,
-                                        isVisible: false,
+                                        isVisible: true,
                                     }}
                                     tooltipProps={{}}
                                 />
