@@ -841,6 +841,7 @@ body:not(.dark) {
                                         variant: 'h6',
                                         align: 'left',
                                     }}
+                                    title={"Trade Volume"}
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,
                                         doStrike: true,
