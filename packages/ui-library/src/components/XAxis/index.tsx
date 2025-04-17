@@ -12,12 +12,14 @@ import { formatNumberWithSuffix, isNumeric } from "../../utils/number";
 import { shimmerClassName } from "../Shimmer/Shimmer";
 import { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { XAxisProps } from "./types";
+import { Label } from "@mui/icons-material";
 
 const MAX_LABEL_CHARS = 15;
 const FIXED_CLASSNAME_XLABELS = "fixed-classname-xlabels";
 
 function XAxis({
   availableWidth = 0,
+  rotated,
   hideAllTicks = false,
   isLoading = false,
   labels: providedLabels,
@@ -119,7 +121,7 @@ function XAxis({
     while (
       scaleLabels.length > 0 &&
       availableWidth / (scaleLabels.join(" ").length * averageWidthPerChar) <
-        0.9
+      0.9
     ) {
       scaleLabels.pop();
     }
@@ -165,7 +167,6 @@ function XAxis({
         tickValues: [],
       };
     }
-    console.log(dynamicNumTicks, "dynamicNumTicks");
     if (scaleLabels.length <= dynamicNumTicks) {
       return {
         angle: 0,
@@ -287,15 +288,18 @@ function XAxis({
 
     const xPos =
       evenPositionsMap &&
-      tickValues &&
-      formattedValue &&
-      evenPositionsMap.get(formattedValue) !== undefined
+        tickValues &&
+        formattedValue &&
+        evenPositionsMap.get(formattedValue) !== undefined
         ? evenPositionsMap.get(formattedValue)
         : tickProps.x;
 
     const yOffset = showAxisLine ? labelOffset : labelOffset / 2;
 
     if (rotate) {
+      if (typeof rotated === "function") {
+        rotated(true)
+      }
       return (
         <g transform={`translate(${xPos},${tickProps.y})`}>
           <text
@@ -314,7 +318,9 @@ function XAxis({
         </g>
       );
     }
-
+    if (typeof rotated === "function") {
+      rotated(false)
+    }
     return (
       <g transform={`translate(${xPos},${tickProps.y})`}>
         <text
@@ -337,7 +343,7 @@ function XAxis({
     ...overLineStyles,
     color: theme.colors.axis.title,
     fill: theme.colors.axis.title,
-    dy: showAxisLine ? `${labelOffset + 4}px` : `${labelOffset + 10}px`,
+    dy: showAxisLine ? `${labelOffset + 4}px` : `${labelOffset + (!rotate ? 10 : 47)}px`,
   };
 
   const mergedTickLabelProps = {

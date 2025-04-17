@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
-import { AxisBottom, AxisLeft } from "@visx/axis";   
+import { AxisBottom, AxisLeft } from "@visx/axis";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
@@ -18,15 +18,16 @@ import { DataPoint, VerticalGroupedBarChartProps } from "./types";
 
 const DEFAULT_MARGIN = {
   top: 20,
-  right: 30,
+  right: -20,
   bottom: 30,
-  left: 40,
+  left: 0,
 };
 
 const DEFAULT_BAR_RADIUS = 5;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
+const TICK_LABEL_PADDING = 8;
 
 const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   data: _data,
@@ -44,7 +45,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   const { theme } = useTheme();
   const { parentRef, width = 0, height = 0 } = useParentSize({ debounceTime: 150 });
 
-  const drawableChartWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
+  //  const drawableChartWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
   const drawableChartHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
 
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
@@ -52,6 +53,10 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(null);
   const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(null);
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
+  const axis_bottom = useRef<SVGGElement | null>(null);
+  const tickRefs = useRef<Record<string, SVGTextElement | null>>({});
+  const tickTextMap = useRef<Record<string, string>>({});
+  const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
 
   const {
     showTooltip,
@@ -61,6 +66,12 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     tooltipTop,
     tooltipOpen,
   } = useTooltip<TooltipData[]>();
+
+
+  const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
+  const axisXStart = DEFAULT_MARGIN.left + yAxisLabelWidth;
+  const drawableChartWidth = width - axisXStart - DEFAULT_MARGIN.right;
+  //  const drawableChartWidth = width - margin.left - DEFAULT_MARGIN.right;
 
   const { data, groupKeys } = useMemo(() =>
     isLoading ? mockVerticalGroupedBarChartData : { data: _data, groupKeys: _groupKeys },
@@ -81,6 +92,25 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       label: capitalize(lowerCase(key)),
       value: data.reduce((total, d) => total + Number(d.data[key] || 0), 0),
     })), [groupKeys, data]);
+
+  useEffect(() => {
+    if (!chartSvgRef.current || !width || !height) return;
+    const svg = chartSvgRef.current;
+    const bbox = svg.getBBox();
+    const titleHeight = document.querySelector(".chart-title")?.getBoundingClientRect().height || 0;
+    const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
+    const updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
+    const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + drawableChartWidth + DEFAULT_MARGIN.right);
+    setAdjustedChartHeight(updatedHeight);
+    setAdjustedChartWidth(updatedWidth);
+  }, [data, width, height, DEFAULT_MARGIN, drawableChartWidth]);
+
+  useEffect(() => {
+    if (!chartSvgRef.current) return;
+    const nodes = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
+    const widths = Array.from(nodes).map((node) => (node as SVGGraphicsElement).getBBox().width);
+    setMaxLabelWidth(Math.max(...widths, 0));
+  }, [data, width, height]);
 
   const activeKeys = useMemo(() => groupKeys.filter((_, i) => !hideIndex.includes(i)), [groupKeys, hideIndex]);
 
@@ -146,25 +176,72 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     }), [groupKeys, colors, theme.colors.charts.bar]);
 
   useEffect(() => {
-    if (!chartSvgRef.current || !width || !height) return;
+    if (!axis_bottom.current || !categoryScale) return;
 
-    const svg = chartSvgRef.current;
-    const bbox = svg.getBBox();
+    const truncationRatio = 0.35;
 
-    const titleEl = document.querySelector(".chart-title") as HTMLElement | null;
-    const legendEl = document.querySelector(".chart-legend") as HTMLElement | null;
+    requestAnimationFrame(() => {
+      const textNodes: SVGTextElement[] = Array.from(
+        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
+      );
 
-    const titleHeight = titleEl?.getBoundingClientRect().height || 0;
-    const legendHeight = legendEl?.getBoundingClientRect().height || 0;
+      if (!textNodes.length) return;
 
-    const totalTop = DEFAULT_MARGIN.top + titleHeight;
-    const totalBottom = DEFAULT_MARGIN.bottom + legendHeight;
-    const requiredHeight = totalTop + bbox.height + totalBottom;
-    const requiredWidth = DEFAULT_MARGIN.left + bbox.width + DEFAULT_MARGIN.right;
+      const usedRects: { x1: number; x2: number }[] = [];
 
-    setAdjustedChartHeight(Math.max(requiredHeight, height) + 5);
-    setAdjustedChartWidth(Math.max(requiredWidth, width));
-  }, [data, width, height, DEFAULT_MARGIN]);
+      // Set all full first
+      textNodes.forEach((node) => {
+        const full = node.dataset.fulltext || node.textContent || "";
+        node.setAttribute("display", "block");
+        node.textContent = full;
+        node.dataset.fulltext = full;
+      });
+      console.log(textNodes)
+      const firstNode = textNodes[0];
+      const lastNode = textNodes[textNodes.length - 1];
+
+      const showAndTruncate = (node: SVGTextElement) => {
+        const label = node.dataset.fulltext || node.textContent || "";
+        const truncated = label.slice(0, Math.floor(label.length * truncationRatio)) + "…";
+        node.textContent = truncated;
+        const bbox = node.getBBox();
+        const x = +node.getAttribute("x")!;
+        const rect = { x1: x - bbox.width / 2, x2: x + bbox.width / 2 };
+        usedRects.push(rect);
+        node.textContent = truncated;
+        node.setAttribute("display", "block");
+      };
+
+      // Always show first and last
+      if (firstNode) showAndTruncate(firstNode);
+      if (lastNode && lastNode !== firstNode) showAndTruncate(lastNode);
+
+      // Hide overlapping others
+      textNodes.slice(1, -1).forEach((node) => {
+        const label = node.dataset.fulltext || node.textContent || "";
+        const truncated = label.slice(0, Math.floor(label.length * truncationRatio)) + "…";
+        const original = node.textContent;
+        node.textContent = truncated;
+        const bbox = node.getBBox();
+        node.textContent = original;
+
+        const x = +node.getAttribute("x")!;
+        const rect = { x1: x - bbox.width / 2, x2: x + bbox.width / 2 };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+
+        if (!isOverlapping) {
+          node.textContent = truncated;
+          node.setAttribute("display", "block");
+          usedRects.push(rect);
+        } else {
+          node.setAttribute("display", "none");
+        }
+      });
+    });
+  }, [categoryScale, axis_bottom.current]);
+
+
+
 
   if (!_data || _data.length === 0) return <div>No data to display.</div>;
 
@@ -192,11 +269,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       }}
       timestampProps={{ timestamp, isLoading }}
     >
-      <svg
-        ref={chartSvgRef}
-        width={adjustedChartWidth || width}
-        height={adjustedChartHeight || height}
-      >
+      <svg ref={chartSvgRef} width={adjustedChartWidth || width} height={adjustedChartHeight || height}>
         {isLoading && <SvgShimmer />}
         <Group top={DEFAULT_MARGIN.top} left={DEFAULT_MARGIN.left}>
           <AxisLeft
@@ -211,19 +284,31 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
             }}
             hideTicks={!showTicks}
           />
-          <AxisBottom
-            scale={categoryScale}
-            top={drawableChartHeight}
-            stroke={theme.colors.axis.line}
-            tickStroke={theme.colors.axis.line}
-            tickLabelProps={{
-              fill: theme.colors.axis.label,
-              fontSize: "12px",
-              textAnchor: "middle",
-              dy: "0.33em",
-            }}
-            hideTicks={hideIndex.length === groupKeys.length || !showTicks}
-          />
+          <g ref={axis_bottom}>
+            <AxisBottom
+              scale={categoryScale}
+              top={drawableChartHeight}
+              stroke={theme.colors.axis.line}
+              tickStroke={theme.colors.axis.line}
+              tickLabelProps={{
+                fill: theme.colors.axis.label,
+                fontSize: "12px",
+                textAnchor: "middle",
+                dy: "0.33em",
+              }}
+              hideTicks={hideIndex.length === groupKeys.length || !showTicks}
+              tickComponent={({ formattedValue, ...tickProps }) => (
+                <text
+                  {...tickProps}
+                  text-anchor="start"
+                  data-fulltext={formattedValue}
+                  x={(categoryScale(formattedValue) ?? 0) + categoryScale.bandwidth() / 2}
+                >
+                  {formattedValue}
+                </text>
+              )}
+            />
+          </g>
           <g>
             {valueScale.ticks(5).map((tick) => (
               <line
@@ -262,8 +347,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                   />
                 );
               })
-            )
-            : filteredData.map((categoryData) => {
+            ) : filteredData.map((categoryData) => {
               const category = String(categoryData.label);
               const categoryX = categoryScale(category) || 0;
               return groupKeys.map((groupKey, index) => {
