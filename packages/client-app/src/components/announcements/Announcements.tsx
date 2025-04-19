@@ -75,11 +75,13 @@ const Announcements = () => {
     );
 
     const { breakpoints, palette } = useTheme();
-    const muiTheme = useTheme();
     const [isExpanded, setIsExpanded] = useState(false);
 
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);
+    const [visibleItems, setVisibleItems] = useState<Record<string, boolean>>(
+        {},
+    );
     const listRef = useRef<HTMLDivElement>(null);
     const isSmallScreen = useMediaQuery(breakpoints.down('sm'));
     const initialVisibleCount = isSmallScreen ? 2 : 3;
@@ -99,9 +101,30 @@ const Announcements = () => {
                 setCanScrollRight(
                     scrollLeft < scrollWidth - clientWidth - tolerance,
                 );
+
+                const containerRect = listRef.current.getBoundingClientRect();
+                const newVisibleItems: Record<string, boolean> = {};
+
+                const children = Array.from(
+                    listRef.current.children,
+                ) as HTMLElement[];
+                children.forEach((child) => {
+                    const id = child.dataset.id;
+                    if (id) {
+                        const childRect = child.getBoundingClientRect();
+
+                        const isFullyVisible =
+                            childRect.left >= containerRect.left - 5 &&
+                            childRect.right <= containerRect.right + 5;
+                        newVisibleItems[id] = isFullyVisible;
+                    }
+                });
+
+                setVisibleItems(newVisibleItems);
             } else {
                 setCanScrollLeft(false);
                 setCanScrollRight(false);
+                setVisibleItems({});
             }
         });
     }, [isExpanded]);
@@ -254,22 +277,27 @@ const Announcements = () => {
                 {displayData.map((announcement, index) => (
                     <Box
                         key={`${announcement.id}`}
+                        data-id={announcement.id}
                         sx={
                             isExpanded
                                 ? {
                                       width: '100%',
                                   }
                                 : {
-                                      width: 'calc(50% - 18px)',
+                                      width: 'calc(50% - 17.75px)',
                                       flexShrink: 0,
                                       scrollSnapAlign: 'start',
                                       scrollMargin: '0 0 0 12px',
-                                      transition: 'all 0.2s ease-in-out',
+                                      scrollBehavior: 'smooth',
+                                      transition: 'all 0.25s ease-in-out',
                                       paddingLeft: index === 0 ? '12px' : '0',
                                       paddingRight:
                                           index === processedData.length - 1
                                               ? '12px'
                                               : '0',
+                                      transform: visibleItems[announcement.id]
+                                          ? 'scaleY(1)'
+                                          : 'scaleY(0.9)',
                                   }
                         }>
                         {isExpanded ? (

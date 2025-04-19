@@ -8,7 +8,7 @@ import { AnnouncementsWidget } from '../components/Cards';
 
 const ComponentsPage = () => {
     const { mode } = useContext(ThemeContext);
-    const [showWidget, setShowWidget] = useState(true); // Add state for visibility
+    const [showWidget, setShowWidget] = useState(false); 
 
     const toggleWidget = () => {
         setShowWidget(!showWidget);
