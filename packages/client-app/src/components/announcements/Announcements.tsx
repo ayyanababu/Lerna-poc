@@ -251,13 +251,26 @@ const Announcements = () => {
                 ref={listRef}
                 className={isExpanded ? 'listContainer' : 'cardList'}
                 onScroll={isExpanded ? undefined : updateScrollState}>
-                {displayData.map((announcement) => (
+                {displayData.map((announcement, index) => (
                     <Box
                         key={`${announcement.id}`}
-                        className={
+                        sx={
                             isExpanded
-                                ? 'announcementListItemMotionWrapper'
-                                : 'announcementCardMotionWrapper'
+                                ? {
+                                      width: '100%',
+                                  }
+                                : {
+                                      width: 'calc(50% - 18px)',
+                                      flexShrink: 0,
+                                      scrollSnapAlign: 'start',
+                                      scrollMargin: '0 0 0 12px',
+                                      transition: 'all 0.2s ease-in-out',
+                                      paddingLeft: index === 0 ? '12px' : '0',
+                                      paddingRight:
+                                          index === processedData.length - 1
+                                              ? '12px'
+                                              : '0',
+                                  }
                         }>
                         {isExpanded ? (
                             <AnnouncementListItem announcement={announcement} />

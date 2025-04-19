@@ -169,6 +169,10 @@ const AnnouncementsList: React.FC<AnnouncementListItemProps> = ({
                                 : lightGrey[600]
                         }`,
                         textTransform: 'capitalize',
+                        fontSize: '10px',
+                        fontWeight: '400',
+                        lineHeight: '16.5px',
+                        letterSpacing: '0.4px',
                     }}
                     variant="overline"
                     className="cardDescription">

@@ -57,9 +57,6 @@
   flex-shrink: 0; /* Prevent buttons shrinking */
 }
 
-.announcementListItemMotionWrapper {
-  width: 100%; /* Ensures list item takes full width */
-}
 
 .cardList {
   display: flex;
@@ -76,16 +73,6 @@
   scrollbar-width: none;
 }
 
-.announcementCardMotionWrapper:nth-child(1) {
-  padding-left: 12px;
-}
-.announcementCardMotionWrapper:nth-last-child(1) {
-  padding-right: 12px;
-}
-.announcementCardMotionWrapper {
-  scroll-margin: 0 0 0 12px; /* Align first card with header */
-  transition: all 0.2s ease-in-out;
-}
 .cardList::-webkit-scrollbar {
   display: none;
 }
@@ -113,18 +100,9 @@
   border-radius: 4px;
 }
 
-.announcementCardMotionWrapper {
-  flex-shrink: 0;
-  scroll-snap-align: start; /* Optional: Snap alignment */
-}
-.announcementListItemMotionWrapper {
-  width: 100%; /* Ensures list item takes full width */
-}
 
 /* Announcement Card (Carousel Item) */
 .announcementCard {
-  width: 164px;
-  min-width: 164px;
   height: 140px;
   border-radius: 12px !important;
   padding: 12px !important;
@@ -199,13 +177,6 @@
   text-overflow: ellipsis;
 }
 
-.listItemDescription {
-  font-size: 10px !important;
-  font-weight: 400 !important;
-  line-height: 16.5px !important;
-  letter-spacing: 0.4px !important;
-  color: var(--Semantic-Colors-Primary-Text) !important;
-}
 
 .actionLink {
   font-size: 12px !important;
