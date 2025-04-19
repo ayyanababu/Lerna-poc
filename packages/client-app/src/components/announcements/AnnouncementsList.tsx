@@ -56,6 +56,10 @@ const AnnouncementsList: React.FC<AnnouncementListItemProps> = ({
                 boxShadow: `0px 0px 7px 0px ${cardShadow}`,
                 display: 'flex',
                 flexDirection: 'column',
+                transition: 'transform 0.25s ease-in-out',
+                '&:hover': {
+                    transform: 'translateY(-2px)',
+                },
             }}
             elevation={0}
             square
@@ -92,13 +96,23 @@ const AnnouncementsList: React.FC<AnnouncementListItemProps> = ({
 
                     <Typography
                         variant="body1"
-                        className="cardTitle"
                         sx={{
                             color: `${
                                 palette.mode === 'dark'
                                     ? darkGreen[50]
                                     : palette.text.secondary
                             }`,
+                            wordWrap: 'break-word',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: 'vertical',
+                            maxHeight: '37.18px',
+                            fontSize: '13px',
+                            fontWeight: 400,
+                            lineHeight: '18.59px',
+                            letterSpacing: '0.25px',
                         }}>
                         {announcement.plainTitle}
                     </Typography>
@@ -154,6 +168,7 @@ const AnnouncementsList: React.FC<AnnouncementListItemProps> = ({
                                 ? darkGrey[100]
                                 : lightGrey[600]
                         }`,
+                        textTransform: 'capitalize',
                     }}
                     variant="overline"
                     className="cardDescription">

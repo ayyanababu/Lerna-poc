@@ -59,9 +59,11 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
             sx={{
                 backgroundColor: `${cardBackground}`,
                 boxShadow: `0px 0px 7px 0px ${cardShadow} !important`,
+                transition: 'all 0.25s ease-in-out',
                 '&:hover': {
                     backgroundColor: `${cardHoverBackground}`,
                     cursor: 'pointer',
+                    transform: 'translateY(-2px)',
                 },
             }}
             elevation={0}
@@ -146,18 +148,32 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                     variant="body1"
                     className="cardTitle"
                     sx={{
-                        lineHeight: 'unset',
                         color: `${
                             palette.mode === 'dark'
                                 ? darkGreen[50]
                                 : palette.text.secondary
                         }`,
+                        fontSize: '13px',
+                        fontWeight: 400,
+                        lineHeight: '18.59px',
+                        letterSpacing: '0.25px',
+                        wordWrap: 'break-word',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        maxHeight: '37.18px',
                     }}>
                     {announcement.plainTitle}
                 </Typography>
                 <Typography
                     sx={{
-                        lineHeight: 'unset',
+                        fontStyle: 'normal',
+                        fontWeight: '400 !important',
+                        fontSize: '10px !important',
+                        lineHeight: '16.5px !important',
+                        letterSpacing: '0.40px !important',
                         color: `${
                             palette.mode === 'dark'
                                 ? darkGrey[100]
