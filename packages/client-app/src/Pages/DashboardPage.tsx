@@ -149,20 +149,20 @@ const fetchStackedBarData = (): Promise<StackedBarItem[]> =>
                 {
                     label: 'Not Priced',
                     data: {
-                        notPriced: Math.floor(Math.random() * 1000) + 2000,
+                        notPriced: Math.floor(Math.random() * 100000000) + 2000,
                     },
                 },
                 {
                     label: 'Stale Priced',
                     data: {
-                        stalePriced: Math.floor(Math.random() * 1000) + 2500,
+                        stalePriced: Math.floor(Math.random() * 100000000) + 2500,
                     },
                 },
                 {
                     label: 'Priced',
                     data: {
-                        'priced:Auto': Math.floor(Math.random() * 200) + 200,
-                        'priced:Manual': Math.floor(Math.random() * 50) + 30,
+                        'priced:Auto': Math.floor(Math.random() * 2000000000) + 200,
+                        'priced:Manual': Math.floor(Math.random() * 500000000) + 30,
                     },
                 },
             ]);
@@ -184,12 +184,12 @@ const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> =>
                     return {
                         label: `${formattedDate}`,
                         data: {
-                            futures: Math.floor(Math.random() * 50000) + 20000,
-                            options: Math.floor(Math.random() * 50000) + 20000,
-                            forwards: Math.floor(Math.random() * 15000) + 5000,
+                            futures: Math.floor(Math.random() * 50000000) + 20000,
+                            options: Math.floor(Math.random() * 50000000) + 20000,
+                            forwards: Math.floor(Math.random() * 150000000) + 5000,
                             fixedIncome:
-                                Math.floor(Math.random() * 10000) + 3000,
-                            others: Math.floor(Math.random() * 6000) + 2000,
+                                Math.floor(Math.random() * 100000000) + 3000,
+                            others: Math.floor(Math.random() * 600000) + 2000,
                         },
                     };
                 }),
@@ -216,8 +216,8 @@ const fetchBarLineData = (): Promise<BarLineData> =>
                 yAxisRightLabel: 'Positions Impacted',
                 chartData: actionTypes.map((action) => ({
                     xAxis: action,
-                    yAxisLeft: Math.floor(Math.random() * 30) + 15, // 15-45
-                    yAxisRight: Math.floor(Math.random() * 35) + 20, // 20-55
+                    yAxisLeft: Math.floor(Math.random() * 300000000) + 15, // 15-45
+                    yAxisRight: Math.floor(Math.random() * 350000000) + 20, // 20-55
                 })),
             });
         }, 2200);
@@ -229,19 +229,19 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
             resolve([
                 {
                     label: 'Not Priced',
-                    value: Math.floor(Math.random() * 20) + 20,
+                    value: 10000000,
                 }, // 20-40
                 {
                     label: 'Stale Price',
-                    value: Math.floor(Math.random() * 25) + 35,
+                    value: 15000000,
                 }, // 35-60
                 {
                     label: 'Priced/Auto',
-                    value: Math.floor(Math.random() * 10) + 10,
+                    value: 10000000,
                 }, // 10-20
                 {
                     label: 'Priced/Manual',
-                    value: Math.floor(Math.random() * 8) + 5,
+                    value: 50000000,
                 }, // 5-13
             ]);
         }, 1300);
@@ -266,11 +266,11 @@ const fetchVerticalGroupedBarData = (): Promise<StackedBarItem[]> =>
                 ...new Array(10).fill(0).map((_, index) => ({
                     label: `Q${index + 1} 2024`,
                     data: {
-                        future: Math.floor(Math.random() * 100) + 20,
-                        options: Math.floor(Math.random() * 100) + 20,
-                        forwards: Math.floor(Math.random() * 100) + 20,
-                        fixedIncome: Math.floor(Math.random() * 100) + 20,
-                        others: Math.floor(Math.random() * 100) + 20,
+                        future: Math.floor(Math.random() * 10000000) + 20,
+                        options: Math.floor(Math.random() * 10000000) + 20,
+                        forwards: Math.floor(Math.random() * 10000000) + 20,
+                        fixedIncome: Math.floor(Math.random() * 10000000) + 20,
+                        others: Math.floor(Math.random() * 10000000) + 20,
                     },
                 })),
             ]);
@@ -284,10 +284,10 @@ const fetchHorizontalGroupedBarData = (): Promise<StackedBarItem[]> =>
                 {
                     label: 'Sales',
                     data: {
-                        q1: Math.floor(Math.random() * 30) + 30, // 30-60
-                        q2: Math.floor(Math.random() * 30) + 40, // 40-70
-                        q3: Math.floor(Math.random() * 30) + 30, // 30-60
-                        q4: Math.floor(Math.random() * 30) + 60, // 60-90
+                        q1: Math.floor(Math.random() * 30000000) + 30, // 30-60
+                        q2: Math.floor(Math.random() * 30000000) + 40, // 40-70
+                        q3: Math.floor(Math.random() * 30000000) + 30, // 30-60
+                        q4: Math.floor(Math.random() * 30000000) + 60, // 60-90
                     },
                 },
                 {
