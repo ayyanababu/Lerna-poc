@@ -1,10 +1,11 @@
+// HorizontalBarChart.tsx (Enhanced: X-axis label truncation, layout precision)
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
 import { useTooltip } from "@visx/tooltip";
 
-import useTheme from "../../hooks/useTheme";     
+import useTheme from "../../hooks/useTheme";
 import { ChartWrapper } from "../ChartWrapper";
 import CustomBar from "../CustomBar";
 import Grid from "../Grid";
@@ -18,14 +19,18 @@ import { DataPoint, HorizontalBarChartProps } from "./types";
 const DEFAULT_MARGIN = {
   top: 20,
   right: 20,
-  bottom: 0,
-  left: 10,
+  bottom: 30,
+  left: 0,
 };
 const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.02;
 const MAX_BAR_HEIGHT = 16;
+const TRUNCATE_RATIO = 0.75;
+const TICK_LABEL_PADDING = 8;
+let AXIS_ROTATE = false;
+
 
 function getMaxLabelWidth(labels: string[], font = "10px sans-serif") {
   const canvas = document.createElement("canvas");
@@ -35,10 +40,9 @@ function getMaxLabelWidth(labels: string[], font = "10px sans-serif") {
   return Math.max(...labels.map((label) => ctx.measureText(label).width));
 }
 
-function truncateLabel(rawLabel: string, maxChars = 15) {
-  return rawLabel.length <= maxChars
-    ? rawLabel
-    : `${rawLabel.substring(0, maxChars)}…`;
+function truncateLabel(label: string, ratio = TRUNCATE_RATIO): string {
+  const limit = Math.floor(label.length * ratio);
+  return label.length <= limit ? label : label.slice(0, limit) + "…";
 }
 
 const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
@@ -59,12 +63,14 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 }) => {
   const { theme } = useTheme();
   const { parentRef, width = 0, height = 0 } = useParentSize({ debounceTime: 150 });
+  const chartSvgRef = useRef<SVGSVGElement | null>(null);
 
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(null);
   const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(null);
-  const chartSvgRef = useRef<SVGSVGElement | null>(null);
+  const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
+  const axis_bottom = useRef<SVGGElement | null>(null);
 
   const {
     showTooltip,
@@ -85,132 +91,222 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     [data, hideIndex]
   );
 
-  const truncatedLabels = useMemo(
-    () => filteredData.map((d) => truncateLabel(String(d.label), 15)),
-    [filteredData]
-  );
+  useEffect(() => {
+    if (!chartSvgRef.current) return;
+    const nodes = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
+    const widths = Array.from(nodes).map((node) => (node as SVGGraphicsElement).getBBox().width);
+    setMaxLabelWidth(Math.max(...widths, 0));
+  }, [data, width, height]);
 
-  const maxLabelPx = useMemo(() => {
-    if (!truncatedLabels.length) return 0;
-    return getMaxLabelWidth(truncatedLabels, "10px sans-serif");
-  }, [truncatedLabels]);
+  const yLabels = useMemo(() => filteredData.map((d) => String(d.label)), [filteredData]);
+  const truncatedLabels = useMemo(() => yLabels.map((l) => truncateLabel(l)), [yLabels]);
+
+  const maxLabelPx = useMemo(() => getMaxLabelWidth(truncatedLabels), [truncatedLabels]);
 
   const margin = useMemo(() => {
-    if (!width) return DEFAULT_MARGIN;
-    let desiredLeft = maxLabelPx + 20;
-    if (desiredLeft > width / 3) desiredLeft = width / 3;
-    desiredLeft = Math.max(desiredLeft, DEFAULT_MARGIN.left);
-    const showingXAxis = xAxisProps?.isVisible !== false;
-    const bottomMargin = showingXAxis
-      ? DEFAULT_MARGIN.bottom
-      : Math.max(DEFAULT_MARGIN.bottom - 10, 10);
-    const rightMargin = Math.min(DEFAULT_MARGIN.right, 20);
+    const desiredLeft = Math.max(maxLabelPx + 10, DEFAULT_MARGIN.left);
     return {
       ...DEFAULT_MARGIN,
-      left: desiredLeft,
-      bottom: bottomMargin,
-      right: rightMargin,
+      left: Math.min(desiredLeft, width / 3),
     };
-  }, [maxLabelPx, width, xAxisProps]);
+  }, [maxLabelPx, width]);
 
-  const drawableChartWidth = width - margin.left - margin.right;
-  const drawableChartHeight = height - margin.top - margin.bottom;
+  const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
+  const axisXStart = DEFAULT_MARGIN.left + yAxisLabelWidth;
+  const drawableChartWidth = width - axisXStart - DEFAULT_MARGIN.right;
+
+  //  const drawableChartWidth = width - margin.left - DEFAULT_MARGIN.right;
+  const drawableChartHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
 
   const maxValue = useMemo(
-    () =>
-      Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) *
-      SCALE_PADDING,
+    () => Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) * SCALE_PADDING,
     [filteredData]
   );
 
+  useEffect(() => {
+    if (!chartSvgRef.current) return;
+    const nodes = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
+    const widths = Array.from(nodes).map((node) => (node as SVGGraphicsElement).getBBox().width);
+    setMaxLabelWidth(Math.max(...widths, 0));
+  }, [data, width, height]);
+
   const yScale = useMemo(
-    () =>
-      scaleBand<string>({
-        domain: filteredData.map((d) => String(d.label)),
-        range: [0, drawableChartHeight],
-        padding: 0.4,
-        round: true,
-      }),
-    [filteredData, drawableChartHeight]
+    () => scaleBand({
+      domain: yLabels,
+      range: [0, drawableChartHeight],
+      padding: 0.4,
+      round: true,
+    }),
+    [yLabels, drawableChartHeight]
   );
 
   const xScale = useMemo(
-    () =>
-      scaleLinear<number>({
-        domain: [0, maxValue],
-        range: [0, drawableChartWidth],
-        nice: true,
-      }),
+    () => scaleLinear({
+      domain: [0, maxValue],
+      range: [0, drawableChartWidth],
+      nice: true,
+    }),
     [maxValue, drawableChartWidth]
   );
 
-  const legendData = useMemo(
-    () => data.map((d) => ({ label: d.label, value: d.value })),
-    [data]
-  );
-
   const colorScale = useMemo(() => {
-    if (colors?.length) {
-      return (index: number) => colors[index % colors.length];
-    }
-    return (index: number) =>
-      theme.colors.charts.bar[index % theme.colors.charts.bar.length];
-  }, [colors, theme.colors.charts.bar]);
+    const defaultColors = theme.colors.charts.bar;
+    return (index: number) => (colors.length ? colors[index % colors.length] : defaultColors[index % defaultColors.length]);
+  }, [colors, theme]);
 
-  const handleBarMouseMove =
-    (value: number, color: string, index: number) =>
-      (event: React.MouseEvent) => {
-        if (!isLoading) {
-          showTooltip({
-            tooltipData: [
-              {
-                label: filteredData[index].label,
-                value,
-                color,
-              },
-            ],
-            tooltipLeft: event.clientX,
-            tooltipTop: event.clientY,
-          });
-          setHoveredBar(index);
+
+  useEffect(() => {
+    if (!chartSvgRef.current) return;
+    const nodes = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
+    const widths = Array.from(nodes).map((node) => (node as SVGGraphicsElement).getBBox().width);
+    setMaxLabelWidth(Math.max(...widths, 0));
+  }, [data, width, height]);
+
+  useEffect(() => {
+    if (!chartSvgRef.current || !width || !height) return;
+    const svg = chartSvgRef.current;
+    const bbox = svg.getBBox();
+    const titleHeight = document.querySelector(".chart-title")?.getBoundingClientRect().height || 0;
+    const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
+    let updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
+    const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right);
+    if (AXIS_ROTATE) {
+      updatedHeight = updatedHeight - (chartSvgRef.current.querySelector('.visx-axis-bottom') as SVGGElement).getBBox().height
+    }
+    setAdjustedChartHeight(updatedHeight);
+    setAdjustedChartWidth(updatedWidth);
+  }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
+
+  useEffect(() => {
+    if (!axis_bottom.current || !xScale) return;
+    if (AXIS_ROTATE) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      const textNodes: SVGTextElement[] = Array.from(
+        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
+      );
+
+      if (!textNodes.length) return;
+
+      const usedRects: { x1: number; x2: number }[] = [];
+
+      // Set all full first
+      textNodes.forEach((node) => {
+        const full = node.dataset.fulltext || node.textContent || "";
+        node.setAttribute("display", "block");
+        node.textContent = full;
+        node.dataset.fulltext = full;
+      });
+      const firstNode = textNodes[0];
+      const lastNode = textNodes[textNodes.length - 1];
+
+      const showAndTruncate = (node: SVGTextElement) => {
+        const label = node.dataset.fulltext || node.textContent || "";
+        const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        const bbox = node.getBBox();
+        let pnode = node.parentNode as Element;
+        let x = 0;
+        if (pnode.getAttribute("transform")) {
+          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+        } else {
+          x = +bbox.x
+        }
+        const rect = { x1: x, x2: x + bbox.width };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        if (!isOverlapping) {
+          node.textContent = label;
+          node.setAttribute("display", "block");
+          usedRects.push(rect);
+        } else {
+          node.textContent = truncated;
+          node.setAttribute("display", "block");
         }
       };
 
-  const handleBarMouseLeave = () => {
-    if (!isLoading) {
-      hideTooltip();
-      setHoveredBar(null);
-    }
-  };
+      // Always show first and last
+      if (firstNode) showAndTruncate(firstNode);
+      if (lastNode && lastNode !== firstNode) showAndTruncate(lastNode);
 
-  
-  useEffect(() => {
-    if (!chartSvgRef.current || !width || !height) return;
+      // Hide overlapping others
+      textNodes.slice(1, -1).forEach((node) => {
+        const label = node.dataset.fulltext || node.textContent || "";
+        const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        const original = node.textContent;
+        node.textContent = truncated;
+        const bbox = node.getBBox();
+        node.textContent = original;
 
-    const svg = chartSvgRef.current;
-    const bbox = svg.getBBox();
+        const x = +node.getAttribute("x")!;
+        const rect = { x1: x - bbox.width, x2: x + bbox.width };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        console.log(label)
+        console.log(truncated)
+        console.log(isOverlapping)
+        if (!isOverlapping) {
+          node.textContent = label;
+          node.setAttribute("display", "block");
+          usedRects.push(rect);
+        } else {
+          node.textContent = truncated;
+          const bbox = node.getBBox();
+          const x = +node.getAttribute("x")!;
+          const rect = { x1: x - bbox.width / 2, x2: x + bbox.width / 2 };
+          const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+          if (!isOverlapping) {
+            node.textContent = truncated;
+            node.setAttribute("display", "block");
+            usedRects.push(rect);
+          } else {
+            const newtruncated = label.slice(0, Math.floor(truncated.length * TRUNCATE_RATIO * .1)) + "…";
+            node.textContent = newtruncated;
+            const bbox = node.getBBox();
+            const x = +node.getAttribute("x")!;
+            const rect = { x1: x - bbox.width / 2, x2: x + bbox.width / 2 };
+            const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+            if (isOverlapping) {
+              node.setAttribute("display", "none");
+            }
+          }
+          //   node.setAttribute("display", "none");
+        }
+      });
+    });
+  }, [xScale, axis_bottom.current]);
 
-    const titleEl = document.querySelector(".chart-title") as HTMLElement | null;
-    const legendEl = document.querySelector(".chart-legend") as HTMLElement | null;
+  const rotated = (rotate: boolean) => {
+    let rot = rotate;
+    setTimeout(() => {
+      console.log("hit")
+      const textNodes: SVGTextElement[] = Array.from(
+        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
+      );
 
-    const titleHeight = titleEl?.getBoundingClientRect().height || 0;
-    const legendHeight = legendEl?.getBoundingClientRect().height || 0;
+      textNodes.forEach((node) => {
+        const full = node.dataset.fulltext || node.textContent || "";
+        node.setAttribute("display", "block");
+        node.textContent = full;
+        node.dataset.fulltext = full;
+      });
+      AXIS_ROTATE = rotate;
 
-    const totalTop = margin.top + titleHeight;
-    const totalBottom = margin.bottom + legendHeight;
-    const requiredHeight = totalTop + bbox.height + totalBottom;
-    const requiredWidth = margin.left + drawableChartWidth + margin.right;
-
-    const updatedHeight = Math.max(requiredHeight, height) + 5;
-    const updatedWidth = Math.max(requiredWidth, width);
-
-    setAdjustedChartHeight(updatedHeight);
-    setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, margin, drawableChartWidth]);
-  
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
+      if (!rot) {
+        if (!chartSvgRef.current || !width || !height) return;
+        const svg = chartSvgRef.current;
+        const bbox = svg.getBBox();
+        const titleHeight = document.querySelector(".chart-title")?.getBoundingClientRect().height || 0;
+        const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
+        let updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
+        const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right);
+        setAdjustedChartHeight(updatedHeight);
+        setAdjustedChartWidth(updatedWidth);
+      }
+    }, 200)
   }
+
+
+  if (!_data || _data.length === 0) return <div>No data to display.</div>;
 
   return (
     <ChartWrapper
@@ -219,16 +315,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       titleProps={{ className: "chart-title", ...titleProps }}
       legendsProps={{
         ...legendsProps,
-        data: legendData,
-        colorScale: scaleOrdinal({
-          domain: legendData.map((d) => d.label),
-          range: filteredData.map((_, i) => colorScale(i)),
-        }),
+        data: data.map((d) => ({ label: d.label, value: d.value })),
+        colorScale: scaleOrdinal({ domain: data.map((d) => d.label), range: data.map((_, i) => colorScale(i)) }),
         hideIndex,
         setHideIndex,
-        hovered: hoveredBar !== null ? legendData[hoveredBar]?.label : null,
-        setHovered: (label) =>
-          setHoveredBar(legendData.findIndex((item) => item.label === label)),
+        hovered: hoveredBar !== null ? data[hoveredBar]?.label : null,
+        setHovered: (label) => setHoveredBar(data.findIndex((d) => d.label === label)),
         isLoading,
       }}
       tooltipProps={{
@@ -240,18 +332,15 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       }}
       timestampProps={{ isLoading, ...timestampProps }}
     >
-      <svg
-        ref={chartSvgRef}
-        width={adjustedChartWidth || width}
-        height={adjustedChartHeight || height}
-      >
+      <svg ref={chartSvgRef} width={adjustedChartWidth || width} height={adjustedChartHeight || height}>
         {isLoading && <SvgShimmer />}
-        <Group top={margin.top} left={margin.left}>
+        <Group top={DEFAULT_MARGIN.top} left={DEFAULT_MARGIN.left}>
           <YAxis
             scale={yScale}
             isLoading={isLoading}
             numTicks={filteredData.length}
             showTicks={false}
+            tickFormat={(val) => truncateLabel(String(val))}
             {...yAxisProps}
           />
           <Grid
@@ -262,64 +351,57 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             isLoading={isLoading}
             {...gridProps}
           />
-          <XAxis
-            scale={xScale}
-            top={drawableChartHeight}
-            isLoading={isLoading}
-            availableWidth={drawableChartWidth}
-            tickLength={0}
-            {...xAxisProps}
-          />
+          <g ref={axis_bottom}>
+            <XAxis
+              scale={xScale}
+              top={drawableChartHeight}
+              isLoading={isLoading}
+              availableWidth={drawableChartWidth}
+              tickLength={0}
+              {...xAxisProps}
+              rotated={rotated}
+            />
+          </g>
           {filteredData.map((d, index) => {
             const value = Number(d.value);
             if (Number.isNaN(value)) return null;
-            const rawBarHeight = yScale.bandwidth();
-            const actualBarHeight =
-              barWidth !== undefined
-                ? barWidth
-                : Math.min(rawBarHeight, MAX_BAR_HEIGHT);
-            const bandY = yScale(d.label) || 0;
-            const barY = bandY + (rawBarHeight - actualBarHeight) / 2;
-            const barLength = xScale(value);
-            const barX = 0;
-            const isHovered = hoveredBar === index;
-            const barOpacity =
-              hoveredBar !== null && !isHovered
-                ? REDUCED_OPACITY
-                : DEFAULT_OPACITY;
-            const radius = Math.min(
-              DEFAULT_BAR_RADIUS,
-              actualBarHeight / 2,
-              barLength
-            );
-            const pathD = `
-              M ${barX},${barY + actualBarHeight}
-              L ${barX + barLength - radius},${barY + actualBarHeight}
-              Q ${barX + barLength},${barY + actualBarHeight} ${barX + barLength},${barY + actualBarHeight - radius}
-              L ${barX + barLength},${barY + radius}
-              Q ${barX + barLength},${barY} ${barX + barLength - radius},${barY}
-              L ${barX},${barY}
-              Z
-            `;
-            const barColor = d.color || colorScale(index);
+            const rawHeight = yScale.bandwidth();
+            const h = barWidth ?? Math.min(rawHeight, MAX_BAR_HEIGHT);
+            const y = (yScale(d.label) || 0) + (rawHeight - h) / 2;
+            const w = xScale(value);
+            const r = Math.min(DEFAULT_BAR_RADIUS, h / 2, w);
+            const fill = d.color || colorScale(index);
             return (
               <CustomBar
                 key={`bar-${d.label}`}
-                x={barX}
-                y={barY}
-                width={barLength}
-                height={actualBarHeight}
-                fill={barColor}
+                x={0}
+                y={y}
+                width={w}
+                height={h}
+                fill={fill}
                 isLoading={isLoading}
-                opacity={barOpacity}
-                pathProps={{ d: pathD }}
-                onMouseMove={handleBarMouseMove(value, barColor, index)}
-                onMouseLeave={handleBarMouseLeave}
-                {...barProps}
-                onClick={(event) => {
-                  if (barProps?.onClick) barProps.onClick(event);
-                  if (onClick) onClick(event, d, index);
+                opacity={hoveredBar !== null && hoveredBar !== index ? REDUCED_OPACITY : DEFAULT_OPACITY}
+                pathProps={{
+                  d: `M0,${y + h} L${w - r},${y + h} Q${w},${y + h} ${w},${y + h - r} L${w},${y + r} Q${w},${y} ${w - r},${y} L0,${y} Z`,
                 }}
+                onMouseMove={(e) => {
+                  showTooltip({
+                    tooltipData: [{ label: d.label, value, color: fill }],
+                    tooltipLeft: e.clientX,
+                    tooltipTop: e.clientY,
+                  });
+                  setHoveredBar(index);
+                }}
+
+                onMouseLeave={() => {
+                  hideTooltip();
+                  setHoveredBar(null);
+                }}
+                onClick={(e) => {
+                  barProps?.onClick?.(e);
+                  onClick?.(e, d, index);
+                }}
+                {...barProps}
               />
             );
           })}

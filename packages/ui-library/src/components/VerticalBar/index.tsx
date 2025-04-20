@@ -1,41 +1,23 @@
-import React, { useMemo, useState } from "react";
+// VerticalBarChart.tsx (Final: Layout-aware truncation + axis sync)
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
-import { useTooltip } from "@visx/tooltip";
+import { AxisBottom, AxisLeft } from "@visx/axis";
 
 import useTheme from "../../hooks/useTheme";
-import { formatNumberWithSuffix } from "../../utils/number";
 import { ChartWrapper } from "../ChartWrapper";
 import CustomBar from "../CustomBar";
-import Grid from "../Grid";
 import SvgShimmer from "../Shimmer/SvgShimmer";
-import { TooltipData } from "../Tooltip/types";
-import XAxis from "../XAxis";
-import YAxis from "../YAxis";
 import mockVerticalBarChartData from "./mockdata";
 import { DataPoint, VerticalBarChartProps } from "./types";
 
-const DEFAULT_MARGIN = {
-  top: 5,
-  right: 0,
-  bottom: 25,
-  left: 25,
-};
-
+const DEFAULT_MARGIN = { top: 20, right: 20, bottom: 30, left: 30 };
 const DEFAULT_MAX_BAR_WIDTH = 16;
 const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
-const REDUCED_OPACITY = 0.3;
-const SCALE_PADDING = 1.02;
-
-const getEstimatedYAxisWidth = (maxValue: number, averageCharWidth = 7) => {
-  const formattedValue = formatNumberWithSuffix(maxValue);
-  const commasCount = Math.floor(
-    Math.max(0, Math.abs(maxValue).toString().length - 3) / 3,
-  );
-  return formattedValue.length * averageCharWidth + commasCount * 3 + 12;
-};
+const SCALE_PADDING = 1.2;
+const TRUNCATE_RATIO = 0.5;
 
 const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   data: _data,
@@ -44,153 +26,148 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   isLoading = false,
   titleProps,
   legendsProps,
-  tooltipProps,
   xAxisProps,
   yAxisProps,
-  gridProps,
   timestampProps,
   barProps,
   onClick,
   maxBarWidth = DEFAULT_MAX_BAR_WIDTH,
 }) => {
   const { theme } = useTheme();
-  const {
-    parentRef,
-    width = 0,
-    height = 0,
-  } = useParentSize({ debounceTime: 150 });
+  const { parentRef, width = 0, height = 0 } = useParentSize({ debounceTime: 150 });
+  const [adjustedLabels, setAdjustedLabels] = useState<Record<string, string>>({});
+  const axis_bottom = useRef<SVGGElement | null>(null);
 
-  const data = useMemo<DataPoint[]>(
-    () => (isLoading ? mockVerticalBarChartData : _data),
-    [isLoading, _data],
-  );
+  const data = useMemo<DataPoint[]>(() => (isLoading ? mockVerticalBarChartData : _data), [isLoading, _data]);
+  const maxValue = useMemo(() => Math.max(0, ...data.map((d) => Number(d.value) || 0)) * SCALE_PADDING, [data]);
 
-  const [hoveredBar, setHoveredBar] = useState<number | null>(null);
-  const [hideIndex, setHideIndex] = useState<number[]>([]);
+  const margin = DEFAULT_MARGIN;
+  const innerWidth = width - margin.left - margin.right;
+  const innerHeight = height - margin.top - margin.bottom;
 
-  const filteredData = useMemo(
-    () => data.filter((_, index) => !hideIndex.includes(index)),
-    [data, hideIndex],
-  );
+  const xLabels = useMemo(() => data.map((d) => String(d.label)), [data]);
 
-  const margin = useMemo(() => {
-    if (!width) return DEFAULT_MARGIN;
+  const xScale = useMemo(() =>
+    scaleBand({
+      domain: xLabels,
+      range: [0, innerWidth],
+      padding: 0.6,
+      round: true,
+    }), [xLabels, innerWidth]);
 
-    const maxValue = Math.max(
-      0,
-      ...filteredData.map((d) => Number(d.value) || 0),
-    );
-    const averageCharWidth = 7;
-    const yAxisWidth = getEstimatedYAxisWidth(maxValue, averageCharWidth);
-
-    const xLabels = filteredData.map((d) => String(d.label));
-    const totalLabelWidth = xLabels.join("").length * averageCharWidth;
-    const needsRotation = xLabels.length > 5 || totalLabelWidth >= width;
-    const maxXLabelLength = Math.max(
-      ...xLabels.map((label) => label.length),
-      0,
-    );
-
-    const rotationAdjustment = needsRotation
-      ? Math.min(
-          5 + (maxXLabelLength > 10 ? (maxXLabelLength - 10) * 1.5 : 0),
-          35,
-        )
-      : 0;
-
-    return {
-      top: DEFAULT_MARGIN.top,
-      right: DEFAULT_MARGIN.right,
-      bottom: DEFAULT_MARGIN.bottom + rotationAdjustment,
-      left: Math.max(DEFAULT_MARGIN.left, yAxisWidth),
-    };
-  }, [DEFAULT_MARGIN, width, filteredData]);
-
-  const innerWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
-  const innerHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
-
-  const {
-    showTooltip,
-    hideTooltip,
-    tooltipData,
-    tooltipLeft,
-    tooltipTop,
-    tooltipOpen,
-  } = useTooltip<TooltipData[]>();
-
-  const maxValue = useMemo(
-    () =>
-      Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) *
-      SCALE_PADDING,
-    [filteredData],
-  );
-
-  const xScale = useMemo(
-    () =>
-      scaleBand<string>({
-        domain: filteredData.map((d) => String(d.label)),
-        range: [0, innerWidth],
-        padding: 0.6,
-        round: true,
-      }),
-    [filteredData, innerWidth],
-  );
-
-  const yScale = useMemo(
-    () =>
-      scaleLinear<number>({
-        domain: [0, maxValue],
-        range: [innerHeight, 0],
-        nice: true,
-      }),
-    [innerHeight, maxValue],
-  );
-
-  const legendData = useMemo(
-    () => data.map((d) => ({ label: d.label, value: d.value })),
-    [data],
-  );
+  const yScale = useMemo(() =>
+    scaleLinear({
+      domain: [0, maxValue],
+      range: [innerHeight, 0],
+      nice: true,
+    }), [innerHeight, maxValue]);
 
   const colorScale = useMemo(() => {
-    if (colors?.length) {
-      return (index: number) => colors[index % colors.length];
-    }
-    return (index: number) =>
-      theme.colors.charts.bar[index % theme.colors.charts.bar.length];
-  }, [colors, theme.colors.charts.bar]);
+    const defaultColors = theme.colors.charts.bar;
+    return (index: number) => (colors.length ? colors[index % colors.length] : defaultColors[index % defaultColors.length]);
+  }, [colors, theme]);
 
-  const handleBarMouseMove =
-    (value: number, color: string, index: number) =>
-    (event: React.MouseEvent) => {
-      if (!isLoading) {
-        showTooltip({
-          tooltipData: [
-            {
-              label: filteredData[index].label,
-              value,
-              color,
-            },
-          ],
-          tooltipLeft: event.clientX,
-          tooltipTop: event.clientY,
-        });
-        setHoveredBar(index);
-      }
-    };
+  const getOptimalBarWidth = (bandWidth: number) => Math.min(bandWidth, maxBarWidth);
 
-  const handleBarMouseLeave = () => {
-    if (!isLoading) {
-      hideTooltip();
-      setHoveredBar(null);
-    }
-  };
+  useEffect(() => {
+    if (!axis_bottom.current || !xScale) return;
 
-  const getOptimalBarWidth = (calculatedWidth: number) =>
-    Math.min(calculatedWidth, maxBarWidth);
+    const truncationRatio = 0.5;
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
+    requestAnimationFrame(() => {
+      const textNodes: SVGTextElement[] = Array.from(
+        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
+      );
+
+      if (!textNodes.length) return;
+
+      const usedRects: { x1: number; x2: number }[] = [];
+
+      // Set all full first
+      textNodes.forEach((node) => {
+        const full = node.dataset.fulltext || node.textContent || "";
+        node.setAttribute("display", "block");
+        node.textContent = full;
+        node.dataset.fulltext = full;
+      });
+      const firstNode = textNodes[0];
+      const lastNode = textNodes[textNodes.length - 1];
+
+      const showAndTruncate = (node: SVGTextElement) => {
+        const label = node.dataset.fulltext || node.textContent || "";
+        const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        const bbox = node.getBBox();
+        let pnode = node.parentNode as Element;
+        let x = 0;
+        if (pnode.getAttribute("transform")) {
+          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+        } else {
+          x = +bbox.x
+        }
+        const rect = { x1: x, x2: x + bbox.width };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        if (!isOverlapping) {
+          node.textContent = label;
+          node.setAttribute("display", "block");
+          usedRects.push(rect);
+        } else {
+          node.textContent = truncated;
+          node.setAttribute("display", "block");
+        }
+      };
+
+      // Always show first and last
+      if (firstNode) showAndTruncate(firstNode);
+      if (lastNode && lastNode !== firstNode) showAndTruncate(lastNode);
+
+      // Hide overlapping others
+      textNodes.slice(1, -1).forEach((node) => {
+        const label = node.dataset.fulltext || node.textContent || "";
+        const truncated = label.slice(0, Math.floor(label.length * truncationRatio)) + "…";
+        const original = node.textContent;
+        node.textContent = truncated;
+        const bbox = node.getBBox();
+        node.textContent = original;
+
+        const x = +node.getAttribute("x")!;
+        const rect = { x1: x - bbox.width, x2: x + bbox.width };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        console.log(label)
+        console.log(truncated)
+        console.log(isOverlapping)
+        if (!isOverlapping) {
+          node.textContent = label;
+          node.setAttribute("display", "block");
+          usedRects.push(rect);
+        } else {
+          node.textContent = truncated;
+          const bbox = node.getBBox();
+          const x = +node.getAttribute("x")!;
+          const rect = { x1: x - bbox.width / 2, x2: x + bbox.width / 2 };
+          const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+          if (!isOverlapping) {
+            node.textContent = truncated;
+            node.setAttribute("display", "block");
+            usedRects.push(rect);
+          } else {
+            const newtruncated = label.slice(0, Math.floor(truncated.length * truncationRatio * .1)) + "…";
+            node.textContent = newtruncated;
+            const bbox = node.getBBox();
+            const x = +node.getAttribute("x")!;
+            const rect = { x1: x - bbox.width / 2, x2: x + bbox.width / 2 };
+            const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+            if (isOverlapping) {
+              node.setAttribute("display", "none");
+            }
+          }
+          //   node.setAttribute("display", "none");
+        }
+      });
+    });
+  }, [xScale, axis_bottom.current]);
+
+
+  if (!_data || _data.length === 0) return <div>No data to display.</div>;
 
   return (
     <ChartWrapper
@@ -198,70 +175,73 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       title={title}
       titleProps={titleProps}
       legendsProps={{
-        data: legendData,
-        colorScale: scaleOrdinal({
-          domain: legendData.map((d) => d.label),
-          range: filteredData.map((_, i) => colorScale(i)),
-        }),
-        hideIndex,
-        setHideIndex,
-        hovered: hoveredBar !== null ? legendData[hoveredBar]?.label : null,
-        setHovered: (label) =>
-          setHoveredBar(legendData.findIndex((item) => item.label === label)),
+        data: data.map((d) => ({ label: d.label, value: d.value })),
+        colorScale: scaleOrdinal({ domain: data.map((d) => d.label), range: data.map((_, i) => colorScale(i)) }),
+        hideIndex: [],
+        setHideIndex: () => { },
+        hovered: null,
+        setHovered: () => { },
         isLoading,
         ...legendsProps,
       }}
       tooltipProps={{
-        data: tooltipData,
-        top: tooltipTop,
-        left: tooltipLeft,
-        isVisible: !isLoading && tooltipOpen,
-        ...tooltipProps,
+        data: [],
+        top: 0,
+        left: 0,
+        isVisible: false,
       }}
       timestampProps={{ isLoading, ...timestampProps }}
     >
       <svg width={width} height={height}>
         {isLoading && <SvgShimmer />}
-        <Group top={DEFAULT_MARGIN.top} left={DEFAULT_MARGIN.left}>
-          <YAxis scale={yScale} isLoading={isLoading} {...yAxisProps} />
-          <Grid
-            width={innerWidth}
-            yScale={yScale}
-            isLoading={isLoading}
-            {...gridProps}
+        <Group top={margin.top} left={margin.left}>
+          <AxisLeft
+            scale={yScale}
+            stroke={theme.colors.axis.line}
+            tickStroke={theme.colors.axis.line}
+            tickLabelProps={{
+              fill: theme.colors.axis.label,
+              fontSize: "12px",
+              textAnchor: "end",
+              dy: "0.33em",
+            }}
+            {...yAxisProps}
           />
-          <XAxis
-            scale={xScale}
-            top={innerHeight}
-            isLoading={isLoading}
-            availableWidth={innerWidth}
-            forceFullLabels
-            {...xAxisProps}
-          />
-          {filteredData.map((d, index) => {
+          <g ref={axis_bottom}>
+            <AxisBottom
+              scale={xScale}
+              top={innerHeight}
+              stroke={theme.colors.axis.line}
+              tickStroke={theme.colors.axis.line}
+              tickLabelProps={{
+                fill: theme.colors.axis.label,
+                fontSize: "12px",
+                textAnchor: "middle",
+                dy: "0.33em",
+              }}
+              tickComponent={({ formattedValue, ...tickProps }) => (
+                <text
+                  {...tickProps}
+                  anchor-text="start"
+                  data-fulltext={formattedValue}
+                  x={(xScale(formattedValue) ?? 0) + xScale.bandwidth() / 2}
+                >
+                  {adjustedLabels[formattedValue] ?? ""}
+                </text>
+              )}
+              {...xAxisProps}
+            />
+          </g>
+          {data.map((d, index) => {
             const value = Number(d.value);
             if (Number.isNaN(value)) return null;
 
-            const calculatedBarWidth = xScale.bandwidth();
-            const barWidth = getOptimalBarWidth(calculatedBarWidth);
-            const barX =
-              barWidth < calculatedBarWidth
-                ? (xScale(d.label) || 0) + (calculatedBarWidth - barWidth) / 2
-                : xScale(d.label) || 0;
-
-            const barHeight = innerHeight - yScale(value);
+            const fullBarWidth = xScale.bandwidth();
+            const barWidth = getOptimalBarWidth(fullBarWidth);
+            const barX = (xScale(d.label) ?? 0) + (fullBarWidth - barWidth) / 2;
             const barY = yScale(value);
-            const isHovered = hoveredBar === index;
-            const barOpacity =
-              hoveredBar !== null && !isHovered
-                ? REDUCED_OPACITY
-                : DEFAULT_OPACITY;
-            const radius = Math.min(
-              DEFAULT_BAR_RADIUS,
-              barWidth / 2,
-              barHeight > 0 ? barHeight : 0,
-            );
-            const barColor = d.color || colorScale(index);
+            const barHeight = innerHeight - barY;
+            const fill = d.color || colorScale(index);
 
             return (
               <CustomBar
@@ -270,28 +250,17 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 y={barY}
                 width={barWidth}
                 height={barHeight}
-                fill={barColor}
+                fill={fill}
                 isLoading={isLoading}
-                opacity={barOpacity}
+                opacity={DEFAULT_OPACITY}
                 pathProps={{
-                  d: `
-                    M ${barX},${barY + barHeight}
-                    L ${barX + barWidth},${barY + barHeight}
-                    L ${barX + barWidth},${barY + radius}
-                    Q ${barX + barWidth},${barY} ${barX + barWidth - radius},${barY}
-                    L ${barX + radius},${barY}
-                    Q ${barX},${barY} ${barX},${barY + radius}
-                    L ${barX},${barY + barHeight}
-                    Z
-                  `,
+                  d: `M ${barX},${barY + barHeight} L ${barX + barWidth},${barY + barHeight} L ${barX + barWidth},${barY + DEFAULT_BAR_RADIUS} Q ${barX + barWidth},${barY} ${barX + barWidth - DEFAULT_BAR_RADIUS},${barY} L ${barX + DEFAULT_BAR_RADIUS},${barY} Q ${barX},${barY} ${barX},${barY + DEFAULT_BAR_RADIUS} Z`,
                 }}
-                onMouseMove={handleBarMouseMove(value, barColor, index)}
-                onMouseLeave={handleBarMouseLeave}
+                onClick={(e) => {
+                  barProps?.onClick?.(e);
+                  onClick?.(e, d, index);
+                }}
                 {...barProps}
-                onClick={(event) => {
-                  if (barProps?.onClick) barProps.onClick(event);
-                  if (onClick) onClick(event, d, index);
-                }}
               />
             );
           })}
