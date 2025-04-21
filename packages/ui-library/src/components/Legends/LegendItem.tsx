@@ -96,7 +96,6 @@ function LegendItem({
       >
         {displayText}
         {!hideValues &&
-          valueText &&
           (isLoading
             ? "loadingloading"
             : ` (${formatNumberWithCommas(valueText)})`)}
