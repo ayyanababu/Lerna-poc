@@ -436,6 +436,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   return (
     <ChartWrapper
       ref={parentRef}
+isLoading={isLoading}
       title={title}
       titleProps={{ className: "chart-title", ...titleProps }}
       legendsProps={{

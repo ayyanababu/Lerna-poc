@@ -461,6 +461,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
   return (
     <ChartWrapper
       ref={parentRef}
+isLoading={isLoading}
       title={title}
       titleProps={titleProps}
       legendsProps={{

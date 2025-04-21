@@ -52,6 +52,7 @@ export type OmittedTooltipProps = Omit<
 
 export interface ChartWrapperProps {
   children: ReactNode;
+  isLoading?: boolean;
   minRenderHeight?: number;
   title?: string;
   titleProps?: TitleProps;

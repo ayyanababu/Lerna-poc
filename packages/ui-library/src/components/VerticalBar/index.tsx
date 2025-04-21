@@ -398,6 +398,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   return (
     <ChartWrapper
       ref={parentRef}
+isLoading={isLoading}
       title={title}
       titleProps={titleProps}
       legendsProps={{

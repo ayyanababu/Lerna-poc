@@ -509,6 +509,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   return (
     <ChartWrapper
       ref={parentRef}
+isLoading={isLoading}
       title={title}
       titleProps={titleProps}
       legendsProps={{

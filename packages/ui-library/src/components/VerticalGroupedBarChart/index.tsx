@@ -444,6 +444,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   return (
     <ChartWrapper
       ref={parentRef}
+isLoading={isLoading}
       title={title}
       titleProps={titleProps}
       legendsProps={{

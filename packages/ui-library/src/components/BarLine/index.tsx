@@ -609,6 +609,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   return (
     <ChartWrapper
       ref={parentRef}
+      isLoading={isLoading}
       title={title}
       titleProps={titleProps}
       legendsProps={{
