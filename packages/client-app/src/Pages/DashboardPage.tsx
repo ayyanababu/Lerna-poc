@@ -13,7 +13,7 @@ import {
     VerticalGroupedBarChart,
     VerticalStackedBarChart,
 } from '@my-org/ui-library';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { ThemeContext } from '../App';
 
 // Define types for our chart data
@@ -155,14 +155,17 @@ const fetchStackedBarData = (): Promise<StackedBarItem[]> =>
                 {
                     label: 'Stale Priced',
                     data: {
-                        stalePriced: Math.floor(Math.random() * 100000000) + 2500,
+                        stalePriced:
+                            Math.floor(Math.random() * 100000000) + 2500,
                     },
                 },
                 {
                     label: 'Priced',
                     data: {
-                        'priced:Auto': Math.floor(Math.random() * 2000000000) + 200,
-                        'priced:Manual': Math.floor(Math.random() * 500000000) + 30,
+                        'priced:Auto':
+                            Math.floor(Math.random() * 2000000000) + 200,
+                        'priced:Manual':
+                            Math.floor(Math.random() * 500000000) + 30,
                     },
                 },
             ]);
@@ -184,9 +187,12 @@ const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> =>
                     return {
                         label: `${formattedDate}`,
                         data: {
-                            futures: Math.floor(Math.random() * 50000000) + 20000,
-                            options: Math.floor(Math.random() * 50000000) + 20000,
-                            forwards: Math.floor(Math.random() * 150000000) + 5000,
+                            futures:
+                                Math.floor(Math.random() * 50000000) + 20000,
+                            options:
+                                Math.floor(Math.random() * 50000000) + 20000,
+                            forwards:
+                                Math.floor(Math.random() * 150000000) + 5000,
                             fixedIncome:
                                 Math.floor(Math.random() * 100000000) + 3000,
                             others: Math.floor(Math.random() * 600000) + 2000,
@@ -489,6 +495,11 @@ function DashboardPage() {
         horizontalGroupedBar: true,
     });
 
+    const isAllLoading = useMemo(
+        () => Object.values(dataLoading).some((loading) => loading),
+        [dataLoading],
+    );
+
     // Fetch data when component mounts
     useEffect(() => {
         const fetchData = async () => {
@@ -683,7 +694,36 @@ body:not(.dark) {
                         }}>
                         Dark
                     </button>
+
+                    <button
+                        onClick={() =>
+                            setDataLoading((prev) => {
+                                const keys = Object.keys(prev);
+
+                                return keys.reduce(
+                                    (acc, key) => {
+                                        // @ts-expect-error this is a workaround
+                                        acc[key] = !prev[keys[0]];
+                                        return acc;
+                                    },
+                                    {} as typeof prev,
+                                );
+                            })
+                        }
+                        style={{
+                            padding: '8px 16px',
+                            borderRadius: '6px',
+                            border: 'none',
+                            background: isAllLoading ? '#e07200' : '#e0e0e0',
+                            color: isAllLoading ? 'white' : '#333',
+                            fontWeight: isAllLoading ? 'bold' : 'normal',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                        }}>
+                        {isAllLoading ? 'Stop' : 'Start'} Loading
+                    </button>
                 </div>
+
                 <div className="blur-circle top"></div>
                 <div className="blur-circle bottom"></div>
             </>
@@ -841,7 +881,7 @@ body:not(.dark) {
                                         variant: 'h6',
                                         align: 'left',
                                     }}
-                                    title={"Trade Volume"}
+                                    title={'Trade Volume'}
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,
                                         doStrike: true,
