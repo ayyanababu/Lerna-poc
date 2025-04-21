@@ -5,6 +5,7 @@ import { withBoundingRects } from "@visx/bounds";
 import { Tooltip as VisxTooltip } from "@visx/tooltip";
 
 import useTheme from "../../hooks/useTheme";
+import { formatNumberWithCommas } from "../../utils/number";
 import { TooltipProps } from "./types";
 
 const MOUSE_OFFSET = 10;
@@ -204,7 +205,7 @@ function TooltipBase({
                 flexShrink: 0,
               }}
             >
-              {item.value}
+              {formatNumberWithCommas(item.value)}
             </Typography>
           </Box>
         ))}

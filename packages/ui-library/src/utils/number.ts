@@ -14,3 +14,20 @@ export const isNumeric = (value: string | number): boolean => {
   if (typeof value !== "string") return false;
   return !isNaN(parseFloat(value)) && isFinite(Number(value));
 };
+
+export function formatNumberWithCommas(value: number | string): string {
+  if (value == null) {
+    return "";
+  }
+
+  const numValue = typeof value === "string" ? parseFloat(value) : value;
+
+  if (isNaN(numValue)) {
+    return String(value);
+  }
+
+  return numValue.toLocaleString("en-US", {
+    maximumFractionDigits: 20,
+    useGrouping: true,
+  });
+}

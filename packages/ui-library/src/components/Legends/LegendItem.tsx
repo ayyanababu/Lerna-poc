@@ -4,6 +4,7 @@ import { Box, Typography } from "@mui/material";
 import { capitalize, lowerCase } from "lodash-es";
 
 import useTheme from "../../hooks/useTheme";
+import { formatNumberWithCommas } from "../../utils/number";
 import { shimmerClassName } from "../Shimmer/Shimmer";
 import { LegendItemProps, LegendVariant } from "./types";
 
@@ -96,7 +97,9 @@ function LegendItem({
         {displayText}
         {!hideValues &&
           valueText &&
-          (isLoading ? "loadingloading" : ` (${valueText})`)}
+          (isLoading
+            ? "loadingloading"
+            : ` (${formatNumberWithCommas(valueText)})`)}
       </Typography>
       <ArrowOutwardIcon
         className="arrow-icon"
@@ -156,7 +159,7 @@ function LegendItem({
             }}
             className={isLoading ? shimmerClassName : ""}
           >
-            {isLoading ? "loadingloading" : valueText}
+            {isLoading ? "loadingloading" : formatNumberWithCommas(valueText)}
           </Typography>
           <ArrowOutwardIcon
             sx={{
