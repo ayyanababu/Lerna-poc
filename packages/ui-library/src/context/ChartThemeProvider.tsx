@@ -1,4 +1,4 @@
-import React, { createContext, useMemo } from "react";
+import React, { createContext, useEffect, useMemo } from "react";
 
 import { Shimmer } from "../components/Shimmer/Shimmer";
 import { defaultDarkTheme, defaultLightTheme } from "../theme/theme";
@@ -85,6 +85,10 @@ export const ChartThemeProvider: React.FC<{
     () => ({ theme: mergedTheme, activeMode, setActiveMode }),
     [mergedTheme, activeMode, setActiveMode],
   );
+
+  useEffect(() => {
+    setActiveMode(themeMode);
+  }, [themeMode]);
 
   return (
     <ThemeContext.Provider value={contextValue}>

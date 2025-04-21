@@ -432,6 +432,7 @@ isLoading={isLoading}
             width={innerWidth}
             yScale={yScale}
             isLoading={isLoading}
+            showHorizontal
             {...gridProps}
           />
           <g ref={axis_bottom}>
