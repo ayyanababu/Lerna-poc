@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 
 import useTheme from "../../hooks/useTheme";
 import { GridProps } from "./types";
@@ -12,19 +12,12 @@ const Grid: React.FC<GridProps> = ({
   showHorizontal = true,
   showVertical = false,
   opacity = 0.3,
-  isVisible,
+  isVisible = false,
   isLoading = false,
 }) => {
-  const { theme, activeMode } = useTheme();
+  const { theme } = useTheme();
 
-  const customVisible = useMemo(() => {
-    if (["undefined", "null"].includes(`${isVisible}`)) {
-      return activeMode === "light";
-    }
-    return isVisible;
-  }, [isVisible, activeMode]);
-
-  if (!customVisible || isLoading) {
+  if (!isVisible || isLoading) {
     return null;
   }
 

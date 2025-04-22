@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useRef, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
@@ -24,7 +24,6 @@ const DEFAULT_MARGIN = {
   left: 20,
 };
 
-
 const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
@@ -37,7 +36,6 @@ let AXIS_ROTATE = false;
 function VerticalStackedBar({
   data: _data,
   groupKeys: _groupKeys,
-  margin = DEFAULT_MARGIN,
   title,
   timestamp,
   colors = [],
@@ -70,7 +68,6 @@ function VerticalStackedBar({
   const axisXStart = DEFAULT_MARGIN.left + yAxisLabelWidth;
   const innerWidth = width - axisXStart - DEFAULT_MARGIN.right;
 
-
   const getStrokeWidth = (width: number, height: number) => {
     const size = Math.min(width, height);
     // Scale between 0.3 and 1 based on size
@@ -98,8 +95,9 @@ function VerticalStackedBar({
       isLoading
         ? mockVerticalStackedBarChartData
         : { data: _data, groupKeys: _groupKeys },
-    [isLoading, _data, _groupKeys, mockVerticalStackedBarChartData],
+    [isLoading, _data, _groupKeys],
   );
+
 
   useEffect(() => {
     if (!chartSvgRef.current) return;
@@ -184,7 +182,7 @@ function VerticalStackedBar({
         range: [0, innerWidth],
         padding: 0.4,
       }),
-    [filteredData, innerWidth]
+    [filteredData, innerWidth],
   );
 
   const yScale = useMemo(
@@ -193,7 +191,7 @@ function VerticalStackedBar({
         domain: [0, maxValue * SCALE_PADDING],
         range: [innerHeight, 0],
       }),
-    [innerHeight, maxValue]
+    [innerHeight, maxValue],
   );
 
   const colorScale = useMemo(
@@ -220,12 +218,12 @@ function VerticalStackedBar({
     setAdjustedChartWidth(updatedWidth);
   }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
 
+
   useEffect(() => {
     if (!axis_bottom.current || !xScale) return;
     if (AXIS_ROTATE) {
-      return
+      return;
     }
-
     requestAnimationFrame(() => {
       const textNodes: SVGTextElement[] = Array.from(
         axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
@@ -233,7 +231,7 @@ function VerticalStackedBar({
 
       if (!textNodes.length) return;
 
-      let usedRects: { x1: number; x2: number }[] = [];
+      const usedRects: { x1: number; x2: number }[] = [];
 
       // Set all full first
       textNodes.forEach((node) => {
@@ -242,26 +240,15 @@ function VerticalStackedBar({
         node.textContent = full;
         node.dataset.fulltext = full;
       });
-      textNodes.forEach((node, i) => {
-        if (i !== 0 && i !== textNodes.length - 1) {
-          const bbox = node.getBBox();
-          let pnode = node.parentNode as Element;
-          let x = 0;
-          if (pnode.getAttribute("transform")) {
-            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
-          } else {
-            x = +bbox.x
-          }
-          const rect = { x1: x - 5, x2: x + bbox.width + 5 };
-          usedRects.push(rect);
-        }
-      });
       const firstNode = textNodes[0];
       const lastNode = textNodes[textNodes.length - 1];
+
       const showAndTruncate = (node: SVGTextElement) => {
         const label = node.dataset.fulltext || node.textContent || "";
         const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        //  node.textContent = truncated;
         const bbox = node.getBBox();
+        // const x = +node.parentNode.getAttribute("transform").split("translate(")[1].split(",")[0];
         let pnode = node.parentNode as Element;
         let x = 0;
         if (pnode.getAttribute("transform")) {
@@ -269,11 +256,12 @@ function VerticalStackedBar({
         } else {
           x = +bbox.x
         }
-        const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+        const rect = { x1: x, x2: x + bbox.width };
         const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
         if (!isOverlapping) {
           node.textContent = label;
           node.setAttribute("display", "block");
+          usedRects.push(rect);
         } else {
           node.textContent = truncated;
           node.setAttribute("display", "block");
@@ -282,79 +270,31 @@ function VerticalStackedBar({
 
       // Always show first and last
       if (firstNode) showAndTruncate(firstNode);
-      if (lastNode) showAndTruncate(lastNode);
-
-      usedRects = [];
-      textNodes.forEach((node, i) => {
-        const bbox = node.getBBox();
-        let pnode = node.parentNode as Element;
-        let x = 0;
-        if (pnode.getAttribute("transform")) {
-          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
-        } else {
-          x = +bbox.x
-        }
-        const rect = { x1: x - 5, x2: x + bbox.width + 5 };
-        usedRects.push(rect);
-      });
-
+      if (lastNode && lastNode !== firstNode) showAndTruncate(lastNode);
 
       // Hide overlapping others
-      textNodes.slice(1, -1).forEach((node, index) => {
+      textNodes.slice(1, -1).forEach((node) => {
         const label = node.dataset.fulltext || node.textContent || "";
         const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
         const original = node.textContent;
-        // node.textContent = truncated;
+        node.textContent = truncated;
         const bbox = node.getBBox();
         node.textContent = original;
-        let x = 0;
-        let pnode = node.parentNode as Element;
-        if (pnode.getAttribute("transform")) {
-          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
-        } else {
-          x = +bbox.x
-        }
-        const rect = { x1: x - 5, x2: x + bbox.width + 5 };
-        let us = usedRects.filter((r, i) => i !== index + 1)
-        const isOverlapping = us.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+
+        const x = +node.getAttribute("x")!;
+        const rect = { x1: x - bbox.width, x2: x + bbox.width };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        console.log(node)
+        console.log(label)
+        console.log(truncated)
+        console.log(isOverlapping)
         if (!isOverlapping) {
           node.textContent = label;
           node.setAttribute("display", "block");
           usedRects.push(rect);
         } else {
           node.textContent = truncated;
-          const bbox = node.getBBox();
-          let x = 0;
-          let pnode = node.parentNode as Element;
-          if (pnode.getAttribute("transform")) {
-            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
-          } else {
-            x = +bbox.x
-          }
-          const rect = { x1: x - 5, x2: x + bbox.width + 5 };
-          //   const x = +node.getAttribute("x")!;
-          //    const rect = { x1: x - bbox.width, x2: x + bbox.width };
-          const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
-          if (!isOverlapping) {
-            node.textContent = truncated;
-            node.setAttribute("display", "block");
-            usedRects.push(rect);
-          } else {
-            const newtruncated = truncated.slice(0, Math.floor(truncated.length * TRUNCATE_RATIO * .1)) + "…";
-            node.textContent = newtruncated;
-            let x = 0;
-            let pnode = node.parentNode as Element;
-            if (pnode.getAttribute("transform")) {
-              x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
-            } else {
-              x = +bbox.x
-            }
-            const rect = { x1: x - 5, x2: x + bbox.width + 5 };
-            const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
-            if (isOverlapping) {
-              node.setAttribute("display", "none");
-            }
-          }
+          //   node.setAttribute("display", "none");
         }
       });
     });
@@ -363,6 +303,7 @@ function VerticalStackedBar({
   const rotated = (rotate: boolean) => {
     let rot = rotate;
     setTimeout(() => {
+      console.log("hit")
       const textNodes: SVGTextElement[] = Array.from(
         axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
       );
@@ -388,6 +329,7 @@ function VerticalStackedBar({
       }
     }, 200)
   }
+
 
   const handleMouseMove = useCallback(
     (groupKey: string, value: number) => (event: React.MouseEvent) => {
@@ -416,14 +358,153 @@ function VerticalStackedBar({
     }
   }, [isLoading, hideTooltip, setHoveredGroupKey]);
 
-  if (!isLoading && (!_data || _data.length === 0)) {
+  const renderStackedBars = useCallback(
+    () =>
+      filteredData.map((categoryData, index) => {
+        const category = String(categoryData.label);
+        // Calculate bar width with maximum limit
+        const calculatedBarWidth = xScale.bandwidth();
+        // Use custom barWidth if provided, otherwise use default with maximum limit
+        const actualBarWidth =
+          barWidth !== undefined
+            ? barWidth
+            : Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
+
+        // If the bar width is limited, center it
+        const barX =
+          actualBarWidth < calculatedBarWidth
+            ? (xScale(category) || 0) +
+            (calculatedBarWidth - actualBarWidth) / 2
+            : xScale(category) || 0;
+
+        // Calculate dynamic radius based on bar width
+        const dynamicRadius = Math.min(DEFAULT_BAR_RADIUS, actualBarWidth / 2);
+
+        return activeKeys.map((groupKey, groupIndex) => {
+          const seriesData = stackedData.find((s) => s.key === groupKey);
+          if (!seriesData) return null;
+
+          const categoryIndex = filteredData.findIndex(
+            (d) => d.label === categoryData.label,
+          );
+          if (categoryIndex === -1) return null;
+
+          const [y0, y1] = seriesData[categoryIndex];
+          const barHeight = yScale(y0) - yScale(y1);
+          const barY = yScale(y1);
+          const value = y1 - y0;
+
+          if (!value) return null;
+
+          const isHoveredGroup = hoveredGroupKey === groupKey;
+          const barOpacity =
+            hoveredGroupKey && !isHoveredGroup
+              ? REDUCED_OPACITY
+              : DEFAULT_OPACITY;
+
+          // Determine if this is the top bar in the stack
+          const isTopBar =
+            seriesData.key ===
+            stackedData.reduce((topKey, current) => {
+              const currentY1 = current[categoryIndex]?.[1] || 0;
+              const topY1 =
+                stackedData.find((s) => s.key === topKey)?.[
+                categoryIndex
+                ]?.[1] || 0;
+              return currentY1 > topY1 ? current.key : topKey;
+            }, activeKeys[0]);
+
+          return (
+            <React.Fragment key={`stacked-${category}-${groupKey}`}>
+              <CustomBar
+                key={`stacked-${category}-${groupKey}`}
+                x={barX}
+                y={barY}
+                width={actualBarWidth}
+                height={barHeight}
+                fill={
+                  isLoading
+                    ? `url(#${shimmerGradientId})`
+                    : colorScale(groupKey)
+                }
+                opacity={barOpacity}
+                pathProps={
+                  isTopBar
+                    ? {
+                      d: `
+                                    M ${barX},${barY + barHeight}
+                                    L ${barX + actualBarWidth},${barY + barHeight}
+                                    L ${barX + actualBarWidth},${barY + dynamicRadius}
+                                    Q ${barX + actualBarWidth},${barY} ${barX + actualBarWidth - dynamicRadius
+                        },${barY}
+                                    L ${barX + dynamicRadius},${barY}
+                                    Q ${barX},${barY} ${barX},${barY + dynamicRadius}
+                                    L ${barX},${barY + barHeight}
+                                    Z
+                                `,
+                    }
+                    : undefined
+                }
+                rx={0}
+                onMouseMove={handleMouseMove(groupKey, value)}
+                onMouseLeave={handleMouseLeave}
+                {...barProps}
+                onClick={(event) => {
+                  if (barProps?.onClick) {
+                    barProps.onClick(event);
+                  }
+                  if (onClick) {
+                    onClick(event, filteredData[index], [index, groupIndex]);
+                  }
+                }}
+              />
+
+              {!isTopBar && (
+                <line
+                  x1={barX}
+                  y1={barY}
+                  x2={barX + actualBarWidth}
+                  y2={barY}
+                  stroke={theme.colors.common.stroke}
+                  strokeWidth={strokeWidth}
+                  pointerEvents="none"
+                />
+              )}
+            </React.Fragment>
+          );
+        });
+      }),
+    [
+      filteredData,
+      xScale,
+      barWidth,
+      activeKeys,
+      stackedData,
+      yScale,
+      hoveredGroupKey,
+      isLoading,
+      colorScale,
+      handleMouseMove,
+      handleMouseLeave,
+      barProps,
+      legendHoveredGroupKey,
+      theme.colors.common.text,
+      theme.colors.common.stroke,
+      strokeWidth,
+    ],
+  );
+
+  const renderBars = useCallback(
+    () => renderStackedBars(),
+    [renderStackedBars],
+  );
+
+  if (!_data || _data.length === 0) {
     return <div>No data to display.</div>;
   }
-
   return (
     <ChartWrapper
       ref={parentRef}
-isLoading={isLoading}
       title={title}
       titleProps={titleProps}
       legendsProps={{
@@ -480,129 +561,10 @@ isLoading={isLoading}
             />
           </g>
 
-          {filteredData.map((categoryData, index) => {
-            const category = String(categoryData.label);
-            // Calculate bar width with maximum limit
-            const calculatedBarWidth = xScale.bandwidth();
-            // Use custom barWidth if provided, otherwise use default with maximum limit
-            const actualBarWidth =
-              barWidth !== undefined
-                ? barWidth
-                : Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
-
-            // If the bar width is limited, center it
-            const barX =
-              actualBarWidth < calculatedBarWidth
-                ? (xScale(category) || 0) +
-                (calculatedBarWidth - actualBarWidth) / 2
-                : xScale(category) || 0;
-
-            // Calculate dynamic radius based on bar width
-            const dynamicRadius = Math.min(
-              DEFAULT_BAR_RADIUS,
-              actualBarWidth / 2,
-            );
-
-            return activeKeys.map((groupKey, groupIndex) => {
-              const seriesData = stackedData.find((s) => s.key === groupKey);
-              if (!seriesData) return null;
-
-              const categoryIndex = filteredData.findIndex(
-                (d) => d.label === categoryData.label,
-              );
-              if (categoryIndex === -1) return null;
-
-              const [y0, y1] = seriesData[categoryIndex];
-              const barHeight = yScale(y0) - yScale(y1);
-              const barY = yScale(y1);
-              const value = y1 - y0;
-
-              if (!value) return null;
-
-              const isHoveredGroup = hoveredGroupKey === groupKey;
-              const barOpacity =
-                hoveredGroupKey && !isHoveredGroup
-                  ? REDUCED_OPACITY
-                  : DEFAULT_OPACITY;
-
-              // Determine if this is the top bar in the stack
-              const isTopBar =
-                seriesData.key ===
-                stackedData.reduce((topKey, current) => {
-                  const currentY1 = current[categoryIndex]?.[1] || 0;
-                  const topY1 =
-                    stackedData.find((s) => s.key === topKey)?.[
-                    categoryIndex
-                    ]?.[1] || 0;
-                  return currentY1 > topY1 ? current.key : topKey;
-                }, activeKeys[0]);
-
-              return (
-                <React.Fragment key={`stacked-${category}-${groupKey}`}>
-                  <CustomBar
-                    key={`stacked-${category}-${groupKey}`}
-                    x={barX}
-                    y={barY}
-                    width={actualBarWidth}
-                    height={barHeight}
-                    fill={
-                      isLoading
-                        ? `url(#${shimmerGradientId})`
-                        : colorScale(groupKey)
-                    }
-                    opacity={barOpacity}
-                    pathProps={
-                      isTopBar
-                        ? {
-                          d: `
-                                M ${barX},${barY + barHeight}
-                                L ${barX + actualBarWidth},${barY + barHeight}
-                                L ${barX + actualBarWidth},${barY + dynamicRadius}
-                                Q ${barX + actualBarWidth},${barY} ${barX + actualBarWidth - dynamicRadius
-                            },${barY}
-                                L ${barX + dynamicRadius},${barY}
-                                Q ${barX},${barY} ${barX},${barY + dynamicRadius}
-                                L ${barX},${barY + barHeight}
-                                Z
-                            `,
-                        }
-                        : undefined
-                    }
-                    rx={0}
-                    onMouseMove={handleMouseMove(groupKey, value)}
-                    onMouseLeave={handleMouseLeave}
-                    {...barProps}
-                    onClick={(event) => {
-                      if (barProps?.onClick) {
-                        barProps.onClick(event);
-                      }
-                      if (onClick) {
-                        onClick(event, filteredData[index], [
-                          index,
-                          groupIndex,
-                        ]);
-                      }
-                    }}
-                  />
-
-                  {!isTopBar && (
-                    <line
-                      x1={barX}
-                      y1={barY}
-                      x2={barX + actualBarWidth}
-                      y2={barY}
-                      stroke={theme.colors.common.stroke}
-                      strokeWidth={strokeWidth}
-                      pointerEvents="none"
-                    />
-                  )}
-                </React.Fragment>
-              );
-            });
-          })}
+          {renderBars()}
         </Group>
       </svg>
-    </ChartWrapper >
+    </ChartWrapper>
   );
 }
 

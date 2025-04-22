@@ -75,7 +75,6 @@ function DonutChart({
   return (
     <ChartWrapper
       ref={parentRef}
-      isLoading={isLoading}
       title={title}
       titleProps={titleProps}
       legendsProps={{
