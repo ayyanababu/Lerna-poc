@@ -19,7 +19,7 @@ import { VerticalStackedBarChartProps } from "./types";
 
 const DEFAULT_MARGIN = {
   top: 20,
-  right: -60,
+  right: -50,
   bottom: 45,
   left: 20,
 };
@@ -622,8 +622,8 @@ function VerticalStackedBar({
       <svg ref={chartSvgRef} width={adjustedChartWidth || width} height={adjustedChartHeight || height}>
         {isLoading && <SvgShimmer />}
 
-        <Group top={DEFAULT_MARGIN.top} left={DEFAULT_MARGIN.left}>
-          <g ref={axis_left}>
+        <Group top={DEFAULT_MARGIN.top} left={yAxisLabelWidth}>
+          <g ref={axis_left} >
             <YAxis
               scale={yScale}
               isLoading={isLoading}

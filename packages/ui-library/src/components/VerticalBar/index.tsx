@@ -18,7 +18,7 @@ import { DataPoint, VerticalBarChartProps } from "./types";
 
 const DEFAULT_MARGIN = {
   top: 5,
-  right: 0,
+  right: -40,
   bottom: 25,
   left: 25,
 };
@@ -398,7 +398,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   return (
     <ChartWrapper
       ref={parentRef}
-isLoading={isLoading}
+      isLoading={isLoading}
       title={title}
       titleProps={titleProps}
       legendsProps={{
@@ -426,7 +426,7 @@ isLoading={isLoading}
     >
       <svg ref={chartSvgRef} width={adjustedChartWidth || width} height={adjustedChartHeight || height}>
         {isLoading && <SvgShimmer />}
-        <Group top={DEFAULT_MARGIN.top} left={DEFAULT_MARGIN.left}>
+        <Group top={DEFAULT_MARGIN.top} left={yAxisLabelWidth}>
           <YAxis scale={yScale} isLoading={isLoading} {...yAxisProps} />
           <Grid
             width={innerWidth}
