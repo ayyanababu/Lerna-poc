@@ -12,7 +12,6 @@ import { formatNumberWithSuffix, isNumeric } from "../../utils/number";
 import { shimmerClassName } from "../Shimmer/Shimmer";
 import { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { XAxisProps } from "./types";
-import { Label } from "@mui/icons-material";
 
 const MAX_LABEL_CHARS = 15;
 const FIXED_CLASSNAME_XLABELS = "fixed-classname-xlabels";
@@ -167,6 +166,7 @@ function XAxis({
         tickValues: [],
       };
     }
+    console.log(dynamicNumTicks, "dynamicNumTicks");
     if (scaleLabels.length <= dynamicNumTicks) {
       return {
         angle: 0,
@@ -190,7 +190,7 @@ function XAxis({
     ) {
       const rotatedCharLimit = Math.min(
         MAX_LABEL_CHARS,
-        Math.floor((availableWidthPerLabel * 1.5) / averageWidthPerChar),
+        Math.floor((availableWidthPerLabel * 3.5) / averageWidthPerChar),
       );
 
       return {
@@ -352,6 +352,7 @@ function XAxis({
     color: theme.colors.axis.label,
     fill: theme.colors.axis.label,
   };
+
 
   if (!isVisible) {
     return null;

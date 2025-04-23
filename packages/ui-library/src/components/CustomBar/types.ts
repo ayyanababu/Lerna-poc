@@ -17,7 +17,4 @@ export interface CustomBarProps extends VisxBarProps {
    * Props for custom path element when you need more control over the bar shape
    */
   pathProps?: React.SVGProps<SVGPathElement>;
-
-  value?: number;
-  label?: string;
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import React, { useCallback, useMemo, useState, useRef, useEffect } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
@@ -19,10 +19,11 @@ import { VerticalStackedBarChartProps } from "./types";
 
 const DEFAULT_MARGIN = {
   top: 20,
-  right: 30,
+  right: -60,
   bottom: 45,
   left: 20,
 };
+
 
 const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
@@ -31,11 +32,13 @@ const SCALE_PADDING = 1.2;
 const MAX_BAR_WIDTH = 16;
 const TICK_LABEL_PADDING = 8;
 const TRUNCATE_RATIO = 0.75;
-let AXIS_ROTATE = false;
+let AXISX_ROTATE = false;
+let AXISY_ROTATE = false;
 
 function VerticalStackedBar({
   data: _data,
   groupKeys: _groupKeys,
+  margin = DEFAULT_MARGIN,
   title,
   timestamp,
   colors = [],
@@ -61,12 +64,14 @@ function VerticalStackedBar({
   const innerHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
   const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
   const axis_bottom = useRef<SVGGElement | null>(null);
+  const axis_left = useRef<SVGGElement | null>(null);
   const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(null);
   const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(null);
 
   const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
   const axisXStart = DEFAULT_MARGIN.left + yAxisLabelWidth;
   const innerWidth = width - axisXStart - DEFAULT_MARGIN.right;
+
 
   const getStrokeWidth = (width: number, height: number) => {
     const size = Math.min(width, height);
@@ -80,7 +85,6 @@ function VerticalStackedBar({
     string | null
   >(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
-
   const {
     showTooltip,
     hideTooltip,
@@ -95,9 +99,8 @@ function VerticalStackedBar({
       isLoading
         ? mockVerticalStackedBarChartData
         : { data: _data, groupKeys: _groupKeys },
-    [isLoading, _data, _groupKeys],
+    [isLoading, _data, _groupKeys, mockVerticalStackedBarChartData],
   );
-
 
   useEffect(() => {
     if (!chartSvgRef.current) return;
@@ -182,7 +185,7 @@ function VerticalStackedBar({
         range: [0, innerWidth],
         padding: 0.4,
       }),
-    [filteredData, innerWidth],
+    [filteredData, innerWidth]
   );
 
   const yScale = useMemo(
@@ -191,7 +194,7 @@ function VerticalStackedBar({
         domain: [0, maxValue * SCALE_PADDING],
         range: [innerHeight, 0],
       }),
-    [innerHeight, maxValue],
+    [innerHeight, maxValue]
   );
 
   const colorScale = useMemo(
@@ -211,19 +214,122 @@ function VerticalStackedBar({
     const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
     let updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
     const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right);
-    if (AXIS_ROTATE) {
+    if (AXISX_ROTATE) {
       updatedHeight = updatedHeight - (chartSvgRef.current.querySelector('.visx-axis-bottom') as SVGGElement).getBBox().height
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
   }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
 
+  const truncateXAxis = (textNodes: any, usedRects: any, axisadded: any, centeronly: boolean) => {
+    textNodes.slice(1, -1).forEach((node: any, index: number) => {
+      const label = node.dataset.fulltext || node.textContent || "";
+      let truncated = label;
+      if (label.length > 3) {
+        truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+      }
+      console.log("tr", truncated);
+      const original = node.textContent;
+      // node.textContent = truncated;
+      const bbox = node.getBBox();
+      node.textContent = original;
+      let x = 0;
+      let pnode = node.parentNode as Element;
+      if (pnode.getAttribute("transform")) {
+        x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+      } else {
+        x = +bbox.x
+      }
+      const rect = { x1: x, x2: x + bbox.width };
+      let us = usedRects.filter((r, i) => i !== index + 1)
+      const isOverlapping = us.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+      if (!isOverlapping) {
+        node.textContent = label;
+        node.setAttribute("display", "block");
+        axisadded[index + 1] = true;
+      } else {
+        axisadded[index + 1] = false;
+        node.textContent = truncated;
+        const bbox = node.getBBox();
+        let x = 0;
+        let pnode = node.parentNode as Element;
+        if (pnode.getAttribute("transform")) {
+          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+        } else {
+          x = +bbox.x
+        }
+        const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        if (!isOverlapping) {
+          node.textContent = truncated;
+          node.setAttribute("display", "block");
+          axisadded[index + 1] = true;
+        } else {
+          axisadded[index + 1] = false;
+          let newtruncated = truncated
+          if (truncated.length > 3) {
+            newtruncated = truncated.slice(0, Math.floor(truncated.length * TRUNCATE_RATIO * .5)) + "…";
+          }
+          node.textContent = newtruncated;
+          let x = 0;
+          let pnode = node.parentNode as Element;
+          if (pnode.getAttribute("transform")) {
+            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          } else {
+            x = +bbox.x
+          }
+          const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+          const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+          if (isOverlapping) {
+            axisadded[index + 1] = false;
+            if (!centeronly) {
+              node.setAttribute("display", "none");
+            }
+          } else {
+            axisadded[index + 1] = true;
+          }
+        }
+      }
+    });
+  }
+
+
+  const truncateYAxis = (textNodes: any, usedRects: any, axisadded: any) => {
+    textNodes.slice(1, -1).forEach((node: any, index: number) => {
+      const label = node.dataset.fulltext || node.textContent || "";
+      const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+      const original = node.textContent;
+      // node.textContent = truncated;
+      const bbox = node.getBBox();
+      node.textContent = original;
+      let y = 0;
+      let pnode = node.parentNode as Element;
+      if (pnode.getAttribute("transform")) {
+        y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+      } else {
+        y = +bbox.y
+      }
+      const rect = { y1: y, y2: y + bbox.height };
+      let us = usedRects.filter((r, i: number) => i !== index + 1)
+      const isOverlapping = us.some((r) => !(rect.y2 < r.y1 || rect.y1 > r.y2));
+      if (!isOverlapping) {
+        node.textContent = label;
+        node.setAttribute("display", "block");
+        axisadded[index + 1] = true;
+      } else {
+        axisadded[index + 1] = false;
+        node.setAttribute("display", "none");
+      }
+    });
+  }
+
 
   useEffect(() => {
     if (!axis_bottom.current || !xScale) return;
-    if (AXIS_ROTATE) {
-      return;
+    if (AXISX_ROTATE) {
+      return
     }
+
     requestAnimationFrame(() => {
       const textNodes: SVGTextElement[] = Array.from(
         axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
@@ -231,7 +337,7 @@ function VerticalStackedBar({
 
       if (!textNodes.length) return;
 
-      const usedRects: { x1: number; x2: number }[] = [];
+      let usedRects: { x1: number; x2: number }[] = [];
 
       // Set all full first
       textNodes.forEach((node) => {
@@ -240,15 +346,57 @@ function VerticalStackedBar({
         node.textContent = full;
         node.dataset.fulltext = full;
       });
+      textNodes.forEach((node, i) => {
+        if (i !== 0 && i !== textNodes.length - 1) {
+          const bbox = node.getBBox();
+          let pnode = node.parentNode as Element;
+          let x = 0;
+          if (pnode.getAttribute("transform")) {
+            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          } else {
+            x = +bbox.x
+          }
+          const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+          usedRects.push(rect);
+        }
+      });
+      let axisadded = {};
       const firstNode = textNodes[0];
       const lastNode = textNodes[textNodes.length - 1];
-
-      const showAndTruncate = (node: SVGTextElement) => {
+      const showAndTruncate = (node: SVGTextElement, index: number) => {
         const label = node.dataset.fulltext || node.textContent || "";
-        const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
-        //  node.textContent = truncated;
+        let truncated = label;
+        if (label.length > 3) {
+          truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        }
         const bbox = node.getBBox();
-        // const x = +node.parentNode.getAttribute("transform").split("translate(")[1].split(",")[0];
+        let pnode = node.parentNode as Element;
+        let x = 0;
+        if (pnode.getAttribute("transform")) {
+          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+        } else {
+          x = +bbox.x
+        }
+        const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        if (!isOverlapping) {
+          axisadded[index] = true;
+          node.textContent = label;
+          node.setAttribute("display", "block");
+        } else {
+          node.textContent = truncated;
+          axisadded[index] = true;
+          node.setAttribute("display", "block");
+        }
+      };
+
+      // Always show first and last
+      if (firstNode) showAndTruncate(firstNode, 0);
+      if (lastNode) showAndTruncate(lastNode, textNodes.length - 1);
+
+      usedRects = [];
+      textNodes.forEach((node) => {
+        const bbox = node.getBBox();
         let pnode = node.parentNode as Element;
         let x = 0;
         if (pnode.getAttribute("transform")) {
@@ -257,53 +405,138 @@ function VerticalStackedBar({
           x = +bbox.x
         }
         const rect = { x1: x, x2: x + bbox.width };
-        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        usedRects.push(rect);
+      });
+      truncateXAxis(textNodes, usedRects, axisadded, false);
+      console.log(axisadded);
+      const trueCount = Object.values(axisadded).filter(value => value === true).length;
+      console.log(trueCount);
+      if (trueCount < 3) {
+        let ntextnodes = [];
+        let midcount = Math.round((textNodes.length - 1) / 2);
+        textNodes.forEach((node, index) => {
+          if (index === 0 || index === midcount || index === textNodes.length - 1) {
+            const full = node.dataset.fulltext || node.textContent || "";
+            node.setAttribute("display", "block");
+            node.textContent = full;
+            node.dataset.fulltext = full;
+            ntextnodes.push(node)
+          }
+        });
+        if (firstNode) showAndTruncate(ntextnodes[0], 0);
+        if (lastNode) showAndTruncate(ntextnodes[ntextnodes.length - 1], textNodes.length - 1);
+        truncateXAxis(ntextnodes, usedRects, axisadded, true);
+      }
+    });
+  }, [xScale, axis_bottom.current]);
+
+
+  useEffect(() => {
+    if (!axis_left.current || !yScale) return;
+    if (AXISY_ROTATE) {
+      return
+    }
+
+    requestAnimationFrame(() => {
+      const textNodes: SVGTextElement[] = Array.from(
+        axis_bottom.current?.querySelectorAll(".visx-axis-left text") || []
+      );
+
+      if (!textNodes.length) return;
+
+      let usedRects: { y1: number; y2: number }[] = [];
+
+      // Set all full first
+      textNodes.forEach((node) => {
+        const full = node.dataset.fulltext || node.textContent || "";
+        node.setAttribute("display", "block");
+        node.textContent = full;
+        node.dataset.fulltext = full;
+      });
+      textNodes.forEach((node, i) => {
+        if (i !== 0 && i !== textNodes.length - 1) {
+          const bbox = node.getBBox();
+          let pnode = node.parentNode as Element;
+          let y = 0;
+          if (pnode.getAttribute("transform")) {
+            y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+          } else {
+            y = +bbox.y
+          }
+          const rect = { y1: y - 5, y2: y + bbox.height + 5 };
+          usedRects.push(rect);
+        }
+      });
+      let axisadded = {};
+      const firstNode = textNodes[0];
+      const lastNode = textNodes[textNodes.length - 1];
+      const showAndTruncate = (node: SVGTextElement, index: number) => {
+        const label = node.dataset.fulltext || node.textContent || "";
+        const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        const bbox = node.getBBox();
+        let pnode = node.parentNode as Element;
+        let y = 0;
+        if (pnode.getAttribute("transform")) {
+          y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+        } else {
+          y = +bbox.y
+        }
+        const rect = { y1: y - 5, y2: y + bbox.height + 5 };
+        const isOverlapping = usedRects.some((r) => !(rect.y2 < r.y1 || rect.y1 > r.y2));
         if (!isOverlapping) {
+          axisadded[index] = true;
           node.textContent = label;
           node.setAttribute("display", "block");
-          usedRects.push(rect);
         } else {
-          node.textContent = truncated;
+          axisadded[index] = true;
+          node.textContent = label;
           node.setAttribute("display", "block");
         }
       };
 
       // Always show first and last
-      if (firstNode) showAndTruncate(firstNode);
-      if (lastNode && lastNode !== firstNode) showAndTruncate(lastNode);
+      if (firstNode) showAndTruncate(firstNode, 0);
+      if (lastNode) showAndTruncate(lastNode, textNodes.length - 1);
 
-      // Hide overlapping others
-      textNodes.slice(1, -1).forEach((node) => {
-        const label = node.dataset.fulltext || node.textContent || "";
-        const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
-        const original = node.textContent;
-        node.textContent = truncated;
+      usedRects = [];
+      textNodes.forEach((node) => {
         const bbox = node.getBBox();
-        node.textContent = original;
-
-        const x = +node.getAttribute("x")!;
-        const rect = { x1: x - bbox.width, x2: x + bbox.width };
-        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
-        console.log(node)
-        console.log(label)
-        console.log(truncated)
-        console.log(isOverlapping)
-        if (!isOverlapping) {
-          node.textContent = label;
-          node.setAttribute("display", "block");
-          usedRects.push(rect);
+        let pnode = node.parentNode as Element;
+        let y = 0;
+        if (pnode.getAttribute("transform")) {
+          y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
         } else {
-          node.textContent = truncated;
-          //   node.setAttribute("display", "none");
+          y = +bbox.y;
         }
+        const rect = { y1: y, y2: y + bbox.height };
+        usedRects.push(rect);
       });
+      truncateYAxis(textNodes, usedRects, axisadded);
+      const trueCount = Object.values(axisadded).filter(value => value === true).length;
+      console.log(trueCount);
+      if (trueCount < 3) {
+        let ntextnodes = [];
+        let midcount = Math.round((textNodes.length - 1) / 2);
+        textNodes.forEach((node, index) => {
+          if (index === 0 || index === midcount || index === textNodes.length - 1) {
+            const full = node.dataset.fulltext || node.textContent || "";
+            node.setAttribute("display", "block");
+            node.textContent = full;
+            node.dataset.fulltext = full;
+            ntextnodes.push(node);
+          }
+        });
+        if (firstNode) showAndTruncate(ntextnodes[0], 0);
+        if (lastNode) showAndTruncate(ntextnodes[ntextnodes.length - 1], textNodes.length - 1);
+        truncateYAxis(ntextnodes, usedRects, axisadded);
+      }
     });
-  }, [xScale, axis_bottom.current]);
+  }, [yScale, axis_left.current]);
+
 
   const rotated = (rotate: boolean) => {
     let rot = rotate;
     setTimeout(() => {
-      console.log("hit")
       const textNodes: SVGTextElement[] = Array.from(
         axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
       );
@@ -314,7 +547,7 @@ function VerticalStackedBar({
         node.textContent = full;
         node.dataset.fulltext = full;
       });
-      AXIS_ROTATE = rotate;
+      AXISX_ROTATE = rotate;
 
       if (!rot) {
         if (!chartSvgRef.current || !width || !height) return;
@@ -329,7 +562,6 @@ function VerticalStackedBar({
       }
     }, 200)
   }
-
 
   const handleMouseMove = useCallback(
     (groupKey: string, value: number) => (event: React.MouseEvent) => {
@@ -358,153 +590,14 @@ function VerticalStackedBar({
     }
   }, [isLoading, hideTooltip, setHoveredGroupKey]);
 
-  const renderStackedBars = useCallback(
-    () =>
-      filteredData.map((categoryData, index) => {
-        const category = String(categoryData.label);
-        // Calculate bar width with maximum limit
-        const calculatedBarWidth = xScale.bandwidth();
-        // Use custom barWidth if provided, otherwise use default with maximum limit
-        const actualBarWidth =
-          barWidth !== undefined
-            ? barWidth
-            : Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
-
-        // If the bar width is limited, center it
-        const barX =
-          actualBarWidth < calculatedBarWidth
-            ? (xScale(category) || 0) +
-            (calculatedBarWidth - actualBarWidth) / 2
-            : xScale(category) || 0;
-
-        // Calculate dynamic radius based on bar width
-        const dynamicRadius = Math.min(DEFAULT_BAR_RADIUS, actualBarWidth / 2);
-
-        return activeKeys.map((groupKey, groupIndex) => {
-          const seriesData = stackedData.find((s) => s.key === groupKey);
-          if (!seriesData) return null;
-
-          const categoryIndex = filteredData.findIndex(
-            (d) => d.label === categoryData.label,
-          );
-          if (categoryIndex === -1) return null;
-
-          const [y0, y1] = seriesData[categoryIndex];
-          const barHeight = yScale(y0) - yScale(y1);
-          const barY = yScale(y1);
-          const value = y1 - y0;
-
-          if (!value) return null;
-
-          const isHoveredGroup = hoveredGroupKey === groupKey;
-          const barOpacity =
-            hoveredGroupKey && !isHoveredGroup
-              ? REDUCED_OPACITY
-              : DEFAULT_OPACITY;
-
-          // Determine if this is the top bar in the stack
-          const isTopBar =
-            seriesData.key ===
-            stackedData.reduce((topKey, current) => {
-              const currentY1 = current[categoryIndex]?.[1] || 0;
-              const topY1 =
-                stackedData.find((s) => s.key === topKey)?.[
-                categoryIndex
-                ]?.[1] || 0;
-              return currentY1 > topY1 ? current.key : topKey;
-            }, activeKeys[0]);
-
-          return (
-            <React.Fragment key={`stacked-${category}-${groupKey}`}>
-              <CustomBar
-                key={`stacked-${category}-${groupKey}`}
-                x={barX}
-                y={barY}
-                width={actualBarWidth}
-                height={barHeight}
-                fill={
-                  isLoading
-                    ? `url(#${shimmerGradientId})`
-                    : colorScale(groupKey)
-                }
-                opacity={barOpacity}
-                pathProps={
-                  isTopBar
-                    ? {
-                      d: `
-                                    M ${barX},${barY + barHeight}
-                                    L ${barX + actualBarWidth},${barY + barHeight}
-                                    L ${barX + actualBarWidth},${barY + dynamicRadius}
-                                    Q ${barX + actualBarWidth},${barY} ${barX + actualBarWidth - dynamicRadius
-                        },${barY}
-                                    L ${barX + dynamicRadius},${barY}
-                                    Q ${barX},${barY} ${barX},${barY + dynamicRadius}
-                                    L ${barX},${barY + barHeight}
-                                    Z
-                                `,
-                    }
-                    : undefined
-                }
-                rx={0}
-                onMouseMove={handleMouseMove(groupKey, value)}
-                onMouseLeave={handleMouseLeave}
-                {...barProps}
-                onClick={(event) => {
-                  if (barProps?.onClick) {
-                    barProps.onClick(event);
-                  }
-                  if (onClick) {
-                    onClick(event, filteredData[index], [index, groupIndex]);
-                  }
-                }}
-              />
-
-              {!isTopBar && (
-                <line
-                  x1={barX}
-                  y1={barY}
-                  x2={barX + actualBarWidth}
-                  y2={barY}
-                  stroke={theme.colors.common.stroke}
-                  strokeWidth={strokeWidth}
-                  pointerEvents="none"
-                />
-              )}
-            </React.Fragment>
-          );
-        });
-      }),
-    [
-      filteredData,
-      xScale,
-      barWidth,
-      activeKeys,
-      stackedData,
-      yScale,
-      hoveredGroupKey,
-      isLoading,
-      colorScale,
-      handleMouseMove,
-      handleMouseLeave,
-      barProps,
-      legendHoveredGroupKey,
-      theme.colors.common.text,
-      theme.colors.common.stroke,
-      strokeWidth,
-    ],
-  );
-
-  const renderBars = useCallback(
-    () => renderStackedBars(),
-    [renderStackedBars],
-  );
-
-  if (!_data || _data.length === 0) {
+  if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;
   }
+
   return (
     <ChartWrapper
       ref={parentRef}
+      isLoading={isLoading}
       title={title}
       titleProps={titleProps}
       legendsProps={{
@@ -530,13 +623,15 @@ function VerticalStackedBar({
         {isLoading && <SvgShimmer />}
 
         <Group top={DEFAULT_MARGIN.top} left={DEFAULT_MARGIN.left}>
-          <YAxis
-            scale={yScale}
-            isLoading={isLoading}
-            showTicks={showTicks}
-            showAxisLine={showYAxis}
-            {...yAxisProps}
-          />
+          <g ref={axis_left}>
+            <YAxis
+              scale={yScale}
+              isLoading={isLoading}
+              showTicks={showTicks}
+              showAxisLine={showYAxis}
+              {...yAxisProps}
+            />
+          </g>
 
           <Grid
             width={innerWidth}
@@ -561,10 +656,129 @@ function VerticalStackedBar({
             />
           </g>
 
-          {renderBars()}
+          {filteredData.map((categoryData, index) => {
+            const category = String(categoryData.label);
+            // Calculate bar width with maximum limit
+            const calculatedBarWidth = xScale.bandwidth();
+            // Use custom barWidth if provided, otherwise use default with maximum limit
+            const actualBarWidth =
+              barWidth !== undefined
+                ? barWidth
+                : Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
+
+            // If the bar width is limited, center it
+            const barX =
+              actualBarWidth < calculatedBarWidth
+                ? (xScale(category) || 0) +
+                (calculatedBarWidth - actualBarWidth) / 2
+                : xScale(category) || 0;
+
+            // Calculate dynamic radius based on bar width
+            const dynamicRadius = Math.min(
+              DEFAULT_BAR_RADIUS,
+              actualBarWidth / 2,
+            );
+
+            return activeKeys.map((groupKey, groupIndex) => {
+              const seriesData = stackedData.find((s) => s.key === groupKey);
+              if (!seriesData) return null;
+
+              const categoryIndex = filteredData.findIndex(
+                (d) => d.label === categoryData.label,
+              );
+              if (categoryIndex === -1) return null;
+
+              const [y0, y1] = seriesData[categoryIndex];
+              const barHeight = yScale(y0) - yScale(y1);
+              const barY = yScale(y1);
+              const value = y1 - y0;
+
+              if (!value) return null;
+
+              const isHoveredGroup = hoveredGroupKey === groupKey;
+              const barOpacity =
+                hoveredGroupKey && !isHoveredGroup
+                  ? REDUCED_OPACITY
+                  : DEFAULT_OPACITY;
+
+              // Determine if this is the top bar in the stack
+              const isTopBar =
+                seriesData.key ===
+                stackedData.reduce((topKey, current) => {
+                  const currentY1 = current[categoryIndex]?.[1] || 0;
+                  const topY1 =
+                    stackedData.find((s) => s.key === topKey)?.[
+                    categoryIndex
+                    ]?.[1] || 0;
+                  return currentY1 > topY1 ? current.key : topKey;
+                }, activeKeys[0]);
+
+              return (
+                <React.Fragment key={`stacked-${category}-${groupKey}`}>
+                  <CustomBar
+                    key={`stacked-${category}-${groupKey}`}
+                    x={barX}
+                    y={barY}
+                    width={actualBarWidth}
+                    height={barHeight}
+                    fill={
+                      isLoading
+                        ? `url(#${shimmerGradientId})`
+                        : colorScale(groupKey)
+                    }
+                    opacity={barOpacity}
+                    pathProps={
+                      isTopBar
+                        ? {
+                          d: `
+                                M ${barX},${barY + barHeight}
+                                L ${barX + actualBarWidth},${barY + barHeight}
+                                L ${barX + actualBarWidth},${barY + dynamicRadius}
+                                Q ${barX + actualBarWidth},${barY} ${barX + actualBarWidth - dynamicRadius
+                            },${barY}
+                                L ${barX + dynamicRadius},${barY}
+                                Q ${barX},${barY} ${barX},${barY + dynamicRadius}
+                                L ${barX},${barY + barHeight}
+                                Z
+                            `,
+                        }
+                        : undefined
+                    }
+                    rx={0}
+                    onMouseMove={handleMouseMove(groupKey, value)}
+                    onMouseLeave={handleMouseLeave}
+                    {...barProps}
+                    onClick={(event) => {
+                      if (barProps?.onClick) {
+                        barProps.onClick(event);
+                      }
+                      if (onClick) {
+                        onClick(event, filteredData[index], [
+                          index,
+                          groupIndex,
+                        ]);
+                      }
+                    }}
+                  />
+
+                  {!isTopBar && (
+                    <line
+                      x1={barX}
+                      y1={barY}
+                      x2={barX + actualBarWidth}
+                      y2={barY}
+                      stroke={theme.colors.common.stroke}
+                      strokeWidth={strokeWidth}
+                      pointerEvents="none"
+                    />
+                  )}
+                </React.Fragment>
+              );
+            });
+          })}
         </Group>
       </svg>
-    </ChartWrapper>
+    </ChartWrapper >
   );
 }
 

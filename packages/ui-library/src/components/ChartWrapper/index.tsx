@@ -20,6 +20,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
   (
     {
       children,
+      isLoading,
       title,
       titleProps,
       legendsProps,
@@ -64,7 +65,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
       () => (
         <>
           {/* Only render title if it exists */}
-          {title && <Title title={title} {...titleProps} />}
+          {!isLoading && title && <Title title={title} {...titleProps} />}
           <Box
             sx={{
               position: "relative",
@@ -76,17 +77,17 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
               gap: position === LegendPosition.BOTTOM ? "12px" : "20px",
               marginTop: title ? "12px" : "0px", // Add 12px gap only if title exists
               ...(position === LegendPosition.LEFT ||
-                position === LegendPosition.RIGHT
+              position === LegendPosition.RIGHT
                 ? {
-                  flexDirection:
-                    position === LegendPosition.LEFT ? "row" : "row-reverse",
-                }
+                    flexDirection:
+                      position === LegendPosition.LEFT ? "row" : "row-reverse",
+                  }
                 : {
-                  flexDirection:
-                    position === LegendPosition.TOP
-                      ? "column"
-                      : "column-reverse",
-                }),
+                    flexDirection:
+                      position === LegendPosition.TOP
+                        ? "column"
+                        : "column-reverse",
+                  }),
             }}
           >
             <Legends

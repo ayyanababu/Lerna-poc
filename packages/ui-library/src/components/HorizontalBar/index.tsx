@@ -1,4 +1,3 @@
-// HorizontalBarChart.tsx (Enhanced: X-axis label truncation, layout precision)
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -27,10 +26,10 @@ const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.02;
 const MAX_BAR_HEIGHT = 16;
-const TRUNCATE_RATIO = 0.75;
-const TICK_LABEL_PADDING = 8;
-let AXIS_ROTATE = false;
-
+const TICK_LABEL_PADDING = 16;
+const TRUNCATE_RATIO = .75;
+let AXISX_ROTATE = false;
+let AXISY_ROTATE = false;
 
 function getMaxLabelWidth(labels: string[], font = "10px sans-serif") {
   const canvas = document.createElement("canvas");
@@ -40,9 +39,10 @@ function getMaxLabelWidth(labels: string[], font = "10px sans-serif") {
   return Math.max(...labels.map((label) => ctx.measureText(label).width));
 }
 
-function truncateLabel(label: string, ratio = TRUNCATE_RATIO): string {
-  const limit = Math.floor(label.length * ratio);
-  return label.length <= limit ? label : label.slice(0, limit) + "…";
+function truncateLabel(rawLabel: string, maxChars = 15) {
+  return rawLabel.length <= maxChars
+    ? rawLabel
+    : `${rawLabel.substring(0, maxChars)}…`;
 }
 
 const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
@@ -63,14 +63,15 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 }) => {
   const { theme } = useTheme();
   const { parentRef, width = 0, height = 0 } = useParentSize({ debounceTime: 150 });
-  const chartSvgRef = useRef<SVGSVGElement | null>(null);
 
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(null);
   const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(null);
-  const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
+  const chartSvgRef = useRef<SVGSVGElement | null>(null);
   const axis_bottom = useRef<SVGGElement | null>(null);
+  const axis_left = useRef<SVGGElement | null>(null);
+  const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
 
   const {
     showTooltip,
@@ -91,76 +92,163 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     [data, hideIndex]
   );
 
-  useEffect(() => {
-    if (!chartSvgRef.current) return;
-    const nodes = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
-    const widths = Array.from(nodes).map((node) => (node as SVGGraphicsElement).getBBox().width);
-    setMaxLabelWidth(Math.max(...widths, 0));
-  }, [data, width, height]);
+  const truncatedLabels = useMemo(
+    () => filteredData.map((d) => truncateLabel(String(d.label), 15)),
+    [filteredData]
+  );
 
-  const yLabels = useMemo(() => filteredData.map((d) => String(d.label)), [filteredData]);
-  const truncatedLabels = useMemo(() => yLabels.map((l) => truncateLabel(l)), [yLabels]);
-
-  const maxLabelPx = useMemo(() => getMaxLabelWidth(truncatedLabels), [truncatedLabels]);
+  const maxLabelPx = useMemo(() => {
+    if (!truncatedLabels.length) return 0;
+    return getMaxLabelWidth(truncatedLabels, "10px sans-serif");
+  }, [truncatedLabels]);
 
   const margin = useMemo(() => {
-    const desiredLeft = Math.max(maxLabelPx + 10, DEFAULT_MARGIN.left);
+    if (!width) return DEFAULT_MARGIN;
+    let desiredLeft = maxLabelPx + 20;
+    if (desiredLeft > width / 3) desiredLeft = width / 3;
+    desiredLeft = Math.max(desiredLeft, DEFAULT_MARGIN.left);
+    const showingXAxis = xAxisProps?.isVisible !== false;
+    const bottomMargin = showingXAxis
+      ? DEFAULT_MARGIN.bottom
+      : Math.max(DEFAULT_MARGIN.bottom - 10, 10);
+    const rightMargin = Math.min(DEFAULT_MARGIN.right, 20);
     return {
       ...DEFAULT_MARGIN,
-      left: Math.min(desiredLeft, width / 3),
+      left: desiredLeft,
+      bottom: bottomMargin,
+      right: rightMargin,
     };
-  }, [maxLabelPx, width]);
+  }, [maxLabelPx, width, xAxisProps]);
 
   const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
   const axisXStart = DEFAULT_MARGIN.left + yAxisLabelWidth;
   const drawableChartWidth = width - axisXStart - DEFAULT_MARGIN.right;
-
-  //  const drawableChartWidth = width - margin.left - DEFAULT_MARGIN.right;
-  const drawableChartHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
+  // const drawableChartWidth = width - margin.left - margin.right;
+  const drawableChartHeight = height - margin.top - margin.bottom;
 
   const maxValue = useMemo(
-    () => Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) * SCALE_PADDING,
+    () =>
+      Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) *
+      SCALE_PADDING,
     [filteredData]
   );
 
-  useEffect(() => {
-    if (!chartSvgRef.current) return;
-    const nodes = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
-    const widths = Array.from(nodes).map((node) => (node as SVGGraphicsElement).getBBox().width);
-    setMaxLabelWidth(Math.max(...widths, 0));
-  }, [data, width, height]);
-
   const yScale = useMemo(
-    () => scaleBand({
-      domain: yLabels,
-      range: [0, drawableChartHeight],
-      padding: 0.4,
-      round: true,
-    }),
-    [yLabels, drawableChartHeight]
+    () =>
+      scaleBand<string>({
+        domain: filteredData.map((d) => String(d.label)),
+        range: [0, drawableChartHeight],
+        padding: 0.4,
+        round: true,
+      }),
+    [filteredData, drawableChartHeight]
   );
 
   const xScale = useMemo(
-    () => scaleLinear({
-      domain: [0, maxValue],
-      range: [0, drawableChartWidth],
-      nice: true,
-    }),
+    () =>
+      scaleLinear<number>({
+        domain: [0, maxValue],
+        range: [0, drawableChartWidth],
+        nice: true,
+      }),
     [maxValue, drawableChartWidth]
   );
 
+  const legendData = useMemo(
+    () => data.map((d) => ({ label: d.label, value: d.value })),
+    [data]
+  );
+
   const colorScale = useMemo(() => {
-    const defaultColors = theme.colors.charts.bar;
-    return (index: number) => (colors.length ? colors[index % colors.length] : defaultColors[index % defaultColors.length]);
-  }, [colors, theme]);
+    if (colors?.length) {
+      return (index: number) => colors[index % colors.length];
+    }
+    return (index: number) =>
+      theme.colors.charts.bar[index % theme.colors.charts.bar.length];
+  }, [colors, theme.colors.charts.bar]);
+
+  const handleBarMouseMove =
+    (value: number, color: string, index: number) =>
+      (event: React.MouseEvent) => {
+        if (!isLoading) {
+          showTooltip({
+            tooltipData: [
+              {
+                label: filteredData[index].label,
+                value,
+                color,
+              },
+            ],
+            tooltipLeft: event.clientX,
+            tooltipTop: event.clientY,
+          });
+          setHoveredBar(index);
+        }
+      };
+
+  const handleBarMouseLeave = () => {
+    if (!isLoading) {
+      hideTooltip();
+      setHoveredBar(null);
+    }
+  };
 
 
   useEffect(() => {
+    if (!chartSvgRef.current || !width || !height) return;
+
+    const svg = chartSvgRef.current;
+    const bbox = svg.getBBox();
+
+    const titleEl = document.querySelector(".chart-title") as HTMLElement | null;
+    const legendEl = document.querySelector(".chart-legend") as HTMLElement | null;
+
+    const titleHeight = titleEl?.getBoundingClientRect().height || 0;
+    const legendHeight = legendEl?.getBoundingClientRect().height || 0;
+
+    const totalTop = margin.top + titleHeight;
+    const totalBottom = margin.bottom + legendHeight;
+    const requiredHeight = totalTop + bbox.height + totalBottom;
+    const requiredWidth = margin.left + drawableChartWidth + margin.right;
+
+    const updatedHeight = Math.max(requiredHeight, height) + 5;
+    const updatedWidth = Math.max(requiredWidth, width);
+
+    setAdjustedChartHeight(updatedHeight);
+    setAdjustedChartWidth(updatedWidth);
+  }, [data, width, height, margin, drawableChartWidth]);
+
+  useEffect(() => {
     if (!chartSvgRef.current) return;
-    const nodes = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
-    const widths = Array.from(nodes).map((node) => (node as SVGGraphicsElement).getBBox().width);
+    const labels = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
+    const widths = Array.from(labels).map(
+      (node) => (node as SVGGraphicsElement).getBBox().width,
+    );
     setMaxLabelWidth(Math.max(...widths, 0));
   }, [data, width, height]);
+
+  useEffect(() => {
+    if (!chartSvgRef.current || !width || !height) return;
+    const svg = chartSvgRef.current;
+    const bbox = svg.getBBox();
+
+    const titleEl = document.querySelector(
+      ".chart-title",
+    ) as HTMLElement | null;
+    const legendEl = document.querySelector(
+      ".chart-legend",
+    ) as HTMLElement | null;
+
+    const titleHeight = titleEl?.getBoundingClientRect().height || 0;
+    const legendHeight = legendEl?.getBoundingClientRect().height || 0;
+
+    const totalTop = DEFAULT_MARGIN.top + titleHeight;
+    const totalBottom = DEFAULT_MARGIN.bottom + legendHeight;
+    const requiredHeight = totalTop + bbox.height + totalBottom;
+
+    setAdjustedChartHeight(Math.max(requiredHeight, height) + 5);
+    setAdjustedChartWidth(width);
+  }, [data, width, height, DEFAULT_MARGIN]);
 
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
@@ -170,17 +258,121 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
     let updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
     const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right);
-    if (AXIS_ROTATE) {
+    if (AXISX_ROTATE) {
       updatedHeight = updatedHeight - (chartSvgRef.current.querySelector('.visx-axis-bottom') as SVGGElement).getBBox().height
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
   }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
 
+  const truncateXAxis = (textNodes: any, usedRects: any, axisadded: any, centeronly: boolean) => {
+    textNodes.slice(1, -1).forEach((node, index) => {
+      const label = node.dataset.fulltext || node.textContent || "";
+      let truncated = label;
+      if (label.length > 3) {
+        truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+      }
+      const original = node.textContent;
+      // node.textContent = truncated;
+      const bbox = node.getBBox();
+      node.textContent = original;
+      let x = 0;
+      let pnode = node.parentNode as Element;
+      if (pnode.getAttribute("transform")) {
+        x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+      } else {
+        x = +bbox.x
+      }
+      const rect = { x1: x, x2: x + bbox.width };
+      let us = usedRects.filter((r, i) => i !== index + 1)
+      const isOverlapping = us.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+      if (!isOverlapping) {
+        node.textContent = label;
+        node.setAttribute("display", "block");
+        axisadded[index + 1] = true;
+      } else {
+        axisadded[index + 1] = false;
+        node.textContent = truncated;
+        const bbox = node.getBBox();
+        let x = 0;
+        let pnode = node.parentNode as Element;
+        if (pnode.getAttribute("transform")) {
+          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+        } else {
+          x = +bbox.x
+        }
+        const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        if (!isOverlapping) {
+          node.textContent = truncated;
+          node.setAttribute("display", "block");
+          axisadded[index + 1] = true;
+        } else {
+          axisadded[index + 1] = false;
+          let newtruncated = truncated;
+          if (truncated.length > 3) {
+            newtruncated = truncated.slice(0, Math.floor(truncated.length * TRUNCATE_RATIO * .1)) + "…";
+          }
+          node.textContent = newtruncated;
+          let x = 0;
+          let pnode = node.parentNode as Element;
+          if (pnode.getAttribute("transform")) {
+            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          } else {
+            x = +bbox.x
+          }
+          const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+          const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+          if (isOverlapping) {
+            axisadded[index + 1] = false;
+            if (!centeronly) {
+              node.setAttribute("display", "none");
+            }
+          } else {
+            axisadded[index + 1] = true;
+          }
+        }
+      }
+    });
+  }
+
+
+  const truncateYAxis = (textNodes: any, usedRects: any, axisadded: any, centeronly: boolean) => {
+    textNodes.slice(1, -1).forEach((node, index) => {
+      const label = node.dataset.fulltext || node.textContent || "";
+      const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+      const original = node.textContent;
+      // node.textContent = truncated;
+      const bbox = node.getBBox();
+      node.textContent = original;
+      let y = 0;
+      let pnode = node.parentNode as Element;
+      if (pnode.getAttribute("transform")) {
+        y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+      } else {
+        y = +bbox.y
+      }
+      const rect = { y1: y, y2: y + bbox.height };
+      let us = usedRects.filter((r, i: number) => i !== index + 1)
+      const isOverlapping = us.some((r) => !(rect.y2 < r.y1 || rect.y1 > r.y2));
+      if (!isOverlapping) {
+        node.textContent = label;
+        node.setAttribute("display", "block");
+        axisadded[index + 1] = true;
+      } else {
+        axisadded[index + 1] = false;
+        if (!centeronly) {
+          node.setAttribute("display", "none");
+        }
+      }
+    });
+  }
+
+
   useEffect(() => {
     if (!axis_bottom.current || !xScale) return;
-    if (AXIS_ROTATE) {
-      return;
+    if (AXISX_ROTATE) {
+      return
     }
 
     requestAnimationFrame(() => {
@@ -190,7 +382,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
       if (!textNodes.length) return;
 
-      const usedRects: { x1: number; x2: number }[] = [];
+      let usedRects: { x1: number; x2: number }[] = [];
 
       // Set all full first
       textNodes.forEach((node) => {
@@ -199,12 +391,56 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         node.textContent = full;
         node.dataset.fulltext = full;
       });
+      textNodes.forEach((node, i) => {
+        if (i !== 0 && i !== textNodes.length - 1) {
+          const bbox = node.getBBox();
+          let pnode = node.parentNode as Element;
+          let x = 0;
+          if (pnode.getAttribute("transform")) {
+            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          } else {
+            x = +bbox.x
+          }
+          const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+          usedRects.push(rect);
+        }
+      });
+      let axisadded = {};
       const firstNode = textNodes[0];
       const lastNode = textNodes[textNodes.length - 1];
-
-      const showAndTruncate = (node: SVGTextElement) => {
+      const showAndTruncate = (node: SVGTextElement, index: number) => {
         const label = node.dataset.fulltext || node.textContent || "";
-        const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        let truncated = label;
+        if (label.length > 3) {
+          truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        }
+        const bbox = node.getBBox();
+        let pnode = node.parentNode as Element;
+        let x = 0;
+        if (pnode.getAttribute("transform")) {
+          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+        } else {
+          x = +bbox.x
+        }
+        const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        if (!isOverlapping) {
+          axisadded[index] = true;
+          node.textContent = label;
+          node.setAttribute("display", "block");
+        } else {
+          node.textContent = truncated;
+          axisadded[index] = true;
+          node.setAttribute("display", "block");
+        }
+      };
+
+      // Always show first and last
+      if (firstNode) showAndTruncate(firstNode, 0);
+      if (lastNode) showAndTruncate(lastNode, textNodes.length - 1);
+
+      usedRects = [];
+      textNodes.forEach((node) => {
         const bbox = node.getBBox();
         let pnode = node.parentNode as Element;
         let x = 0;
@@ -214,71 +450,142 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           x = +bbox.x
         }
         const rect = { x1: x, x2: x + bbox.width };
-        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        usedRects.push(rect);
+      });
+      truncateXAxis(textNodes, usedRects, axisadded, false);
+      console.log(axisadded);
+      const trueCount = Object.values(axisadded).filter(value => value === true).length;
+      console.log(trueCount);
+      if (trueCount < 3) {
+        let ntextnodes = [];
+        let midcount = Math.round((textNodes.length - 1) / 2);
+        textNodes.forEach((node, index) => {
+          if (index === 0 || index === midcount || index === textNodes.length - 1) {
+            const full = node.dataset.fulltext || node.textContent || "";
+            node.setAttribute("display", "block");
+            node.textContent = full;
+            node.dataset.fulltext = full;
+            ntextnodes.push(node);
+          }
+        });
+        if (firstNode) showAndTruncate(ntextnodes[0], 0);
+        if (lastNode) showAndTruncate(ntextnodes[ntextnodes.length - 1], textNodes.length - 1);
+        truncateXAxis(ntextnodes, usedRects, axisadded, true);
+      }
+    });
+  }, [xScale, axis_bottom.current]);
+
+
+  useEffect(() => {
+    if (!axis_left.current || !yScale) return;
+    if (AXISY_ROTATE) {
+      return
+    }
+
+    requestAnimationFrame(() => {
+      const textNodes: SVGTextElement[] = Array.from(
+        axis_left.current?.querySelectorAll(".visx-axis-left text") || []
+      );
+
+      if (!textNodes.length) return;
+
+      let usedRects: { y1: number; y2: number }[] = [];
+
+      // Set all full first
+      textNodes.forEach((node) => {
+        const full = node.dataset.fulltext || node.textContent || "";
+        node.setAttribute("display", "block");
+        node.textContent = full;
+        node.dataset.fulltext = full;
+      });
+      console.log("nodes", textNodes)
+      textNodes.forEach((node, i) => {
+        if (i !== 0 && i !== textNodes.length - 1) {
+          const bbox = node.getBBox();
+          let pnode = node.parentNode as Element;
+          let y = 0;
+          if (pnode.getAttribute("transform")) {
+            y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+          } else {
+            y = +bbox.y
+          }
+          const rect = { y1: y - 5, y2: y + bbox.height + 5 };
+          usedRects.push(rect);
+        }
+      });
+      let axisadded = {};
+      const firstNode = textNodes[0];
+      const lastNode = textNodes[textNodes.length - 1];
+      const showAndTruncate = (node: SVGTextElement, index: number) => {
+        const label = node.dataset.fulltext || node.textContent || "";
+        let truncated = label;
+        if (label.length > 3) {
+          truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        }
+        const bbox = node.getBBox();
+        let pnode = node.parentNode as Element;
+        let y = 0;
+        if (pnode.getAttribute("transform")) {
+          y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+        } else {
+          y = +bbox.y
+        }
+        const rect = { y1: y - 5, y2: y + bbox.height + 5 };
+        const isOverlapping = usedRects.some((r) => !(rect.y2 < r.y1 || rect.y1 > r.y2));
         if (!isOverlapping) {
+          axisadded[index] = true;
           node.textContent = label;
           node.setAttribute("display", "block");
-          usedRects.push(rect);
         } else {
-          node.textContent = truncated;
+          axisadded[index] = true;
+          node.textContent = label;
           node.setAttribute("display", "block");
         }
       };
 
       // Always show first and last
-      if (firstNode) showAndTruncate(firstNode);
-      if (lastNode && lastNode !== firstNode) showAndTruncate(lastNode);
+      if (firstNode) showAndTruncate(firstNode, 0);
+      if (lastNode) showAndTruncate(lastNode, textNodes.length - 1);
 
-      // Hide overlapping others
-      textNodes.slice(1, -1).forEach((node) => {
-        const label = node.dataset.fulltext || node.textContent || "";
-        const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
-        const original = node.textContent;
-        node.textContent = truncated;
+      usedRects = [];
+      textNodes.forEach((node) => {
         const bbox = node.getBBox();
-        node.textContent = original;
-
-        const x = +node.getAttribute("x")!;
-        const rect = { x1: x - bbox.width, x2: x + bbox.width };
-        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
-        console.log(label)
-        console.log(truncated)
-        console.log(isOverlapping)
-        if (!isOverlapping) {
-          node.textContent = label;
-          node.setAttribute("display", "block");
-          usedRects.push(rect);
+        let pnode = node.parentNode as Element;
+        let y = 0;
+        if (pnode.getAttribute("transform")) {
+          y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
         } else {
-          node.textContent = truncated;
-          const bbox = node.getBBox();
-          const x = +node.getAttribute("x")!;
-          const rect = { x1: x - bbox.width / 2, x2: x + bbox.width / 2 };
-          const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
-          if (!isOverlapping) {
-            node.textContent = truncated;
-            node.setAttribute("display", "block");
-            usedRects.push(rect);
-          } else {
-            const newtruncated = label.slice(0, Math.floor(truncated.length * TRUNCATE_RATIO * .1)) + "…";
-            node.textContent = newtruncated;
-            const bbox = node.getBBox();
-            const x = +node.getAttribute("x")!;
-            const rect = { x1: x - bbox.width / 2, x2: x + bbox.width / 2 };
-            const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
-            if (isOverlapping) {
-              node.setAttribute("display", "none");
-            }
-          }
-          //   node.setAttribute("display", "none");
+          y = +bbox.y;
         }
+        const rect = { y1: y, y2: y + bbox.height };
+        usedRects.push(rect);
       });
+      truncateYAxis(textNodes, usedRects, axisadded, false);
+      const trueCount = Object.values(axisadded).filter(value => value === true).length;
+      console.log(trueCount);
+      if (trueCount < 3) {
+        let ntextnodes = [];
+        let midcount = Math.round((textNodes.length - 1) / 2);
+        textNodes.forEach((node, index) => {
+          if (index === 0 || index === midcount || index === textNodes.length - 1) {
+            const full = node.dataset.fulltext || node.textContent || "";
+            node.setAttribute("display", "block");
+            node.textContent = full;
+            node.dataset.fulltext = full;
+            ntextnodes.push(node);
+          }
+        });
+        if (firstNode) showAndTruncate(ntextnodes[0], 0);
+        if (lastNode) showAndTruncate(ntextnodes[ntextnodes.length - 1], textNodes.length - 1);
+        truncateYAxis(ntextnodes, usedRects, axisadded, true);
+      }
     });
-  }, [xScale, axis_bottom.current]);
+  }, [yScale, axis_left.current]);
+
 
   const rotated = (rotate: boolean) => {
     let rot = rotate;
     setTimeout(() => {
-      console.log("hit")
       const textNodes: SVGTextElement[] = Array.from(
         axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
       );
@@ -289,7 +596,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         node.textContent = full;
         node.dataset.fulltext = full;
       });
-      AXIS_ROTATE = rotate;
+      AXISX_ROTATE = rotate;
 
       if (!rot) {
         if (!chartSvgRef.current || !width || !height) return;
@@ -305,22 +612,28 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     }, 200)
   }
 
-
-  if (!_data || _data.length === 0) return <div>No data to display.</div>;
+  if (!isLoading && (!_data || _data.length === 0)) {
+    return <div>No data to display.</div>;
+  }
 
   return (
     <ChartWrapper
       ref={parentRef}
+      isLoading={isLoading}
       title={title}
       titleProps={{ className: "chart-title", ...titleProps }}
       legendsProps={{
         ...legendsProps,
-        data: data.map((d) => ({ label: d.label, value: d.value })),
-        colorScale: scaleOrdinal({ domain: data.map((d) => d.label), range: data.map((_, i) => colorScale(i)) }),
+        data: legendData,
+        colorScale: scaleOrdinal({
+          domain: legendData.map((d) => d.label),
+          range: filteredData.map((_, i) => colorScale(i)),
+        }),
         hideIndex,
         setHideIndex,
-        hovered: hoveredBar !== null ? data[hoveredBar]?.label : null,
-        setHovered: (label) => setHoveredBar(data.findIndex((d) => d.label === label)),
+        hovered: hoveredBar !== null ? legendData[hoveredBar]?.label : null,
+        setHovered: (label) =>
+          setHoveredBar(legendData.findIndex((item) => item.label === label)),
         isLoading,
       }}
       tooltipProps={{
@@ -334,15 +647,16 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     >
       <svg ref={chartSvgRef} width={adjustedChartWidth || width} height={adjustedChartHeight || height}>
         {isLoading && <SvgShimmer />}
-        <Group top={DEFAULT_MARGIN.top} left={DEFAULT_MARGIN.left}>
-          <YAxis
-            scale={yScale}
-            isLoading={isLoading}
-            numTicks={filteredData.length}
-            showTicks={false}
-            tickFormat={(val) => truncateLabel(String(val))}
-            {...yAxisProps}
-          />
+        <Group top={margin.top} left={margin.left}>
+          <g ref={axis_left}>
+            <YAxis
+              scale={yScale}
+              isLoading={isLoading}
+              numTicks={filteredData.length}
+              showTicks={false}
+              {...yAxisProps}
+            />
+          </g>
           <Grid
             height={drawableChartHeight}
             xScale={xScale}
@@ -365,43 +679,53 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           {filteredData.map((d, index) => {
             const value = Number(d.value);
             if (Number.isNaN(value)) return null;
-            const rawHeight = yScale.bandwidth();
-            const h = barWidth ?? Math.min(rawHeight, MAX_BAR_HEIGHT);
-            const y = (yScale(d.label) || 0) + (rawHeight - h) / 2;
-            const w = xScale(value);
-            const r = Math.min(DEFAULT_BAR_RADIUS, h / 2, w);
-            const fill = d.color || colorScale(index);
+            const rawBarHeight = yScale.bandwidth();
+            const actualBarHeight =
+              barWidth !== undefined
+                ? barWidth
+                : Math.min(rawBarHeight, MAX_BAR_HEIGHT);
+            const bandY = yScale(d.label) || 0;
+            const barY = bandY + (rawBarHeight - actualBarHeight) / 2;
+            const barLength = xScale(value);
+            const barX = 0;
+            const isHovered = hoveredBar === index;
+            const barOpacity =
+              hoveredBar !== null && !isHovered
+                ? REDUCED_OPACITY
+                : DEFAULT_OPACITY;
+            const radius = Math.min(
+              DEFAULT_BAR_RADIUS,
+              actualBarHeight / 2,
+              barLength
+            );
+            const pathD = `
+              M ${barX},${barY + actualBarHeight}
+              L ${barX + barLength - radius},${barY + actualBarHeight}
+              Q ${barX + barLength},${barY + actualBarHeight} ${barX + barLength},${barY + actualBarHeight - radius}
+              L ${barX + barLength},${barY + radius}
+              Q ${barX + barLength},${barY} ${barX + barLength - radius},${barY}
+              L ${barX},${barY}
+              Z
+            `;
+            const barColor = d.color || colorScale(index);
             return (
               <CustomBar
                 key={`bar-${d.label}`}
-                x={0}
-                y={y}
-                width={w}
-                height={h}
-                fill={fill}
+                x={barX}
+                y={barY}
+                width={barLength}
+                height={actualBarHeight}
+                fill={barColor}
                 isLoading={isLoading}
-                opacity={hoveredBar !== null && hoveredBar !== index ? REDUCED_OPACITY : DEFAULT_OPACITY}
-                pathProps={{
-                  d: `M0,${y + h} L${w - r},${y + h} Q${w},${y + h} ${w},${y + h - r} L${w},${y + r} Q${w},${y} ${w - r},${y} L0,${y} Z`,
-                }}
-                onMouseMove={(e) => {
-                  showTooltip({
-                    tooltipData: [{ label: d.label, value, color: fill }],
-                    tooltipLeft: e.clientX,
-                    tooltipTop: e.clientY,
-                  });
-                  setHoveredBar(index);
-                }}
-
-                onMouseLeave={() => {
-                  hideTooltip();
-                  setHoveredBar(null);
-                }}
-                onClick={(e) => {
-                  barProps?.onClick?.(e);
-                  onClick?.(e, d, index);
-                }}
+                opacity={barOpacity}
+                pathProps={{ d: pathD }}
+                onMouseMove={handleBarMouseMove(value, barColor, index)}
+                onMouseLeave={handleBarMouseLeave}
                 {...barProps}
+                onClick={(event) => {
+                  if (barProps?.onClick) barProps.onClick(event);
+                  if (onClick) onClick(event, d, index);
+                }}
               />
             );
           })}

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AxisBottom, AxisLeft } from "@visx/axis";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -14,20 +14,22 @@ import { shimmerClassName } from "../Shimmer/Shimmer";
 import SvgShimmer, { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { TooltipData } from "../Tooltip/types";
 import { mockVerticalGroupedBarChartData } from "./mockdata";
-import { DataPoint, VerticalGroupedBarChartProps } from "./types";
+import { VerticalGroupedBarChartProps } from "./types";
 
 const DEFAULT_MARGIN = {
   top: 20,
-  right: -20,
+  right: 20,
   bottom: 30,
-  left: 0,
+  left: 30,
 };
 
 const DEFAULT_BAR_RADIUS = 5;
 const DEFAULT_OPACITY = 1;
-const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
 const TICK_LABEL_PADDING = 8;
+const TRUNCATE_RATIO = .75;
+let AXISX_ROTATE = false;
+let AXISY_ROTATE = false;
 
 const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   data: _data,
@@ -43,76 +45,69 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   showTicks = false,
 }) => {
   const { theme } = useTheme();
-  const { parentRef, width = 0, height = 0 } = useParentSize({ debounceTime: 150 });
-
-  //  const drawableChartWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
-  const drawableChartHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
-
-  const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
-  const [hideIndex, setHideIndex] = useState<number[]>([]);
-  const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(null);
-  const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(null);
-  const chartSvgRef = useRef<SVGSVGElement | null>(null);
-  const axis_bottom = useRef<SVGGElement | null>(null);
-  const tickRefs = useRef<Record<string, SVGTextElement | null>>({});
-  const tickTextMap = useRef<Record<string, string>>({});
-  const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
-
   const {
-    showTooltip,
-    hideTooltip,
-    tooltipData,
-    tooltipLeft,
-    tooltipTop,
-    tooltipOpen,
-  } = useTooltip<TooltipData[]>();
-
+    parentRef,
+    width = 0,
+    height = 0,
+  } = useParentSize({ debounceTime: 150 });
+  const axis_bottom = useRef<SVGGElement | null>(null);
+  const axis_left = useRef<SVGGElement | null>(null);
+  const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
 
   const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
   const axisXStart = DEFAULT_MARGIN.left + yAxisLabelWidth;
   const drawableChartWidth = width - axisXStart - DEFAULT_MARGIN.right;
-  //  const drawableChartWidth = width - margin.left - DEFAULT_MARGIN.right;
 
-  const { data, groupKeys } = useMemo(() =>
-    isLoading ? mockVerticalGroupedBarChartData : { data: _data, groupKeys: _groupKeys },
-    [isLoading, _data, _groupKeys]
+  //  const drawableChartWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
+  const drawableChartHeight =
+    height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
+
+  const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
+  const [hideIndex, setHideIndex] = useState<number[]>([]);
+  const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(
+    null,
+  );
+  const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(
+    null,
+  );
+  const chartSvgRef = useRef<SVGSVGElement | null>(null);
+
+  const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
+    useTooltip<TooltipData[]>();
+
+  const { data, groupKeys } = useMemo(
+    () =>
+      isLoading
+        ? mockVerticalGroupedBarChartData
+        : { data: _data, groupKeys: _groupKeys },
+    [isLoading, _data, _groupKeys],
   );
 
-  const filteredData = useMemo(() =>
-    data.map((categoryData) => {
-      const d = cloneDeep(categoryData);
-      groupKeys.forEach((groupKey, index) => {
-        if (hideIndex.includes(index)) delete d.data?.[groupKey];
-      });
-      return d;
-    }), [data, hideIndex, groupKeys]);
+  const filteredData = useMemo(
+    () =>
+      data.map((categoryData) => {
+        const d = cloneDeep(categoryData);
+        groupKeys.forEach((groupKey, index) => {
+          if (hideIndex.includes(index)) delete d.data?.[groupKey];
+        });
+        return d;
+      }),
+    [data, hideIndex, groupKeys],
+  );
 
-  const legendData = useMemo(() =>
-    groupKeys.map((key) => ({
-      label: capitalize(lowerCase(key)),
-      value: data.reduce((total, d) => total + Number(d.data[key] || 0), 0),
-    })), [groupKeys, data]);
+  const legendData = useMemo(
+    () =>
+      groupKeys.map((key) => ({
+        label: capitalize(lowerCase(key)),
+        value: data.reduce((total, d) => total + Number(d.data[key] || 0), 0),
+      })),
+    [groupKeys, data],
+  );
 
-  useEffect(() => {
-    if (!chartSvgRef.current || !width || !height) return;
-    const svg = chartSvgRef.current;
-    const bbox = svg.getBBox();
-    const titleHeight = document.querySelector(".chart-title")?.getBoundingClientRect().height || 0;
-    const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
-    const updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
-    const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + drawableChartWidth + DEFAULT_MARGIN.right);
-    setAdjustedChartHeight(updatedHeight);
-    setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, drawableChartWidth]);
-
-  useEffect(() => {
-    if (!chartSvgRef.current) return;
-    const nodes = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
-    const widths = Array.from(nodes).map((node) => (node as SVGGraphicsElement).getBBox().width);
-    setMaxLabelWidth(Math.max(...widths, 0));
-  }, [data, width, height]);
-
-  const activeKeys = useMemo(() => groupKeys.filter((_, i) => !hideIndex.includes(i)), [groupKeys, hideIndex]);
+  const activeKeys = useMemo(
+    () => groupKeys.filter((_, i) => !hideIndex.includes(i)),
+    [groupKeys, hideIndex],
+  );
 
   const stackedData = useMemo(() => {
     if (type !== "stacked") return null;
@@ -137,48 +132,238 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       return Math.max(
         0,
         ...filteredData.map((d) =>
-          activeKeys.reduce((sum, key) => sum + Number(d.data[key] || 0), 0)
-        )
+          activeKeys.reduce((sum, key) => sum + Number(d.data[key] || 0), 0),
+        ),
       );
     }
     return Math.max(
       0,
       ...filteredData.flatMap((d) =>
-        activeKeys.map((key) => Number(d.data[key]) || 0)
-      )
+        activeKeys.map((key) => Number(d.data[key]) || 0),
+      ),
     );
   }, [filteredData, activeKeys, type]);
 
-  const categoryScale = useMemo(() =>
-    scaleBand<string>({
-      domain: filteredData.map((d) => String(d.label)),
-      range: [0, drawableChartWidth],
-      padding: 0.4,
-    }), [filteredData, drawableChartWidth]);
+  const categoryScale = useMemo(
+    () =>
+      scaleBand<string>({
+        domain: filteredData.map((d) => String(d.label)),
+        range: [0, drawableChartWidth],
+        padding: 0.4,
+      }),
+    [filteredData, drawableChartWidth],
+  );
 
-  const groupScale = useMemo(() =>
-    scaleBand<string>({
-      domain: activeKeys,
-      range: [0, categoryScale.bandwidth()],
-      padding: 0.3,
-    }), [activeKeys, categoryScale]);
+  const groupScale = useMemo(
+    () =>
+      scaleBand<string>({
+        domain: activeKeys,
+        range: [0, categoryScale.bandwidth()],
+        padding: 0.3,
+      }),
+    [activeKeys, categoryScale],
+  );
 
-  const valueScale = useMemo(() =>
-    scaleLinear<number>({
-      domain: [0, maxValue * SCALE_PADDING],
-      range: [drawableChartHeight, 0],
-    }), [drawableChartHeight, maxValue]);
+  const valueScale = useMemo(
+    () =>
+      scaleLinear<number>({
+        domain: [0, maxValue * SCALE_PADDING],
+        range: [drawableChartHeight, 0],
+      }),
+    [drawableChartHeight, maxValue],
+  );
 
-  const groupColorScale = useMemo(() =>
-    scaleOrdinal<string, string>({
-      domain: groupKeys,
-      range: colors?.length ? colors : theme.colors.charts.bar,
-    }), [groupKeys, colors, theme.colors.charts.bar]);
+  const groupColorScale = useMemo(
+    () =>
+      scaleOrdinal<string, string>({
+        domain: groupKeys,
+        range: colors?.length ? colors : theme.colors.charts.bar,
+      }),
+    [groupKeys, colors, theme.colors.charts.bar],
+  );
+
+  useEffect(() => {
+    if (!chartSvgRef.current || !width || !height) return;
+
+    const svg = chartSvgRef.current;
+    const bbox = svg.getBBox();
+
+    const titleEl = document.querySelector(
+      ".chart-title",
+    ) as HTMLElement | null;
+    const legendEl = document.querySelector(
+      ".chart-legend",
+    ) as HTMLElement | null;
+
+    const titleHeight = titleEl?.getBoundingClientRect().height || 0;
+    const legendHeight = legendEl?.getBoundingClientRect().height || 0;
+
+    const totalTop = DEFAULT_MARGIN.top + titleHeight;
+    const totalBottom = DEFAULT_MARGIN.bottom + legendHeight;
+    const requiredHeight = totalTop + bbox.height + totalBottom;
+    const requiredWidth =
+      DEFAULT_MARGIN.left + bbox.width + DEFAULT_MARGIN.right;
+
+    setAdjustedChartHeight(Math.max(requiredHeight, height) + 5);
+    setAdjustedChartWidth(Math.max(requiredWidth, width));
+  }, [data, width, height, DEFAULT_MARGIN]);
+
+
+  useEffect(() => {
+    if (!chartSvgRef.current) return;
+    const labels = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
+    const widths = Array.from(labels).map(
+      (node) => (node as SVGGraphicsElement).getBBox().width,
+    );
+    console.log("width", widths)
+    setMaxLabelWidth(Math.max(...widths, 0));
+  }, [data, width, height]);
+
+  useEffect(() => {
+    if (!chartSvgRef.current || !width || !height) return;
+    const svg = chartSvgRef.current;
+    const bbox = svg.getBBox();
+
+    const titleEl = document.querySelector(
+      ".chart-title",
+    ) as HTMLElement | null;
+    const legendEl = document.querySelector(
+      ".chart-legend",
+    ) as HTMLElement | null;
+
+    const titleHeight = titleEl?.getBoundingClientRect().height || 0;
+    const legendHeight = legendEl?.getBoundingClientRect().height || 0;
+
+    const totalTop = DEFAULT_MARGIN.top + titleHeight;
+    const totalBottom = DEFAULT_MARGIN.bottom + legendHeight;
+    const requiredHeight = totalTop + bbox.height + totalBottom;
+
+    setAdjustedChartHeight(Math.max(requiredHeight, height) + 5);
+    setAdjustedChartWidth(width);
+  }, [data, width, height, DEFAULT_MARGIN]);
+
+  useEffect(() => {
+    if (!chartSvgRef.current || !width || !height) return;
+    const svg = chartSvgRef.current;
+    const bbox = svg.getBBox();
+    const titleHeight = document.querySelector(".chart-title")?.getBoundingClientRect().height || 0;
+    const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
+    let updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
+    const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right);
+    if (AXISX_ROTATE) {
+      updatedHeight = updatedHeight - (chartSvgRef.current.querySelector('.visx-axis-bottom') as SVGGElement).getBBox().height
+    }
+    setAdjustedChartHeight(updatedHeight);
+    setAdjustedChartWidth(updatedWidth);
+  }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
+
+  const truncateXAxis = (textNodes: any, usedRects: any, axisadded: any, centeronly: boolean) => {
+    textNodes.slice(1, -1).forEach((node, index) => {
+      const label = node.dataset.fulltext || node.textContent || "";
+      let truncated = label;
+      if (label.length > 3) {
+        truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+      }
+      const original = node.textContent;
+      // node.textContent = truncated;
+      const bbox = node.getBBox();
+      node.textContent = original;
+      let x = 0;
+      let pnode = node.parentNode as Element;
+      if (pnode.getAttribute("transform")) {
+        x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+      } else {
+        x = +bbox.x
+      }
+      const rect = { x1: x, x2: x + bbox.width };
+      let us = usedRects.filter((r, i) => i !== index + 1)
+      const isOverlapping = us.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+      if (!isOverlapping) {
+        node.textContent = label;
+        node.setAttribute("display", "block");
+        axisadded[index + 1] = true;
+      } else {
+        axisadded[index + 1] = false;
+        node.textContent = truncated;
+        const bbox = node.getBBox();
+        let x = 0;
+        let pnode = node.parentNode as Element;
+        if (pnode.getAttribute("transform")) {
+          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+        } else {
+          x = +bbox.x
+        }
+        const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        if (!isOverlapping) {
+          node.textContent = truncated;
+          node.setAttribute("display", "block");
+          axisadded[index + 1] = true;
+        } else {
+          axisadded[index + 1] = false;
+          let newtruncated = truncated;
+          if (truncated.length > 3) {
+            newtruncated = truncated.slice(0, Math.floor(truncated.length * TRUNCATE_RATIO * .5)) + "…";
+          }
+          node.textContent = newtruncated;
+          let x = 0;
+          let pnode = node.parentNode as Element;
+          if (pnode.getAttribute("transform")) {
+            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          } else {
+            x = +bbox.x
+          }
+          const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+          const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+          if (isOverlapping) {
+            axisadded[index + 1] = false;
+            if (!centeronly) {
+              node.setAttribute("display", "none");
+            }
+          } else {
+            axisadded[index + 1] = true;
+          }
+        }
+      }
+    });
+  }
+
+
+  const truncateYAxis = (textNodes: any, usedRects: any, axisadded: any) => {
+    textNodes.slice(1, -1).forEach((node, index) => {
+      const label = node.dataset.fulltext || node.textContent || "";
+      const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+      const original = node.textContent;
+      // node.textContent = truncated;
+      const bbox = node.getBBox();
+      node.textContent = original;
+      let y = 0;
+      let pnode = node.parentNode as Element;
+      if (pnode.getAttribute("transform")) {
+        y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+      } else {
+        y = +bbox.y
+      }
+      const rect = { y1: y, y2: y + bbox.height };
+      let us = usedRects.filter((r, i: number) => i !== index + 1)
+      const isOverlapping = us.some((r) => !(rect.y2 < r.y1 || rect.y1 > r.y2));
+      if (!isOverlapping) {
+        node.textContent = label;
+        node.setAttribute("display", "block");
+        axisadded[index + 1] = true;
+      } else {
+        axisadded[index + 1] = false;
+        node.setAttribute("display", "none");
+      }
+    });
+  }
+
 
   useEffect(() => {
     if (!axis_bottom.current || !categoryScale) return;
-
-    const truncationRatio = 0.35;
+    if (AXISX_ROTATE) {
+      return
+    }
 
     requestAnimationFrame(() => {
       const textNodes: SVGTextElement[] = Array.from(
@@ -187,7 +372,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
 
       if (!textNodes.length) return;
 
-      const usedRects: { x1: number; x2: number }[] = [];
+      let usedRects: { x1: number; x2: number }[] = [];
 
       // Set all full first
       textNodes.forEach((node) => {
@@ -196,58 +381,246 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         node.textContent = full;
         node.dataset.fulltext = full;
       });
-      console.log(textNodes)
+      textNodes.forEach((node, i) => {
+        if (i !== 0 && i !== textNodes.length - 1) {
+          const bbox = node.getBBox();
+          let pnode = node.parentNode as Element;
+          let x = 0;
+          if (pnode.getAttribute("transform")) {
+            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          } else {
+            x = +bbox.x
+          }
+          const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+          usedRects.push(rect);
+        }
+      });
+      let axisadded = {};
       const firstNode = textNodes[0];
       const lastNode = textNodes[textNodes.length - 1];
-
-      const showAndTruncate = (node: SVGTextElement) => {
+      const showAndTruncate = (node: SVGTextElement, index: number) => {
         const label = node.dataset.fulltext || node.textContent || "";
-        const truncated = label.slice(0, Math.floor(label.length * truncationRatio)) + "…";
-        node.textContent = truncated;
+        const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
         const bbox = node.getBBox();
-        const x = +node.getAttribute("x")!;
-        const rect = { x1: x - bbox.width / 2, x2: x + bbox.width / 2 };
-        usedRects.push(rect);
-        node.textContent = truncated;
-        node.setAttribute("display", "block");
+        let pnode = node.parentNode as Element;
+        let x = 0;
+        if (pnode.getAttribute("transform")) {
+          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+        } else {
+          x = +bbox.x
+        }
+        const rect = { x1: x - 5, x2: x + bbox.width + 5 };
+        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        if (!isOverlapping) {
+          axisadded[index] = true;
+          node.textContent = label;
+          node.setAttribute("display", "block");
+        } else {
+          node.textContent = truncated;
+          axisadded[index] = true;
+          node.setAttribute("display", "block");
+        }
       };
 
       // Always show first and last
-      if (firstNode) showAndTruncate(firstNode);
-      if (lastNode && lastNode !== firstNode) showAndTruncate(lastNode);
+      if (firstNode) showAndTruncate(firstNode, 0);
+      if (lastNode) showAndTruncate(lastNode, textNodes.length - 1);
 
-      // Hide overlapping others
-      textNodes.slice(1, -1).forEach((node) => {
-        const label = node.dataset.fulltext || node.textContent || "";
-        const truncated = label.slice(0, Math.floor(label.length * truncationRatio)) + "…";
-        const original = node.textContent;
-        node.textContent = truncated;
+      usedRects = [];
+      textNodes.forEach((node) => {
         const bbox = node.getBBox();
-        node.textContent = original;
-
-        const x = +node.getAttribute("x")!;
-        const rect = { x1: x - bbox.width / 2, x2: x + bbox.width / 2 };
-        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
-
-        if (!isOverlapping) {
-          node.textContent = truncated;
-          node.setAttribute("display", "block");
-          usedRects.push(rect);
+        let pnode = node.parentNode as Element;
+        let x = 0;
+        if (pnode.getAttribute("transform")) {
+          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
         } else {
-          node.setAttribute("display", "none");
+          x = +bbox.x
         }
+        const rect = { x1: x, x2: x + bbox.width };
+        usedRects.push(rect);
       });
+      truncateXAxis(textNodes, usedRects, axisadded, false);
+      console.log(axisadded);
+      const trueCount = Object.values(axisadded).filter(value => value === true).length;
+      console.log("true", trueCount);
+      if (trueCount < 3) {
+        let ntextnodes = [];
+        let midcount = Math.round((textNodes.length - 1) / 2);
+        textNodes.forEach((node, index) => {
+          if (index === 0 || index === midcount || index === textNodes.length - 1) {
+            const full = node.dataset.fulltext || node.textContent || "";
+            node.setAttribute("display", "block");
+            node.textContent = full;
+            node.dataset.fulltext = full;
+            ntextnodes.push(node);
+          }
+        });
+        if (firstNode) showAndTruncate(ntextnodes[0], 0);
+        if (lastNode) showAndTruncate(ntextnodes[ntextnodes.length - 1], textNodes.length - 1);
+        truncateXAxis(ntextnodes, usedRects, axisadded, true);
+      }
     });
   }, [categoryScale, axis_bottom.current]);
 
 
+  useEffect(() => {
+    if (!axis_left.current || !valueScale) return;
+    if (AXISY_ROTATE) {
+      return
+    }
+
+    requestAnimationFrame(() => {
+      const textNodes: SVGTextElement[] = Array.from(
+        axis_left.current?.querySelectorAll(".visx-axis-left text") || []
+      );
+
+      if (!textNodes.length) return;
+
+      let usedRects: { y1: number; y2: number }[] = [];
+
+      // Set all full first
+      textNodes.forEach((node) => {
+        const full = node.dataset.fulltext || node.textContent || "";
+        node.setAttribute("display", "block");
+        node.textContent = full;
+        node.dataset.fulltext = full;
+      });
+      console.log("nodes", textNodes)
+      textNodes.forEach((node, i) => {
+        if (i !== 0 && i !== textNodes.length - 1) {
+          const bbox = node.getBBox();
+          let pnode = node.parentNode as Element;
+          let y = 0;
+          if (pnode.getAttribute("transform")) {
+            y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+          } else {
+            y = +bbox.y
+          }
+          const rect = { y1: y - 5, y2: y + bbox.height + 5 };
+          usedRects.push(rect);
+        }
+      });
+      let axisadded = {};
+      const firstNode = textNodes[0];
+      const lastNode = textNodes[textNodes.length - 1];
+      const showAndTruncate = (node: SVGTextElement, index: number) => {
+        const label = node.dataset.fulltext || node.textContent || "";
+        const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        const bbox = node.getBBox();
+        let pnode = node.parentNode as Element;
+        let y = 0;
+        if (pnode.getAttribute("transform")) {
+          y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+        } else {
+          y = +bbox.y
+        }
+        const rect = { y1: y - 5, y2: y + bbox.height + 5 };
+        const isOverlapping = usedRects.some((r) => !(rect.y2 < r.y1 || rect.y1 > r.y2));
+        if (!isOverlapping) {
+          axisadded[index] = true;
+          node.textContent = label;
+          node.setAttribute("display", "block");
+        } else {
+          axisadded[index] = true;
+          node.textContent = label;
+          node.setAttribute("display", "block");
+        }
+      };
+
+      // Always show first and last
+      if (firstNode) showAndTruncate(firstNode, 0);
+      if (lastNode) showAndTruncate(lastNode, textNodes.length - 1);
+
+      usedRects = [];
+      textNodes.forEach((node) => {
+        const bbox = node.getBBox();
+        let pnode = node.parentNode as Element;
+        let y = 0;
+        if (pnode.getAttribute("transform")) {
+          y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+        } else {
+          y = +bbox.y;
+        }
+        const rect = { y1: y, y2: y + bbox.height };
+        usedRects.push(rect);
+      });
+      truncateYAxis(textNodes, usedRects, axisadded);
+      const trueCount = Object.values(axisadded).filter(value => value === true).length;
+      console.log(trueCount);
+      if (trueCount < 3) {
+        let ntextnodes = [];
+        let midcount = Math.round((textNodes.length - 1) / 2);
+        textNodes.forEach((node, index) => {
+          if (index === 0 || index === midcount || index === textNodes.length - 1) {
+            const full = node.dataset.fulltext || node.textContent || "";
+            node.setAttribute("display", "block");
+            node.textContent = full;
+            node.dataset.fulltext = full;
+            ntextnodes.push(node);
+          }
+        });
+        if (firstNode) showAndTruncate(ntextnodes[0], 0);
+        if (lastNode) showAndTruncate(ntextnodes[ntextnodes.length - 1], textNodes.length - 1);
+        truncateYAxis(ntextnodes, usedRects, axisadded);
+      }
+    });
+  }, [valueScale, axis_left.current]);
 
 
-  if (!_data || _data.length === 0) return <div>No data to display.</div>;
+  const rotated = (rotate: boolean) => {
+    let rot = rotate;
+    setTimeout(() => {
+      const textNodes: SVGTextElement[] = Array.from(
+        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
+      );
+
+      textNodes.forEach((node) => {
+        const full = node.dataset.fulltext || node.textContent || "";
+        node.setAttribute("display", "block");
+        node.textContent = full;
+        node.dataset.fulltext = full;
+      });
+      AXISX_ROTATE = rotate;
+
+      if (!rot) {
+        if (!chartSvgRef.current || !width || !height) return;
+        const svg = chartSvgRef.current;
+        const bbox = svg.getBBox();
+        const titleHeight = document.querySelector(".chart-title")?.getBoundingClientRect().height || 0;
+        const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
+        let updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
+        const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right);
+        setAdjustedChartHeight(updatedHeight);
+        setAdjustedChartWidth(updatedWidth);
+      }
+    }, 200)
+  }
+
+  // Hide axis labels when loading
+  const renderAxisLabel = (
+    formattedValue: string,
+    tickProps: React.SVGProps<SVGTextElement>,
+  ) => (
+    <text
+      {...tickProps}
+      className={`${isLoading ? shimmerClassName : ""}`}
+      fill={isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label}
+      style={{
+        fontSize: "12px",
+      }}
+    >
+      {isLoading ? "" : formattedValue}
+    </text>
+  );
+
+  if (!isLoading && (!_data || _data.length === 0)) {
+    return <div>No data to display.</div>;
+  }
 
   return (
     <ChartWrapper
       ref={parentRef}
+      isLoading={isLoading}
       title={title}
       titleProps={titleProps}
       legendsProps={{
@@ -269,22 +642,28 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       }}
       timestampProps={{ timestamp, isLoading }}
     >
-      <svg ref={chartSvgRef} width={adjustedChartWidth || width} height={adjustedChartHeight || height}>
+      <svg
+        ref={chartSvgRef}
+        width={adjustedChartWidth || width}
+        height={adjustedChartHeight || height}
+      >
         {isLoading && <SvgShimmer />}
-        <Group top={DEFAULT_MARGIN.top} left={DEFAULT_MARGIN.left}>
-          <AxisLeft
-            scale={valueScale}
-            stroke={theme.colors.axis.line}
-            tickStroke={theme.colors.axis.line}
-            tickLabelProps={{
-              fill: theme.colors.axis.label,
-              fontSize: "12px",
-              textAnchor: "end",
-              dy: "0.33em",
-            }}
-            hideTicks={!showTicks}
-          />
-          <g ref={axis_bottom}>
+        <Group top={DEFAULT_MARGIN.top}>
+          <g ref={axis_left} transform={`translate(${yAxisLabelWidth},0)`}>
+            <AxisLeft
+              scale={valueScale}
+              stroke={theme.colors.axis.line}
+              tickStroke={theme.colors.axis.line}
+              tickLabelProps={{
+                fill: theme.colors.axis.label,
+                fontSize: "12px",
+                textAnchor: "end",
+                dy: "0.33em",
+              }}
+              hideTicks={!showTicks}
+            />
+          </g>
+          <g ref={axis_bottom} transform={`translate(${yAxisLabelWidth},0)`}>
             <AxisBottom
               scale={categoryScale}
               top={drawableChartHeight}
@@ -297,23 +676,13 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                 dy: "0.33em",
               }}
               hideTicks={hideIndex.length === groupKeys.length || !showTicks}
-              tickComponent={({ formattedValue, ...tickProps }) => (
-                <text
-                  {...tickProps}
-                  text-anchor="start"
-                  data-fulltext={formattedValue}
-                  x={(categoryScale(formattedValue) ?? 0) + categoryScale.bandwidth() / 2}
-                >
-                  {formattedValue}
-                </text>
-              )}
             />
           </g>
           <g>
             {valueScale.ticks(5).map((tick) => (
               <line
                 key={tick}
-                x1={0}
+                x1={yAxisLabelWidth}
                 x2={drawableChartWidth}
                 y1={valueScale(tick)}
                 y2={valueScale(tick)}
@@ -334,20 +703,19 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                 return (
                   <CustomBar
                     key={`stacked-${series.key}-${category}`}
-                    x={barX}
+                    x={yAxisLabelWidth + barX}
                     y={barY}
                     width={barWidth}
                     height={barHeight}
                     fill={groupColorScale(series.key)}
                     opacity={DEFAULT_OPACITY}
-                    value={bar[1] - bar[0]}
-                    label={series.key}
                     onMouseMove={() => { }}
                     onMouseLeave={() => { }}
                   />
                 );
-              })
-            ) : filteredData.map((categoryData) => {
+              }),
+            )
+            : filteredData.map((categoryData) => {
               const category = String(categoryData.label);
               const categoryX = categoryScale(category) || 0;
               return groupKeys.map((groupKey, index) => {
@@ -360,15 +728,13 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
                 return (
                   <CustomBar
                     key={`grouped-${category}-${groupKey}`}
-                    x={barX}
+                    x={yAxisLabelWidth + barX}
                     y={barY}
                     width={barWidth}
                     height={barHeight}
                     fill={groupColorScale(groupKey)}
                     opacity={DEFAULT_OPACITY}
                     rx={DEFAULT_BAR_RADIUS}
-                    value={value}
-                    label={groupKey}
                     onMouseMove={() => { }}
                     onMouseLeave={() => { }}
                   />
