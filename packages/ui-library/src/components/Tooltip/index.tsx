@@ -174,39 +174,50 @@ function TooltipBase({
                 flexShrink: 0,
               }}
             />
-            <Typography
-              variant="caption"
+            <Box
               sx={{
-                color: theme.colors.tooltip.text,
-                fontFeatureSettings: "'liga' off, 'clig' off",
-                fontFamily: "Roboto",
-                fontSize: "12px",
-                fontStyle: "normal",
-                fontWeight: 400,
-                lineHeight: "143%",
-                letterSpacing: "0.4px",
-                flexGrow: 1,
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+                alignItems: "center",
+                width: "100%",
+                columnGap: "16px",
+                rowGap: "2px",
               }}
             >
-              {item.label}
-            </Typography>
-            <Typography
-              variant="subtitle2"
-              sx={{
-                color: theme.colors.tooltip.text,
-                fontFeatureSettings: "'liga' off, 'clig' off",
-                fontFamily: "Roboto",
-                fontSize: "13px",
-                fontStyle: "normal",
-                fontWeight: 500,
-                lineHeight: "150%",
-                letterSpacing: "0.25px",
-                marginLeft: "16px",
-                flexShrink: 0,
-              }}
-            >
-              {formatNumberWithCommas(item.value)}
-            </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: theme.colors.tooltip.text,
+                  fontFeatureSettings: "'liga' off, 'clig' off",
+                  fontFamily: "Roboto",
+                  fontSize: "12px",
+                  fontStyle: "normal",
+                  fontWeight: 400,
+                  lineHeight: "143%",
+                  letterSpacing: "0.4px",
+                  flexGrow: 1,
+                }}
+              >
+                {item.label}
+              </Typography>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  color: theme.colors.tooltip.text,
+                  fontFeatureSettings: "'liga' off, 'clig' off",
+                  fontFamily: "Roboto",
+                  fontSize: "13px",
+                  fontStyle: "normal",
+                  fontWeight: 500,
+                  lineHeight: "150%",
+                  letterSpacing: "0.25px",
+                  flexShrink: 0,
+                }}
+              >
+                {formatNumberWithCommas(item.value)}
+              </Typography>
+            </Box>
           </Box>
         ))}
       </Box>
