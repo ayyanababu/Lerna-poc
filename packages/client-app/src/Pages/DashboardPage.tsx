@@ -222,10 +222,11 @@ const fetchBarLineData = (): Promise<BarLineData> =>
                 xAxislabel: 'Corporate Action',
                 yAxisLeftLabel: 'Number of Actions',
                 yAxisRightLabel: 'Positions Impacted',
-                chartData: actionTypes.map((action) => ({
+                chartData: actionTypes.map((action, index) => ({
                     xAxis: action,
                     yAxisLeft: Math.floor(Math.random() * 300000000) + 15, // 15-45
                     yAxisRight: Math.floor(Math.random() * 350000000) + 20, // 20-55
+                    barColor: index == 0 ? 'red' : null,
                 })),
             });
         }, 2200);

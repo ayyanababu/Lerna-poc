@@ -950,7 +950,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
           {!hideChart.includes(0) && (
             <>
-              <g ref={axis_left}>>
+              <g ref={axis_left}>
                 <YAxis
                   scale={leftScale}
                   hideTicks={!showTicks}
@@ -981,7 +981,13 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                     y={barY}
                     width={actualBarWidth}
                     height={barHeight}
-                    fill={isLoading ? `url(#${shimmerGradientId})` : colors.bar}
+                    fill={
+                      isLoading
+                        ? `url(#${shimmerGradientId})`
+                        : d?.barColor
+                          ? d?.barColor
+                          : colors.bar
+                    }
                     opacity={barOpacity}
                     onMouseMove={handleBarMouseMove(d.yAxisLeft, index)}
                     onMouseLeave={handleBarMouseLeave}
