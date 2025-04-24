@@ -257,7 +257,7 @@ const fetchHorizontalBarData = (): Promise<VerticalBarItem[]> =>
     new Promise((resolve) => {
         setTimeout(() => {
             resolve(
-                Array.from({ length: 10 }, (_, index) => ({
+                Array.from({ length: 5 }, (_, index) => ({
                     label: `${index + 1} asdf adfasdf a`,
                     value: Math.floor(Math.random() * 100),
                 })),
