@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -26,15 +25,11 @@ const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.02;
-const MAX_BAR_HEIGHT = 16;
+const DEFAULT_MAX_BAR_HEIGHT = 16;
 const TICK_LABEL_PADDING = 16;
 const TRUNCATE_RATIO = 0.75;
 let AXISX_ROTATE = false;
 const AXISY_ROTATE = false;
-const BASE_ADJUST_WIDTH = 5; // used to fix the check width for the overlap of xaxis
-const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
-const BASE_ADJUST_HEIGHT = 5; // used to fix the check width for the overlap of yaxis
-const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
 
 function getMaxLabelWidth(labels: string[], font = "10px sans-serif") {
   const canvas = document.createElement("canvas");
@@ -55,7 +50,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   title,
   colors = [],
   isLoading = false,
-  barWidth,
+  maxBarHeight = DEFAULT_MAX_BAR_HEIGHT,
   titleProps,
   legendsProps,
   tooltipProps,
@@ -301,12 +296,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
 
   const truncateXAxis = (
-    textNodes: SVGTextElement[],
-    usedRects: { x1: number; x2: number }[],
-    axisadded: boolean[],
+    textNodes: any,
+    usedRects: any,
+    axisadded: any,
     centeronly: boolean,
   ) => {
-    textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
+    textNodes.slice(1, -1).forEach((node, index) => {
       const label = node.dataset.fulltext || node.textContent || "";
       let truncated = label;
       if (label.length > 3) {
@@ -328,16 +323,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       } else {
         x = +bbox.x;
       }
-      const rect = {
-        x1: x - ADD_ADJUST_WIDTH,
-        x2: x + bbox.width + ADD_ADJUST_WIDTH,
-      };
-      const us = usedRects.filter(
-        (r: { x1: number; x2: number }, i: number) => i !== index + 1,
-      );
-      const isOverlapping = us.some(
-        (r: { x1: number; x2: number }) => !(rect.x2 < r.x1 || rect.x1 > r.x2),
-      );
+      const rect = { x1: x, x2: x + bbox.width };
+      const us = usedRects.filter((r, i) => i !== index + 1);
+      const isOverlapping = us.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
       if (!isOverlapping) {
         node.textContent = label;
         node.setAttribute("display", "block");
@@ -357,13 +345,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         } else {
           x = +bbox.x;
         }
-        const rect = {
-          x1: x - ADD_ADJUST_WIDTH,
-          x2: x + bbox.width + ADD_ADJUST_WIDTH,
-        };
+        const rect = { x1: x - 5, x2: x + bbox.width + 5 };
         const isOverlapping = usedRects.some(
-          (r: { x1: number; x2: number }) =>
-            !(rect.x2 < r.x1 || rect.x1 > r.x2),
+          (r) => !(rect.x2 < r.x1 || rect.x1 > r.x2),
         );
         if (!isOverlapping) {
           node.textContent = truncated;
@@ -376,7 +360,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             newtruncated =
               truncated.slice(
                 0,
-                Math.floor(truncated.length * TRUNCATE_RATIO * 0.5),
+                Math.floor(truncated.length * TRUNCATE_RATIO * 0.1),
               ) + "…";
           }
           node.textContent = newtruncated;
@@ -391,13 +375,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           } else {
             x = +bbox.x;
           }
-          const rect = {
-            x1: x - ADD_ADJUST_WIDTH,
-            x2: x + bbox.width + ADD_ADJUST_WIDTH,
-          };
+          const rect = { x1: x - 5, x2: x + bbox.width + 5 };
           const isOverlapping = usedRects.some(
-            (r: { x1: number; x2: number }) =>
-              !(rect.x2 < r.x1 || rect.x1 > r.x2),
+            (r) => !(rect.x2 < r.x1 || rect.x1 > r.x2),
           );
           if (isOverlapping) {
             axisadded[index + 1] = false;
@@ -413,15 +393,15 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   };
 
   const truncateYAxis = (
-    textNodes: SVGTextElement[],
-    usedRects: { y1: number; y2: number }[],
-    axisadded: boolean[],
+    textNodes: any,
+    usedRects: any,
+    axisadded: any,
     centeronly: boolean,
   ) => {
-    textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
+    textNodes.slice(1, -1).forEach((node, index) => {
       const label = node.dataset.fulltext || node.textContent || "";
-      //    const truncated =
-      //     label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+      const truncated =
+        label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
       const original = node.textContent;
       // node.textContent = truncated;
       const bbox = node.getBBox();
@@ -437,16 +417,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       } else {
         y = +bbox.y;
       }
-      const rect = {
-        y1: y - ADD_ADJUST_HEIGHT,
-        y2: y + bbox.height + ADD_ADJUST_HEIGHT,
-      };
-      const us = usedRects.filter(
-        (r: { y1: number; y2: number }, i: number) => i !== index + 1,
-      );
-      const isOverlapping = us.some(
-        (r: { y1: number; y2: number }) => !(rect.y2 < r.y1 || rect.y1 > r.y2),
-      );
+      const rect = { y1: y, y2: y + bbox.height };
+      const us = usedRects.filter((r, i: number) => i !== index + 1);
+      const isOverlapping = us.some((r) => !(rect.y2 < r.y1 || rect.y1 > r.y2));
       if (!isOverlapping) {
         node.textContent = label;
         node.setAttribute("display", "block");
@@ -466,7 +439,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       return;
     }
 
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       const textNodes: SVGTextElement[] = Array.from(
         axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
       );
@@ -496,10 +469,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           } else {
             x = +bbox.x;
           }
-          const rect = {
-            x1: x - BASE_ADJUST_WIDTH,
-            x2: x + bbox.width + BASE_ADJUST_WIDTH,
-          };
+          const rect = { x1: x - 5, x2: x + bbox.width + 5 };
           usedRects.push(rect);
         }
       });
@@ -525,13 +495,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         } else {
           x = +bbox.x;
         }
-        const rect = {
-          x1: x - ADD_ADJUST_WIDTH,
-          x2: x + bbox.width + ADD_ADJUST_WIDTH,
-        };
+        const rect = { x1: x - 5, x2: x + bbox.width + 5 };
         const isOverlapping = usedRects.some(
-          (r: { x1: number; x2: number }) =>
-            !(rect.x2 < r.x1 || rect.x1 > r.x2),
+          (r) => !(rect.x2 < r.x1 || rect.x1 > r.x2),
         );
         if (!isOverlapping) {
           axisadded[index] = true;
@@ -562,16 +528,15 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         } else {
           x = +bbox.x;
         }
-        const rect = {
-          x1: x - BASE_ADJUST_WIDTH,
-          x2: x + bbox.width + BASE_ADJUST_WIDTH,
-        };
+        const rect = { x1: x, x2: x + bbox.width };
         usedRects.push(rect);
       });
       truncateXAxis(textNodes, usedRects, axisadded, false);
+      // console.log(axisadded);
       const trueCount = Object.values(axisadded).filter(
         (value) => value === true,
       ).length;
+      // console.log(trueCount);
       if (trueCount < 3) {
         const ntextnodes = [];
         const midcount = Math.round((textNodes.length - 1) / 2);
@@ -596,7 +561,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           );
         truncateXAxis(ntextnodes, usedRects, axisadded, true);
       }
-    }, 500);
+    });
   }, [xScale, axis_bottom.current]);
 
   useEffect(() => {
@@ -604,7 +569,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     if (AXISY_ROTATE) {
       return;
     }
-    setTimeout(() => {
+
+    requestAnimationFrame(() => {
       const textNodes: SVGTextElement[] = Array.from(
         axis_left.current?.querySelectorAll(".visx-axis-left text") || [],
       );
@@ -620,6 +586,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         node.textContent = full;
         node.dataset.fulltext = full;
       });
+      // console.log("nodes", textNodes)
       textNodes.forEach((node, i) => {
         if (i !== 0 && i !== textNodes.length - 1) {
           const bbox = node.getBBox();
@@ -634,10 +601,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           } else {
             y = +bbox.y;
           }
-          const rect = {
-            y1: y - BASE_ADJUST_HEIGHT,
-            y2: y + bbox.height + BASE_ADJUST_HEIGHT,
-          };
+          const rect = { y1: y - 5, y2: y + bbox.height + 5 };
           usedRects.push(rect);
         }
       });
@@ -646,8 +610,11 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       const lastNode = textNodes[textNodes.length - 1];
       const showAndTruncate = (node: SVGTextElement, index: number) => {
         const label = node.dataset.fulltext || node.textContent || "";
-        //const truncated =
-        //  label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        let truncated = label;
+        if (label.length > 3) {
+          truncated =
+            label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        }
         const bbox = node.getBBox();
         const pnode = node.parentNode as Element;
         let y = 0;
@@ -660,13 +627,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         } else {
           y = +bbox.y;
         }
-        const rect = {
-          y1: y - ADD_ADJUST_HEIGHT,
-          y2: y + bbox.height + ADD_ADJUST_HEIGHT,
-        };
+        const rect = { y1: y - 5, y2: y + bbox.height + 5 };
         const isOverlapping = usedRects.some(
-          (r: { y1: number; y2: number }) =>
-            !(rect.y2 < r.y1 || rect.y1 > r.y2),
+          (r) => !(rect.y2 < r.y1 || rect.y1 > r.y2),
         );
         if (!isOverlapping) {
           axisadded[index] = true;
@@ -697,17 +660,14 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         } else {
           y = +bbox.y;
         }
-        const rect = {
-          y1: y - BASE_ADJUST_HEIGHT,
-          y2: y + bbox.height + BASE_ADJUST_HEIGHT,
-        };
+        const rect = { y1: y, y2: y + bbox.height };
         usedRects.push(rect);
       });
       truncateYAxis(textNodes, usedRects, axisadded, false);
       const trueCount = Object.values(axisadded).filter(
         (value) => value === true,
       ).length;
-      console.log("trued", trueCount);
+      // console.log(trueCount);
       if (trueCount < 3) {
         const ntextnodes = [];
         const midcount = Math.round((textNodes.length - 1) / 2);
@@ -732,7 +692,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           );
         truncateYAxis(ntextnodes, usedRects, axisadded, true);
       }
-    }, 500);
+    });
   }, [yScale, axis_left.current]);
 
   const rotated = (rotate: boolean) => {
@@ -851,10 +811,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             const value = Number(d.value);
             if (Number.isNaN(value)) return null;
             const rawBarHeight = yScale.bandwidth();
-            const actualBarHeight =
-              barWidth !== undefined
-                ? barWidth
-                : Math.min(rawBarHeight, MAX_BAR_HEIGHT);
+            // Use maxBarHeight to limit the actual bar height
+            const actualBarHeight = Math.min(rawBarHeight, maxBarHeight);
             const bandY = yScale(d.label) || 0;
             const barY = bandY + (rawBarHeight - actualBarHeight) / 2;
             const barLength = xScale(value);

@@ -89,7 +89,9 @@ function XAxis({
 
     if (axisRef.current) resizeObserver.observe(axisRef.current);
 
-    return resizeObserver.unobserve(axisRef.current!);
+    return () => {
+      if (axisRef.current) resizeObserver.unobserve(axisRef.current!);
+    };
   }, []);
 
   const overLineStyles = {
@@ -143,9 +145,9 @@ function XAxis({
         : []);
     // Calculate available width per label
     const availableWidthPerLabel = availableWidth / scaleLabels.length;
-    //    const maxLabelChars = Math.floor(
-    //     availableWidthPerLabel / averageWidthPerChar,
-    //   );
+    const maxLabelChars = Math.floor(
+      availableWidthPerLabel / averageWidthPerChar,
+    );
     const maxLabelLength = Math.max(
       ...scaleLabels.map((label) => String(label).length),
     );
@@ -155,31 +157,28 @@ function XAxis({
       return {
         angle: 0,
         evenPositionsMap: null,
-        //   formatLabel: (label: string): string => {
-        //     return String(label)
-        //              if (typeof label !== "string") return String(label);
-        //             return label.length > MAX_LABEL_CHARS
-        //               ? `${label.substring(0, MAX_LABEL_CHARS - 3)}...`
-        //               : label;
-        //  },
+        formatLabel: (label: string): string => {
+          if (typeof label !== "string") return String(label);
+          return label.length > MAX_LABEL_CHARS
+            ? `${label.substring(0, MAX_LABEL_CHARS - 3)}...`
+            : label;
+        },
         rotate: false,
         textAnchor: "middle",
         tickValues: [],
       };
     }
-    console.log(dynamicNumTicks, "dynamicNumTicks");
     if (scaleLabels.length <= dynamicNumTicks) {
       return {
         angle: 0,
         evenPositionsMap: null,
-        // formatLabel: (label: string): string => {
-        //   return String(label);
-        //          if (typeof label !== "string") return String(label);
+        formatLabel: (label: string): string => {
+          if (typeof label !== "string") return String(label);
 
-        //          return label.length > maxLabelChars && isOverlapping
-        //            ? `${label.substring(0, maxLabelChars - 3)}...`
-        //            : label;
-        // },
+          return label.length > maxLabelChars && isOverlapping
+            ? `${label.substring(0, maxLabelChars - 3)}...`
+            : label;
+        },
         rotate: false,
         textAnchor: "middle",
         tickValues: null,

@@ -29,13 +29,13 @@ const getStrokeWidth = (width: number, height: number) => {
   return Math.max(0.3, Math.min(0.3, size / 500));
 };
 
-/* const DEFAULT_MARGIN = {
+const DEFAULT_MARGIN = {
   top: 0, // Removed top margin
   right: 0, // Removed right margin
   bottom: 0, // Removed bottom margin
   left: 0, // Removed left margin
 };
- */
+
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 
@@ -86,7 +86,7 @@ const getExternalSides = (node: RectNode, allNodes: RectNode[]) => {
 
 const TreeMapChart = ({
   data: _data,
-  // margin = DEFAULT_MARGIN,
+  margin = DEFAULT_MARGIN,
   title,
   colors = [],
   isLoading = false,
@@ -94,7 +94,7 @@ const TreeMapChart = ({
   legendsProps,
   tooltipProps,
   timestampProps,
-  // tilePadding = 0,
+  tilePadding = 0,
   borderRadius = 4,
   showLabels = false,
   onClick = () => {},
