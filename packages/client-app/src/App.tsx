@@ -1,6 +1,9 @@
 import { createContext, useState } from 'react';
 import ComponentsPage from './Pages/ComponentsPage';
 import DashboardPage from './Pages/DashboardPage';
+import { ThemeProvider } from '@mui/material';
+import darkTheme from './themeUtils/colors/default/dark';
+import lightTheme from './themeUtils/colors/default/light';
 
 interface IThemeContext {
     mode: 'dark' | 'light';
@@ -33,7 +36,10 @@ const App = () => {
                     style={{
                         flex: '1 1 100%',
                     }}>
-                    <DashboardPage />
+                    <ThemeProvider
+                        theme={mode === 'dark' ? darkTheme : lightTheme}>
+                        <DashboardPage />
+                    </ThemeProvider>
                 </div>
 
                 <div

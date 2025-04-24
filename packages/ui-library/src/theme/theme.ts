@@ -78,7 +78,7 @@ export const defaultDarkTheme: Theme = {
     },
     legend: {
       text: "#ACBBC7",
-      background: "#1B2025",
+      background: "#272b30",
     },
     charts: {
       bar: [...colors],

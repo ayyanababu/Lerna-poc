@@ -89,7 +89,9 @@ function XAxis({
 
     if (axisRef.current) resizeObserver.observe(axisRef.current);
 
-    return resizeObserver.unobserve(axisRef.current!);
+    return () => {
+      if (axisRef.current) resizeObserver.unobserve(axisRef.current!);
+    };
   }, []);
 
   const overLineStyles = {
@@ -120,7 +122,7 @@ function XAxis({
     while (
       scaleLabels.length > 0 &&
       availableWidth / (scaleLabels.join(" ").length * averageWidthPerChar) <
-      0.9
+        0.9
     ) {
       scaleLabels.pop();
     }
@@ -166,7 +168,6 @@ function XAxis({
         tickValues: [],
       };
     }
-    console.log(dynamicNumTicks, "dynamicNumTicks");
     if (scaleLabels.length <= dynamicNumTicks) {
       return {
         angle: 0,
@@ -288,9 +289,9 @@ function XAxis({
 
     const xPos =
       evenPositionsMap &&
-        tickValues &&
-        formattedValue &&
-        evenPositionsMap.get(formattedValue) !== undefined
+      tickValues &&
+      formattedValue &&
+      evenPositionsMap.get(formattedValue) !== undefined
         ? evenPositionsMap.get(formattedValue)
         : tickProps.x;
 
@@ -298,7 +299,7 @@ function XAxis({
 
     if (rotate) {
       if (typeof rotated === "function") {
-        rotated(true)
+        rotated(true);
       }
       return (
         <g transform={`translate(${xPos},${tickProps.y})`}>
@@ -319,7 +320,7 @@ function XAxis({
       );
     }
     if (typeof rotated === "function") {
-      rotated(false)
+      rotated(false);
     }
     return (
       <g transform={`translate(${xPos},${tickProps.y})`}>
@@ -343,7 +344,9 @@ function XAxis({
     ...overLineStyles,
     color: theme.colors.axis.title,
     fill: theme.colors.axis.title,
-    dy: showAxisLine ? `${labelOffset + 4}px` : `${labelOffset + (!rotate ? 10 : 47)}px`,
+    dy: showAxisLine
+      ? `${labelOffset + 4}px`
+      : `${labelOffset + (!rotate ? 10 : 47)}px`,
   };
 
   const mergedTickLabelProps = {
@@ -352,7 +355,6 @@ function XAxis({
     color: theme.colors.axis.label,
     fill: theme.colors.axis.label,
   };
-
 
   if (!isVisible) {
     return null;

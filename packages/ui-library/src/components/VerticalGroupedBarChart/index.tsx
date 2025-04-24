@@ -215,7 +215,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     const widths = Array.from(labels).map(
       (node) => (node as SVGGraphicsElement).getBBox().width,
     );
-    console.log("width", widths)
+    // console.log("width", widths)
     setMaxLabelWidth(Math.max(...widths, 0));
   }, [data, width, height]);
 
@@ -440,9 +440,9 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         usedRects.push(rect);
       });
       truncateXAxis(textNodes, usedRects, axisadded, false);
-      console.log(axisadded);
+      // console.log(axisadded);
       const trueCount = Object.values(axisadded).filter(value => value === true).length;
-      console.log("true", trueCount);
+      // console.log("true", trueCount);
       if (trueCount < 3) {
         let ntextnodes = [];
         let midcount = Math.round((textNodes.length - 1) / 2);
@@ -485,7 +485,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         node.textContent = full;
         node.dataset.fulltext = full;
       });
-      console.log("nodes", textNodes)
+      // console.log("nodes", textNodes)
       textNodes.forEach((node, i) => {
         if (i !== 0 && i !== textNodes.length - 1) {
           const bbox = node.getBBox();
@@ -546,7 +546,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       });
       truncateYAxis(textNodes, usedRects, axisadded);
       const trueCount = Object.values(axisadded).filter(value => value === true).length;
-      console.log(trueCount);
+      // console.log(trueCount);
       if (trueCount < 3) {
         let ntextnodes = [];
         let midcount = Math.round((textNodes.length - 1) / 2);

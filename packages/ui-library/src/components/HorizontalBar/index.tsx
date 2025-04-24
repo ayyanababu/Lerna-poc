@@ -453,9 +453,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         usedRects.push(rect);
       });
       truncateXAxis(textNodes, usedRects, axisadded, false);
-      console.log(axisadded);
+      // console.log(axisadded);
       const trueCount = Object.values(axisadded).filter(value => value === true).length;
-      console.log(trueCount);
+      // console.log(trueCount);
       if (trueCount < 3) {
         let ntextnodes = [];
         let midcount = Math.round((textNodes.length - 1) / 2);
@@ -498,7 +498,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         node.textContent = full;
         node.dataset.fulltext = full;
       });
-      console.log("nodes", textNodes)
+      // console.log("nodes", textNodes)
       textNodes.forEach((node, i) => {
         if (i !== 0 && i !== textNodes.length - 1) {
           const bbox = node.getBBox();
@@ -562,7 +562,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       });
       truncateYAxis(textNodes, usedRects, axisadded, false);
       const trueCount = Object.values(axisadded).filter(value => value === true).length;
-      console.log(trueCount);
+      // console.log(trueCount);
       if (trueCount < 3) {
         let ntextnodes = [];
         let midcount = Math.round((textNodes.length - 1) / 2);

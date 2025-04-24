@@ -1,4 +1,5 @@
-import React, { useMemo, useRef, useState, useEffect } from "react";
+/* eslint-disable max-lines */
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
@@ -38,9 +39,9 @@ const SCALE_PADDING = 1.2;
 const MAX_BAR_HEIGHT = 16;
 const MAX_LABEL_CHARS = 15;
 const TICK_LABEL_PADDING = 8;
-const TRUNCATE_RATIO = .75;
-let AXISX_ROTATE = false
-let AXISY_ROTATE = false
+const TRUNCATE_RATIO = 0.75;
+let AXISX_ROTATE = false;
+const AXISY_ROTATE = false;
 
 /**
  * Helper: measure the widest label in pixels using a hidden <canvas>
@@ -99,10 +100,13 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
   const axis_bottom = useRef<SVGGElement | null>(null);
   const axis_left = useRef<SVGGElement | null>(null);
-  const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(null);
-  const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(null);
+  const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(
+    null,
+  );
+  const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(
+    null,
+  );
   const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
-
 
   const getStrokeWidth = (width: number, height: number) => {
     const size = Math.min(width, height);
@@ -317,11 +321,12 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     return Math.max(2, Math.floor(innerHeight / tickHeight));
   }, [innerHeight]);
 
-
   useEffect(() => {
     if (!chartSvgRef.current) return;
     const nodes = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
-    const widths = Array.from(nodes).map((node) => (node as SVGGraphicsElement).getBBox().width);
+    const widths = Array.from(nodes).map(
+      (node) => (node as SVGGraphicsElement).getBBox().width,
+    );
     setMaxLabelWidth(Math.max(...widths, 0));
   }, [data, width, height]);
 
@@ -329,10 +334,25 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
-    const titleHeight = document.querySelector(".chart-title")?.getBoundingClientRect().height || 0;
-    const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
-    const updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
-    const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right);
+    const titleHeight =
+      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
+      0;
+    const legendHeight =
+      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
+      0;
+    const updatedHeight =
+      Math.max(
+        DEFAULT_MARGIN.top +
+          bbox.height +
+          DEFAULT_MARGIN.bottom +
+          legendHeight +
+          titleHeight,
+        height,
+      ) + 5;
+    const updatedWidth = Math.max(
+      width,
+      DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
+    );
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
   }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
@@ -341,23 +361,48 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
-    const titleHeight = document.querySelector(".chart-title")?.getBoundingClientRect().height || 0;
-    const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
-    let updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
-    const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right);
+    const titleHeight =
+      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
+      0;
+    const legendHeight =
+      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
+      0;
+    let updatedHeight =
+      Math.max(
+        DEFAULT_MARGIN.top +
+          bbox.height +
+          DEFAULT_MARGIN.bottom +
+          legendHeight +
+          titleHeight,
+        height,
+      ) + 5;
+    const updatedWidth = Math.max(
+      width,
+      DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
+    );
     if (AXISX_ROTATE) {
-      updatedHeight = updatedHeight - (chartSvgRef.current.querySelector('.visx-axis-bottom') as SVGGElement).getBBox().height
+      updatedHeight =
+        updatedHeight -
+        (
+          chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
+        ).getBBox().height;
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
   }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
 
-  const truncateXAxis = (textNodes: any, usedRects: any, axisadded: any, centeronly: boolean) => {
+  const truncateXAxis = (
+    textNodes: any,
+    usedRects: any,
+    axisadded: any,
+    centeronly: boolean,
+  ) => {
     textNodes.slice(1, -1).forEach((node: any, index: number) => {
       const label = node.dataset.fulltext || node.textContent || "";
       let truncated = label;
       if (label.length > 3) {
-        truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        truncated =
+          label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
       }
       console.log("tr", truncated);
       const original = node.textContent;
@@ -365,14 +410,18 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       const bbox = node.getBBox();
       node.textContent = original;
       let x = 0;
-      let pnode = node.parentNode as Element;
+      const pnode = node.parentNode as Element;
       if (pnode.getAttribute("transform")) {
-        x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+        x =
+          +pnode
+            .getAttribute("transform")
+            .split("translate(")[1]
+            .split(",")[0] + bbox.x;
       } else {
-        x = +bbox.x
+        x = +bbox.x;
       }
       const rect = { x1: x, x2: x + bbox.width };
-      let us = usedRects.filter((r, i) => i !== index + 1)
+      const us = usedRects.filter((r, i) => i !== index + 1);
       const isOverlapping = us.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
       if (!isOverlapping) {
         node.textContent = label;
@@ -383,34 +432,50 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         node.textContent = truncated;
         const bbox = node.getBBox();
         let x = 0;
-        let pnode = node.parentNode as Element;
+        const pnode = node.parentNode as Element;
         if (pnode.getAttribute("transform")) {
-          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          x =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(",")[0] + bbox.x;
         } else {
-          x = +bbox.x
+          x = +bbox.x;
         }
         const rect = { x1: x - 5, x2: x + bbox.width + 5 };
-        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        const isOverlapping = usedRects.some(
+          (r) => !(rect.x2 < r.x1 || rect.x1 > r.x2),
+        );
         if (!isOverlapping) {
           node.textContent = truncated;
           node.setAttribute("display", "block");
           axisadded[index + 1] = true;
         } else {
           axisadded[index + 1] = false;
-          let newtruncated = truncated
+          let newtruncated = truncated;
           if (truncated.length > 3) {
-            newtruncated = truncated.slice(0, Math.floor(truncated.length * TRUNCATE_RATIO * .5)) + "…";
+            newtruncated =
+              truncated.slice(
+                0,
+                Math.floor(truncated.length * TRUNCATE_RATIO * 0.5),
+              ) + "…";
           }
           node.textContent = newtruncated;
           let x = 0;
-          let pnode = node.parentNode as Element;
+          const pnode = node.parentNode as Element;
           if (pnode.getAttribute("transform")) {
-            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+            x =
+              +pnode
+                .getAttribute("transform")
+                .split("translate(")[1]
+                .split(",")[0] + bbox.x;
           } else {
-            x = +bbox.x
+            x = +bbox.x;
           }
           const rect = { x1: x - 5, x2: x + bbox.width + 5 };
-          const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+          const isOverlapping = usedRects.some(
+            (r) => !(rect.x2 < r.x1 || rect.x1 > r.x2),
+          );
           if (isOverlapping) {
             axisadded[index + 1] = false;
             if (!centeronly) {
@@ -422,26 +487,30 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         }
       }
     });
-  }
-
+  };
 
   const truncateYAxis = (textNodes: any, usedRects: any, axisadded: any) => {
     textNodes.slice(1, -1).forEach((node: any, index: number) => {
       const label = node.dataset.fulltext || node.textContent || "";
-      const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+      const truncated =
+        label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
       const original = node.textContent;
       // node.textContent = truncated;
       const bbox = node.getBBox();
       node.textContent = original;
       let y = 0;
-      let pnode = node.parentNode as Element;
+      const pnode = node.parentNode as Element;
       if (pnode.getAttribute("transform")) {
-        y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+        y =
+          +pnode
+            .getAttribute("transform")
+            .split("translate(")[1]
+            .split(",")[1] + bbox.y;
       } else {
-        y = +bbox.y
+        y = +bbox.y;
       }
       const rect = { y1: y, y2: y + bbox.height };
-      let us = usedRects.filter((r, i: number) => i !== index + 1)
+      const us = usedRects.filter((r, i: number) => i !== index + 1);
       const isOverlapping = us.some((r) => !(rect.y2 < r.y1 || rect.y1 > r.y2));
       if (!isOverlapping) {
         node.textContent = label;
@@ -452,18 +521,17 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         node.setAttribute("display", "none");
       }
     });
-  }
-
+  };
 
   useEffect(() => {
     if (!axis_bottom.current || !xScale) return;
     if (AXISX_ROTATE) {
-      return
+      return;
     }
 
     requestAnimationFrame(() => {
       const textNodes: SVGTextElement[] = Array.from(
-        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
+        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
       );
 
       if (!textNodes.length) return;
@@ -480,36 +548,47 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       textNodes.forEach((node, i) => {
         if (i !== 0 && i !== textNodes.length - 1) {
           const bbox = node.getBBox();
-          let pnode = node.parentNode as Element;
+          const pnode = node.parentNode as Element;
           let x = 0;
           if (pnode.getAttribute("transform")) {
-            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+            x =
+              +pnode
+                .getAttribute("transform")
+                .split("translate(")[1]
+                .split(",")[0] + bbox.x;
           } else {
-            x = +bbox.x
+            x = +bbox.x;
           }
           const rect = { x1: x - 5, x2: x + bbox.width + 5 };
           usedRects.push(rect);
         }
       });
-      let axisadded = {};
+      const axisadded = {};
       const firstNode = textNodes[0];
       const lastNode = textNodes[textNodes.length - 1];
       const showAndTruncate = (node: SVGTextElement, index: number) => {
         const label = node.dataset.fulltext || node.textContent || "";
         let truncated = label;
         if (label.length > 3) {
-          truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+          truncated =
+            label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
         }
         const bbox = node.getBBox();
-        let pnode = node.parentNode as Element;
+        const pnode = node.parentNode as Element;
         let x = 0;
         if (pnode.getAttribute("transform")) {
-          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          x =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(",")[0] + bbox.x;
         } else {
-          x = +bbox.x
+          x = +bbox.x;
         }
         const rect = { x1: x - 5, x2: x + bbox.width + 5 };
-        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        const isOverlapping = usedRects.some(
+          (r) => !(rect.x2 < r.x1 || rect.x1 > r.x2),
+        );
         if (!isOverlapping) {
           axisadded[index] = true;
           node.textContent = label;
@@ -528,49 +607,62 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       usedRects = [];
       textNodes.forEach((node) => {
         const bbox = node.getBBox();
-        let pnode = node.parentNode as Element;
+        const pnode = node.parentNode as Element;
         let x = 0;
         if (pnode.getAttribute("transform")) {
-          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          x =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(",")[0] + bbox.x;
         } else {
-          x = +bbox.x
+          x = +bbox.x;
         }
         const rect = { x1: x, x2: x + bbox.width };
         usedRects.push(rect);
       });
       truncateXAxis(textNodes, usedRects, axisadded, false);
       console.log(axisadded);
-      const trueCount = Object.values(axisadded).filter(value => value === true).length;
+      const trueCount = Object.values(axisadded).filter(
+        (value) => value === true,
+      ).length;
       console.log(trueCount);
       if (trueCount < 3) {
-        let ntextnodes = [];
-        let midcount = Math.round((textNodes.length - 1) / 2);
+        const ntextnodes = [];
+        const midcount = Math.round((textNodes.length - 1) / 2);
         textNodes.forEach((node, index) => {
-          if (index === 0 || index === midcount || index === textNodes.length - 1) {
+          if (
+            index === 0 ||
+            index === midcount ||
+            index === textNodes.length - 1
+          ) {
             const full = node.dataset.fulltext || node.textContent || "";
             node.setAttribute("display", "block");
             node.textContent = full;
             node.dataset.fulltext = full;
-            ntextnodes.push(node)
+            ntextnodes.push(node);
           }
         });
         if (firstNode) showAndTruncate(ntextnodes[0], 0);
-        if (lastNode) showAndTruncate(ntextnodes[ntextnodes.length - 1], textNodes.length - 1);
+        if (lastNode)
+          showAndTruncate(
+            ntextnodes[ntextnodes.length - 1],
+            textNodes.length - 1,
+          );
         truncateXAxis(ntextnodes, usedRects, axisadded, true);
       }
     });
   }, [xScale, axis_bottom.current]);
 
-
   useEffect(() => {
     if (!axis_left.current || !categoryScale) return;
     if (AXISY_ROTATE) {
-      return
+      return;
     }
 
     requestAnimationFrame(() => {
       const textNodes: SVGTextElement[] = Array.from(
-        axis_bottom.current?.querySelectorAll(".visx-axis-left text") || []
+        axis_bottom.current?.querySelectorAll(".visx-axis-left text") || [],
       );
 
       if (!textNodes.length) return;
@@ -587,33 +679,44 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       textNodes.forEach((node, i) => {
         if (i !== 0 && i !== textNodes.length - 1) {
           const bbox = node.getBBox();
-          let pnode = node.parentNode as Element;
+          const pnode = node.parentNode as Element;
           let y = 0;
           if (pnode.getAttribute("transform")) {
-            y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+            y =
+              +pnode
+                .getAttribute("transform")
+                .split("translate(")[1]
+                .split(",")[1] + bbox.y;
           } else {
-            y = +bbox.y
+            y = +bbox.y;
           }
           const rect = { y1: y - 5, y2: y + bbox.height + 5 };
           usedRects.push(rect);
         }
       });
-      let axisadded = {};
+      const axisadded = {};
       const firstNode = textNodes[0];
       const lastNode = textNodes[textNodes.length - 1];
       const showAndTruncate = (node: SVGTextElement, index: number) => {
         const label = node.dataset.fulltext || node.textContent || "";
-        const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        const truncated =
+          label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
         const bbox = node.getBBox();
-        let pnode = node.parentNode as Element;
+        const pnode = node.parentNode as Element;
         let y = 0;
         if (pnode.getAttribute("transform")) {
-          y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+          y =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(",")[1] + bbox.y;
         } else {
-          y = +bbox.y
+          y = +bbox.y;
         }
         const rect = { y1: y - 5, y2: y + bbox.height + 5 };
-        const isOverlapping = usedRects.some((r) => !(rect.y2 < r.y1 || rect.y1 > r.y2));
+        const isOverlapping = usedRects.some(
+          (r) => !(rect.y2 < r.y1 || rect.y1 > r.y2),
+        );
         if (!isOverlapping) {
           axisadded[index] = true;
           node.textContent = label;
@@ -632,10 +735,14 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       usedRects = [];
       textNodes.forEach((node) => {
         const bbox = node.getBBox();
-        let pnode = node.parentNode as Element;
+        const pnode = node.parentNode as Element;
         let y = 0;
         if (pnode.getAttribute("transform")) {
-          y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+          y =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;
         }
@@ -643,13 +750,19 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         usedRects.push(rect);
       });
       truncateYAxis(textNodes, usedRects, axisadded);
-      const trueCount = Object.values(axisadded).filter(value => value === true).length;
+      const trueCount = Object.values(axisadded).filter(
+        (value) => value === true,
+      ).length;
       console.log(trueCount);
       if (trueCount < 3) {
-        let ntextnodes = [];
-        let midcount = Math.round((textNodes.length - 1) / 2);
+        const ntextnodes = [];
+        const midcount = Math.round((textNodes.length - 1) / 2);
         textNodes.forEach((node, index) => {
-          if (index === 0 || index === midcount || index === textNodes.length - 1) {
+          if (
+            index === 0 ||
+            index === midcount ||
+            index === textNodes.length - 1
+          ) {
             const full = node.dataset.fulltext || node.textContent || "";
             node.setAttribute("display", "block");
             node.textContent = full;
@@ -658,18 +771,21 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
           }
         });
         if (firstNode) showAndTruncate(ntextnodes[0], 0);
-        if (lastNode) showAndTruncate(ntextnodes[ntextnodes.length - 1], textNodes.length - 1);
+        if (lastNode)
+          showAndTruncate(
+            ntextnodes[ntextnodes.length - 1],
+            textNodes.length - 1,
+          );
         truncateYAxis(ntextnodes, usedRects, axisadded);
       }
     });
   }, [categoryScale, axis_left.current]);
 
-
   const rotated = (rotate: boolean) => {
-    let rot = rotate;
+    const rot = rotate;
     setTimeout(() => {
       const textNodes: SVGTextElement[] = Array.from(
-        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
+        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
       );
 
       textNodes.forEach((node) => {
@@ -684,15 +800,30 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         if (!chartSvgRef.current || !width || !height) return;
         const svg = chartSvgRef.current;
         const bbox = svg.getBBox();
-        const titleHeight = document.querySelector(".chart-title")?.getBoundingClientRect().height || 0;
-        const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
-        let updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
-        const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right);
+        const titleHeight =
+          document.querySelector(".chart-title")?.getBoundingClientRect()
+            .height || 0;
+        const legendHeight =
+          document.querySelector(".chart-legend")?.getBoundingClientRect()
+            .height || 0;
+        const updatedHeight =
+          Math.max(
+            DEFAULT_MARGIN.top +
+              bbox.height +
+              DEFAULT_MARGIN.bottom +
+              legendHeight +
+              titleHeight,
+            height,
+          ) + 5;
+        const updatedWidth = Math.max(
+          width,
+          DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
+        );
         setAdjustedChartHeight(updatedHeight);
         setAdjustedChartWidth(updatedWidth);
       }
-    }, 200)
-  }
+    }, 200);
+  };
 
   if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;
@@ -723,7 +854,11 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       }}
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
     >
-      <svg ref={chartSvgRef} width={adjustedChartWidth || width} height={adjustedChartHeight || height}>
+      <svg
+        ref={chartSvgRef}
+        width={adjustedChartWidth || width}
+        height={adjustedChartHeight || height}
+      >
         {isLoading && <SvgShimmer />}
 
         {/* Use the dynamicMargin for top/left */}
@@ -811,17 +946,18 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
               // if rightmost => round corners
               const pathProps = isRightmostBar
                 ? {
-                  d: `
+                    d: `
                 M ${barX},${barY + actualBarHeight}
                 L ${barX},${barY}
                 L ${barX + barWidth - dynamicRadius},${barY}
                 Q ${barX + barWidth},${barY} ${barX + barWidth},${barY + dynamicRadius}
                 L ${barX + barWidth},${barY + actualBarHeight - dynamicRadius}
-                Q ${barX + barWidth},${barY + actualBarHeight} ${barX + barWidth - dynamicRadius},${barY + actualBarHeight
-                    }
+                Q ${barX + barWidth},${barY + actualBarHeight} ${barX + barWidth - dynamicRadius},${
+                  barY + actualBarHeight
+                }
                 Z
               `,
-                }
+                  }
                 : undefined;
 
               return (

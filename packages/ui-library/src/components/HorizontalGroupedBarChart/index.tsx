@@ -297,7 +297,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
       if (label.length > 3) {
         truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
       }
-      console.log("tr", truncated);
+      // console.log("tr", truncated);
       const original = node.textContent;
       // node.textContent = truncated;
       const bbox = node.getBBox();
@@ -477,9 +477,9 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
         usedRects.push(rect);
       });
       truncateXAxis(textNodes, usedRects, axisadded, false);
-      console.log(axisadded);
+      // console.log(axisadded);
       const trueCount = Object.values(axisadded).filter(value => value === true).length;
-      console.log(trueCount);
+      // console.log(trueCount);
       if (trueCount < 3) {
         let ntextnodes = [];
         let midcount = Math.round((textNodes.length - 1) / 2);
@@ -582,7 +582,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
       });
       truncateYAxis(textNodes, usedRects, axisadded);
       const trueCount = Object.values(axisadded).filter(value => value === true).length;
-      console.log(trueCount);
+      // console.log(trueCount);
       if (trueCount < 3) {
         let ntextnodes = [];
         let midcount = Math.round((textNodes.length - 1) / 2);

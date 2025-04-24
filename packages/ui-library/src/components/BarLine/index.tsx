@@ -257,7 +257,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     );
     setMaxLabelWidthLeft(Math.max(...widthsleft, 0));
     const nodesright = chartSvgRef.current.querySelectorAll(".visx-axis-right");
-    console.log("noderight", nodesright);
+    // console.log("noderight", nodesright);
     const widthsright = Array.from(nodesright).map(
       (node) => (node as SVGGraphicsElement).getBBox().width,
     );
@@ -411,7 +411,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       if (label.length > 3) {
         truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
       }
-      console.log("tr", truncated);
+      // console.log("tr", truncated);
       const original = node.textContent;
       // node.textContent = truncated;
       const bbox = node.getBBox();
@@ -621,9 +621,9 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         usedRects.push(rect);
       });
       truncateXAxis(textNodes, usedRects, axisadded, false);
-      console.log(axisadded);
+      // console.log(axisadded);
       const trueCount = Object.values(axisadded).filter(value => value === true).length;
-      console.log(trueCount);
+      // console.log(trueCount);
       if (trueCount < 3) {
         let ntextnodes = [];
         let midcount = Math.round((textNodes.length - 1) / 2);
@@ -726,7 +726,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       });
       truncateYAxis(textNodes, usedRects, axisadded);
       const trueCount = Object.values(axisadded).filter(value => value === true).length;
-      console.log(trueCount);
+      // console.log(trueCount);
       if (trueCount < 3) {
         let ntextnodes = [];
         let midcount = Math.round((textNodes.length - 1) / 2);
@@ -829,7 +829,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       });
       truncateY1Axis(textNodes, usedRects, axisadded);
       const trueCount = Object.values(axisadded).filter(value => value === true).length;
-      console.log(trueCount);
+      // console.log(trueCount);
       if (trueCount < 3) {
         let ntextnodes = [];
         let midcount = Math.round((textNodes.length - 1) / 2);
