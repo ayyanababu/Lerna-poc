@@ -760,6 +760,7 @@ body:not(.dark) {
                                     isLoading={dataLoading.stackedBar}
                                     showYAxis={false}
                                     showXAxis={false}
+                                    maxBarWidth={230}
                                 />
                             </SortableCard>
 

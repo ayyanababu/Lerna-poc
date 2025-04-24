@@ -61,6 +61,11 @@ export interface VerticalStackedBarChartProps {
   barWidth?: number;
 
   /**
+   * Maximum width of the bars
+   */
+  maxBarWidth?: number;
+
+  /**
    * Custom colors for the chart
    */
   colors?: string[];

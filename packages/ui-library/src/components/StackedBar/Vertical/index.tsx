@@ -34,7 +34,7 @@ const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
-const MAX_BAR_WIDTH = 16;
+const DEFAULT_MAX_BAR_WIDTH = 16;
 const TICK_LABEL_PADDING = 8;
 const TRUNCATE_RATIO = 0.75;
 let AXISX_ROTATE = false;
@@ -49,6 +49,7 @@ function VerticalStackedBar({
   colors = [],
   isLoading,
   barWidth,
+  maxBarWidth = DEFAULT_MAX_BAR_WIDTH,
   titleProps,
   legendsProps,
   tooltipProps,
@@ -788,8 +789,8 @@ function VerticalStackedBar({
             // Use custom barWidth if provided, otherwise use default with maximum limit
             const actualBarWidth =
               barWidth !== undefined
-                ? barWidth
-                : Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
+                ? Math.min(barWidth, maxBarWidth)
+                : Math.min(calculatedBarWidth, maxBarWidth);
 
             // If the bar width is limited, center it
             const barX =
