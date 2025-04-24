@@ -15,6 +15,8 @@ import {
 } from '@my-org/ui-library';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { ThemeContext } from '../App';
+import AnnouncementCard from '../components/announcements/AnnouncementCard';
+import ReconciliationCard from '../components/DashboardPage/ReconciliationCard';
 
 // Define types for our chart data
 type DonutDataItem = {
@@ -731,7 +733,14 @@ body:not(.dark) {
             <div className="main-container">
                 <div className="container">
                     {
-                        <Sortable className="my-cards">
+                        <Sortable className="my-cards" styles={{
+                            3: {
+                                gridColumn: 'span 2',
+                            },
+                            6: {
+                                gridColumn: 'span 2',
+                            }
+                        }}>
                             <SortableCard height={400} width={'100%'}>
                                 <DonutChart
                                     data={donutData}
@@ -788,26 +797,24 @@ body:not(.dark) {
                             </SortableCard>
 
                             <SortableCard height={400} width={'100%'}>
-                                <TreeMapChart
-                                    data={treeMapData}
-                                    title="Investment Portfolio Allocation"
-                                    colors={[
-                                        'rgba(232, 134, 97,0.50)',
-                                        'rgba(232, 134, 97,0.30)',
-                                        'rgba(232, 134, 97,0.15)',
-                                        '#4E7AC2',
-                                    ]}
-                                    isLoading={dataLoading.treeMap}
+                                <BarLineChart
+                                    data={barLineData}
+                                    title="Monthly Trade Volume"
+                                    timestamp={new Date().toISOString()}
+                                    isLoading={dataLoading.barLine}
+                                    titleProps={{
+                                        variant: 'h6',
+                                        align: 'left',
+                                    }}
                                     legendsProps={{
-                                        position: 'bottom',
-                                        doStrike: false,
+                                        position: Legends.Position.BOTTOM,
+                                        doStrike: true,
+                                        isVisible: true,
                                     }}
                                     tooltipProps={{}}
-                                    tilePadding={2}
-                                    borderRadius={5}
                                 />
                             </SortableCard>
-
+                            
                             <SortableCard height={400} width={'100%'}>
                                 <DonutChart
                                     data={semiDonutData}
@@ -835,24 +842,6 @@ body:not(.dark) {
                                 />
                             </SortableCard>
 
-                            <SortableCard height={400} width={'100%'}>
-                                <BarLineChart
-                                    data={barLineData}
-                                    title="Monthly Trade Volume"
-                                    timestamp={new Date().toISOString()}
-                                    isLoading={dataLoading.barLine}
-                                    titleProps={{
-                                        variant: 'h6',
-                                        align: 'left',
-                                    }}
-                                    legendsProps={{
-                                        position: Legends.Position.BOTTOM,
-                                        doStrike: true,
-                                        isVisible: true,
-                                    }}
-                                    tooltipProps={{}}
-                                />
-                            </SortableCard>
 
                             {/* VerticalBarChart example */}
                             <SortableCard height={400} width={'100%'}>
@@ -873,6 +862,8 @@ body:not(.dark) {
                                     tooltipProps={{}}
                                 />
                             </SortableCard>
+
+                            <ReconciliationCard />
 
                             {/* HorizontalBarChart example */}
                             <SortableCard height={400} width={'100%'}>
