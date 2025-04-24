@@ -881,6 +881,7 @@ body:not(.dark) {
                                         variant: 'h6',
                                         align: 'left',
                                     }}
+                                    maxBarHeight={160}
                                     title={'Trade Volume'}
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,

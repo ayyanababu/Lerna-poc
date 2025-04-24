@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef, useEffect } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
@@ -25,11 +25,11 @@ const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.02;
-const MAX_BAR_HEIGHT = 16;
+const DEFAULT_MAX_BAR_HEIGHT = 16;
 const TICK_LABEL_PADDING = 16;
-const TRUNCATE_RATIO = .75;
+const TRUNCATE_RATIO = 0.75;
 let AXISX_ROTATE = false;
-let AXISY_ROTATE = false;
+const AXISY_ROTATE = false;
 
 function getMaxLabelWidth(labels: string[], font = "10px sans-serif") {
   const canvas = document.createElement("canvas");
@@ -50,7 +50,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   title,
   colors = [],
   isLoading = false,
-  barWidth,
+  maxBarHeight = DEFAULT_MAX_BAR_HEIGHT,
   titleProps,
   legendsProps,
   tooltipProps,
@@ -62,12 +62,20 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   onClick,
 }) => {
   const { theme } = useTheme();
-  const { parentRef, width = 0, height = 0 } = useParentSize({ debounceTime: 150 });
+  const {
+    parentRef,
+    width = 0,
+    height = 0,
+  } = useParentSize({ debounceTime: 150 });
 
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
-  const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(null);
-  const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(null);
+  const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(
+    null,
+  );
+  const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(
+    null,
+  );
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
   const axis_bottom = useRef<SVGGElement | null>(null);
   const axis_left = useRef<SVGGElement | null>(null);
@@ -84,17 +92,17 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
   const data = useMemo<DataPoint[]>(
     () => (isLoading ? mockHorizontalBarChartData : _data),
-    [isLoading, _data]
+    [isLoading, _data],
   );
 
   const filteredData = useMemo(
     () => data.filter((_, index) => !hideIndex.includes(index)),
-    [data, hideIndex]
+    [data, hideIndex],
   );
 
   const truncatedLabels = useMemo(
     () => filteredData.map((d) => truncateLabel(String(d.label), 15)),
-    [filteredData]
+    [filteredData],
   );
 
   const maxLabelPx = useMemo(() => {
@@ -130,7 +138,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     () =>
       Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) *
       SCALE_PADDING,
-    [filteredData]
+    [filteredData],
   );
 
   const yScale = useMemo(
@@ -141,7 +149,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         padding: 0.4,
         round: true,
       }),
-    [filteredData, drawableChartHeight]
+    [filteredData, drawableChartHeight],
   );
 
   const xScale = useMemo(
@@ -151,12 +159,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         range: [0, drawableChartWidth],
         nice: true,
       }),
-    [maxValue, drawableChartWidth]
+    [maxValue, drawableChartWidth],
   );
 
   const legendData = useMemo(
     () => data.map((d) => ({ label: d.label, value: d.value })),
-    [data]
+    [data],
   );
 
   const colorScale = useMemo(() => {
@@ -169,22 +177,22 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
   const handleBarMouseMove =
     (value: number, color: string, index: number) =>
-      (event: React.MouseEvent) => {
-        if (!isLoading) {
-          showTooltip({
-            tooltipData: [
-              {
-                label: filteredData[index].label,
-                value,
-                color,
-              },
-            ],
-            tooltipLeft: event.clientX,
-            tooltipTop: event.clientY,
-          });
-          setHoveredBar(index);
-        }
-      };
+    (event: React.MouseEvent) => {
+      if (!isLoading) {
+        showTooltip({
+          tooltipData: [
+            {
+              label: filteredData[index].label,
+              value,
+              color,
+            },
+          ],
+          tooltipLeft: event.clientX,
+          tooltipTop: event.clientY,
+        });
+        setHoveredBar(index);
+      }
+    };
 
   const handleBarMouseLeave = () => {
     if (!isLoading) {
@@ -193,15 +201,18 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     }
   };
 
-
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
 
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
 
-    const titleEl = document.querySelector(".chart-title") as HTMLElement | null;
-    const legendEl = document.querySelector(".chart-legend") as HTMLElement | null;
+    const titleEl = document.querySelector(
+      ".chart-title",
+    ) as HTMLElement | null;
+    const legendEl = document.querySelector(
+      ".chart-legend",
+    ) as HTMLElement | null;
 
     const titleHeight = titleEl?.getBoundingClientRect().height || 0;
     const legendHeight = legendEl?.getBoundingClientRect().height || 0;
@@ -254,37 +265,66 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
-    const titleHeight = document.querySelector(".chart-title")?.getBoundingClientRect().height || 0;
-    const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
-    let updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
-    const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right);
+    const titleHeight =
+      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
+      0;
+    const legendHeight =
+      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
+      0;
+    let updatedHeight =
+      Math.max(
+        DEFAULT_MARGIN.top +
+          bbox.height +
+          DEFAULT_MARGIN.bottom +
+          legendHeight +
+          titleHeight,
+        height,
+      ) + 5;
+    const updatedWidth = Math.max(
+      width,
+      DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
+    );
     if (AXISX_ROTATE) {
-      updatedHeight = updatedHeight - (chartSvgRef.current.querySelector('.visx-axis-bottom') as SVGGElement).getBBox().height
+      updatedHeight =
+        updatedHeight -
+        (
+          chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
+        ).getBBox().height;
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
   }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
 
-  const truncateXAxis = (textNodes: any, usedRects: any, axisadded: any, centeronly: boolean) => {
+  const truncateXAxis = (
+    textNodes: any,
+    usedRects: any,
+    axisadded: any,
+    centeronly: boolean,
+  ) => {
     textNodes.slice(1, -1).forEach((node, index) => {
       const label = node.dataset.fulltext || node.textContent || "";
       let truncated = label;
       if (label.length > 3) {
-        truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        truncated =
+          label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
       }
       const original = node.textContent;
       // node.textContent = truncated;
       const bbox = node.getBBox();
       node.textContent = original;
       let x = 0;
-      let pnode = node.parentNode as Element;
+      const pnode = node.parentNode as Element;
       if (pnode.getAttribute("transform")) {
-        x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+        x =
+          +pnode
+            .getAttribute("transform")
+            .split("translate(")[1]
+            .split(",")[0] + bbox.x;
       } else {
-        x = +bbox.x
+        x = +bbox.x;
       }
       const rect = { x1: x, x2: x + bbox.width };
-      let us = usedRects.filter((r, i) => i !== index + 1)
+      const us = usedRects.filter((r, i) => i !== index + 1);
       const isOverlapping = us.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
       if (!isOverlapping) {
         node.textContent = label;
@@ -295,14 +335,20 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         node.textContent = truncated;
         const bbox = node.getBBox();
         let x = 0;
-        let pnode = node.parentNode as Element;
+        const pnode = node.parentNode as Element;
         if (pnode.getAttribute("transform")) {
-          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          x =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(",")[0] + bbox.x;
         } else {
-          x = +bbox.x
+          x = +bbox.x;
         }
         const rect = { x1: x - 5, x2: x + bbox.width + 5 };
-        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        const isOverlapping = usedRects.some(
+          (r) => !(rect.x2 < r.x1 || rect.x1 > r.x2),
+        );
         if (!isOverlapping) {
           node.textContent = truncated;
           node.setAttribute("display", "block");
@@ -311,18 +357,28 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           axisadded[index + 1] = false;
           let newtruncated = truncated;
           if (truncated.length > 3) {
-            newtruncated = truncated.slice(0, Math.floor(truncated.length * TRUNCATE_RATIO * .1)) + "…";
+            newtruncated =
+              truncated.slice(
+                0,
+                Math.floor(truncated.length * TRUNCATE_RATIO * 0.1),
+              ) + "…";
           }
           node.textContent = newtruncated;
           let x = 0;
-          let pnode = node.parentNode as Element;
+          const pnode = node.parentNode as Element;
           if (pnode.getAttribute("transform")) {
-            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+            x =
+              +pnode
+                .getAttribute("transform")
+                .split("translate(")[1]
+                .split(",")[0] + bbox.x;
           } else {
-            x = +bbox.x
+            x = +bbox.x;
           }
           const rect = { x1: x - 5, x2: x + bbox.width + 5 };
-          const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+          const isOverlapping = usedRects.some(
+            (r) => !(rect.x2 < r.x1 || rect.x1 > r.x2),
+          );
           if (isOverlapping) {
             axisadded[index + 1] = false;
             if (!centeronly) {
@@ -334,26 +390,35 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         }
       }
     });
-  }
+  };
 
-
-  const truncateYAxis = (textNodes: any, usedRects: any, axisadded: any, centeronly: boolean) => {
+  const truncateYAxis = (
+    textNodes: any,
+    usedRects: any,
+    axisadded: any,
+    centeronly: boolean,
+  ) => {
     textNodes.slice(1, -1).forEach((node, index) => {
       const label = node.dataset.fulltext || node.textContent || "";
-      const truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+      const truncated =
+        label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
       const original = node.textContent;
       // node.textContent = truncated;
       const bbox = node.getBBox();
       node.textContent = original;
       let y = 0;
-      let pnode = node.parentNode as Element;
+      const pnode = node.parentNode as Element;
       if (pnode.getAttribute("transform")) {
-        y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+        y =
+          +pnode
+            .getAttribute("transform")
+            .split("translate(")[1]
+            .split(",")[1] + bbox.y;
       } else {
-        y = +bbox.y
+        y = +bbox.y;
       }
       const rect = { y1: y, y2: y + bbox.height };
-      let us = usedRects.filter((r, i: number) => i !== index + 1)
+      const us = usedRects.filter((r, i: number) => i !== index + 1);
       const isOverlapping = us.some((r) => !(rect.y2 < r.y1 || rect.y1 > r.y2));
       if (!isOverlapping) {
         node.textContent = label;
@@ -366,18 +431,17 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         }
       }
     });
-  }
-
+  };
 
   useEffect(() => {
     if (!axis_bottom.current || !xScale) return;
     if (AXISX_ROTATE) {
-      return
+      return;
     }
 
     requestAnimationFrame(() => {
       const textNodes: SVGTextElement[] = Array.from(
-        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
+        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
       );
 
       if (!textNodes.length) return;
@@ -394,36 +458,47 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       textNodes.forEach((node, i) => {
         if (i !== 0 && i !== textNodes.length - 1) {
           const bbox = node.getBBox();
-          let pnode = node.parentNode as Element;
+          const pnode = node.parentNode as Element;
           let x = 0;
           if (pnode.getAttribute("transform")) {
-            x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+            x =
+              +pnode
+                .getAttribute("transform")
+                .split("translate(")[1]
+                .split(",")[0] + bbox.x;
           } else {
-            x = +bbox.x
+            x = +bbox.x;
           }
           const rect = { x1: x - 5, x2: x + bbox.width + 5 };
           usedRects.push(rect);
         }
       });
-      let axisadded = {};
+      const axisadded = {};
       const firstNode = textNodes[0];
       const lastNode = textNodes[textNodes.length - 1];
       const showAndTruncate = (node: SVGTextElement, index: number) => {
         const label = node.dataset.fulltext || node.textContent || "";
         let truncated = label;
         if (label.length > 3) {
-          truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+          truncated =
+            label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
         }
         const bbox = node.getBBox();
-        let pnode = node.parentNode as Element;
+        const pnode = node.parentNode as Element;
         let x = 0;
         if (pnode.getAttribute("transform")) {
-          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          x =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(",")[0] + bbox.x;
         } else {
-          x = +bbox.x
+          x = +bbox.x;
         }
         const rect = { x1: x - 5, x2: x + bbox.width + 5 };
-        const isOverlapping = usedRects.some((r) => !(rect.x2 < r.x1 || rect.x1 > r.x2));
+        const isOverlapping = usedRects.some(
+          (r) => !(rect.x2 < r.x1 || rect.x1 > r.x2),
+        );
         if (!isOverlapping) {
           axisadded[index] = true;
           node.textContent = label;
@@ -442,25 +517,35 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       usedRects = [];
       textNodes.forEach((node) => {
         const bbox = node.getBBox();
-        let pnode = node.parentNode as Element;
+        const pnode = node.parentNode as Element;
         let x = 0;
         if (pnode.getAttribute("transform")) {
-          x = +pnode.getAttribute("transform").split("translate(")[1].split(",")[0] + bbox.x;
+          x =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(",")[0] + bbox.x;
         } else {
-          x = +bbox.x
+          x = +bbox.x;
         }
         const rect = { x1: x, x2: x + bbox.width };
         usedRects.push(rect);
       });
       truncateXAxis(textNodes, usedRects, axisadded, false);
       // console.log(axisadded);
-      const trueCount = Object.values(axisadded).filter(value => value === true).length;
+      const trueCount = Object.values(axisadded).filter(
+        (value) => value === true,
+      ).length;
       // console.log(trueCount);
       if (trueCount < 3) {
-        let ntextnodes = [];
-        let midcount = Math.round((textNodes.length - 1) / 2);
+        const ntextnodes = [];
+        const midcount = Math.round((textNodes.length - 1) / 2);
         textNodes.forEach((node, index) => {
-          if (index === 0 || index === midcount || index === textNodes.length - 1) {
+          if (
+            index === 0 ||
+            index === midcount ||
+            index === textNodes.length - 1
+          ) {
             const full = node.dataset.fulltext || node.textContent || "";
             node.setAttribute("display", "block");
             node.textContent = full;
@@ -469,22 +554,25 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           }
         });
         if (firstNode) showAndTruncate(ntextnodes[0], 0);
-        if (lastNode) showAndTruncate(ntextnodes[ntextnodes.length - 1], textNodes.length - 1);
+        if (lastNode)
+          showAndTruncate(
+            ntextnodes[ntextnodes.length - 1],
+            textNodes.length - 1,
+          );
         truncateXAxis(ntextnodes, usedRects, axisadded, true);
       }
     });
   }, [xScale, axis_bottom.current]);
 
-
   useEffect(() => {
     if (!axis_left.current || !yScale) return;
     if (AXISY_ROTATE) {
-      return
+      return;
     }
 
     requestAnimationFrame(() => {
       const textNodes: SVGTextElement[] = Array.from(
-        axis_left.current?.querySelectorAll(".visx-axis-left text") || []
+        axis_left.current?.querySelectorAll(".visx-axis-left text") || [],
       );
 
       if (!textNodes.length) return;
@@ -502,36 +590,47 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       textNodes.forEach((node, i) => {
         if (i !== 0 && i !== textNodes.length - 1) {
           const bbox = node.getBBox();
-          let pnode = node.parentNode as Element;
+          const pnode = node.parentNode as Element;
           let y = 0;
           if (pnode.getAttribute("transform")) {
-            y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+            y =
+              +pnode
+                .getAttribute("transform")
+                .split("translate(")[1]
+                .split(",")[1] + bbox.y;
           } else {
-            y = +bbox.y
+            y = +bbox.y;
           }
           const rect = { y1: y - 5, y2: y + bbox.height + 5 };
           usedRects.push(rect);
         }
       });
-      let axisadded = {};
+      const axisadded = {};
       const firstNode = textNodes[0];
       const lastNode = textNodes[textNodes.length - 1];
       const showAndTruncate = (node: SVGTextElement, index: number) => {
         const label = node.dataset.fulltext || node.textContent || "";
         let truncated = label;
         if (label.length > 3) {
-          truncated = label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+          truncated =
+            label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
         }
         const bbox = node.getBBox();
-        let pnode = node.parentNode as Element;
+        const pnode = node.parentNode as Element;
         let y = 0;
         if (pnode.getAttribute("transform")) {
-          y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+          y =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(",")[1] + bbox.y;
         } else {
-          y = +bbox.y
+          y = +bbox.y;
         }
         const rect = { y1: y - 5, y2: y + bbox.height + 5 };
-        const isOverlapping = usedRects.some((r) => !(rect.y2 < r.y1 || rect.y1 > r.y2));
+        const isOverlapping = usedRects.some(
+          (r) => !(rect.y2 < r.y1 || rect.y1 > r.y2),
+        );
         if (!isOverlapping) {
           axisadded[index] = true;
           node.textContent = label;
@@ -550,10 +649,14 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       usedRects = [];
       textNodes.forEach((node) => {
         const bbox = node.getBBox();
-        let pnode = node.parentNode as Element;
+        const pnode = node.parentNode as Element;
         let y = 0;
         if (pnode.getAttribute("transform")) {
-          y = +pnode.getAttribute("transform").split("translate(")[1].split(",")[1] + bbox.y;
+          y =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;
         }
@@ -561,13 +664,19 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         usedRects.push(rect);
       });
       truncateYAxis(textNodes, usedRects, axisadded, false);
-      const trueCount = Object.values(axisadded).filter(value => value === true).length;
+      const trueCount = Object.values(axisadded).filter(
+        (value) => value === true,
+      ).length;
       // console.log(trueCount);
       if (trueCount < 3) {
-        let ntextnodes = [];
-        let midcount = Math.round((textNodes.length - 1) / 2);
+        const ntextnodes = [];
+        const midcount = Math.round((textNodes.length - 1) / 2);
         textNodes.forEach((node, index) => {
-          if (index === 0 || index === midcount || index === textNodes.length - 1) {
+          if (
+            index === 0 ||
+            index === midcount ||
+            index === textNodes.length - 1
+          ) {
             const full = node.dataset.fulltext || node.textContent || "";
             node.setAttribute("display", "block");
             node.textContent = full;
@@ -576,18 +685,21 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           }
         });
         if (firstNode) showAndTruncate(ntextnodes[0], 0);
-        if (lastNode) showAndTruncate(ntextnodes[ntextnodes.length - 1], textNodes.length - 1);
+        if (lastNode)
+          showAndTruncate(
+            ntextnodes[ntextnodes.length - 1],
+            textNodes.length - 1,
+          );
         truncateYAxis(ntextnodes, usedRects, axisadded, true);
       }
     });
   }, [yScale, axis_left.current]);
 
-
   const rotated = (rotate: boolean) => {
-    let rot = rotate;
+    const rot = rotate;
     setTimeout(() => {
       const textNodes: SVGTextElement[] = Array.from(
-        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || []
+        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
       );
 
       textNodes.forEach((node) => {
@@ -602,15 +714,30 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         if (!chartSvgRef.current || !width || !height) return;
         const svg = chartSvgRef.current;
         const bbox = svg.getBBox();
-        const titleHeight = document.querySelector(".chart-title")?.getBoundingClientRect().height || 0;
-        const legendHeight = document.querySelector(".chart-legend")?.getBoundingClientRect().height || 0;
-        let updatedHeight = Math.max(DEFAULT_MARGIN.top + bbox.height + DEFAULT_MARGIN.bottom + legendHeight + titleHeight, height) + 5;
-        const updatedWidth = Math.max(width, DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right);
+        const titleHeight =
+          document.querySelector(".chart-title")?.getBoundingClientRect()
+            .height || 0;
+        const legendHeight =
+          document.querySelector(".chart-legend")?.getBoundingClientRect()
+            .height || 0;
+        const updatedHeight =
+          Math.max(
+            DEFAULT_MARGIN.top +
+              bbox.height +
+              DEFAULT_MARGIN.bottom +
+              legendHeight +
+              titleHeight,
+            height,
+          ) + 5;
+        const updatedWidth = Math.max(
+          width,
+          DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
+        );
         setAdjustedChartHeight(updatedHeight);
         setAdjustedChartWidth(updatedWidth);
       }
-    }, 200)
-  }
+    }, 200);
+  };
 
   if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;
@@ -645,7 +772,11 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       }}
       timestampProps={{ isLoading, ...timestampProps }}
     >
-      <svg ref={chartSvgRef} width={adjustedChartWidth || width} height={adjustedChartHeight || height}>
+      <svg
+        ref={chartSvgRef}
+        width={adjustedChartWidth || width}
+        height={adjustedChartHeight || height}
+      >
         {isLoading && <SvgShimmer />}
         <Group top={margin.top} left={margin.left}>
           <g ref={axis_left}>
@@ -680,10 +811,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             const value = Number(d.value);
             if (Number.isNaN(value)) return null;
             const rawBarHeight = yScale.bandwidth();
-            const actualBarHeight =
-              barWidth !== undefined
-                ? barWidth
-                : Math.min(rawBarHeight, MAX_BAR_HEIGHT);
+            // Use maxBarHeight to limit the actual bar height
+            const actualBarHeight = Math.min(rawBarHeight, maxBarHeight);
             const bandY = yScale(d.label) || 0;
             const barY = bandY + (rawBarHeight - actualBarHeight) / 2;
             const barLength = xScale(value);
@@ -696,7 +825,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             const radius = Math.min(
               DEFAULT_BAR_RADIUS,
               actualBarHeight / 2,
-              barLength
+              barLength,
             );
             const pathD = `
               M ${barX},${barY + actualBarHeight}
