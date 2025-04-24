@@ -82,7 +82,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   timestamp,
   colors = [],
   isLoading,
-  barWidth,
+  maxBarHeight = MAX_BAR_HEIGHT,
   showTicks = false,
   titleProps,
   legendsProps,
@@ -903,10 +903,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
             // bar thickness with clamp
             const rawBarHeight = categoryScale.bandwidth();
             // Use custom barWidth if provided, otherwise use default with maximum limit
-            const actualBarHeight =
-              barWidth !== undefined
-                ? barWidth
-                : Math.min(rawBarHeight, MAX_BAR_HEIGHT);
+            const actualBarHeight = Math.min(rawBarHeight, maxBarHeight);
             // center if clamped
             const bandY = categoryScale(category) || 0;
             const barY = bandY + (rawBarHeight - actualBarHeight) / 2;

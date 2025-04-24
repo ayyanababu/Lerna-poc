@@ -783,6 +783,7 @@ body:not(.dark) {
                                         '#9aa4b3',
                                     ]}
                                     isLoading={dataLoading.horizontalStacked}
+                                    maxBarHeight={200}
                                 />
                             </SortableCard>
 
