@@ -1,6 +1,5 @@
 import { WithBoundingRectsProps } from "@visx/bounds";
 
-
 export interface TooltipData {
   label: string;
   value: number | string;
@@ -12,5 +11,5 @@ export interface TooltipProps extends WithBoundingRectsProps {
   left?: number;
   data?: TooltipData[];
   isVisible?: boolean;
-  containerRef?: React.RefObject<HTMLElement>; 
+  containerRef?: React.RefObject<HTMLElement>;
 }

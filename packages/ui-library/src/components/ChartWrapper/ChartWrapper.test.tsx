@@ -56,7 +56,7 @@ const mockParentElement = {
     bottom: 400,
     x: 0,
     y: 0,
-    toJSON: () => { },
+    toJSON: () => {},
   }),
 };
 
@@ -105,14 +105,14 @@ describe("ChartWrapper", () => {
           bottom: 100,
           x: 0,
           y: 0,
-          toJSON: () => { },
+          toJSON: () => {},
         }),
       },
     });
 
     render(<ChartWrapper>Chart content</ChartWrapper>);
     expect(
-      screen.getByText("Cannot Render the chart under this size")
+      screen.getByText("Cannot Render the chart under this size"),
     ).toBeInTheDocument();
   });
 
@@ -127,7 +127,7 @@ describe("ChartWrapper", () => {
     };
 
     render(
-      <ChartWrapper legendsProps={legendsProps}>Chart content</ChartWrapper>
+      <ChartWrapper legendsProps={legendsProps}>Chart content</ChartWrapper>,
     );
 
     expect(screen.getByTestId("legends")).toBeInTheDocument();
@@ -141,10 +141,10 @@ describe("ChartWrapper", () => {
       isVisible: true,
     };
     render(
-      <ChartWrapper tooltipProps={tooltipProps}>Chart content</ChartWrapper>
+      <ChartWrapper tooltipProps={tooltipProps}>Chart content</ChartWrapper>,
     );
     expect(screen.getByTestId("tooltip")).toHaveTextContent(
-      "Test Tooltip: 100"
+      "Test Tooltip: 100",
     );
   });
 
@@ -155,12 +155,12 @@ describe("ChartWrapper", () => {
     render(
       <ChartWrapper timestampProps={timestampProps}>
         Chart content
-      </ChartWrapper>
+      </ChartWrapper>,
     );
     const timestampElement = screen.getByTestId("timestamp");
     expect(timestampElement).toBeInTheDocument();
     expect(timestampElement).toHaveTextContent(
-      "Last Update: 2023-05-01T12:00:00Z"
+      "Last Update: 2023-05-01T12:00:00Z",
     );
   });
 
@@ -169,7 +169,7 @@ describe("ChartWrapper", () => {
 
     expect(screen.getByText("Chart content")).toBeInTheDocument();
     expect(
-      screen.queryByText("Cannot Render the chart under this size")
+      screen.queryByText("Cannot Render the chart under this size"),
     ).not.toBeInTheDocument();
   });
 
@@ -187,14 +187,14 @@ describe("ChartWrapper", () => {
 
     expect(addEventListenerSpy).toHaveBeenCalledWith(
       "resize",
-      expect.any(Function)
+      expect.any(Function),
     );
 
     unmount();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith(
       "resize",
-      expect.any(Function)
+      expect.any(Function),
     );
 
     addEventListenerSpy.mockRestore();
@@ -212,7 +212,7 @@ describe("ChartWrapper", () => {
     };
 
     render(
-      <ChartWrapper legendsProps={legendsProps}>Chart content</ChartWrapper>
+      <ChartWrapper legendsProps={legendsProps}>Chart content</ChartWrapper>,
     );
   });
 
@@ -245,7 +245,7 @@ describe("ChartWrapper", () => {
     render(
       <ChartWrapper {...props}>
         <div data-testid="chart-visualization">Chart Visualization</div>
-      </ChartWrapper>
+      </ChartWrapper>,
     );
   });
 
@@ -257,7 +257,7 @@ describe("ChartWrapper", () => {
     };
 
     render(
-      <ChartWrapper tooltipProps={tooltipProps}>Chart content</ChartWrapper>
+      <ChartWrapper tooltipProps={tooltipProps}>Chart content</ChartWrapper>,
     );
 
     expect(screen.getByText("Chart content")).toBeInTheDocument();
@@ -272,7 +272,7 @@ describe("ChartWrapper", () => {
     };
 
     render(
-      <ChartWrapper tooltipProps={tooltipProps}>Chart content</ChartWrapper>
+      <ChartWrapper tooltipProps={tooltipProps}>Chart content</ChartWrapper>,
     );
   });
 });

@@ -19,7 +19,7 @@ export interface HorizontalBarChartProps {
   margin?: { top: number; right: number; bottom: number; left: number };
   colors?: string[];
   isLoading?: boolean;
-  maxBarHeight?: number;
+  barWidth?: number;
   titleProps?: Partial<TitleProps>;
   legendsProps?: Partial<LegendsProps>;
   tooltipProps?: Partial<TooltipProps>;

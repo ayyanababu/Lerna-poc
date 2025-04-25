@@ -7,7 +7,6 @@ import { SortableProps } from "./types";
 export default function SortableComponent({
   children,
   className,
-  styles,
 }: SortableProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<{ id: number }[]>([]);
@@ -96,14 +95,7 @@ export default function SortableComponent({
       }}
     >
       {state.map((item) => (
-        <div
-          key={item.id}
-          data-id={item.id}
-          className="drag-handle"
-          style={{
-            ...styles?.[item.id],
-          }}
-        >
+        <div key={item.id} data-id={item.id} className="drag-handle">
           {childrenArray[item.id]}
         </div>
       ))}
