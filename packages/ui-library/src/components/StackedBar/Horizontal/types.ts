@@ -36,4 +36,5 @@ export interface HorizontalStackedBarChartProps {
     data: DataPoint,
     index: [number, number],
   ) => void;
+  removeBothAxis?: boolean;
 }

@@ -15,7 +15,6 @@ import {
 } from '@my-org/ui-library';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { ThemeContext } from '../App';
-import AnnouncementCard from '../components/announcements/AnnouncementCard';
 import ReconciliationCard from '../components/DashboardPage/ReconciliationCard';
 
 // Define types for our chart data
@@ -178,7 +177,7 @@ const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> =>
     new Promise((resolve) => {
         setTimeout(() => {
             resolve([
-                ...new Array(3).fill(0).map(() => {
+                ...new Array(1).fill(0).map(() => {
                     const randomDate = new Date(
                         2020 + Math.floor(Math.random() * 4),
                         Math.floor(Math.random() * 12),
@@ -190,14 +189,14 @@ const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> =>
                         label: `${formattedDate}`,
                         data: {
                             futures:
-                                Math.floor(Math.random() * 50000000) + 20000,
+                                Math.floor(Math.random() * 100) + 0,
                             options:
-                                Math.floor(Math.random() * 50000000) + 20000,
+                                Math.floor(Math.random() * 100) + 0,
                             forwards:
-                                Math.floor(Math.random() * 150000000) + 5000,
+                                Math.floor(Math.random() * 100) + 0,
                             fixedIncome:
-                                Math.floor(Math.random() * 100000000) + 3000,
-                            others: Math.floor(Math.random() * 600000) + 2000,
+                                Math.floor(Math.random() * 100) + 0,
+                            others: Math.floor(Math.random() * 100) + 0,
                         },
                     };
                 }),
@@ -222,10 +221,11 @@ const fetchBarLineData = (): Promise<BarLineData> =>
                 xAxislabel: 'Corporate Action',
                 yAxisLeftLabel: 'Number of Actions',
                 yAxisRightLabel: 'Positions Impacted',
-                chartData: actionTypes.map((action) => ({
+                chartData: actionTypes.map((action, index) => ({
                     xAxis: action,
                     yAxisLeft: Math.floor(Math.random() * 300000000) + 15, // 15-45
                     yAxisRight: Math.floor(Math.random() * 350000000) + 20, // 20-55
+                    barColor: index == 0 ? 'red' : null,
                 })),
             });
         }, 2200);
@@ -773,7 +773,7 @@ body:not(.dark) {
                                 />
                             </SortableCard>
 
-                            <SortableCard height={400} width={'100%'}>
+                            <SortableCard height={200} width={'100%'}>
                                 <HorizontalStackedBarChart
                                     data={horizontalStackedData}
                                     groupKeys={[
@@ -792,7 +792,8 @@ body:not(.dark) {
                                         '#9aa4b3',
                                     ]}
                                     isLoading={dataLoading.horizontalStacked}
-                                    maxBarHeight={200}
+                                    maxBarHeight={32}
+                                    removeBothAxis
                                 />
                             </SortableCard>
 
@@ -812,6 +813,7 @@ body:not(.dark) {
                                         isVisible: true,
                                     }}
                                     tooltipProps={{}}
+                                    maxBarWidth={32}
                                 />
                             </SortableCard>
                             

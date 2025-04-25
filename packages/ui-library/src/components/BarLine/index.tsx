@@ -17,6 +17,7 @@ import XAxis from "../XAxis";
 import YAxis from "../YAxis";
 import mockBarLineChartData from "./mockData";
 import { BarLineChartProps, BarLineData } from "./types";
+import { values } from "lodash-es";
 
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
@@ -51,7 +52,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   colors: _colors,
   titleProps,
   isLoading = false,
-  barWidth,
+  maxBarWidth = MAX_BAR_WIDTH,
   tooltipProps,
   legendsProps,
   showTicks = false,
@@ -262,10 +263,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   }, [data, width, height]);
 
   const defaultBarWidth = xScale.bandwidth();
-  const actualBarWidth =
-    barWidth !== undefined
-      ? barWidth
-      : Math.min(defaultBarWidth, MAX_BAR_WIDTH);
+  const actualBarWidth = Math.min(defaultBarWidth, maxBarWidth);
   const xOffset =
     actualBarWidth < defaultBarWidth
       ? (defaultBarWidth - actualBarWidth) / 2
@@ -1200,7 +1198,13 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                     y={barY}
                     width={actualBarWidth}
                     height={barHeight}
-                    fill={isLoading ? `url(#${shimmerGradientId})` : colors.bar}
+                    fill={
+                      isLoading
+                        ? `url(#${shimmerGradientId})`
+                        : d?.barColor
+                          ? d?.barColor
+                          : colors.bar
+                    }
                     opacity={barOpacity}
                     onMouseMove={handleBarMouseMove(d.yAxisLeft, index)}
                     onMouseLeave={handleBarMouseLeave}
