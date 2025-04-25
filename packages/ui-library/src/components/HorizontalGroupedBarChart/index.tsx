@@ -4,13 +4,13 @@ import { AxisBottom, AxisLeft } from "@visx/axis";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
-import { BarProps } from "@visx/shape/lib/shapes/Bar";
 import { useTooltip } from "@visx/tooltip";
 import { capitalize, cloneDeep, lowerCase } from "lodash-es";
 
 import useTheme from "../../hooks/useTheme";
 import ChartWrapper from "../ChartWrapper";
 import CustomBar from "../CustomBar";
+import { CustomBarProps } from "../CustomBar/types";
 import SvgShimmer, { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { TooltipData } from "../Tooltip/types";
 import { mockVerticalGroupedBarChartData } from "../VerticalGroupedBarChart/mockdata";
@@ -186,7 +186,13 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     [groupKeys, colors, theme.colors.charts.bar],
   );
 
-  const renderBar = (props: BarProps) => <CustomBar {...props} />;
+  const renderBar = (
+    props: CustomBarProps & {
+      key: string | number;
+      value: number;
+      label: string | number;
+    },
+  ) => <CustomBar {...props} />;
 
   const handleMouseMove =
     (groupKey: string, value: number) => (e: React.MouseEvent) => {
@@ -315,7 +321,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
   const truncateXAxis = (
     textNodes: SVGTextElement[],
     usedRects: { x1: number; x2: number }[],
-    axisadded: boolean[],
+    axisadded: Record<string, boolean>,
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
@@ -428,7 +434,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
   const truncateYAxis = (
     textNodes: SVGTextElement[],
     usedRects: { y1: number; y2: number }[],
-    axisadded: boolean[],
+    axisadded: Record<string, boolean>,
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {

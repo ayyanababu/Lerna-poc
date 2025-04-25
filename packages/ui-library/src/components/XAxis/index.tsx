@@ -87,9 +87,13 @@ function XAxis({
       calculateLabelWidths(axisRef),
     );
 
-    if (axisRef.current) resizeObserver.observe(axisRef.current);
+    if (axisRef.current) resizeObserver?.observe(axisRef.current);
 
-    return resizeObserver.unobserve(axisRef.current!);
+    return () => {
+      if (axisRef.current) {
+        resizeObserver?.unobserve(axisRef.current);
+      }
+    };
   }, []);
 
   const overLineStyles = {

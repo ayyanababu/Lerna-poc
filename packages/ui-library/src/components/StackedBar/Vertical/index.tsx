@@ -35,7 +35,7 @@ const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
-const MAX_BAR_WIDTH = 16;
+const DEFAULT_MAX_BAR_WIDTH = 16;
 const TICK_LABEL_PADDING = 8;
 const TRUNCATE_RATIO = 0.75;
 let AXISX_ROTATE = false;
@@ -53,7 +53,7 @@ function VerticalStackedBar({
   timestamp,
   colors = [],
   isLoading,
-  barWidth,
+  maxBarWidth = DEFAULT_MAX_BAR_WIDTH,
   titleProps,
   legendsProps,
   tooltipProps,
@@ -258,7 +258,7 @@ function VerticalStackedBar({
   const truncateXAxis = (
     textNodes: SVGTextElement[],
     usedRects: { x1: number; x2: number }[],
-    axisadded: boolean[],
+    axisadded: Record<string, boolean>,
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
@@ -371,7 +371,7 @@ function VerticalStackedBar({
   const truncateYAxis = (
     textNodes: SVGTextElement[],
     usedRects: { y1: number; y2: number }[],
-    axisadded: boolean[],
+    axisadded: Record<string, boolean>,
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
@@ -837,10 +837,7 @@ function VerticalStackedBar({
             // Calculate bar width with maximum limit
             const calculatedBarWidth = xScale.bandwidth();
             // Use custom barWidth if provided, otherwise use default with maximum limit
-            const actualBarWidth =
-              barWidth !== undefined
-                ? barWidth
-                : Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
+            const actualBarWidth = Math.min(calculatedBarWidth, maxBarWidth);
 
             // If the bar width is limited, center it
             const barX =
