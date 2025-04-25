@@ -107,7 +107,7 @@ describe("DonutChart", () => {
         data={testData}
         title="Test Donut Chart"
         timestamp="2023-05-01T12:00:00Z"
-      />
+      />,
     );
 
     const chartWrapper = screen.getByTestId("chart-wrapper");
@@ -139,13 +139,13 @@ describe("DonutChart", () => {
         data={testData}
         title="Chart Title"
         titleProps={titleProps}
-      />
+      />,
     );
     const chartWrapper = screen.getByTestId("chart-wrapper");
     expect(chartWrapper).toBeInTheDocument();
     expect(chartWrapper).toHaveAttribute(
       "titleProps",
-      expect.stringContaining("custom-title")
+      expect.stringContaining("custom-title"),
     );
   });
 
