@@ -51,7 +51,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   colors: _colors,
   titleProps,
   isLoading = false,
-  barWidth,
+  maxBarWidth = MAX_BAR_WIDTH,
   tooltipProps,
   legendsProps,
   showTicks = false,
@@ -262,10 +262,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   }, [data, width, height]);
 
   const defaultBarWidth = xScale.bandwidth();
-  const actualBarWidth =
-    barWidth !== undefined
-      ? barWidth
-      : Math.min(defaultBarWidth, MAX_BAR_WIDTH);
+  const actualBarWidth = Math.min(defaultBarWidth, maxBarWidth);
   const xOffset =
     actualBarWidth < defaultBarWidth
       ? (defaultBarWidth - actualBarWidth) / 2

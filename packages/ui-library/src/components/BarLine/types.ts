@@ -52,9 +52,10 @@ export interface BarLineChartProps {
   height?: number;
 
   /**
-   * Width of the bars
+   * Maximum width of the bars (computed bar widths will be capped to this value)
+   * @default MAX_BAR_WIDTH constant in component (16)
    */
-  barWidth?: number;
+  maxBarWidth?: number;
 
   /**
    * Custom colors for the chart

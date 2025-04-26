@@ -813,6 +813,7 @@ body:not(.dark) {
                                         isVisible: true,
                                     }}
                                     tooltipProps={{}}
+                                    maxBarWidth={32}
                                 />
                             </SortableCard>
                             
