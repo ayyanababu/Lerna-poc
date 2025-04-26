@@ -83,13 +83,15 @@ function XAxis({
   }, [calculateLabelWidths]);
 
   useLayoutEffect(() => {
-    const resizeObserver = new ResizeObserver(() =>
-      calculateLabelWidths(axisRef),
-    );
+    if (axisRef.current) {
+      const resizeObserver = new ResizeObserver(() =>
+        calculateLabelWidths(axisRef),
+      );
 
-    if (axisRef.current) resizeObserver.observe(axisRef.current);
+      if (axisRef.current) resizeObserver.observe(axisRef.current);
 
-    return resizeObserver.unobserve(axisRef.current!);
+      return resizeObserver.unobserve(axisRef.current);
+    }
   }, []);
 
   const overLineStyles = {

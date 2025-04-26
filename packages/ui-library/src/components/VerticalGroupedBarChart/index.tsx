@@ -187,6 +187,16 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   );
 
   useEffect(() => {
+    if (!chartSvgRef.current) return;
+    const labels = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
+    const widths = Array.from(labels).map(
+      (node) => (node as SVGGraphicsElement).getBBox().width,
+    );
+    console.log("width", widths);
+    setMaxLabelWidth(Math.max(...widths, 0));
+  }, [data, width, height]);
+
+  /*   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
 
     const svg = chartSvgRef.current;
@@ -212,15 +222,6 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     setAdjustedChartWidth(Math.max(requiredWidth, width));
   }, [data, width, height, DEFAULT_MARGIN]);
 
-  useEffect(() => {
-    if (!chartSvgRef.current) return;
-    const labels = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
-    const widths = Array.from(labels).map(
-      (node) => (node as SVGGraphicsElement).getBBox().width,
-    );
-    console.log("width", widths);
-    setMaxLabelWidth(Math.max(...widths, 0));
-  }, [data, width, height]);
 
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
@@ -277,7 +278,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
+  }, [data, width, height, DEFAULT_MARGIN, innerWidth]); */
 
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
@@ -316,7 +317,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   const truncateXAxis = (
     textNodes: SVGTextElement[],
     usedRects: { x1: number; x2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
@@ -429,7 +430,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   const truncateYAxis = (
     textNodes: SVGTextElement[],
     usedRects: { y1: number; y2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
