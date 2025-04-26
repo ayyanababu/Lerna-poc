@@ -1,46 +1,26 @@
 import {
     SortableCard,
-    TreeMapChart,
     Title,
     HorizontalStackedBarChart,
 } from '@my-org/ui-library';
 import { useEffect, useState } from 'react';
-import { TreeMapNode } from '../../../../ui-library/dist/components/TreeMapChart/types';
 import { Box, Chip } from '@mui/material';
 import { StackedBarItem } from '../../Pages/DashboardPage';
 
-const fetchTreeMapData = (): Promise<TreeMapNode> =>
+const fetchFirstStackedBarData = (): Promise<StackedBarItem[]> =>
     new Promise((resolve) => {
         setTimeout(() => {
-            resolve({
-                id: 'portfolio',
-                name: 'Portfolio',
-                value: 1000,
-                children: [
-                    {
-                        id: 'break',
-                        name: 'Break',
-                        value: 1_342,
-                        children: [
-                            {
-                                id: 'externalMissing',
-                                name: 'External Missing',
-                                value: 8_342,
-                            },
-                            {
-                                id: 'internalMissing',
-                                name: 'Internal Missing',
-                                value: 4_342,
-                            },
-                        ],
+            resolve([
+                {
+                    label: 'Portfolio1',
+                    data: {
+                        break: 1_342,
+                        externalMissing: 8_342,
+                        internalMissing: 4_342,
+                        match: 2_343,
                     },
-                    {
-                        id: 'match',
-                        name: 'Match',
-                        value: 2_343,
-                    },
-                ],
-            });
+                },
+            ]);
         }, 2000);
     });
 
@@ -67,12 +47,9 @@ const fetchStackedBarData = (): Promise<StackedBarItem[]> =>
     });
 
 export default function ReconciliationCard() {
-    const [treeMapData, setTreeMapData] = useState<TreeMapNode>({
-        id: 'portfolio',
-        name: 'Portfolio',
-        value: 1000,
-        children: [],
-    });
+    const [firstStackedBarData, setFirstStackedBarData] = useState<
+        StackedBarItem[]
+    >([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const [stackedBarData, setStackedBarData] = useState<StackedBarItem[]>([]);
@@ -81,8 +58,8 @@ export default function ReconciliationCard() {
 
     useEffect(() => {
         setIsLoading(true);
-        fetchTreeMapData().then((data) => {
-            setTreeMapData(data);
+        fetchFirstStackedBarData().then((data) => {
+            setFirstStackedBarData(data);
             setIsLoading(false);
         });
         setIsStackedBarLoading(true);
@@ -93,15 +70,19 @@ export default function ReconciliationCard() {
     }, []);
 
     return (
-        <SortableCard height={400} width={'100%'}>
-            <div
-                style={{
+        <SortableCard 
+            height={400} 
+            width={'100%'}
+        >
+            <Box
+                sx={ {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '40px',
                     width: '100%',
                     overflowY: 'auto',
-                }}>
+                }}
+            >
                 <div
                     style={{
                         display: 'flex',
@@ -147,13 +128,14 @@ export default function ReconciliationCard() {
                 </div>
 
                 <div style={{ height: '60px', width: '100%' }}>
-                    <TreeMapChart
-                        data={treeMapData}
+                    <HorizontalStackedBarChart
+                        data={firstStackedBarData}
+                        groupKeys={['break', 'externalMissing', 'internalMissing', 'match']}
                         colors={[
                             'rgba(232, 134, 97,0.50)',
-                            '#4E7AC2',
                             'rgba(232, 134, 97,0.30)',
                             'rgba(232, 134, 97,0.15)',
+                            '#4E7AC2',
                         ]}
                         isLoading={isLoading}
                         legendsProps={{
@@ -161,9 +143,8 @@ export default function ReconciliationCard() {
                             doStrike: false,
                             isVisible: true,
                         }}
-                        tooltipProps={{}}
-                        tilePadding={2}
-                        borderRadius={5}
+                        maxBarHeight={62}
+                        removeBothAxis
                     />
                 </div>
 
@@ -187,23 +168,11 @@ export default function ReconciliationCard() {
                             doStrike: false,
                             isVisible: true,
                         }}
-                        xAxisProps={{
-                            isVisible: false,
-                        }}
-                        yAxisProps={{
-                            isVisible: false,
-                        }}
-                        // margin={{
-                        //     top: 0,
-                        //     right: 0,
-                        //     bottom: 0,
-                        //     left: 0,
-                        // }}
+                        removeBothAxis
                         title="Sign Off Status"
-                        // borderRadius={5}
                     />
                 </div>
-            </div>
+            </Box>
         </SortableCard>
     );
 }

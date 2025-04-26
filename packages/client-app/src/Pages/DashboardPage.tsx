@@ -31,7 +31,7 @@ type TreeMapNode = {
     children?: TreeMapNode[];
 };
 
-type StackedBarItem = {
+export type StackedBarItem = {
     label: string;
     data: Record<string, number>;
 };
