@@ -43,7 +43,6 @@ function DonutChart({
     tooltipOpen,
   } = useTooltip<TooltipData[]>();
   const [hoveredArc, setHoveredArc] = useState<string | null>(null);
-  const [legendHoveredArc, setLegendHoveredArc] = useState<string | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const radius = useMemo(
     () => Math.min(width, height) / (type === "semi" ? 2 : 2.5),
@@ -58,13 +57,8 @@ function DonutChart({
   }, [isLoading, _data, type]);
 
   const filteredData = useMemo(
-    () =>
-      data.filter((_, i) =>
-        legendHoveredArc
-          ? legendHoveredArc === data[i].label
-          : !hideIndex.includes(i),
-      ),
-    [legendHoveredArc, hideIndex, data],
+    () => data.filter((_, i) => !hideIndex.includes(i)),
+    [hideIndex, data],
   );
 
   const colorScale = scaleOrdinal<string, string>({
@@ -83,8 +77,8 @@ function DonutChart({
         colorScale,
         hideIndex,
         setHideIndex,
-        hovered: legendHoveredArc,
-        setHovered: setLegendHoveredArc,
+        hovered: hoveredArc,
+        setHovered: setHoveredArc,
         isLoading,
         ...legendsProps,
       }}

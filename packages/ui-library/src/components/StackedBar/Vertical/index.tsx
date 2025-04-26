@@ -94,9 +94,6 @@ function VerticalStackedBar({
   const strokeWidth = getStrokeWidth(width, height);
 
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
-  const [legendHoveredGroupKey, setLegendHoveredGroupKey] = useState<
-    string | null
-  >(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const {
     showTooltip,
@@ -135,15 +132,9 @@ function VerticalStackedBar({
             }
           });
         }
-        if (legendHoveredGroupKey) {
-          const groupKey = legendHoveredGroupKey;
-          d.data = {
-            [groupKey]: d.data[groupKey],
-          };
-        }
         return d;
       }),
-    [data, hideIndex, groupKeys, legendHoveredGroupKey],
+    [data, hideIndex, groupKeys],
   );
 
   const legendData = useMemo(
@@ -777,8 +768,8 @@ function VerticalStackedBar({
         colorScale,
         hideIndex,
         setHideIndex,
-        hovered: legendHoveredGroupKey,
-        setHovered: setLegendHoveredGroupKey,
+        hovered: hoveredGroupKey,
+        setHovered: setHoveredGroupKey,
         isLoading,
         ...legendsProps,
       }}

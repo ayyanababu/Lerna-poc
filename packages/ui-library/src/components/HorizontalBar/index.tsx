@@ -799,8 +799,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         hideIndex,
         setHideIndex,
         hovered: hoveredBar !== null ? legendData[hoveredBar]?.label : null,
-        setHovered: (label) =>
-          setHoveredBar(legendData.findIndex((item) => item.label === label)),
+        setHovered: (label) => {
+          const hoveredIndex = legendData?.findIndex(
+            (item) => item.label === label,
+          );
+          setHoveredBar(hoveredIndex !== -1 ? hoveredIndex : null);
+        },
         isLoading,
       }}
       tooltipProps={{

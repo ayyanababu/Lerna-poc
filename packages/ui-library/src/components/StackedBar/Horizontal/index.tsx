@@ -120,9 +120,6 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   const strokeWidth = getStrokeWidth(width, height);
 
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
-  const [legendHoveredGroupKey, setLegendHoveredGroupKey] = useState<
-    string | null
-  >(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
 
   // Tooltip
@@ -155,16 +152,10 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
             }
           });
         }
-        // If a legend item is hovered, only show that group
-        if (legendHoveredGroupKey) {
-          const groupKey = legendHoveredGroupKey;
-          d.data = {
-            [groupKey]: d.data[groupKey],
-          };
-        }
+
         return d;
       }),
-    [data, hideIndex, groupKeys, legendHoveredGroupKey],
+    [data, hideIndex, groupKeys],
   );
 
   const labels = useMemo(
@@ -890,8 +881,8 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         colorScale: groupColorScale,
         hideIndex,
         setHideIndex,
-        hovered: legendHoveredGroupKey,
-        setHovered: setLegendHoveredGroupKey,
+        hovered: hoveredGroupKey,
+        setHovered: setHoveredGroupKey,
         isLoading,
         ...legendsProps,
       }}
