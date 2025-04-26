@@ -33,17 +33,17 @@ const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
 const BASE_ADJUST_HEIGHT = 5; // used to fix the check width for the overlap of yaxis
 const ADD_ADJUST_HEIGHT = 5; // used to check the overlap of yaxis
 
-const fontSize = 10;
-const labelPadding = 8;
+//const fontSize = 10;
+//const labelPadding = 8;
 
-function getLabelWidth(label: string) {
-  return label ? label.length * fontSize * 0.6 + labelPadding : 0;
-}
+//function getLabelWidth(label: string) {
+//  return label ? label.length * fontSize * 0.6 + labelPadding : 0;
+//}
 
-function getTickWidth(value: number) {
-  const formatted = value.toLocaleString();
-  return formatted.length * fontSize * 0.6 + labelPadding;
-}
+//function getTickWidth(value: number) {
+//  const formatted = value.toLocaleString();
+//  return formatted.length * fontSize * 0.6 + labelPadding;
+//}
 
 const BarLineChart: React.FC<BarLineChartProps> = ({
   data: _data,
@@ -123,12 +123,12 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   const leftMax = Math.max(...chartData.map((d) => d.yAxisLeft), 0);
   const rightMax = Math.max(...chartData.map((d) => d.yAxisRight), 0);
 
-  const yAxisLeftTickWidth = getTickWidth(leftMax);
-  const yAxisRightTickWidth = getTickWidth(rightMax);
-  const yAxisLeftLabelWidth = getLabelWidth(yAxisLeftLabel);
-  const yAxisRightLabelWidth = getLabelWidth(yAxisRightLabel);
+  //  const yAxisLeftTickWidth = getTickWidth(leftMax);
+  //  const yAxisRightTickWidth = getTickWidth(rightMax);
+  //  const yAxisLeftLabelWidth = getLabelWidth(yAxisLeftLabel);
+  //  const yAxisRightLabelWidth = getLabelWidth(yAxisRightLabel);
 
-  const margin = useMemo(
+  /*   const margin = useMemo(
     () => ({
       ...DEFAULT_MARGIN,
       left: Math.max(
@@ -149,7 +149,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       yAxisRightLabelWidth,
     ],
   );
-
+ */
   //  const drawableWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
   //  const drawableHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
 
@@ -177,7 +177,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     isLoading,
   ]);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
@@ -209,7 +209,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, isLoading, innerWidth]);
+  }, [data, width, height, DEFAULT_MARGIN, isLoading, innerWidth]); */
 
   const xScale = useMemo(
     () =>
@@ -298,7 +298,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     }
   };
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
 
     const titleHeight =
@@ -350,8 +350,8 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
   }, [data, width, height, drawableChartWidth, DEFAULT_MARGIN]);
-
-  useEffect(() => {
+ */
+  /*   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
@@ -384,7 +384,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
   }, [data, width, height, DEFAULT_MARGIN, isLoading, innerWidth]);
-
+ */
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
@@ -422,7 +422,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   const truncateXAxis = (
     textNodes: SVGTextElement[],
     usedRects: { x1: number; x2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
@@ -535,7 +535,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   const truncateYAxis = (
     textNodes: SVGTextElement[],
     usedRects: { y1: number; y2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
@@ -583,7 +583,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   const truncateY1Axis = (
     textNodes: SVGTextElement[],
     usedRects: { y1: number; y2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {

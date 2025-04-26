@@ -219,7 +219,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const getOptimalBarWidth = (calculatedWidth: number) =>
     Math.min(calculatedWidth, maxBarWidth);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
@@ -251,7 +251,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
+  }, [data, width, height, DEFAULT_MARGIN, innerWidth]); */
 
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
@@ -290,7 +290,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const truncateXAxis = (
     textNodes: SVGTextElement[],
     usedRects: { x1: number; x2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
@@ -403,7 +403,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const truncateYAxis = (
     textNodes: SVGTextElement[],
     usedRects: { y1: number; y2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {

@@ -4,7 +4,6 @@ import { AxisBottom, AxisLeft } from "@visx/axis";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
-import { BarProps } from "@visx/shape/lib/shapes/Bar";
 import { useTooltip } from "@visx/tooltip";
 import { capitalize, cloneDeep, lowerCase } from "lodash-es";
 
@@ -186,7 +185,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     [groupKeys, colors, theme.colors.charts.bar],
   );
 
-  const renderBar = (props: BarProps) => <CustomBar {...props} />;
+  const renderBar = (props: object) => <CustomBar {...props} />;
 
   const handleMouseMove =
     (groupKey: string, value: number) => (e: React.MouseEvent) => {
@@ -255,7 +254,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     setMaxLabelWidth(Math.max(...widths, 0));
   }, [data, width, height]);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
@@ -277,7 +276,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     setAdjustedChartHeight(Math.max(requiredHeight, height) + 5);
     setAdjustedChartWidth(width);
   }, [data, width, height, DEFAULT_MARGIN]);
-
+ */
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
@@ -312,10 +311,55 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     setAdjustedChartWidth(updatedWidth);
   }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
 
+  /*   const rotated = (rotate: boolean) => {
+      const rot = rotate;
+      setTimeout(() => {
+        const textNodes: SVGTextElement[] = Array.from(
+          axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
+        );
+  
+        textNodes.forEach((node) => {
+          const full = node.dataset.fulltext || node.textContent || "";
+          node.setAttribute("display", "block");
+          node.textContent = full;
+          node.dataset.fulltext = full;
+        });
+        AXISX_ROTATE = rotate;
+  
+        if (!rot) {
+          if (!chartSvgRef.current || !width || !height) return;
+          const svg = chartSvgRef.current;
+          const bbox = svg.getBBox();
+          const titleHeight =
+            document.querySelector(".chart-title")?.getBoundingClientRect()
+              .height || 0;
+          const legendHeight =
+            document.querySelector(".chart-legend")?.getBoundingClientRect()
+              .height || 0;
+          const updatedHeight =
+            Math.max(
+              DEFAULT_MARGIN.top +
+              bbox.height +
+              DEFAULT_MARGIN.bottom +
+              legendHeight +
+              titleHeight,
+              height,
+            ) + 5;
+          const updatedWidth = Math.max(
+            width,
+            DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
+          );
+          setAdjustedChartHeight(updatedHeight);
+          setAdjustedChartWidth(updatedWidth);
+        }
+      }, 200);
+    };
+   */
+
   const truncateXAxis = (
     textNodes: SVGTextElement[],
     usedRects: { x1: number; x2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
@@ -428,7 +472,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
   const truncateYAxis = (
     textNodes: SVGTextElement[],
     usedRects: { y1: number; y2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
@@ -749,50 +793,6 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     }, 500);
   }, [valueScale, axis_left.current]);
 
-  /*   const rotated = (rotate: boolean) => {
-      const rot = rotate;
-      setTimeout(() => {
-        const textNodes: SVGTextElement[] = Array.from(
-          axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
-        );
-  
-        textNodes.forEach((node) => {
-          const full = node.dataset.fulltext || node.textContent || "";
-          node.setAttribute("display", "block");
-          node.textContent = full;
-          node.dataset.fulltext = full;
-        });
-        AXISX_ROTATE = rotate;
-  
-        if (!rot) {
-          if (!chartSvgRef.current || !width || !height) return;
-          const svg = chartSvgRef.current;
-          const bbox = svg.getBBox();
-          const titleHeight =
-            document.querySelector(".chart-title")?.getBoundingClientRect()
-              .height || 0;
-          const legendHeight =
-            document.querySelector(".chart-legend")?.getBoundingClientRect()
-              .height || 0;
-          const updatedHeight =
-            Math.max(
-              DEFAULT_MARGIN.top +
-              bbox.height +
-              DEFAULT_MARGIN.bottom +
-              legendHeight +
-              titleHeight,
-              height,
-            ) + 5;
-          const updatedWidth = Math.max(
-            width,
-            DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
-          );
-          setAdjustedChartHeight(updatedHeight);
-          setAdjustedChartWidth(updatedWidth);
-        }
-      }, 200);
-    };
-   */
   if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;
   }

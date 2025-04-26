@@ -206,7 +206,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     }
   };
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
 
     const svg = chartSvgRef.current;
@@ -232,7 +232,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, margin, drawableChartWidth]);
+  }, [data, width, height, margin, drawableChartWidth]); */
 
   useEffect(() => {
     if (!chartSvgRef.current) return;
@@ -243,7 +243,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     setMaxLabelWidth(Math.max(...widths, 0));
   }, [data, width, height]);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
@@ -265,7 +265,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     setAdjustedChartHeight(Math.max(requiredHeight, height) + 5);
     setAdjustedChartWidth(width);
   }, [data, width, height, DEFAULT_MARGIN]);
-
+ */
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
@@ -303,7 +303,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   const truncateXAxis = (
     textNodes: SVGTextElement[],
     usedRects: { x1: number; x2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
@@ -415,7 +415,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   const truncateYAxis = (
     textNodes: SVGTextElement[],
     usedRects: { y1: number; y2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {

@@ -334,7 +334,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     setMaxLabelWidth(Math.max(...widths, 0));
   }, [data, width, height]);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
@@ -359,7 +359,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     );
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
+  }, [data, width, height, DEFAULT_MARGIN, innerWidth]); */
 
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
@@ -398,7 +398,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   const truncateXAxis = (
     textNodes: SVGTextElement[],
     usedRects: { x1: number; x2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
@@ -511,7 +511,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   const truncateYAxis = (
     textNodes: SVGTextElement[],
     usedRects: { y1: number; y2: number }[],
-    axisadded: boolean[],
+    axisadded: { [key: number]: boolean },
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
