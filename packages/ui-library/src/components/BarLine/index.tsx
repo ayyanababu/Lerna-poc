@@ -1200,7 +1200,13 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                     y={barY}
                     width={actualBarWidth}
                     height={barHeight}
-                    fill={isLoading ? `url(#${shimmerGradientId})` : colors.bar}
+                    fill={
+                      isLoading
+                        ? `url(#${shimmerGradientId})`
+                        : d?.barColor
+                          ? d?.barColor
+                          : colors.bar
+                    }
                     opacity={barOpacity}
                     onMouseMove={handleBarMouseMove(d.yAxisLeft, index)}
                     onMouseLeave={handleBarMouseLeave}

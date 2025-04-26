@@ -13,6 +13,7 @@ export interface BarLineDataPoint {
   xAxis: string;
   yAxisLeft: number;
   yAxisRight: number;
+  barColor?: string;
 }
 
 export interface BarLineData {
