@@ -26,7 +26,7 @@ const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.02;
-const MAX_BAR_HEIGHT = 16;
+const DEFAULT_MAX_BAR_HEIGHT = 16;
 const TICK_LABEL_PADDING = 16;
 const TRUNCATE_RATIO = 0.75;
 let AXISX_ROTATE = false;
@@ -55,7 +55,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   title,
   colors = [],
   isLoading = false,
-  barWidth,
+  maxBarHeight = DEFAULT_MAX_BAR_HEIGHT,
   titleProps,
   legendsProps,
   tooltipProps,
@@ -855,10 +855,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             const value = Number(d.value);
             if (Number.isNaN(value)) return null;
             const rawBarHeight = yScale.bandwidth();
-            const actualBarHeight =
-              barWidth !== undefined
-                ? barWidth
-                : Math.min(rawBarHeight, MAX_BAR_HEIGHT);
+            const actualBarHeight = Math.min(rawBarHeight, maxBarHeight);
             const bandY = yScale(d.label) || 0;
             const barY = bandY + (rawBarHeight - actualBarHeight) / 2;
             const barLength = xScale(value);
