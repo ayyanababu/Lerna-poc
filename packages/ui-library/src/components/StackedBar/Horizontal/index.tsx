@@ -98,6 +98,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   gridProps,
   barProps,
   onClick,
+  removeBothAxis = false,
 }) => {
   const { theme } = useTheme();
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
@@ -172,6 +173,10 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
 
   // Dynamic margin: expand or shrink left margin
   const dynamicMargin = useMemo<DynamicMargin>(() => {
+    if (removeBothAxis) {
+      return { top: 0, right: 0, bottom: 0, left: 0 };
+    }
+
     if (!width) return DEFAULT_MARGIN;
 
     let desiredLeft = maxLabelPx + 10;
@@ -191,7 +196,13 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
 
       bottom: bottomMargin,
     };
-  }, [DEFAULT_MARGIN, maxLabelPx, width, xAxisProps?.isVisible]);
+  }, [
+    DEFAULT_MARGIN,
+    maxLabelPx,
+    width,
+    xAxisProps?.isVisible,
+    removeBothAxis,
+  ]);
 
   // Inner chart dimensions
   const innerWidth = width - dynamicMargin.left - dynamicMargin.right;
@@ -269,10 +280,10 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     () =>
       scaleLinear<number>({
         domain: [0, maxValue * SCALE_PADDING],
-        range: [0, drawableChartWidth],
+        range: [0, removeBothAxis ? width : drawableChartWidth],
         nice: true,
       }),
-    [innerWidth, maxValue],
+    [innerWidth, maxValue, removeBothAxis, width, drawableChartWidth],
   );
 
   // Color scale
@@ -894,6 +905,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
         ...tooltipProps,
       }}
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
+      minRenderHeight={removeBothAxis ? 0 : 200}
     >
       <svg
         ref={chartSvgRef}
@@ -912,6 +924,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
               numTicks={calculatedNumTicks}
               showTicks={showTicks}
               isLoading={isLoading}
+              isVisible={!removeBothAxis}
               {...yAxisProps}
             />
           </g>
@@ -925,6 +938,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
               availableWidth={innerWidth}
               showAxisLine={showXAxis}
               tickLength={0}
+              isVisible={!removeBothAxis}
               {...xAxisProps}
               rotated={rotated}
             />
@@ -975,7 +989,20 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                   rightmostKey = s.key;
                 }
               });
+
+              // figure out if it's the leftmost bar
+              let leftmostKey = activeKeys[0];
+              let minX0 = Infinity;
+              stackedData.forEach((s) => {
+                const x0Val = s[categoryIndex]?.[0] || 0;
+                if (x0Val < minX0) {
+                  minX0 = x0Val;
+                  leftmostKey = s.key;
+                }
+              });
+
               const isRightmostBar = seriesData.key === rightmostKey;
+              const isLeftmostBar = seriesData.key === leftmostKey;
 
               const dynamicRadius = Math.min(
                 DEFAULT_BAR_RADIUS,
@@ -996,7 +1023,19 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                 Z
               `,
                   }
-                : undefined;
+                : isLeftmostBar
+                  ? {
+                      d: `
+              M ${barX + dynamicRadius},${barY + actualBarHeight}
+              Q ${barX},${barY + actualBarHeight} ${barX},${barY + actualBarHeight - dynamicRadius}
+              L ${barX},${barY + dynamicRadius}
+              Q ${barX},${barY} ${barX + dynamicRadius},${barY}
+              L ${barX + barWidth},${barY}
+              L ${barX + barWidth},${barY + actualBarHeight}
+              Z
+              `,
+                    }
+                  : undefined;
 
               return (
                 <React.Fragment key={`stacked-${category}-${groupKey}`}>

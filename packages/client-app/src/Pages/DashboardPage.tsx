@@ -177,7 +177,7 @@ const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> =>
     new Promise((resolve) => {
         setTimeout(() => {
             resolve([
-                ...new Array(3).fill(0).map(() => {
+                ...new Array(1).fill(0).map(() => {
                     const randomDate = new Date(
                         2020 + Math.floor(Math.random() * 4),
                         Math.floor(Math.random() * 12),
@@ -189,14 +189,14 @@ const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> =>
                         label: `${formattedDate}`,
                         data: {
                             futures:
-                                Math.floor(Math.random() * 50000000) + 20000,
+                                Math.floor(Math.random() * 100) + 0,
                             options:
-                                Math.floor(Math.random() * 50000000) + 20000,
+                                Math.floor(Math.random() * 100) + 0,
                             forwards:
-                                Math.floor(Math.random() * 150000000) + 5000,
+                                Math.floor(Math.random() * 100) + 0,
                             fixedIncome:
-                                Math.floor(Math.random() * 100000000) + 3000,
-                            others: Math.floor(Math.random() * 600000) + 2000,
+                                Math.floor(Math.random() * 100) + 0,
+                            others: Math.floor(Math.random() * 100) + 0,
                         },
                     };
                 }),
@@ -773,7 +773,7 @@ body:not(.dark) {
                                 />
                             </SortableCard>
 
-                            <SortableCard height={400} width={'100%'}>
+                            <SortableCard height={200} width={'100%'}>
                                 <HorizontalStackedBarChart
                                     data={horizontalStackedData}
                                     groupKeys={[
@@ -792,7 +792,8 @@ body:not(.dark) {
                                         '#9aa4b3',
                                     ]}
                                     isLoading={dataLoading.horizontalStacked}
-                                    maxBarHeight={200}
+                                    maxBarHeight={32}
+                                    removeBothAxis
                                 />
                             </SortableCard>
 
