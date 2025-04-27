@@ -13,6 +13,7 @@ const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
     return (
       <Card
         ref={ref}
+        {...props}
         sx={{
           backgroundColor: theme.colors.common.background,
           display: "flex",
@@ -27,8 +28,8 @@ const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
           "&:hover": {
             transform: "translateY(-2px)",
           },
+          ...(props?.sx || {}),
         }}
-        {...props}
       >
         {title && (
           <Box
@@ -59,11 +60,13 @@ const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
         )}
 
         <CardContent
+          {...props?.childrenProps}
           sx={{
             display: "flex",
             padding: "4px",
             height,
             width,
+            ...(props?.sx || {}),
           }}
         >
           {children}

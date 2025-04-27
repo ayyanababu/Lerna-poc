@@ -21,6 +21,7 @@ function LegendItem({
   onMouseOver,
   onMouseLeave,
   hideValues = false,
+  onArrowClick,
 }: LegendItemProps) {
   const { theme } = useTheme();
   const itemStyles = {
@@ -56,6 +57,7 @@ function LegendItem({
         width: "12px",
         height: "12px",
       }}
+      onClick={() => onToggle?.()}
       className={isLoading ? shimmerClassName : ""}
     />
   );
@@ -92,6 +94,7 @@ function LegendItem({
           letterSpacing: "0.4px",
           paddingTop: "1px",
         }}
+        onClick={() => onToggle?.()}
         className={isLoading ? shimmerClassName : ""}
       >
         {displayText}
@@ -109,6 +112,7 @@ function LegendItem({
           opacity: 0,
           transition: "opacity 0.250s ease-in-out",
         }}
+        onClick={() => onArrowClick?.()}
       />
     </Box>
   );
@@ -135,6 +139,7 @@ function LegendItem({
             paddingTop: "1px",
           }}
           className={isLoading ? shimmerClassName : ""}
+          onClick={() => onToggle?.()}
         >
           {displayText}
         </Typography>
@@ -156,6 +161,7 @@ function LegendItem({
               fontWeight: 700,
               color: theme.colors.legend.text,
             }}
+            onClick={() => onToggle?.()}
             className={isLoading ? shimmerClassName : ""}
           >
             {isLoading ? "loadingloading" : formatNumberWithCommas(valueText)}
@@ -168,6 +174,8 @@ function LegendItem({
               opacity: 0,
               transition: "opacity 0.250s ease-in-out",
             }}
+            className="arrow-icon"
+            onClick={() => onArrowClick?.()}
           />
         </Box>
       )}
@@ -176,7 +184,6 @@ function LegendItem({
 
   return (
     <Box
-      onClick={onToggle}
       tabIndex={0}
       onMouseOver={onMouseOver}
       onMouseLeave={onMouseLeave}

@@ -53,7 +53,7 @@ function Legends({
     position === "left" || position === "right" ? "column" : "row";
 
   const handleToggleItem = useCallback(
-    (index: number, labelText: string) => {
+    (index: number) => {
       if (setHideIndex && hideIndex) {
         setHideIndex((prev) =>
           prev.includes(index)
@@ -61,12 +61,8 @@ function Legends({
             : [...prev, index],
         );
       }
-
-      if (onClick && data) {
-        onClick(data, labelText, index);
-      }
     },
-    [data, onClick, setHideIndex, hideIndex],
+    [data, setHideIndex, hideIndex],
   );
 
   const handleMouseOver = useCallback(
@@ -126,10 +122,15 @@ function Legends({
                   isLoading={isLoading}
                   doStrike={doStrike}
                   variant={variant}
-                  onToggle={() => handleToggleItem(index, label.text)}
+                  onToggle={() => handleToggleItem(index)}
                   onMouseOver={() => handleMouseOver(label.text)}
                   onMouseLeave={handleMouseLeave}
                   hideValues={hideValues}
+                  onArrowClick={() => {
+                    if (onClick && data) {
+                      onClick(data, label.text, index);
+                    }
+                  }}
                 />
               );
             })}

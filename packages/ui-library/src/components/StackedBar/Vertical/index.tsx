@@ -35,7 +35,7 @@ const DEFAULT_BAR_RADIUS = 4;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
-const MAX_BAR_WIDTH = 16;
+const DEFAULT_MAX_BAR_WIDTH = 16;
 const TICK_LABEL_PADDING = 8;
 const TRUNCATE_RATIO = 0.75;
 let AXISX_ROTATE = false;
@@ -55,7 +55,7 @@ function VerticalStackedBar({
   timestamp,
   colors = [],
   isLoading,
-  barWidth,
+  maxBarWidth = DEFAULT_MAX_BAR_WIDTH,
   titleProps,
   legendsProps,
   tooltipProps,
@@ -110,9 +110,6 @@ function VerticalStackedBar({
   const strokeWidth = getStrokeWidth(width, height);
 
   const [hoveredGroupKey, setHoveredGroupKey] = useState<string | null>(null);
-  const [legendHoveredGroupKey, setLegendHoveredGroupKey] = useState<
-    string | null
-  >(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const {
     showTooltip,
@@ -151,15 +148,9 @@ function VerticalStackedBar({
             }
           });
         }
-        if (legendHoveredGroupKey) {
-          const groupKey = legendHoveredGroupKey;
-          d.data = {
-            [groupKey]: d.data[groupKey],
-          };
-        }
         return d;
       }),
-    [data, hideIndex, groupKeys, legendHoveredGroupKey],
+    [data, hideIndex, groupKeys],
   );
 
   const legendData = useMemo(
@@ -798,8 +789,8 @@ function VerticalStackedBar({
         colorScale,
         hideIndex,
         setHideIndex,
-        hovered: legendHoveredGroupKey,
-        setHovered: setLegendHoveredGroupKey,
+        hovered: hoveredGroupKey,
+        setHovered: setHoveredGroupKey,
         isLoading,
         ...legendsProps,
       }}
@@ -858,10 +849,7 @@ function VerticalStackedBar({
             // Calculate bar width with maximum limit
             const calculatedBarWidth = xScale.bandwidth();
             // Use custom barWidth if provided, otherwise use default with maximum limit
-            const actualBarWidth =
-              barWidth !== undefined
-                ? barWidth
-                : Math.min(calculatedBarWidth, MAX_BAR_WIDTH);
+            const actualBarWidth = Math.min(calculatedBarWidth, maxBarWidth);
 
             // If the bar width is limited, center it
             const barX =

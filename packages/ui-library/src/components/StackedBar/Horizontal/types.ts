@@ -20,7 +20,7 @@ export interface HorizontalStackedBarChartProps {
   timestamp?: string;
   colors?: string[];
   isLoading?: boolean;
-  barWidth?: number;
+  maxBarHeight?: number;
   showTicks?: boolean;
   titleProps?: TitleProps;
   legendsProps?: Partial<LegendsProps>;
@@ -36,4 +36,5 @@ export interface HorizontalStackedBarChartProps {
     data: DataPoint,
     index: [number, number],
   ) => void;
+  removeBothAxis?: boolean;
 }

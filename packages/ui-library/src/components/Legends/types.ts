@@ -65,4 +65,5 @@ export interface LegendItemProps {
   onMouseOver?: () => void;
   onMouseLeave?: () => void;
   hideValues?: boolean;
+  onArrowClick?: () => void;
 }
