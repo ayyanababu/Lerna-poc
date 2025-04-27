@@ -44,6 +44,8 @@ const BASE_ADJUST_WIDTH = 5; // used to fix the check width for the overlap of x
 const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
 const BASE_ADJUST_HEIGHT = 5; // used to fix the check width for the overlap of yaxis
 const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
+const bottomHeightAddOnSpace = 0;
+const titleHeightAddOnSpace = 0;
 
 function VerticalStackedBar({
   data: _data,
@@ -81,6 +83,20 @@ function VerticalStackedBar({
   const [adjustedChartWidth, setAdjustedChartWidth] = useState<number | null>(
     null,
   );
+  const [bottomHeight, setBottomHeight] = useState(0);
+  const [titleHeight,setTitleHeight] = useState(0);  
+
+  useEffect(()=>{
+    if (parentRef.current){
+        setTimeout(()=>{
+           let legendbox = parentRef.current.parentNode.querySelectorAll('div')[0];
+           const spans = parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>('span');
+           const lastSpan = spans ? spans[spans.length - 1] : null;
+           setBottomHeight(legendbox.offsetHeight+lastSpan.offsetHeight + bottomHeightAddOnSpace)
+           setTitleHeight(parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>('.MuiTypography-h6').offsetHeight+titleHeightAddOnSpace)
+        },7500)   
+    }    
+  },[parentRef.current])       
 
   const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
   const axisXStart = DEFAULT_MARGIN.left + yAxisLabelWidth;
@@ -225,12 +241,12 @@ function VerticalStackedBar({
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
-    const titleHeight =
-      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
-      0;
-    const legendHeight =
-      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
-      0;
+ //   const titleHeight =
+ //     document.querySelector(".chart-title")?.getBoundingClientRect().height ||
+ //     0;
+    const legendHeight = bottomHeight
+//      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
+//      0;
     let updatedHeight =
       Math.max(
         DEFAULT_MARGIN.top +
@@ -239,7 +255,7 @@ function VerticalStackedBar({
           legendHeight +
           titleHeight,
         height,
-      ) + 5;
+      );
     const updatedWidth = Math.max(
       width,
       DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
@@ -253,7 +269,8 @@ function VerticalStackedBar({
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
+  }, [data, width, height, DEFAULT_MARGIN, innerWidth, bottomHeight, titleHeight]);
+
 
   const truncateXAxis = (
     textNodes: SVGTextElement[],
@@ -389,6 +406,7 @@ function VerticalStackedBar({
           +pnode
             .getAttribute("transform")
             .split("translate(")[1]
+            .split(")")[0]
             .split(",")[1] + bbox.y;
       } else {
         y = +bbox.y;
@@ -586,6 +604,7 @@ function VerticalStackedBar({
               +pnode
                 .getAttribute("transform")
                 .split("translate(")[1]
+                .split(")")[0]
                 .split(",")[1] + bbox.y;
           } else {
             y = +bbox.y;
@@ -612,6 +631,7 @@ function VerticalStackedBar({
             +pnode
               .getAttribute("transform")
               .split("translate(")[1]
+              .split(")")[0]
               .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;
@@ -649,6 +669,7 @@ function VerticalStackedBar({
             +pnode
               .getAttribute("transform")
               .split("translate(")[1]
+              .split(")")[0]
               .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;

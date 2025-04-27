@@ -26,7 +26,7 @@ interface DynamicMargin {
 }
 
 const DEFAULT_MARGIN = {
-  top: 20,
+  top: 0,
   right: 0,
   bottom: 20,
   left: 60,
@@ -46,6 +46,8 @@ const BASE_ADJUST_WIDTH = 5; // used to fix the check width for the overlap of x
 const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
 const BASE_ADJUST_HEIGHT = 5; // used to fix the check width for the overlap of yaxis
 const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
+const bottomHeightAddOnSpace = 0;
+const titleHeightAddOnSpace = 0;
 
 /**
  * Helper: measure the widest label in pixels using a hidden <canvas>
@@ -124,6 +126,8 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     string | null
   >(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
+  const [bottomHeight, setBottomHeight] = useState(0);
+  const [titleHeight,setTitleHeight] = useState(0);  
 
   // Tooltip
   const {
@@ -134,6 +138,18 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     tooltipTop,
     tooltipOpen,
   } = useTooltip<TooltipData[]>();
+
+  useEffect(()=>{
+    if (parentRef.current){
+        setTimeout(()=>{
+           let legendbox = parentRef.current.parentNode.querySelectorAll('div')[0];
+           const spans = parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>('span');
+           const lastSpan = spans ? spans[spans.length - 1] : null;
+           setBottomHeight(legendbox.offsetHeight+lastSpan.offsetHeight + bottomHeightAddOnSpace)
+           setTitleHeight(parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>('.MuiTypography-h6').offsetHeight+titleHeightAddOnSpace)
+        },7500)   
+    }    
+  },[parentRef.current])     
 
   // Decide whether to use real data or mock data
   const { data, groupKeys } = useMemo(() => {
@@ -334,16 +350,16 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     setMaxLabelWidth(Math.max(...widths, 0));
   }, [data, width, height]);
 
-  /*   useEffect(() => {
+  useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
-    const titleHeight =
-      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
-      0;
-    const legendHeight =
-      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
-      0;
+  //  const titleHeight =
+  //    document.querySelector(".chart-title")?.getBoundingClientRect().height ||
+  //    0;
+    const legendHeight = bottomHeight;
+  //    document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
+  //    0;
     const updatedHeight =
       Math.max(
         DEFAULT_MARGIN.top +
@@ -359,41 +375,38 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     );
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, innerWidth]); */
+  }, [data, width, height, DEFAULT_MARGIN, innerWidth, bottomHeight, titleHeight]);
+
 
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
+
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
-    const titleHeight =
-      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
-      0;
-    const legendHeight =
-      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
-      0;
-    let updatedHeight =
-      Math.max(
-        DEFAULT_MARGIN.top +
-          bbox.height +
-          DEFAULT_MARGIN.bottom +
-          legendHeight +
-          titleHeight,
-        height,
-      ) + 5;
-    const updatedWidth = Math.max(
-      width,
-      DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
-    );
-    if (AXISX_ROTATE) {
-      updatedHeight =
-        updatedHeight -
-        (
-          chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
-        ).getBBox().height;
-    }
+
+ //   const titleEl = document.querySelector(
+ //     ".chart-title",
+ //   ) as HTMLElement | null;
+ //   const legendEl = document.querySelector(
+ //     ".chart-legend",
+ //   ) as HTMLElement | null;
+
+    //const titleHeight = titleEl?.getBoundingClientRect().height || 0;
+    const legendHeight = bottomHeight; //legendEl?.getBoundingClientRect().height || 0;
+
+    const totalTop = DEFAULT_MARGIN.top + titleHeight;
+    const totalBottom = DEFAULT_MARGIN.bottom + legendHeight;
+    const requiredHeight = totalTop + bbox.height + totalBottom;
+    const requiredWidth = DEFAULT_MARGIN.left + drawableChartWidth + DEFAULT_MARGIN.right;
+
+    const updatedHeight = Math.max(requiredHeight, height);
+    const updatedWidth = Math.max(requiredWidth, width);
+
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
+  }, [data, width, height, DEFAULT_MARGIN, drawableChartWidth,bottomHeight, titleHeight]); 
+
+
 
   const truncateXAxis = (
     textNodes: SVGTextElement[],
@@ -529,6 +542,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
           +pnode
             .getAttribute("transform")
             .split("translate(")[1]
+            .split(")")[0]
             .split(",")[1] + bbox.y;
       } else {
         y = +bbox.y;
@@ -726,6 +740,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
               +pnode
                 .getAttribute("transform")
                 .split("translate(")[1]
+                .split(")")[0]
                 .split(",")[1] + bbox.y;
           } else {
             y = +bbox.y;
@@ -752,6 +767,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
             +pnode
               .getAttribute("transform")
               .split("translate(")[1]
+              .split(")")[0]
               .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;
@@ -789,6 +805,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
             +pnode
               .getAttribute("transform")
               .split("translate(")[1]
+              .split(")")[0]
               .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;

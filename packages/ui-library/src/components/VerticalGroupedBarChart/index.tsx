@@ -18,8 +18,8 @@ import { VerticalGroupedBarChartProps } from "./types";
 
 const DEFAULT_MARGIN = {
   top: 20,
-  right: 20,
-  bottom: 30,
+  right: 0,
+  bottom: 20,
   left: 30,
 };
 
@@ -34,6 +34,8 @@ const BASE_ADJUST_WIDTH = 5; // used to fix the check width for the overlap of x
 const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
 const BASE_ADJUST_HEIGHT = 5; // used to fix the check width for the overlap of yaxis
 const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
+const bottomHeightAddOnSpace = 0;
+const titleHeightAddOnSpace = 0;
 
 const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   data: _data,
@@ -61,6 +63,8 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
   const axisXStart = DEFAULT_MARGIN.left + yAxisLabelWidth;
   const drawableChartWidth = width - axisXStart - DEFAULT_MARGIN.right;
+  const [bottomHeight, setBottomHeight] = useState(0);
+  const [titleHeight,setTitleHeight] = useState(0);  
 
   //  const drawableChartWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
   const drawableChartHeight =
@@ -78,6 +82,19 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
 
   const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
     useTooltip<TooltipData[]>();
+
+  useEffect(()=>{
+    if (parentRef.current){
+        setTimeout(()=>{
+           console.log("hit")
+           let legendbox = parentRef.current.parentNode.querySelectorAll('div')[0];
+           const spans = parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>('span');
+           const lastSpan = spans ? spans[spans.length - 1] : null;
+           setBottomHeight(legendbox.offsetHeight+lastSpan.offsetHeight + bottomHeightAddOnSpace)
+           setTitleHeight(parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>('.MuiTypography-h6').offsetHeight+titleHeightAddOnSpace)
+        },7500)   
+    }    
+  },[parentRef.current]) 
 
   const { data, groupKeys } = useMemo(
     () =>
@@ -221,22 +238,22 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     setAdjustedChartHeight(Math.max(requiredHeight, height) + 5);
     setAdjustedChartWidth(Math.max(requiredWidth, width));
   }, [data, width, height, DEFAULT_MARGIN]);
-
+*/
 
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
 
-    const titleEl = document.querySelector(
-      ".chart-title",
-    ) as HTMLElement | null;
-    const legendEl = document.querySelector(
-      ".chart-legend",
-    ) as HTMLElement | null;
+ //   const titleEl = document.querySelector(
+ //     ".chart-title",
+ //   ) as HTMLElement | null;
+ //   const legendEl = document.querySelector(
+ //     ".chart-legend",
+ //   ) as HTMLElement | null;
 
-    const titleHeight = titleEl?.getBoundingClientRect().height || 0;
-    const legendHeight = legendEl?.getBoundingClientRect().height || 0;
+//    const titleHeight = titleEl?.getBoundingClientRect().height || 0;
+    const legendHeight = bottomHeight //legendEl?.getBoundingClientRect().height || 0;
 
     const totalTop = DEFAULT_MARGIN.top + titleHeight;
     const totalBottom = DEFAULT_MARGIN.bottom + legendHeight;
@@ -244,8 +261,8 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
 
     setAdjustedChartHeight(Math.max(requiredHeight, height) + 5);
     setAdjustedChartWidth(width);
-  }, [data, width, height, DEFAULT_MARGIN]);
-
+  }, [data, width, height, DEFAULT_MARGIN, bottomHeight, titleHeight]);
+/*
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
@@ -284,12 +301,12 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
-    const titleHeight =
-      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
-      0;
-    const legendHeight =
-      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
-      0;
+//    const titleHeight =
+//      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
+//      0;
+    const legendHeight = bottomHeight
+//      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
+//      0;
     let updatedHeight =
       Math.max(
         DEFAULT_MARGIN.top +
@@ -312,7 +329,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
+  }, [data, width, height, DEFAULT_MARGIN, innerWidth, bottomHeight, titleHeight]);
 
   const truncateXAxis = (
     textNodes: SVGTextElement[],
@@ -448,6 +465,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
           +pnode
             .getAttribute("transform")
             .split("translate(")[1]
+            .split(")")[0]
             .split(",")[1] + bbox.y;
       } else {
         y = +bbox.y;
@@ -645,6 +663,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
               +pnode
                 .getAttribute("transform")
                 .split("translate(")[1]
+                .split(")")[0]
                 .split(",")[1] + bbox.y;
           } else {
             y = +bbox.y;
@@ -671,6 +690,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
             +pnode
               .getAttribute("transform")
               .split("translate(")[1]
+              .split(")")[0]
               .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;
@@ -708,6 +728,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
             +pnode
               .getAttribute("transform")
               .split("translate(")[1]
+              .split(")")[0]
               .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;

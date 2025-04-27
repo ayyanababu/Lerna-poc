@@ -17,7 +17,7 @@ import { mockHorizontalBarChartData } from "./mockdata";
 import { DataPoint, HorizontalBarChartProps } from "./types";
 
 const DEFAULT_MARGIN = {
-  top: 20,
+  top: 0,
   right: 20,
   bottom: 30,
   left: 0,
@@ -35,6 +35,8 @@ const BASE_ADJUST_WIDTH = 5; // used to fix the check width for the overlap of x
 const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
 const BASE_ADJUST_HEIGHT = 5; // used to fix the check width for the overlap of yaxis
 const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
+const bottomHeightAddOnSpace = 0;
+const titleHeightAddOnSpace = 0;
 
 function getMaxLabelWidth(labels: string[], font = "10px sans-serif") {
   const canvas = document.createElement("canvas");
@@ -85,6 +87,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   const axis_bottom = useRef<SVGGElement | null>(null);
   const axis_left = useRef<SVGGElement | null>(null);
   const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
+  const [bottomHeight, setBottomHeight] = useState(0);
+  const [titleHeight,setTitleHeight] = useState(0);
 
   const {
     showTooltip,
@@ -94,6 +98,19 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     tooltipTop,
     tooltipOpen,
   } = useTooltip<TooltipData[]>();
+
+  useEffect(()=>{
+    if (parentRef.current){
+        setTimeout(()=>{
+           console.log("hit")
+           let legendbox = parentRef.current.parentNode.querySelectorAll('div')[0];
+           const spans = parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>('span');
+           const lastSpan = spans ? spans[spans.length - 1] : null;
+           setBottomHeight(legendbox.offsetHeight+lastSpan.offsetHeight + bottomHeightAddOnSpace)
+           setTitleHeight(parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>('.MuiTypography-h6').offsetHeight+titleHeightAddOnSpace)
+        },7500)   
+    }    
+  },[parentRef.current])  
 
   const data = useMemo<DataPoint[]>(
     () => (isLoading ? mockHorizontalBarChartData : _data),
@@ -206,33 +223,33 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     }
   };
 
-  /*   useEffect(() => {
+  useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
 
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
 
-    const titleEl = document.querySelector(
-      ".chart-title",
-    ) as HTMLElement | null;
-    const legendEl = document.querySelector(
-      ".chart-legend",
-    ) as HTMLElement | null;
+ //   const titleEl = document.querySelector(
+ //     ".chart-title",
+ //   ) as HTMLElement | null;
+ //   const legendEl = document.querySelector(
+ //     ".chart-legend",
+ //   ) as HTMLElement | null;
 
-    const titleHeight = titleEl?.getBoundingClientRect().height || 0;
-    const legendHeight = legendEl?.getBoundingClientRect().height || 0;
+    //const titleHeight = titleEl?.getBoundingClientRect().height || 0;
+    const legendHeight = bottomHeight; //legendEl?.getBoundingClientRect().height || 0;
 
     const totalTop = margin.top + titleHeight;
     const totalBottom = margin.bottom + legendHeight;
     const requiredHeight = totalTop + bbox.height + totalBottom;
     const requiredWidth = margin.left + drawableChartWidth + margin.right;
 
-    const updatedHeight = Math.max(requiredHeight, height) + 5;
+    const updatedHeight = Math.max(requiredHeight, height);
     const updatedWidth = Math.max(requiredWidth, width);
 
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, margin, drawableChartWidth]); */
+  }, [data, width, height, margin, drawableChartWidth,bottomHeight, titleHeight]); 
 
   useEffect(() => {
     if (!chartSvgRef.current) return;
@@ -266,16 +283,11 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     setAdjustedChartWidth(width);
   }, [data, width, height, DEFAULT_MARGIN]);
  */
-  useEffect(() => {
+ useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
-    const titleHeight =
-      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
-      0;
-    const legendHeight =
-      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
-      0;
+    const legendHeight = bottomHeight
     let updatedHeight =
       Math.max(
         DEFAULT_MARGIN.top +
@@ -284,12 +296,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           legendHeight +
           titleHeight,
         height,
-      ) + 5;
+      );
     const updatedWidth = Math.max(
       width,
       DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
     );
-    if (AXISX_ROTATE) {
+    if (AXISY_ROTATE) {
       updatedHeight =
         updatedHeight -
         (
@@ -298,7 +310,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
+  }, [data, width, height, DEFAULT_MARGIN, isLoading, innerWidth, bottomHeight, titleHeight]); 
 
   const truncateXAxis = (
     textNodes: SVGTextElement[],
@@ -433,6 +445,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           +pnode
             .getAttribute("transform")
             .split("translate(")[1]
+            .split(")")[0]
             .split(",")[1] + bbox.y;
       } else {
         y = +bbox.y;
@@ -626,11 +639,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           const pnode = node.parentNode as Element;
           let y = 0;
           if (pnode.getAttribute("transform")) {
-            y =
-              +pnode
-                .getAttribute("transform")
-                .split("translate(")[1]
-                .split(",")[1] + bbox.y;
+            y =            
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(")")[0]
+              .split(",")[1] + bbox.y;
           } else {
             y = +bbox.y;
           }
@@ -656,10 +670,14 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             +pnode
               .getAttribute("transform")
               .split("translate(")[1]
+              .split(")")[0]
               .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;
         }
+        console.log("height",bbox.height)
+        console.log("y",y)
+        console.log(usedRects)
         const rect = {
           y1: y - ADD_ADJUST_HEIGHT,
           y2: y + bbox.height + ADD_ADJUST_HEIGHT,
@@ -693,6 +711,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             +pnode
               .getAttribute("transform")
               .split("translate(")[1]
+              .split(")")[0]
               .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;

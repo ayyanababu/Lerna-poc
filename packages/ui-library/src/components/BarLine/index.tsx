@@ -17,6 +17,7 @@ import XAxis from "../XAxis";
 import YAxis from "../YAxis";
 import mockBarLineChartData from "./mockData";
 import { BarLineChartProps, BarLineData } from "./types";
+import { colors } from "@mui/material";
 
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
@@ -32,6 +33,8 @@ const BASE_ADJUST_WIDTH = 5; // used to fix the check width for the overlap of x
 const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
 const BASE_ADJUST_HEIGHT = 5; // used to fix the check width for the overlap of yaxis
 const ADD_ADJUST_HEIGHT = 5; // used to check the overlap of yaxis
+const bottomHeightAddOnSpace = 0;
+const titleHeightAddOnSpace = 0;
 
 //const fontSize = 10;
 //const labelPadding = 8;
@@ -74,7 +77,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     () => ({
       top: 0,
       right: isLoading ? 0 : 30,
-      bottom: isLoading ? 0 : 50,
+      bottom: isLoading ? 0 : 10,
       left: isLoading ? 0 : 60,
     }),
     [isLoading],
@@ -110,7 +113,8 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   const [hideChart, setHideChart] = useState<number[]>([]);
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
   const [hoveredChart, setHoveredChart] = useState<string | null>(null);
-
+  const [bottomHeight, setBottomHeight] = useState(0);
+  const [titleHeight,setTitleHeight] = useState(0);
   const {
     showTooltip,
     hideTooltip,
@@ -122,6 +126,19 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
   const leftMax = Math.max(...chartData.map((d) => d.yAxisLeft), 0);
   const rightMax = Math.max(...chartData.map((d) => d.yAxisRight), 0);
+
+  useEffect(()=>{
+    if (parentRef.current){
+        setTimeout(()=>{
+           console.log("hit")
+           let legendbox = parentRef.current.parentNode.querySelectorAll('div')[0];
+           const spans = parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>('span');
+           const lastSpan = spans ? spans[spans.length - 1] : null;
+           setBottomHeight(legendbox.offsetHeight+lastSpan.offsetHeight + bottomHeightAddOnSpace)
+           setTitleHeight(parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>('.MuiTypography-h6').offsetHeight+titleHeightAddOnSpace)
+        },7500)   
+    }    
+  },[parentRef.current])
 
   //  const yAxisLeftTickWidth = getTickWidth(leftMax);
   //  const yAxisRightTickWidth = getTickWidth(rightMax);
@@ -159,7 +176,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     //    const yAxisLabelWidthRight = maxLabelWidthRight + TICK_LABEL_PADDING;
     // const axisXEnd = DEFAULT_MARGIN.left + yAxisLabelWidthRight;
     setdrawableChartWidth(width - axisXStart - DEFAULT_MARGIN.right + 20);
-    const hgt = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
+    const hgt = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom - bottomHeight;
     setdrawableChartHeight(hgt);
     if (sideY.current) {
       sideY.current.setAttribute(
@@ -175,18 +192,14 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     sideY.current,
     DEFAULT_MARGIN,
     isLoading,
+    bottomHeight
   ]);
 
-  /*   useEffect(() => {
+  useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
-    const titleHeight =
-      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
-      0;
-    const legendHeight =
-      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
-      0;
+    const legendHeight = bottomHeight
     let updatedHeight =
       Math.max(
         DEFAULT_MARGIN.top +
@@ -209,7 +222,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, isLoading, innerWidth]); */
+  }, [data, width, height, DEFAULT_MARGIN, isLoading, innerWidth, bottomHeight, titleHeight]); 
 
   const xScale = useMemo(
     () =>
@@ -389,12 +402,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
-    const titleHeight =
-      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
-      0;
-    const legendHeight =
-      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
-      0;
+    const legendHeight = bottomHeight
     let updatedHeight =
       Math.max(
         DEFAULT_MARGIN.top +
@@ -417,7 +425,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, innerWidth]);
+  }, [data, width, height, DEFAULT_MARGIN, innerWidth, bottomHeight, titleHeight]);
 
   const truncateXAxis = (
     textNodes: SVGTextElement[],
@@ -553,6 +561,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
           +pnode
             .getAttribute("transform")
             .split("translate(")[1]
+            .split(")")[0]
             .split(",")[1] + bbox.y;
       } else {
         y = +bbox.y;
@@ -601,6 +610,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
           +pnode
             .getAttribute("transform")
             .split("translate(")[1]
+            .split(")")[0]
             .split(",")[1] + bbox.y;
       } else {
         y = +bbox.y;
@@ -799,6 +809,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
               +pnode
                 .getAttribute("transform")
                 .split("translate(")[1]
+                .split(")")[0]
                 .split(",")[1] + bbox.y;
           } else {
             y = +bbox.y;
@@ -825,6 +836,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
             +pnode
               .getAttribute("transform")
               .split("translate(")[1]
+              .split(")")[0]
               .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;
@@ -857,20 +869,6 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         const pnode = node.parentNode as Element;
         let y = 0;
         if (pnode.getAttribute("transform")) {
-          console.log(pnode.getAttribute("transform"));
-          console.log(
-            pnode
-              .getAttribute("transform")
-              .split("translate(")[1]
-              .split(")")[0],
-          );
-          console.log(
-            +pnode
-              .getAttribute("transform")
-              .split("translate(")[1]
-              .split(")")[0]
-              .split(",")[1],
-          );
           y =
             +pnode
               .getAttribute("transform")
@@ -951,6 +949,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
               +pnode
                 .getAttribute("transform")
                 .split("translate(")[1]
+                .split(")")[0]
                 .split(",")[1] + bbox.y;
           } else {
             y = +bbox.y;
@@ -977,6 +976,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
             +pnode
               .getAttribute("transform")
               .split("translate(")[1]
+              .split(")")[0]
               .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;
@@ -1013,6 +1013,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
             +pnode
               .getAttribute("transform")
               .split("translate(")[1]
+              .split(")")[0]
               .split(",")[1] + bbox.y;
         } else {
           y = +bbox.y;
