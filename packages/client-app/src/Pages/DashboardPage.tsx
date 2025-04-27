@@ -211,10 +211,10 @@ const fetchBarLineData = (): Promise<BarLineData> =>
                 'Dividend (NNA)',
                 'Dividend (NCA)',
                 'Dividend (NEA)',
-                'Stock Split (NCA)',
-                'Rights Issue (NCA)',
-                'Merger (NEA)',
-                'Tender Offer (NCA)',
+  //              'Stock Split (NCA)',
+  //              'Rights Issue (NCA)',
+  //              'Merger (NEA)',
+  //              'Tender Offer (NCA)',
             ];
 
             resolve({

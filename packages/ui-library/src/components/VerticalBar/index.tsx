@@ -39,7 +39,7 @@ const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
 const bottomHeightAddOnSpace = 0;
 const titleHeightAddOnSpace = 0;
 const truncatedLabelSuffix = "..";
-const activatesizing = false;
+const activatesizing =  true;
 const nodenametocheck = "SVG";
 
 /* const getEstimatedYAxisWidth = (maxValue: number, averageCharWidth = 7) => {
@@ -97,6 +97,8 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const axisXStart = DEFAULT_MARGIN.left + yAxisLabelWidth;
   const innerWidth = width - axisXStart - DEFAULT_MARGIN.right;
   const [drawableChartHeight, setdrawableChartHeight] = useState(0);
+  const [innerHeight, setinnerHeight] = useState(height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom)
+  let rotateincrease = 0;
 
   useEffect(() => {
     if (parentRef.current && activatesizing) {
@@ -183,7 +185,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     }, [DEFAULT_MARGIN, width, filteredData]);
    */
   //  const innerWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
-  const innerHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
+//  const innerHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
 
   useEffect(() => {
     setdrawableChartHeight(innerHeight);
@@ -331,7 +333,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
         ).getBBox().height;
     }
-    setAdjustedChartHeight(updatedHeight);
+    setAdjustedChartHeight(updatedHeight+rotateincrease);
     setAdjustedChartWidth(updatedWidth);
   }, [
     data,
@@ -379,7 +381,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           x2: x + bbox.width + ADD_ADJUST_WIDTH,
         };
         const us = usedRects.filter(
-          (r: { x1: number; x2: number }, i: number) => i === index + 1,
+          (r: { x1: number; x2: number }, i: number) => i === index + 2,
         );
         const isOverlapping = us.some(
           (r: { x1: number; x2: number }) => rect.x1 >= r.x1 && rect.x1 <= r.x2,
@@ -817,9 +819,20 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
   const rotated = (rotate: boolean) => {
     AXISX_ROTATE = rotate;
+    if (rotate){
+      rotateincrease = 70
+    }
     console.log("rotating");
     if (rotate && chartSvgRef.current) {
       setTimeout(() => {
+        const legendHeight = bottomHeight;
+        const bottomaxisheight = axis_bottom.current.getBBox().height - 30;
+        const hgt =
+           height -
+           DEFAULT_MARGIN.top -
+           DEFAULT_MARGIN.bottom -
+           bottomaxisheight;
+        setinnerHeight(hgt);   
         //     const svg = chartSvgRef.current;
         //     const bbox = svg.getBBox();
         //     const legendHeight = bottomHeight;

@@ -26,7 +26,7 @@ import { VerticalStackedBarChartProps } from "./types";
 
 const DEFAULT_MARGIN = {
   top: 20,
-  right: -50,
+  right: -20,
   bottom: 45,
   left: 20,
 };
@@ -38,7 +38,7 @@ const SCALE_PADDING = 1.2;
 const DEFAULT_MAX_BAR_WIDTH = 16;
 const TICK_LABEL_PADDING = 8;
 const TRUNCATE_RATIO = 0.75;
-let AXISX_ROTATE = true;
+let AXISX_ROTATE = false;
 const AXISY_ROTATE = true;
 const BASE_ADJUST_WIDTH = 0; // used to fix the check width for the overlap of xaxis
 const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
@@ -47,7 +47,7 @@ const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
 const bottomHeightAddOnSpace = 0;
 const titleHeightAddOnSpace = 0;
 const truncatedLabelSuffix = "..";
-const activatesizing = false;
+const activatesizing = true;
 const nodenametocheck = "SVG";
 
 function VerticalStackedBar({
@@ -76,7 +76,7 @@ function VerticalStackedBar({
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
   //const innerWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
-  const innerHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
+  const innerHeight  = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
   const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
   const axis_bottom = useRef<SVGGElement | null>(null);
   const axis_left = useRef<SVGGElement | null>(null);
@@ -88,6 +88,7 @@ function VerticalStackedBar({
   );
   const [bottomHeight, setBottomHeight] = useState(0);
   const [titleHeight, setTitleHeight] = useState(0);
+  const [drawableChartHeight,setdrawableChartHeight] = useState(0);
 
   useEffect(() => {
     if (parentRef.current && activatesizing) {
@@ -238,6 +239,7 @@ function VerticalStackedBar({
     [filteredData, innerWidth],
   );
 
+
   const yScale = useMemo(
     () =>
       scaleLinear<number>({
@@ -332,7 +334,7 @@ function VerticalStackedBar({
           x2: x + bbox.width + ADD_ADJUST_WIDTH,
         };
         const us = usedRects.filter(
-          (r: { x1: number; x2: number }, i: number) => i === index + 1,
+          (r: { x1: number; x2: number }, i: number) => i === index + 2,
         );
         const isOverlapping = us.some(
           (r: { x1: number; x2: number }) => rect.x1 >= r.x1 && rect.x1 <= r.x2,
@@ -775,14 +777,15 @@ function VerticalStackedBar({
       setTimeout(() => {
         //    const svg = chartSvgRef.current;
         //    const bbox = svg.getBBox();
-        //    const legendHeight = bottomHeight;
-        //    const bottomaxisheight = axis_bottom.current.getBBox().height;
-        //    const hgt =
-        //      height -
-        //      DEFAULT_MARGIN.top -
-        //      DEFAULT_MARGIN.bottom -
-        //      bottomaxisheight;
-        //    setdrawableChartHeight(hgt);
+        //      const legendHeight = bottomHeight;
+        //      const bottomaxisheight = axis_bottom.current.getBBox().height+50;
+        //      const hgt =
+        //         height -
+        //         DEFAULT_MARGIN.top -
+        //         DEFAULT_MARGIN.bottom -
+        //         bottomaxisheight;
+        //     setinnerHeight(hgt);    
+//             setdrawableChartHeight(hgt);
       }, 200);
     }
   };

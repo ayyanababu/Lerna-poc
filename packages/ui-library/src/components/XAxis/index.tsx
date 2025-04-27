@@ -237,7 +237,7 @@ function XAxis({
     }
     //  console.log(dynamicNumTicks, "dynamicNumTicks");
     //  console.log(scaleLabels.length,"scale")
-    if (scaleLabels.length <= dynamicNumTicks || !isOverlapping) {
+    if (scaleLabels.length < dynamicNumTicks || !isOverlapping) {
       return {
         angle: 0,
         evenPositionsMap: null,
