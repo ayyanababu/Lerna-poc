@@ -13,8 +13,10 @@ import { shimmerClassName } from "../Shimmer/Shimmer";
 import { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { XAxisProps } from "./types";
 
-const MAX_LABEL_CHARS = 15;
+//const MAX_LABEL_CHARS = 15;
 const FIXED_CLASSNAME_XLABELS = "fixed-classname-xlabels";
+const BASE_ADJUST_WIDTH = 10;
+const ADD_ADJUST_WIDTH = 0;
 
 function XAxis({
   availableWidth = 0,
@@ -53,26 +55,90 @@ function XAxis({
           return;
         }
 
-        let lastRight = 0;
-        let overlapping = false;
-        let widthSum = 0;
-        let totalChars = 0;
-
-        nodeList.forEach((node) => {
-          const { width, left, right } = node.getBoundingClientRect();
-          const chars = node.innerHTML.length;
-
-          if (lastRight > left) overlapping = true;
-
-          lastRight = right;
-          widthSum += width;
-          totalChars += chars;
+        //   let lastRight = 0;
+        //   let overlapping = false;
+        //    let widthSum = 0;
+        //    let totalChars = 0;
+        const usedRects: { x1: number; x2: number }[] = [];
+        nodeList.forEach((node: SVGTextElement) => {
+          const bbox = node.getBBox();
+          const pnode = node.parentNode as Element;
+          let x = 0;
+          if (pnode.getAttribute("transform")) {
+            x =
+              +pnode
+                .getAttribute("transform")
+                .split("translate(")[1]
+                .split(",")[0] + bbox.x;
+          } else {
+            x = +bbox.x;
+          }
+          const rect = {
+            x1: x - BASE_ADJUST_WIDTH,
+            x2: x + bbox.width + BASE_ADJUST_WIDTH,
+          };
+          usedRects.push(rect);
         });
-
-        if (overlapping) {
+        console.log("xaxisused", usedRects);
+        const nodeIndices = Array.from(
+          { length: nodeList.length },
+          (_, i) => i,
+        );
+        let isOverlappings = false;
+        nodeIndices.forEach((index: number) => {
+          nodeList.forEach((node: SVGTextElement, nindex: number) => {
+            console.log(node.textContent);
+            if (index !== nindex) {
+              const bbox = node.getBBox();
+              let x = 0;
+              const pnode = node.parentNode as Element;
+              if (pnode.getAttribute("transform")) {
+                x =
+                  +pnode
+                    .getAttribute("transform")
+                    .split("translate(")[1]
+                    .split(",")[0] + bbox.x;
+              } else {
+                x = +bbox.x;
+              }
+              const us = usedRects.filter(
+                (r: { x1: number; x2: number }, i: number) => i !== index,
+              );
+              const rect = {
+                x1: x - ADD_ADJUST_WIDTH,
+                x2: x + bbox.width + ADD_ADJUST_WIDTH,
+              };
+              const isOverlapping = us.some(
+                (r: { x1: number; x2: number }) =>
+                  !(rect.x2 < r.x1 || rect.x1 > r.x2),
+              );
+              if (isOverlapping) {
+                isOverlappings = isOverlapping;
+              }
+            }
+          });
+        });
+        console.log("overlaps", isOverlappings);
+        if (isOverlappings) {
           setIsOverlapping(true);
-          setAverageWidthPerChar(Math.ceil(widthSum / totalChars));
+        } else {
+          setIsOverlapping(false);
         }
+        //        nodeList.forEach((node) => {
+        //          const { width, left, right } = node.getBoundingClientRect();
+        //          const chars = node.innerHTML.length;
+        //
+        //          if (lastRight > left) overlapping = true/;
+        //
+        //          lastRight = right;
+        //          widthSum += width;
+        //          totalChars += chars;
+        //        });
+
+        //        if (overlapping) {
+        //          setIsOverlapping(true);
+        //          setAverageWidthPerChar(Math.ceil(widthSum / totalChars));
+        //        }
       });
     },
     [],
@@ -157,54 +223,55 @@ function XAxis({
       return {
         angle: 0,
         evenPositionsMap: null,
-        //   formatLabel: (label: string): string => {
-        //     return String(label)
-        //              if (typeof label !== "string") return String(label);
-        //             return label.length > MAX_LABEL_CHARS
-        //               ? `${label.substring(0, MAX_LABEL_CHARS - 3)}...`
-        //               : label;
-        //  },
+        formatLabel: (label: string): string => {
+          return String(label);
+          //              if (typeof label !== "string") return String(label);
+          //             return label.length > MAX_LABEL_CHARS
+          //               ? `${label.substring(0, MAX_LABEL_CHARS - 3)}...`
+          //               : label;
+        },
         rotate: false,
         textAnchor: "middle",
         tickValues: [],
       };
     }
-    console.log(dynamicNumTicks, "dynamicNumTicks");
-    if (scaleLabels.length <= dynamicNumTicks) {
+    //  console.log(dynamicNumTicks, "dynamicNumTicks");
+    //  console.log(scaleLabels.length,"scale")
+    if (scaleLabels.length <= dynamicNumTicks || !isOverlapping) {
       return {
         angle: 0,
         evenPositionsMap: null,
-        // formatLabel: (label: string): string => {
-        //   return String(label);
-        //          if (typeof label !== "string") return String(label);
+        formatLabel: (label: string): string => {
+          return String(label);
+          //          if (typeof label !== "string") return String(label);
 
-        //          return label.length > maxLabelChars && isOverlapping
-        //            ? `${label.substring(0, maxLabelChars - 3)}...`
-        //            : label;
-        // },
+          //          return label.length > maxLabelChars && isOverlapping
+          //            ? `${label.substring(0, maxLabelChars - 3)}...`
+          //            : label;
+        },
         rotate: false,
         textAnchor: "middle",
         tickValues: null,
       };
     }
-
     if (
       scaleLabels.length <= dynamicNumTicks * 2 ||
       availableWidthPerLabel > estimatedMaxLabelWidth * 0.6
     ) {
-      const rotatedCharLimit = Math.min(
-        MAX_LABEL_CHARS,
-        Math.floor((availableWidthPerLabel * 3.5) / averageWidthPerChar),
-      );
+      //      const rotatedCharLimit = Math.min(
+      //        MAX_LABEL_CHARS,
+      //        Math.floor((availableWidthPerLabel * 3.5) / averageWidthPerChar),
+      //     );
 
       return {
         angle: -45,
         evenPositionsMap: null,
         formatLabel: (label: string): string => {
-          if (typeof label !== "string") return String(label);
-          return label.length > rotatedCharLimit
-            ? `${label.substring(0, rotatedCharLimit - 3)}...`
-            : label;
+          return String(label);
+          //     if (typeof label !== "string") return String(label);
+          //      return label.length > rotatedCharLimit
+          //        ? `${label.substring(0, rotatedCharLimit - 3)}...`
+          //        : label;
         },
         rotate: true,
         textAnchor: "end",
@@ -243,22 +310,23 @@ function XAxis({
 
     // Calculate how many characters we can show based on available space
 
-    const rotatedSpaceFactor = 1.8;
-    const maxCharsPerLabel = Math.floor(
-      (availableWidthPerLabel * rotatedSpaceFactor) / averageWidthPerChar,
-    );
+    //const rotatedSpaceFactor = 1.8;
+    //    const maxCharsPerLabel = Math.floor(
+    //      (availableWidthPerLabel * rotatedSpaceFactor) / averageWidthPerChar,
+    //    );
 
-    const charLimit = Math.min(MAX_LABEL_CHARS, Math.max(8, maxCharsPerLabel));
+    //    const charLimit = Math.min(MAX_LABEL_CHARS, Math.max(8, maxCharsPerLabel));
 
     return {
       angle: -45,
       evenPositionsMap: positions,
       formatLabel: (label: string): string => {
-        if (typeof label !== "string") return String(label);
+        return String(label);
+        //    if (typeof label !== "string") return String(label);
 
-        return label.length > charLimit
-          ? `${label.substring(0, charLimit - 3)}...`
-          : label;
+        //       return label.length > charLimit
+        //         ? `${label.substring(0, charLimit - 3)}...`
+        //         : label;
       },
       rotate: true,
       textAnchor: "end",
@@ -301,6 +369,8 @@ function XAxis({
     const yOffset = showAxisLine ? labelOffset : labelOffset / 2;
 
     if (rotate) {
+      console.log("rotate", rotate);
+      console.log("label", label);
       if (typeof rotated === "function") {
         rotated(true);
       }
@@ -349,7 +419,7 @@ function XAxis({
     fill: theme.colors.axis.title,
     dy: showAxisLine
       ? `${labelOffset + 4}px`
-      : `${labelOffset + (!rotate ? 10 : 47)}px`,
+      : `${labelOffset + (!rotate ? 10 : 62)}px`,
   };
 
   const mergedTickLabelProps = {

@@ -11,7 +11,7 @@ const MIN_SPACE_BETWEEN_TICKS = 45;
 // Added more bottom padding for rotated labels
 const ROTATED_LABEL_PADDING = 20;
 
-function XAxis({
+function XAxisNew({
   availableWidth = 0,
   hideAllTicks = false,
   isLoading = false,
@@ -301,4 +301,4 @@ function XAxis({
   );
 }
 
-export default XAxis;
+export default XAxisNew;

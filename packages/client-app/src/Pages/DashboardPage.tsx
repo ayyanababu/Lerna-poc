@@ -261,7 +261,7 @@ const fetchHorizontalBarData = (): Promise<VerticalBarItem[]> =>
             resolve(
                 Array.from({ length: 5 }, (_, index) => ({
                     label: `${index + 1} asdf adfasdf a`,
-                    value: Math.floor(Math.random() * 100),
+                    value: Math.floor(Math.random() * 100000),
                 })),
             );
         }, 1600);
@@ -735,10 +735,10 @@ body:not(.dark) {
                     {
                         <Sortable className="my-cards" styles={{
                             3: {
-                                gridColumn: 'span 2',
+                                gridColumn: 'span 1',
                             },
                             6: {
-                                gridColumn: 'span 2',
+                                gridColumn: 'span 1',
                             }
                         }}>
                             <SortableCard height={400} width={'100%'}>

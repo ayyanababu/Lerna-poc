@@ -38,14 +38,17 @@ const SCALE_PADDING = 1.2;
 const DEFAULT_MAX_BAR_WIDTH = 16;
 const TICK_LABEL_PADDING = 8;
 const TRUNCATE_RATIO = 0.75;
-let AXISX_ROTATE = false;
+let AXISX_ROTATE = true;
 const AXISY_ROTATE = true;
-const BASE_ADJUST_WIDTH = 5; // used to fix the check width for the overlap of xaxis
+const BASE_ADJUST_WIDTH = 0; // used to fix the check width for the overlap of xaxis
 const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
 const BASE_ADJUST_HEIGHT = 5; // used to fix the check width for the overlap of yaxis
 const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
 const bottomHeightAddOnSpace = 0;
 const titleHeightAddOnSpace = 0;
+const truncatedLabelSuffix = "..";
+const activatesizing = false;
+const nodenametocheck = "SVG";
 
 function VerticalStackedBar({
   data: _data,
@@ -84,19 +87,44 @@ function VerticalStackedBar({
     null,
   );
   const [bottomHeight, setBottomHeight] = useState(0);
-  const [titleHeight,setTitleHeight] = useState(0);  
+  const [titleHeight, setTitleHeight] = useState(0);
 
-  useEffect(()=>{
-    if (parentRef.current){
-        setTimeout(()=>{
-           let legendbox = parentRef.current.parentNode.querySelectorAll('div')[0];
-           const spans = parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>('span');
-           const lastSpan = spans ? spans[spans.length - 1] : null;
-           setBottomHeight(legendbox.offsetHeight+lastSpan.offsetHeight + bottomHeightAddOnSpace)
-           setTitleHeight(parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>('.MuiTypography-h6').offsetHeight+titleHeightAddOnSpace)
-        },7500)   
-    }    
-  },[parentRef.current])       
+  useEffect(() => {
+    if (parentRef.current && activatesizing) {
+      setTimeout(() => {
+        const legendboxtimer = setInterval(() => {
+          if (
+            parentRef.current.parentNode &&
+            parentRef.current.parentNode.querySelectorAll("div")[0]
+          ) {
+            const legendbox =
+              parentRef.current.parentNode.querySelectorAll("div")[0];
+            const spans =
+              parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
+                "span",
+              );
+            const lastSpan = spans ? spans[spans.length - 1] : null;
+            setBottomHeight(
+              legendbox.offsetHeight +
+                lastSpan.offsetHeight +
+                bottomHeightAddOnSpace,
+            );
+            clearInterval(legendboxtimer);
+          }
+        }, 10);
+        const titleboxtimer = setInterval(() => {
+          const titlebox =
+            parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
+              ".MuiTypography-h6",
+            );
+          if (titlebox) {
+            setTitleHeight(titlebox.offsetHeight + titleHeightAddOnSpace);
+            clearInterval(titleboxtimer);
+          }
+        }, 10);
+      }, 100);
+    }
+  }, [parentRef.current]);
 
   const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
   const axisXStart = DEFAULT_MARGIN.left + yAxisLabelWidth;
@@ -232,21 +260,20 @@ function VerticalStackedBar({
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
     const bbox = svg.getBBox();
- //   const titleHeight =
- //     document.querySelector(".chart-title")?.getBoundingClientRect().height ||
- //     0;
-    const legendHeight = bottomHeight
-//      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
-//      0;
-    let updatedHeight =
-      Math.max(
-        DEFAULT_MARGIN.top +
-          bbox.height +
-          DEFAULT_MARGIN.bottom +
-          legendHeight +
-          titleHeight,
-        height,
-      );
+    //   const titleHeight =
+    //     document.querySelector(".chart-title")?.getBoundingClientRect().height ||
+    //     0;
+    const legendHeight = bottomHeight;
+    //      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
+    //      0;
+    let updatedHeight = Math.max(
+      DEFAULT_MARGIN.top +
+        bbox.height +
+        DEFAULT_MARGIN.bottom +
+        legendHeight +
+        titleHeight,
+      height,
+    );
     const updatedWidth = Math.max(
       width,
       DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
@@ -260,8 +287,15 @@ function VerticalStackedBar({
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, innerWidth, bottomHeight, titleHeight]);
-
+  }, [
+    data,
+    width,
+    height,
+    DEFAULT_MARGIN,
+    innerWidth,
+    bottomHeight,
+    titleHeight,
+  ]);
 
   const truncateXAxis = (
     textNodes: SVGTextElement[],
@@ -270,46 +304,18 @@ function VerticalStackedBar({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      const label = node.dataset.fulltext || node.textContent || "";
-      let truncated = label;
-      if (label.length > 3) {
-        truncated =
-          label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
-      }
-      console.log("tr", truncated);
-      const original = node.textContent;
-      // node.textContent = truncated;
-      const bbox = node.getBBox();
-      node.textContent = original;
-      let x = 0;
-      const pnode = node.parentNode as Element;
-      if (pnode.getAttribute("transform")) {
-        x =
-          +pnode
-            .getAttribute("transform")
-            .split("translate(")[1]
-            .split(",")[0] + bbox.x;
-      } else {
-        x = +bbox.x;
-      }
-      const rect = {
-        x1: x - ADD_ADJUST_WIDTH,
-        x2: x + bbox.width + ADD_ADJUST_WIDTH,
-      };
-      const us = usedRects.filter(
-        (r: { x1: number; x2: number }, i: number) => i !== index + 1,
-      );
-      const isOverlapping = us.some(
-        (r: { x1: number; x2: number }) => !(rect.x2 < r.x1 || rect.x1 > r.x2),
-      );
-      if (!isOverlapping) {
-        node.textContent = label;
-        node.setAttribute("display", "block");
-        axisadded[index + 1] = true;
-      } else {
-        axisadded[index + 1] = false;
-        node.textContent = truncated;
+      if (node && node.parentNode.nodeName.toUpperCase() !== nodenametocheck) {
+        const label = node.dataset.fulltext || node.textContent || "";
+        let truncated = label;
+        if (label.length > 3) {
+          truncated =
+            label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) +
+            truncatedLabelSuffix;
+        }
+        const original = node.textContent;
+        // node.textContent = truncated;
         const bbox = node.getBBox();
+        node.textContent = original;
         let x = 0;
         const pnode = node.parentNode as Element;
         if (pnode.getAttribute("transform")) {
@@ -325,25 +331,20 @@ function VerticalStackedBar({
           x1: x - ADD_ADJUST_WIDTH,
           x2: x + bbox.width + ADD_ADJUST_WIDTH,
         };
-        const isOverlapping = usedRects.some(
-          (r: { x1: number; x2: number }) =>
-            !(rect.x2 < r.x1 || rect.x1 > r.x2),
+        const us = usedRects.filter(
+          (r: { x1: number; x2: number }, i: number) => i === index + 1,
+        );
+        const isOverlapping = us.some(
+          (r: { x1: number; x2: number }) => rect.x1 >= r.x1 && rect.x1 <= r.x2,
         );
         if (!isOverlapping) {
-          node.textContent = truncated;
+          node.textContent = label;
           node.setAttribute("display", "block");
           axisadded[index + 1] = true;
         } else {
           axisadded[index + 1] = false;
-          let newtruncated = truncated;
-          if (truncated.length > 3) {
-            newtruncated =
-              truncated.slice(
-                0,
-                Math.floor(truncated.length * TRUNCATE_RATIO * 0.5),
-              ) + "…";
-          }
-          node.textContent = newtruncated;
+          node.textContent = truncated;
+          const bbox = node.getBoundingClientRect();
           let x = 0;
           const pnode = node.parentNode as Element;
           if (pnode.getAttribute("transform")) {
@@ -361,15 +362,50 @@ function VerticalStackedBar({
           };
           const isOverlapping = usedRects.some(
             (r: { x1: number; x2: number }) =>
-              !(rect.x2 < r.x1 || rect.x1 > r.x2),
+              rect.x1 >= r.x1 && rect.x1 <= r.x2,
           );
-          if (isOverlapping) {
-            axisadded[index + 1] = false;
-            if (!centeronly) {
-              node.setAttribute("display", "none");
-            }
-          } else {
+          if (!isOverlapping) {
+            node.textContent = truncated;
+            node.setAttribute("display", "block");
             axisadded[index + 1] = true;
+          } else {
+            axisadded[index + 1] = false;
+            let newtruncated = truncated;
+            if (truncated.length > 3) {
+              newtruncated =
+                truncated.slice(
+                  0,
+                  Math.floor(truncated.length * TRUNCATE_RATIO * 0.5),
+                ) + truncatedLabelSuffix;
+            }
+            node.textContent = newtruncated;
+            let x = 0;
+            const pnode = node.parentNode as Element;
+            if (pnode.getAttribute("transform")) {
+              x =
+                +pnode
+                  .getAttribute("transform")
+                  .split("translate(")[1]
+                  .split(",")[0] + bbox.x;
+            } else {
+              x = +bbox.x;
+            }
+            const rect = {
+              x1: x - ADD_ADJUST_WIDTH,
+              x2: x + bbox.width + ADD_ADJUST_WIDTH,
+            };
+            const isOverlapping = usedRects.some(
+              (r: { x1: number; x2: number }) =>
+                rect.x1 >= r.x1 && rect.x1 <= r.x2,
+            );
+            if (isOverlapping) {
+              axisadded[index + 1] = false;
+              if (!centeronly) {
+                //   node.setAttribute("display", "none");
+              }
+            } else {
+              axisadded[index + 1] = true;
+            }
           }
         }
       }
@@ -383,43 +419,45 @@ function VerticalStackedBar({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      const label = node.dataset.fulltext || node.textContent || "";
-      //      const truncated =
-      //       label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
-      const original = node.textContent;
-      // node.textContent = truncated;
-      const bbox = node.getBBox();
-      node.textContent = original;
-      let y = 0;
-      const pnode = node.parentNode as Element;
-      if (pnode.getAttribute("transform")) {
-        y =
-          +pnode
-            .getAttribute("transform")
-            .split("translate(")[1]
-            .split(")")[0]
-            .split(",")[1] + bbox.y;
-      } else {
-        y = +bbox.y;
-      }
-      const rect = {
-        y1: y - ADD_ADJUST_HEIGHT,
-        y2: y + bbox.height + ADD_ADJUST_HEIGHT,
-      };
-      const us = usedRects.filter(
-        (r: { y1: number; y2: number }, i: number) => i !== index + 1,
-      );
-      const isOverlapping = us.some(
-        (r: { y1: number; y2: number }) => !(rect.y2 < r.y1 || rect.y1 > r.y2),
-      );
-      if (!isOverlapping) {
-        node.textContent = label;
-        node.setAttribute("display", "block");
-        axisadded[index + 1] = true;
-      } else {
-        axisadded[index + 1] = false;
-        if (!centeronly) {
-          node.setAttribute("display", "none");
+      if (node && node.parentNode.nodeName.toUpperCase() !== nodenametocheck) {
+        const label = node.dataset.fulltext || node.textContent || "";
+        //  const truncated =
+        //    label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        const original = node.textContent;
+        // node.textContent = truncated;
+        const bbox = node.getBoundingClientRect();
+        node.textContent = original;
+        let y = 0;
+        const pnode = node.parentNode as Element;
+        if (pnode.getAttribute("transform")) {
+          y =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(")")[0]
+              .split(",")[1] + bbox.y;
+        } else {
+          y = +bbox.y;
+        }
+        const rect = {
+          y1: y - ADD_ADJUST_HEIGHT,
+          y2: y + bbox.height + ADD_ADJUST_HEIGHT,
+        };
+        const us = usedRects.filter(
+          (r: { y1: number; y2: number }, i: number) => i === index + 2,
+        );
+        const isOverlapping = us.some(
+          (r: { y1: number; y2: number }) => rect.y1 >= r.y1 && rect.y1 <= r.y2,
+        );
+        if (!isOverlapping) {
+          node.textContent = label;
+          node.setAttribute("display", "block");
+          axisadded[index + 1] = true;
+        } else {
+          axisadded[index + 1] = false;
+          if (!centeronly) {
+            node.setAttribute("display", "none");
+          }
         }
       }
     });
@@ -448,7 +486,12 @@ function VerticalStackedBar({
         node.dataset.fulltext = full;
       });
       textNodes.forEach((node, i) => {
-        if (i !== 0 && i !== textNodes.length - 1) {
+        if (
+          i !== 0 &&
+          i !== textNodes.length - 1 &&
+          node &&
+          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+        ) {
           const bbox = node.getBBox();
           const pnode = node.parentNode as Element;
           let x = 0;
@@ -472,40 +515,49 @@ function VerticalStackedBar({
       const firstNode = textNodes[0];
       const lastNode = textNodes[textNodes.length - 1];
       const showAndTruncate = (node: SVGTextElement, index: number) => {
-        const label = node.dataset.fulltext || node.textContent || "";
-        let truncated = label;
-        if (label.length > 3) {
-          truncated =
-            label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
-        }
-        const bbox = node.getBBox();
-        const pnode = node.parentNode as Element;
-        let x = 0;
-        if (pnode.getAttribute("transform")) {
-          x =
-            +pnode
-              .getAttribute("transform")
-              .split("translate(")[1]
-              .split(",")[0] + bbox.x;
-        } else {
-          x = +bbox.x;
-        }
-        const rect = {
-          x1: x - ADD_ADJUST_WIDTH,
-          x2: x + bbox.width + ADD_ADJUST_WIDTH,
-        };
-        const isOverlapping = usedRects.some(
-          (r: { x1: number; x2: number }) =>
-            !(rect.x2 < r.x1 || rect.x1 > r.x2),
-        );
-        if (!isOverlapping) {
-          axisadded[index] = true;
-          node.textContent = label;
-          node.setAttribute("display", "block");
-        } else {
-          node.textContent = truncated;
-          axisadded[index] = true;
-          node.setAttribute("display", "block");
+        if (
+          node &&
+          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+        ) {
+          const label = node.dataset.fulltext || node.textContent || "";
+          let truncated = label;
+          if (label.length > 3) {
+            truncated =
+              label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) +
+              truncatedLabelSuffix;
+          }
+          const bbox = node.getBoundingClientRect();
+          const pnode = node.parentNode as Element;
+          let x = 0;
+          if (pnode.getAttribute("transform")) {
+            x =
+              +pnode
+                .getAttribute("transform")
+                .split("translate(")[1]
+                .split(",")[0] + bbox.x;
+          } else {
+            x = +bbox.x;
+          }
+          const rect = {
+            x1: x - ADD_ADJUST_WIDTH,
+            x2: x + bbox.width + ADD_ADJUST_WIDTH,
+          };
+          const us = usedRects.filter(
+            (r: { x1: number; x2: number }, i: number) => i !== index,
+          );
+          const isOverlapping = us.some(
+            (r: { x1: number; x2: number }) =>
+              rect.x1 >= r.x1 && rect.x1 <= r.x2,
+          );
+          if (!isOverlapping) {
+            axisadded[index] = true;
+            node.textContent = label;
+            node.setAttribute("display", "block");
+          } else {
+            node.textContent = truncated;
+            axisadded[index] = true;
+            node.setAttribute("display", "block");
+          }
         }
       };
 
@@ -515,23 +567,28 @@ function VerticalStackedBar({
 
       usedRects = [];
       textNodes.forEach((node) => {
-        const bbox = node.getBBox();
-        const pnode = node.parentNode as Element;
-        let x = 0;
-        if (pnode.getAttribute("transform")) {
-          x =
-            +pnode
-              .getAttribute("transform")
-              .split("translate(")[1]
-              .split(",")[0] + bbox.x;
-        } else {
-          x = +bbox.x;
+        if (
+          node &&
+          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+        ) {
+          const bbox = node.getBBox();
+          const pnode = node.parentNode as Element;
+          let x = 0;
+          if (pnode.getAttribute("transform")) {
+            x =
+              +pnode
+                .getAttribute("transform")
+                .split("translate(")[1]
+                .split(",")[0] + bbox.x;
+          } else {
+            x = +bbox.x;
+          }
+          const rect = {
+            x1: x - BASE_ADJUST_WIDTH,
+            x2: x + bbox.width + BASE_ADJUST_WIDTH,
+          };
+          usedRects.push(rect);
         }
-        const rect = {
-          x1: x - BASE_ADJUST_WIDTH,
-          x2: x + bbox.width + BASE_ADJUST_WIDTH,
-        };
-        usedRects.push(rect);
       });
       truncateXAxis(textNodes, usedRects, axisadded, false);
       const trueCount = Object.values(axisadded).filter(
@@ -542,9 +599,11 @@ function VerticalStackedBar({
         const midcount = Math.round((textNodes.length - 1) / 2);
         textNodes.forEach((node, index) => {
           if (
-            index === 0 ||
-            index === midcount ||
-            index === textNodes.length - 1
+            node &&
+            node.parentNode.nodeName.toUpperCase() !== nodenametocheck &&
+            (index === 0 ||
+              index === midcount ||
+              index === textNodes.length - 1)
           ) {
             const full = node.dataset.fulltext || node.textContent || "";
             node.setAttribute("display", "block");
@@ -562,97 +621,36 @@ function VerticalStackedBar({
         truncateXAxis(ntextnodes, usedRects, axisadded, true);
       }
     }, 500);
-  }, [xScale, axis_bottom.current]);
+  }, [xScale, axis_bottom.current, AXISX_ROTATE]);
 
   useEffect(() => {
     if (!axis_left.current || !yScale) return;
     if (AXISY_ROTATE) {
       return;
     }
-    setTimeout(() => {
-      const textNodes: SVGTextElement[] = Array.from(
-        axis_left.current?.querySelectorAll(".visx-axis-left text") || [],
-      );
+    const textNodes: SVGTextElement[] = Array.from(
+      axis_left.current?.querySelectorAll(".visx-axis-left text") || [],
+    );
 
-      if (!textNodes.length) return;
+    if (!textNodes.length) return;
 
-      let usedRects: { y1: number; y2: number }[] = [];
+    let usedRects: { y1: number; y2: number }[] = [];
 
-      // Set all full first
-      textNodes.forEach((node) => {
-        const full = node.dataset.fulltext || node.textContent || "";
-        node.setAttribute("display", "block");
-        node.textContent = full;
-        node.dataset.fulltext = full;
-      });
-      textNodes.forEach((node, i) => {
-        if (i !== 0 && i !== textNodes.length - 1) {
-          const bbox = node.getBBox();
-          const pnode = node.parentNode as Element;
-          let y = 0;
-          if (pnode.getAttribute("transform")) {
-            y =
-              +pnode
-                .getAttribute("transform")
-                .split("translate(")[1]
-                .split(")")[0]
-                .split(",")[1] + bbox.y;
-          } else {
-            y = +bbox.y;
-          }
-          const rect = {
-            y1: y - BASE_ADJUST_HEIGHT,
-            y2: y + bbox.height + BASE_ADJUST_HEIGHT,
-          };
-          usedRects.push(rect);
-        }
-      });
-      const axisadded = {};
-      const firstNode = textNodes[0];
-      const lastNode = textNodes[textNodes.length - 1];
-      const showAndTruncate = (node: SVGTextElement, index: number) => {
-        const label = node.dataset.fulltext || node.textContent || "";
-        //  const truncated =
-        //      label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
-        const bbox = node.getBBox();
-        const pnode = node.parentNode as Element;
-        let y = 0;
-        if (pnode.getAttribute("transform")) {
-          y =
-            +pnode
-              .getAttribute("transform")
-              .split("translate(")[1]
-              .split(")")[0]
-              .split(",")[1] + bbox.y;
-        } else {
-          y = +bbox.y;
-        }
-        const rect = {
-          y1: y - ADD_ADJUST_HEIGHT,
-          y2: y + bbox.height + ADD_ADJUST_HEIGHT,
-        };
-        const isOverlapping = usedRects.some(
-          (r: { y1: number; y2: number }) =>
-            !(rect.y2 < r.y1 || rect.y1 > r.y2),
-        );
-        if (!isOverlapping) {
-          axisadded[index] = true;
-          node.textContent = label;
-          node.setAttribute("display", "block");
-        } else {
-          axisadded[index] = true;
-          node.textContent = label;
-          node.setAttribute("display", "block");
-        }
-      };
-
-      // Always show first and last
-      if (firstNode) showAndTruncate(firstNode, 0);
-      if (lastNode) showAndTruncate(lastNode, textNodes.length - 1);
-
-      usedRects = [];
-      textNodes.forEach((node) => {
-        const bbox = node.getBBox();
+    // Set all full first
+    textNodes.forEach((node) => {
+      const full = node.dataset.fulltext || node.textContent || "";
+      node.setAttribute("display", "block");
+      node.textContent = full;
+      node.dataset.fulltext = full;
+    });
+    textNodes.forEach((node, i) => {
+      if (
+        i !== 0 &&
+        i !== textNodes.length - 1 &&
+        node &&
+        node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+      ) {
+        const bbox = node.getBoundingClientRect();
         const pnode = node.parentNode as Element;
         let y = 0;
         if (pnode.getAttribute("transform")) {
@@ -670,81 +668,123 @@ function VerticalStackedBar({
           y2: y + bbox.height + BASE_ADJUST_HEIGHT,
         };
         usedRects.push(rect);
-      });
-      truncateYAxis(textNodes, usedRects, axisadded, false);
-      const trueCount = Object.values(axisadded).filter(
-        (value) => value === true,
-      ).length;
-      console.log("trued", trueCount);
-      if (trueCount < 3) {
-        const ntextnodes = [];
-        const midcount = Math.round((textNodes.length - 1) / 2);
-        textNodes.forEach((node, index) => {
-          if (
-            index === 0 ||
-            index === midcount ||
-            index === textNodes.length - 1
-          ) {
-            const full = node.dataset.fulltext || node.textContent || "";
-            node.setAttribute("display", "block");
-            node.textContent = full;
-            node.dataset.fulltext = full;
-            ntextnodes.push(node);
-          }
-        });
-        if (firstNode) showAndTruncate(ntextnodes[0], 0);
-        if (lastNode)
-          showAndTruncate(
-            ntextnodes[ntextnodes.length - 1],
-            textNodes.length - 1,
-          );
-        truncateYAxis(ntextnodes, usedRects, axisadded, true);
       }
-    }, 500);
+    });
+    const axisadded = {};
+    const firstNode = textNodes[0];
+    const lastNode = textNodes[textNodes.length - 1];
+    const showAndTruncate = (node: SVGTextElement, index: number) => {
+      if (node && node.parentNode.nodeName.toUpperCase() !== nodenametocheck) {
+        const label = node.dataset.fulltext || node.textContent || "";
+        //     const truncated =
+        //       label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
+        const bbox = node.getBoundingClientRect();
+        const pnode = node.parentNode as Element;
+        let y = 0;
+        if (pnode.getAttribute("transform")) {
+          y =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(")")[0]
+              .split(",")[1] + bbox.y;
+        } else {
+          y = +bbox.y;
+        }
+        const rect = {
+          y1: y - ADD_ADJUST_HEIGHT,
+          y2: y + bbox.height + ADD_ADJUST_HEIGHT,
+        };
+        const isOverlapping = usedRects.some(
+          (r: { y1: number; y2: number }) => rect.y1 >= r.y1 && rect.y1 <= r.y2,
+        );
+        if (!isOverlapping) {
+          axisadded[index] = true;
+          node.textContent = label;
+          node.setAttribute("display", "block");
+        } else {
+          axisadded[index] = true;
+          node.textContent = label;
+          node.setAttribute("display", "block");
+        }
+      }
+    };
+
+    // Always show first and last
+    if (firstNode) showAndTruncate(firstNode, 0);
+    if (lastNode) showAndTruncate(lastNode, textNodes.length - 1);
+
+    usedRects = [];
+    textNodes.forEach((node) => {
+      if (node && node.parentNode.nodeName.toUpperCase() !== nodenametocheck) {
+        const bbox = node.getBoundingClientRect();
+        const pnode = node.parentNode as Element;
+        let y = 0;
+        if (pnode.getAttribute("transform")) {
+          y =
+            +pnode
+              .getAttribute("transform")
+              .split("translate(")[1]
+              .split(")")[0]
+              .split(",")[1] + bbox.y;
+        } else {
+          y = +bbox.y;
+        }
+        const rect = {
+          y1: y - BASE_ADJUST_HEIGHT,
+          y2: y + bbox.height + BASE_ADJUST_HEIGHT,
+        };
+        usedRects.push(rect);
+      }
+    });
+    truncateYAxis(textNodes, usedRects, axisadded, false);
+    const trueCount = Object.values(axisadded).filter(
+      (value) => value === true,
+    ).length;
+    console.log("trued", trueCount);
+    if (trueCount < 3) {
+      const ntextnodes = [];
+      const midcount = Math.round((textNodes.length - 1) / 2);
+      textNodes.forEach((node, index) => {
+        if (
+          node &&
+          node.parentNode.nodeName.toUpperCase() !== nodenametocheck &&
+          (index === 0 || index === midcount || index === textNodes.length - 1)
+        ) {
+          const full = node.dataset.fulltext || node.textContent || "";
+          node.setAttribute("display", "block");
+          node.textContent = full;
+          node.dataset.fulltext = full;
+          ntextnodes.push(node);
+        }
+      });
+      if (firstNode) showAndTruncate(ntextnodes[0], 0);
+      if (lastNode)
+        showAndTruncate(
+          ntextnodes[ntextnodes.length - 1],
+          textNodes.length - 1,
+        );
+      truncateYAxis(ntextnodes, usedRects, axisadded, true);
+    }
   }, [yScale, axis_left.current]);
 
   const rotated = (rotate: boolean) => {
-    const rot = rotate;
-    setTimeout(() => {
-      const textNodes: SVGTextElement[] = Array.from(
-        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
-      );
-
-      textNodes.forEach((node) => {
-        const full = node.dataset.fulltext || node.textContent || "";
-        node.setAttribute("display", "block");
-        node.textContent = full;
-        node.dataset.fulltext = full;
-      });
-      AXISX_ROTATE = rotate;
-
-      if (!rot) {
-        if (!chartSvgRef.current || !width || !height) return;
-        const svg = chartSvgRef.current;
-        const bbox = svg.getBBox();
-        const titleHeight =
-          document.querySelector(".chart-title")?.getBoundingClientRect()
-            .height || 0;
-        const legendHeight =
-          document.querySelector(".chart-legend")?.getBoundingClientRect()
-            .height || 0;
-        const updatedHeight =
-          Math.max(
-            DEFAULT_MARGIN.top +
-              bbox.height +
-              DEFAULT_MARGIN.bottom +
-              legendHeight +
-              titleHeight,
-            height,
-          ) + 5;
-        const updatedWidth = Math.max(
-          width,
-          DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
-        );
-        setAdjustedChartHeight(updatedHeight);
-        setAdjustedChartWidth(updatedWidth);
-      }
-    }, 200);
+    AXISX_ROTATE = rotate;
+    console.log("rotating");
+    if (rotate && chartSvgRef.current) {
+      setTimeout(() => {
+        //    const svg = chartSvgRef.current;
+        //    const bbox = svg.getBBox();
+        //    const legendHeight = bottomHeight;
+        //    const bottomaxisheight = axis_bottom.current.getBBox().height;
+        //    const hgt =
+        //      height -
+        //      DEFAULT_MARGIN.top -
+        //      DEFAULT_MARGIN.bottom -
+        //      bottomaxisheight;
+        //    setdrawableChartHeight(hgt);
+      }, 200);
+    }
   };
 
   const handleMouseMove = useCallback(
@@ -837,7 +877,7 @@ function VerticalStackedBar({
               showAxisLine={showXAxis}
               labels={filteredData.map((d) => String(d.label))}
               availableWidth={innerWidth}
-              autoRotate
+              // autoRotate
               forceFullLabels
               {...xAxisProps}
               rotated={rotated}
