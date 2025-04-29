@@ -70,7 +70,7 @@ const fetchDonutData = (): Promise<DonutDataItem[]> =>
                     color: '#ea8660',
                 },
             ]);
-        }, 5000);
+        }, 500);
     });
 
 const fetchSemiDonutData = (): Promise<DonutDataItem[]> =>
@@ -88,7 +88,7 @@ const fetchSemiDonutData = (): Promise<DonutDataItem[]> =>
                     color: '#50c1c2',
                 },
             ]);
-        }, 1200);
+        }, 500);
     });
 
 const fetchTreeMapData = (): Promise<TreeMapNode> =>
@@ -140,7 +140,7 @@ const fetchTreeMapData = (): Promise<TreeMapNode> =>
                     },
                 ],
             });
-        }, 2000);
+        }, 500);
     });
 
 const fetchStackedBarData = (): Promise<StackedBarItem[]> =>
@@ -170,7 +170,7 @@ const fetchStackedBarData = (): Promise<StackedBarItem[]> =>
                     },
                 },
             ]);
-        }, 1800);
+        }, 500);
     });
 
 const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> =>
@@ -201,7 +201,7 @@ const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> =>
                     };
                 }),
             ]);
-        }, 1700);
+        }, 500);
     });
 
 const fetchBarLineData = (): Promise<BarLineData> =>
@@ -228,7 +228,7 @@ const fetchBarLineData = (): Promise<BarLineData> =>
                     barColor: index == 0 ? 'red' : null,
                 })),
             });
-        }, 2200);
+        }, 500);
     });
 
 const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
@@ -242,13 +242,49 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
                 {
                     label: 'Priced',
                     value: 1000,
-                }, // 20-40     
+                }, // 20-40
                 {
                     label: 'Low Priced',
                     value: 100000,
-                }, // 20-40                           
+                }, // 20-40
+                {
+                    label: 'Low Priced 1',
+                    value: 100000,
+                }, // 20-40
+                {
+                    label: 'Low Priced 2',
+                    value: 100000,
+                }, // 20-40
+                {
+                    label: 'Low Priced 3',
+                    value: 100000,
+                }, // 20-40
+                {
+                    label: 'Low Priced 4',
+                    value: 100000,
+                }, // 20-40
+                {
+                    label: 'Low Priced 5',
+                    value: 100000,
+                }, // 20-40
+                {
+                    label: 'Low Priced 6',
+                    value: 100000,
+                }, // 20-40
+                {
+                    label: 'Low Priced 7',
+                    value: 100000,
+                }, // 20-40
+                {
+                    label: 'Low Priced 8',
+                    value: 100000,
+                }, // 20-40
+                {
+                    label: 'Low Priced 9',
+                    value: 100000,
+                }, // 20-40
             ]);
-        }, 1300);
+        }, 500);
     });
 
 const fetchHorizontalBarData = (): Promise<VerticalBarItem[]> =>
@@ -260,7 +296,7 @@ const fetchHorizontalBarData = (): Promise<VerticalBarItem[]> =>
                     value: Math.floor(Math.random() * 100000),
                 })),
             );
-        }, 1600);
+        }, 500);
     });
 
 const fetchVerticalGroupedBarData = (): Promise<StackedBarItem[]> =>
@@ -278,7 +314,7 @@ const fetchVerticalGroupedBarData = (): Promise<StackedBarItem[]> =>
                     },
                 })),
             ]);
-        }, 1900);
+        }, 500);
     });
 
 const fetchHorizontalGroupedBarData = (): Promise<StackedBarItem[]> =>
@@ -322,7 +358,7 @@ const fetchHorizontalGroupedBarData = (): Promise<StackedBarItem[]> =>
                     },
                 },
             ]);
-        }, 1400);
+        }, 500);
     });
 
 const fetchMarketTreeMapData = (): Promise<TreeMapNode> =>
@@ -433,7 +469,7 @@ const fetchMarketTreeMapData = (): Promise<TreeMapNode> =>
                     },
                 ],
             });
-        }, 2500);
+        }, 500);
     });
 
 function DashboardPage() {
@@ -812,7 +848,7 @@ body:not(.dark) {
                                     maxBarWidth={32}
                                 />
                             </SortableCard>
-                            
+
                             <SortableCard height={400} width={'100%'}>
                                 <DonutChart
                                     data={semiDonutData}
@@ -855,9 +891,11 @@ body:not(.dark) {
                                     isLoading={dataLoading.verticalBar}
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,
-                                        isVisible: true,
+                                        isVisible: false,
                                     }}
                                     tooltipProps={{}}
+                                    maxBarWidth={32}
+
                                 />
                             </SortableCard>
 
