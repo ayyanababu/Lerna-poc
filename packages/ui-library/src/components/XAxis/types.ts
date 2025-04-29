@@ -49,5 +49,8 @@ export interface XAxisProps extends AxisBottomProps {
   tickLength?: number;
   labelOffset?: number;
   forceFullLabels?: boolean;
+  addGap:number;
+  barWidth:number;
+  wrapped:(wrapped: boolean) => void;
   rotated: (rotate: boolean) => void;
 }

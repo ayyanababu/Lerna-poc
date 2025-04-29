@@ -76,7 +76,7 @@ function VerticalStackedBar({
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
   //const innerWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
-  const innerHeight  = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
+  let innerHeight  = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
   const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
   const axis_bottom = useRef<SVGGElement | null>(null);
   const axis_left = useRef<SVGGElement | null>(null);
@@ -89,6 +89,8 @@ function VerticalStackedBar({
   const [bottomHeight, setBottomHeight] = useState(0);
   const [titleHeight, setTitleHeight] = useState(0);
   const [drawableChartHeight,setdrawableChartHeight] = useState(0);
+  const [Wrapped,setWrapped] = useState(false);
+  let actualBarWidth = 0;
 
   useEffect(() => {
     if (parentRef.current && activatesizing) {
@@ -465,164 +467,12 @@ function VerticalStackedBar({
     });
   };
 
+  const calculatedBarWidth = xScale.bandwidth();
+  // Use custom barWidth if provided, otherwise use default with maximum limit
+  actualBarWidth = Math.min(calculatedBarWidth, maxBarWidth);
+
   useEffect(() => {
-    if (!axis_bottom.current || !xScale) return;
-    if (AXISX_ROTATE) {
-      return;
-    }
-
-    setTimeout(() => {
-      const textNodes: SVGTextElement[] = Array.from(
-        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
-      );
-
-      if (!textNodes.length) return;
-
-      let usedRects: { x1: number; x2: number }[] = [];
-
-      // Set all full first
-      textNodes.forEach((node) => {
-        const full = node.dataset.fulltext || node.textContent || "";
-        node.setAttribute("display", "block");
-        node.textContent = full;
-        node.dataset.fulltext = full;
-      });
-      textNodes.forEach((node, i) => {
-        if (
-          i !== 0 &&
-          i !== textNodes.length - 1 &&
-          node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
-        ) {
-          const bbox = node.getBBox();
-          const pnode = node.parentNode as Element;
-          let x = 0;
-          if (pnode.getAttribute("transform")) {
-            x =
-              +pnode
-                .getAttribute("transform")
-                .split("translate(")[1]
-                .split(",")[0] + bbox.x;
-          } else {
-            x = +bbox.x;
-          }
-          const rect = {
-            x1: x - BASE_ADJUST_WIDTH,
-            x2: x + bbox.width + BASE_ADJUST_WIDTH,
-          };
-          usedRects.push(rect);
-        }
-      });
-      const axisadded = {};
-      const firstNode = textNodes[0];
-      const lastNode = textNodes[textNodes.length - 1];
-      const showAndTruncate = (node: SVGTextElement, index: number) => {
-        if (
-          node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
-        ) {
-          const label = node.dataset.fulltext || node.textContent || "";
-          let truncated = label;
-          if (label.length > 3) {
-            truncated =
-              label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) +
-              truncatedLabelSuffix;
-          }
-          const bbox = node.getBoundingClientRect();
-          const pnode = node.parentNode as Element;
-          let x = 0;
-          if (pnode.getAttribute("transform")) {
-            x =
-              +pnode
-                .getAttribute("transform")
-                .split("translate(")[1]
-                .split(",")[0] + bbox.x;
-          } else {
-            x = +bbox.x;
-          }
-          const rect = {
-            x1: x - ADD_ADJUST_WIDTH,
-            x2: x + bbox.width + ADD_ADJUST_WIDTH,
-          };
-          const us = usedRects.filter(
-            (r: { x1: number; x2: number }, i: number) => i !== index,
-          );
-          const isOverlapping = us.some(
-            (r: { x1: number; x2: number }) =>
-              rect.x1 >= r.x1 && rect.x1 <= r.x2,
-          );
-          if (!isOverlapping) {
-            axisadded[index] = true;
-            node.textContent = label;
-            node.setAttribute("display", "block");
-          } else {
-            node.textContent = truncated;
-            axisadded[index] = true;
-            node.setAttribute("display", "block");
-          }
-        }
-      };
-
-      // Always show first and last
-      if (firstNode) showAndTruncate(firstNode, 0);
-      if (lastNode) showAndTruncate(lastNode, textNodes.length - 1);
-
-      usedRects = [];
-      textNodes.forEach((node) => {
-        if (
-          node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
-        ) {
-          const bbox = node.getBBox();
-          const pnode = node.parentNode as Element;
-          let x = 0;
-          if (pnode.getAttribute("transform")) {
-            x =
-              +pnode
-                .getAttribute("transform")
-                .split("translate(")[1]
-                .split(",")[0] + bbox.x;
-          } else {
-            x = +bbox.x;
-          }
-          const rect = {
-            x1: x - BASE_ADJUST_WIDTH,
-            x2: x + bbox.width + BASE_ADJUST_WIDTH,
-          };
-          usedRects.push(rect);
-        }
-      });
-      truncateXAxis(textNodes, usedRects, axisadded, false);
-      const trueCount = Object.values(axisadded).filter(
-        (value) => value === true,
-      ).length;
-      if (trueCount < 3) {
-        const ntextnodes = [];
-        const midcount = Math.round((textNodes.length - 1) / 2);
-        textNodes.forEach((node, index) => {
-          if (
-            node &&
-            node.parentNode.nodeName.toUpperCase() !== nodenametocheck &&
-            (index === 0 ||
-              index === midcount ||
-              index === textNodes.length - 1)
-          ) {
-            const full = node.dataset.fulltext || node.textContent || "";
-            node.setAttribute("display", "block");
-            node.textContent = full;
-            node.dataset.fulltext = full;
-            ntextnodes.push(node);
-          }
-        });
-        if (firstNode) showAndTruncate(ntextnodes[0], 0);
-        if (lastNode)
-          showAndTruncate(
-            ntextnodes[ntextnodes.length - 1],
-            textNodes.length - 1,
-          );
-        truncateXAxis(ntextnodes, usedRects, axisadded, true);
-      }
-    }, 500);
+    return
   }, [xScale, axis_bottom.current, AXISX_ROTATE]);
 
   useEffect(() => {
@@ -790,6 +640,25 @@ function VerticalStackedBar({
     }
   };
 
+  const wrapped = (wrapped:boolean) =>{
+    setTimeout(()=>{
+      if (wrapped && chartSvgRef.current && axis_bottom.current) {
+          setWrapped(wrapped);
+          const bottomaxisheight = axis_bottom.current.getBBox().height;
+          const hgt =
+            height -
+            DEFAULT_MARGIN.top -
+            DEFAULT_MARGIN.bottom -
+            bottomaxisheight
+            - bottomHeight
+            console.log("wrap",wrapped);
+          setdrawableChartHeight(hgt-10);
+          innerHeight = hgt-10;
+      }   
+    },300)
+  }
+
+
   const handleMouseMove = useCallback(
     (groupKey: string, value: number) => (event: React.MouseEvent) => {
       if (!isLoading) {
@@ -882,8 +751,11 @@ function VerticalStackedBar({
               availableWidth={innerWidth}
               // autoRotate
               forceFullLabels
+              addGap={BASE_ADJUST_WIDTH}
               {...xAxisProps}
               rotated={rotated}
+              wrapped={wrapped}
+              barWidth={actualBarWidth+20}
             />
           </g>
 
@@ -892,7 +764,7 @@ function VerticalStackedBar({
             // Calculate bar width with maximum limit
             const calculatedBarWidth = xScale.bandwidth();
             // Use custom barWidth if provided, otherwise use default with maximum limit
-            const actualBarWidth = Math.min(calculatedBarWidth, maxBarWidth);
+            actualBarWidth = Math.min(calculatedBarWidth, maxBarWidth);
 
             // If the bar width is limited, center it
             const barX =

@@ -129,6 +129,8 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const [bottomHeight, setBottomHeight] = useState(0);
   const [titleHeight, setTitleHeight] = useState(0);
+  const [Wrapped,setWrapped] = useState(false);
+  let barwidth = 0;
 
   // Tooltip
   const {
@@ -250,7 +252,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
 
   // Inner chart dimensions
   const innerWidth = width - dynamicMargin.left - dynamicMargin.right;
-  const innerHeight = height - dynamicMargin.top - dynamicMargin.bottom;
+  let innerHeight = height - dynamicMargin.top - dynamicMargin.bottom;
 
   // Legend data
   const legendData = useMemo(
@@ -619,163 +621,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   };
 
   useEffect(() => {
-    if (!axis_bottom.current || !xScale) return;
-    if (AXISX_ROTATE) {
-      return;
-    }
-
-    setTimeout(() => {
-      const textNodes: SVGTextElement[] = Array.from(
-        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
-      );
-
-      if (!textNodes.length) return;
-
-      let usedRects: { x1: number; x2: number }[] = [];
-
-      // Set all full first
-      textNodes.forEach((node) => {
-        const full = node.dataset.fulltext || node.textContent || "";
-        node.setAttribute("display", "block");
-        node.textContent = full;
-        node.dataset.fulltext = full;
-      });
-      textNodes.forEach((node, i) => {
-        if (
-          i !== 0 &&
-          i !== textNodes.length - 1 &&
-          node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
-        ) {
-          const bbox = node.getBBox();
-          const pnode = node.parentNode as Element;
-          let x = 0;
-          if (pnode.getAttribute("transform")) {
-            x =
-              +pnode
-                .getAttribute("transform")
-                .split("translate(")[1]
-                .split(",")[0] + bbox.x;
-          } else {
-            x = +bbox.x;
-          }
-          const rect = {
-            x1: x - BASE_ADJUST_WIDTH,
-            x2: x + bbox.width + BASE_ADJUST_WIDTH,
-          };
-          usedRects.push(rect);
-        }
-      });
-      const axisadded = {};
-      const firstNode = textNodes[0];
-      const lastNode = textNodes[textNodes.length - 1];
-      const showAndTruncate = (node: SVGTextElement, index: number) => {
-        if (
-          node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
-        ) {
-          const label = node.dataset.fulltext || node.textContent || "";
-          let truncated = label;
-          if (label.length > 3) {
-            truncated =
-              label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) +
-              truncatedLabelSuffix;
-          }
-          const bbox = node.getBoundingClientRect();
-          const pnode = node.parentNode as Element;
-          let x = 0;
-          if (pnode.getAttribute("transform")) {
-            x =
-              +pnode
-                .getAttribute("transform")
-                .split("translate(")[1]
-                .split(",")[0] + bbox.x;
-          } else {
-            x = +bbox.x;
-          }
-          const rect = {
-            x1: x - ADD_ADJUST_WIDTH,
-            x2: x + bbox.width + ADD_ADJUST_WIDTH,
-          };
-          const us = usedRects.filter(
-            (r: { x1: number; x2: number }, i: number) => i !== index,
-          );
-          const isOverlapping = us.some(
-            (r: { x1: number; x2: number }) =>
-              rect.x1 >= r.x1 && rect.x1 <= r.x2,
-          );
-          if (!isOverlapping) {
-            axisadded[index] = true;
-            node.textContent = label;
-            node.setAttribute("display", "block");
-          } else {
-            node.textContent = truncated;
-            axisadded[index] = true;
-            node.setAttribute("display", "block");
-          }
-        }
-      };
-
-      // Always show first and last
-      if (firstNode) showAndTruncate(firstNode, 0);
-      if (lastNode) showAndTruncate(lastNode, textNodes.length - 1);
-
-      usedRects = [];
-      textNodes.forEach((node) => {
-        if (
-          node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
-        ) {
-          const bbox = node.getBBox();
-          const pnode = node.parentNode as Element;
-          let x = 0;
-          if (pnode.getAttribute("transform")) {
-            x =
-              +pnode
-                .getAttribute("transform")
-                .split("translate(")[1]
-                .split(",")[0] + bbox.x;
-          } else {
-            x = +bbox.x;
-          }
-          const rect = {
-            x1: x - BASE_ADJUST_WIDTH,
-            x2: x + bbox.width + BASE_ADJUST_WIDTH,
-          };
-          usedRects.push(rect);
-        }
-      });
-      truncateXAxis(textNodes, usedRects, axisadded, false);
-      const trueCount = Object.values(axisadded).filter(
-        (value) => value === true,
-      ).length;
-      if (trueCount < 3) {
-        const ntextnodes = [];
-        const midcount = Math.round((textNodes.length - 1) / 2);
-        textNodes.forEach((node, index) => {
-          if (
-            node &&
-            node.parentNode.nodeName.toUpperCase() !== nodenametocheck &&
-            (index === 0 ||
-              index === midcount ||
-              index === textNodes.length - 1)
-          ) {
-            const full = node.dataset.fulltext || node.textContent || "";
-            node.setAttribute("display", "block");
-            node.textContent = full;
-            node.dataset.fulltext = full;
-            ntextnodes.push(node);
-          }
-        });
-        if (firstNode) showAndTruncate(ntextnodes[0], 0);
-        if (lastNode)
-          showAndTruncate(
-            ntextnodes[ntextnodes.length - 1],
-            textNodes.length - 1,
-          );
-        truncateXAxis(ntextnodes, usedRects, axisadded, true);
-      }
-    }, 500);
+    return;
   }, [xScale, axis_bottom.current, AXISX_ROTATE]);
 
   useEffect(() => {
@@ -942,6 +788,23 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     }
   };
 
+  const wrapped = (wrapped:boolean) =>{
+    setTimeout(()=>{
+      if (wrapped && chartSvgRef.current && axis_bottom.current) {
+          setWrapped(wrapped);
+          const bottomaxisheight = axis_bottom.current.getBBox().height;
+          const hgt =
+            height -
+            DEFAULT_MARGIN.top -
+            DEFAULT_MARGIN.bottom -
+            bottomaxisheight
+            - bottomHeight
+          innerHeight = hgt-10;
+      }   
+    },300)
+  }  
+
+
   if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;
   }
@@ -1005,7 +868,10 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
               tickLength={0}
               isVisible={!removeBothAxis}
               {...xAxisProps}
+              addGap={BASE_ADJUST_WIDTH}
               rotated={rotated}
+              wrapped={wrapped}
+              barWidth={barwidth}
             />
           </g>
           <Grid
@@ -1033,7 +899,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
               if (!seriesData) return null;
 
               const [x0, x1] = seriesData[categoryIndex];
-              const barWidth = xScale(x1) - xScale(x0);
+              barwidth = xScale(x1) - xScale(x0);
               const barX = xScale(x0);
               const value = x1 - x0;
               if (!value) return null;
@@ -1079,10 +945,10 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                     d: `
                 M ${barX},${barY + actualBarHeight}
                 L ${barX},${barY}
-                L ${barX + barWidth - dynamicRadius},${barY}
-                Q ${barX + barWidth},${barY} ${barX + barWidth},${barY + dynamicRadius}
-                L ${barX + barWidth},${barY + actualBarHeight - dynamicRadius}
-                Q ${barX + barWidth},${barY + actualBarHeight} ${barX + barWidth - dynamicRadius},${
+                L ${barX + barwidth - dynamicRadius},${barY}
+                Q ${barX + barwidth},${barY} ${barX + barwidth},${barY + dynamicRadius}
+                L ${barX + barwidth},${barY + actualBarHeight - dynamicRadius}
+                Q ${barX + barwidth},${barY + actualBarHeight} ${barX + barwidth - dynamicRadius},${
                   barY + actualBarHeight
                 }
                 Z
@@ -1095,8 +961,8 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
               Q ${barX},${barY + actualBarHeight} ${barX},${barY + actualBarHeight - dynamicRadius}
               L ${barX},${barY + dynamicRadius}
               Q ${barX},${barY} ${barX + dynamicRadius},${barY}
-              L ${barX + barWidth},${barY}
-              L ${barX + barWidth},${barY + actualBarHeight}
+              L ${barX + barwidth},${barY}
+              L ${barX + barwidth},${barY + actualBarHeight}
               Z
               `,
                     }
@@ -1107,7 +973,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
                   <CustomBar
                     x={barX}
                     y={barY}
-                    width={barWidth}
+                    width={barwidth}
                     height={actualBarHeight}
                     fill={
                       isLoading

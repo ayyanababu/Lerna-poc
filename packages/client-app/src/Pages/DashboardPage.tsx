@@ -154,7 +154,7 @@ const fetchStackedBarData = (): Promise<StackedBarItem[]> =>
                     },
                 },
                 {
-                    label: 'Stale Priced',
+                    label: 'Stale Priced sdf sdf  sdfsf ',
                     data: {
                         stalePriced:
                             Math.floor(Math.random() * 100000000) + 2500,
@@ -208,7 +208,7 @@ const fetchBarLineData = (): Promise<BarLineData> =>
     new Promise((resolve) => {
         setTimeout(() => {
             const actionTypes = [
-                'Dividend (NNA)',
+                'Dividend (NNA) test this test',
                 'Dividend (NCA)',
                 'Dividend (NEA)',
   //              'Stock Split (NCA)',
@@ -239,18 +239,6 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
                     label: 'Not Priced',
                     value: 10000000,
                 }, // 20-40
-                {
-                    label: 'Stale Price',
-                    value: 15000000,
-                }, // 35-60
-                {
-                    label: 'Priced/Auto',
-                    value: 10000000,
-                }, // 10-20
-                {
-                    label: 'Priced/Manual',
-                    value: 50000000,
-                }, // 5-13
             ]);
         }, 1300);
     });
