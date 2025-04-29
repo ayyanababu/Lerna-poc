@@ -104,6 +104,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom,
   );
   const [Wrapped, setWrapped] = useState(false);
+  const [recalculate,setRecalculate] = useState(true);
 
   let rotateincrease = 0;
   let barwidth = 0;
@@ -116,21 +117,24 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             parentRef.current.parentNode &&
             parentRef.current.parentNode.querySelectorAll("div")[0]
           ) {
+            console.log("parent",parentRef.current )
             const legendbox =
               parentRef.current.parentNode.querySelectorAll("div")[0];
+            const lb = legendbox.querySelectorAll("div")
+            const lheight = lb[lb.length - 1].offsetTop  - lb[0].offsetTop;
             const spans =
               parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
                 "span",
               );
             const lastSpan = spans ? spans[spans.length - 1] : null;
             setBottomHeight(
-              legendbox.offsetHeight +
+                lheight +
                 lastSpan.offsetHeight +
                 bottomHeightAddOnSpace,
             );
             clearInterval(legendboxtimer);
           }
-        }, 10);
+        }, 2000);
         const titleboxtimer = setInterval(() => {
           const titlebox =
             parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
@@ -140,10 +144,10 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             setTitleHeight(titlebox.offsetHeight + titleHeightAddOnSpace);
             clearInterval(titleboxtimer);
           }
-        }, 10);
-      }, 100);
+        }, 2000);
+      }, 1000);
     }
-  }, [parentRef.current]);
+  }, [parentRef.current,recalculate]);
 
   useEffect(() => {
     if (!chartSvgRef.current) return;
@@ -708,14 +712,17 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     setTimeout(() => {
       if (wrapped && chartSvgRef.current && axis_bottom.current) {
         setWrapped(wrapped);
+        setRecalculate(true);
         const bottomaxisheight = axis_bottom.current.getBBox().height;
         const hgt =
           height -
           DEFAULT_MARGIN.top -
           DEFAULT_MARGIN.bottom -
-          bottomaxisheight;
-        console.log("wrap", wrapped);
-        setinnerHeight(hgt - 20);
+          bottomaxisheight
+          -bottomHeight
+        console.log("bottom",bottomHeight);
+        console.log("hgt",hgt)
+        setinnerHeight(hgt-10);
       }
     }, 300);
   };
@@ -799,13 +806,13 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 ? (xScale(d.label) || 0) + (calculatedBarWidth - barwidth) / 2
                 : xScale(d.label) || 0;
             if (index === 0 || index === filteredData.length - 1) {
-                  if (index === 0) {
-                     barX = barX - BASE_ADJUST_WIDTH;
-                  } else {
-                     barX = barX + BASE_ADJUST_WIDTH * 1.5;
-                  }
+                if (index === 0) {
+                    barX = barX - BASE_ADJUST_WIDTH;
+                } else {
+                    barX = barX + BASE_ADJUST_WIDTH * 1.5;
+                }
             } else {
-                  barX = barX + BASE_ADJUST_WIDTH / 2;
+                barX = barX + BASE_ADJUST_WIDTH / 2;
             }                               
             const barHeight = drawableChartHeight - yScale(value);
             const barY = yScale(value);
