@@ -236,7 +236,13 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     }
     setAdjustedChartHeight(updatedHeight + rotateincrease);
     setAdjustedChartWidth(updatedWidth);
-    setIsChartReady(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setIsChartReady(true);
+        }, 300);
+      });
+    });
   }, [
     data,
     width,
@@ -485,12 +491,10 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     return <div>No data to display.</div>;
   }
 
-  console.log(
-    "@@@@ verticalbar loading",
-    !isChartReady,
-    isLoading,
-    !isChartReady || isLoading,
-  );
+  const svgStyles = {
+    opacity: isChartReady ? 1 : 0,
+    transition: "opacity 0.5s ease-out",
+  };
 
   return (
     <ChartWrapper
@@ -529,6 +533,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         ref={chartSvgRef}
         width={adjustedChartWidth || width}
         height={adjustedChartHeight || height}
+        style={svgStyles}
       >
         {isLoading && <SvgShimmer />}
         <Group top={DEFAULT_MARGIN.top} left={yAxisLabelWidth}>
