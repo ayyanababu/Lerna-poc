@@ -106,9 +106,33 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     activatesizing,
   );
   const [isChartReady, setIsChartReady] = useState(false);
+  const [barAnimationProgress, setBarAnimationProgress] = useState(0);
 
   let rotateincrease = 0;
   let barwidth = 0;
+
+  useEffect(() => {
+    if (!isChartReady) return;
+
+    let animationFrameId: number;
+    const animationDuration = 1000; // ms
+    const startTime = performance.now();
+
+    const animate = (time: number) => {
+      const elapsed = time - startTime;
+      const progress = Math.min(elapsed / animationDuration, 1); // 0 to 1
+      setBarAnimationProgress(progress);
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [isChartReady]);
 
   useEffect(() => {
     if (!chartSvgRef.current) return;
@@ -240,7 +264,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       requestAnimationFrame(() => {
         setTimeout(() => {
           setIsChartReady(true);
-        }, 300);
+        }, 400);
       });
     });
   }, [
@@ -580,8 +604,10 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             } else {
               barX = barX + BASE_ADJUST_WIDTH / 2;
             }
-            const barHeight = drawableChartHeight - yScale(value);
-            const barY = yScale(value);
+            const finalBarHeight = drawableChartHeight - yScale(value);
+            const barHeight = finalBarHeight * barAnimationProgress;
+            const barY = drawableChartHeight - barHeight;
+
             const isHovered = hoveredBar === index;
             const barOpacity =
               hoveredBar !== null && !isHovered
