@@ -129,7 +129,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const [bottomHeight, setBottomHeight] = useState(0);
   const [titleHeight, setTitleHeight] = useState(0);
-  const [Wrapped,setWrapped] = useState(false);
+  const [Wrapped, setWrapped] = useState(false);
   let barwidth = 0;
 
   // Tooltip
@@ -788,22 +788,21 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     }
   };
 
-  const wrapped = (wrapped:boolean) =>{
-    setTimeout(()=>{
+  const wrapped = (wrapped: boolean) => {
+    setTimeout(() => {
       if (wrapped && chartSvgRef.current && axis_bottom.current) {
-          setWrapped(wrapped);
-          const bottomaxisheight = axis_bottom.current.getBBox().height;
-          const hgt =
-            height -
-            DEFAULT_MARGIN.top -
-            DEFAULT_MARGIN.bottom -
-            bottomaxisheight
-            - bottomHeight
-          innerHeight = hgt-10;
-      }   
-    },300)
-  }  
-
+        setWrapped(wrapped);
+        const bottomaxisheight = axis_bottom.current.getBBox().height;
+        const hgt =
+          height -
+          DEFAULT_MARGIN.top -
+          DEFAULT_MARGIN.bottom -
+          bottomaxisheight -
+          bottomHeight;
+        innerHeight = hgt - 10;
+      }
+    }, 300);
+  };
 
   if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;

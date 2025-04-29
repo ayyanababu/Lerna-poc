@@ -76,7 +76,7 @@ function VerticalStackedBar({
   const { parentRef, width, height } = useParentSize({ debounceTime: 150 });
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
   //const innerWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
-  let innerHeight  = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
+  let innerHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
   const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
   const axis_bottom = useRef<SVGGElement | null>(null);
   const axis_left = useRef<SVGGElement | null>(null);
@@ -88,8 +88,8 @@ function VerticalStackedBar({
   );
   const [bottomHeight, setBottomHeight] = useState(0);
   const [titleHeight, setTitleHeight] = useState(0);
-  const [drawableChartHeight,setdrawableChartHeight] = useState(0);
-  const [Wrapped,setWrapped] = useState(false);
+  const [drawableChartHeight, setdrawableChartHeight] = useState(0);
+  const [Wrapped, setWrapped] = useState(false);
   let actualBarWidth = 0;
 
   useEffect(() => {
@@ -240,7 +240,6 @@ function VerticalStackedBar({
       }),
     [filteredData, innerWidth],
   );
-
 
   const yScale = useMemo(
     () =>
@@ -472,7 +471,7 @@ function VerticalStackedBar({
   actualBarWidth = Math.min(calculatedBarWidth, maxBarWidth);
 
   useEffect(() => {
-    return
+    return;
   }, [xScale, axis_bottom.current, AXISX_ROTATE]);
 
   useEffect(() => {
@@ -634,30 +633,29 @@ function VerticalStackedBar({
         //         DEFAULT_MARGIN.top -
         //         DEFAULT_MARGIN.bottom -
         //         bottomaxisheight;
-        //     setinnerHeight(hgt);    
-//             setdrawableChartHeight(hgt);
+        //     setinnerHeight(hgt);
+        //             setdrawableChartHeight(hgt);
       }, 200);
     }
   };
 
-  const wrapped = (wrapped:boolean) =>{
-    setTimeout(()=>{
+  const wrapped = (wrapped: boolean) => {
+    setTimeout(() => {
       if (wrapped && chartSvgRef.current && axis_bottom.current) {
-          setWrapped(wrapped);
-          const bottomaxisheight = axis_bottom.current.getBBox().height;
-          const hgt =
-            height -
-            DEFAULT_MARGIN.top -
-            DEFAULT_MARGIN.bottom -
-            bottomaxisheight
-            - bottomHeight
-            console.log("wrap",wrapped);
-          setdrawableChartHeight(hgt-10);
-          innerHeight = hgt-10;
-      }   
-    },300)
-  }
-
+        setWrapped(wrapped);
+        const bottomaxisheight = axis_bottom.current.getBBox().height;
+        const hgt =
+          height -
+          DEFAULT_MARGIN.top -
+          DEFAULT_MARGIN.bottom -
+          bottomaxisheight -
+          bottomHeight;
+        console.log("wrap", wrapped);
+        setdrawableChartHeight(hgt - 10);
+        innerHeight = hgt - 10;
+      }
+    }, 300);
+  };
 
   const handleMouseMove = useCallback(
     (groupKey: string, value: number) => (event: React.MouseEvent) => {
@@ -755,7 +753,7 @@ function VerticalStackedBar({
               {...xAxisProps}
               rotated={rotated}
               wrapped={wrapped}
-              barWidth={actualBarWidth+20}
+              barWidth={actualBarWidth + 20}
             />
           </g>
 

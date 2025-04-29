@@ -239,6 +239,14 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
                     label: 'Not Priced',
                     value: 10000000,
                 }, // 20-40
+                {
+                    label: 'Priced',
+                    value: 1000,
+                }, // 20-40     
+                {
+                    label: 'Low Priced',
+                    value: 100000,
+                }, // 20-40                           
             ]);
         }, 1300);
     });

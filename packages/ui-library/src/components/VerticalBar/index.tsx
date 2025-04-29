@@ -39,7 +39,7 @@ const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
 const bottomHeightAddOnSpace = 0;
 const titleHeightAddOnSpace = 0;
 const truncatedLabelSuffix = "..";
-const activatesizing =  true;
+const activatesizing = true;
 const nodenametocheck = "SVG";
 
 /* const getEstimatedYAxisWidth = (maxValue: number, averageCharWidth = 7) => {
@@ -72,7 +72,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     width = 100,
     height = 100,
   } = useParentSize({ debounceTime: 150 });
-  
+
   width = width > 0 ? width : 100;
   height = height > 0 ? height : 300;
 
@@ -100,12 +100,13 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const axisXStart = DEFAULT_MARGIN.left + yAxisLabelWidth;
   const innerWidth = width - axisXStart - DEFAULT_MARGIN.right;
   const [drawableChartHeight, setdrawableChartHeight] = useState(0);
-  const [innerHeight, setinnerHeight] = useState(height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom)
-  const [Wrapped,setWrapped] = useState(false);
-  
+  const [innerHeight, setinnerHeight] = useState(
+    height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom,
+  );
+  const [Wrapped, setWrapped] = useState(false);
+
   let rotateincrease = 0;
   let barwidth = 0;
-  
 
   useEffect(() => {
     if (parentRef.current && activatesizing) {
@@ -192,10 +193,10 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     }, [DEFAULT_MARGIN, width, filteredData]);
    */
   //  const innerWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
-//  const innerHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
+  //  const innerHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
 
   useEffect(() => {
-    console.log("inner",innerHeight);
+    console.log("inner", innerHeight);
     setdrawableChartHeight(innerHeight);
   }, [innerHeight]);
 
@@ -235,7 +236,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       }),
     [innerHeight, maxValue],
   );
-  
 
   const legendData = useMemo(
     () => data.map((d) => ({ label: d.label, value: d.value })),
@@ -345,7 +345,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
         ).getBBox().height;
     }
-    setAdjustedChartHeight(updatedHeight+rotateincrease);
+    setAdjustedChartHeight(updatedHeight + rotateincrease);
     setAdjustedChartWidth(updatedWidth);
   }, [
     data,
@@ -675,8 +675,8 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
   const rotated = (rotate: boolean) => {
     AXISX_ROTATE = rotate;
-    if (rotate){
-      rotateincrease = 70
+    if (rotate) {
+      rotateincrease = 70;
     }
     console.log("rotating");
     if (rotate && chartSvgRef.current) {
@@ -684,11 +684,11 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         const legendHeight = bottomHeight;
         const bottomaxisheight = axis_bottom.current.getBBox().height - 30;
         const hgt =
-           height -
-           DEFAULT_MARGIN.top -
-           DEFAULT_MARGIN.bottom -
-           bottomaxisheight;
-        setinnerHeight(hgt);   
+          height -
+          DEFAULT_MARGIN.top -
+          DEFAULT_MARGIN.bottom -
+          bottomaxisheight;
+        setinnerHeight(hgt);
         //     const svg = chartSvgRef.current;
         //     const bbox = svg.getBBox();
         //     const legendHeight = bottomHeight;
@@ -699,26 +699,26 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         //       DEFAULT_MARGIN.bottom -
         //       bottomaxisheight;
         //    setdrawableChartHeight(hgt);
+        //        innerHeight = hgt;
       }, 200);
     }
   };
 
-  const wrapped = (wrapped:boolean) =>{
-    setTimeout(()=>{
+  const wrapped = (wrapped: boolean) => {
+    setTimeout(() => {
       if (wrapped && chartSvgRef.current && axis_bottom.current) {
-          setWrapped(wrapped);
-          const bottomaxisheight = axis_bottom.current.getBBox().height;
-          const hgt =
-            height -
-            DEFAULT_MARGIN.top -
-            DEFAULT_MARGIN.bottom -
-            bottomaxisheight
-            - bottomHeight
-            console.log("wrap",wrapped);
-          setdrawableChartHeight(hgt-10);
-      }   
-    },300)
-  }
+        setWrapped(wrapped);
+        const bottomaxisheight = axis_bottom.current.getBBox().height;
+        const hgt =
+          height -
+          DEFAULT_MARGIN.top -
+          DEFAULT_MARGIN.bottom -
+          bottomaxisheight;
+        console.log("wrap", wrapped);
+        setinnerHeight(hgt - 20);
+      }
+    }, 300);
+  };
 
   if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;

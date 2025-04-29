@@ -6,13 +6,13 @@ import React, {
   useState,
 } from "react";
 import { AxisBottom } from "@visx/axis";
+import * as d3 from "d3";
 
 import useTheme from "../../hooks/useTheme";
 import { formatNumberWithSuffix, isNumeric } from "../../utils/number";
 import { shimmerClassName } from "../Shimmer/Shimmer";
 import { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { XAxisProps } from "./types";
-import * as d3 from "d3";
 
 //const MAX_LABEL_CHARS = 15;
 const FIXED_CLASSNAME_XLABELS = "fixed-classname-xlabels";
@@ -44,9 +44,9 @@ function XAxis({
   const axisRef = useRef<SVGGElement>(null);
   const [isOverlapping, setIsOverlapping] = useState(false);
   const [averageWidthPerChar, setAverageWidthPerChar] = useState(6);
-  const [isWrapped,setWrapped] = useState(false);
-  const [wrappedMaxHeight,setwrappedMaxHeight] = useState(0);
-  
+  const [isWrapped, setWrapped] = useState(false);
+  const [wrappedMaxHeight, setwrappedMaxHeight] = useState(0);
+
   const calculateLabelWidths = useCallback(
     (ref: React.RefObject<SVGGElement>) => {
       setIsOverlapping(false);
@@ -68,7 +68,7 @@ function XAxis({
         //    let totalChars = 0;
         const usedRects: { x1: number; x2: number }[] = [];
         nodeList.forEach((node: SVGTextElement) => {
-          console.log(node)
+          console.log(node);
           const bbox = node.getBBox();
           const pnode = node.parentNode as Element;
           let x = 0;
@@ -118,7 +118,7 @@ function XAxis({
               };
               const isOverlapping = us.some(
                 (r: { x1: number; x2: number }) =>
-                  !(rect.x2 >= r.x1 &&  rect.x2 <= r.x2),
+                  !(rect.x2 >= r.x1 && rect.x2 <= r.x2),
               );
               if (isOverlapping) {
                 isOverlappings = isOverlapping;
@@ -360,25 +360,25 @@ function XAxis({
       const y = 1;
       const dy = 1;
 
-      let x = 0
-      if (index === 0 || index === textNodes.length-1){
-        if (index === 0){
-          x = x - addGap
+      let x = 0;
+      if (index === 0 || index === textNodes.length - 1) {
+        if (index === 0) {
+          x = x - addGap;
         }
-        if (index === textNodes.length - 1){
-          x = x + addGap * 1.5
-        }            
-      }else{
-        x = x + (addGap/2)
-      }      
-  
+        if (index === textNodes.length - 1) {
+          x = x + addGap * 1.5;
+        }
+      } else {
+        x = x + addGap / 2;
+      }
+
       let tspan = text
         .text(null)
         .append("tspan")
         .attr("x", x)
         .attr("y", y)
         .attr("dy", dy + "em");
-  
+
       while ((word = words.pop())) {
         line.push(word);
         tspan.text(line.join(" "));
@@ -386,16 +386,16 @@ function XAxis({
           line.pop();
           tspan.text(line.join(" "));
           line = [word];
-          let x = 0
-          if (index === 0 || index === textNodes.length - 1){
-            if (index === 0){
-              x = x - addGap
+          let x = 0;
+          if (index === 0 || index === textNodes.length - 1) {
+            if (index === 0) {
+              x = x - addGap;
             }
-            if (index === textNodes.length - 1){
-              x = x + addGap * 1.5
-            }            
-          }else{
-            x = x + (addGap/2)
+            if (index === textNodes.length - 1) {
+              x = x + addGap * 1.5;
+            }
+          } else {
+            x = x + addGap / 2;
           }
           tspan = text
             .append("tspan")
@@ -409,48 +409,51 @@ function XAxis({
     setWrapped(false);
     if (typeof wrapped === "function") {
       wrapped(false);
-    }       
+    }
     textNodes.forEach((textNode, index) => {
-      let tspans = [];
-      textNode.querySelectorAll("tspan").forEach((tspan)=>{
-         if (tspan.textContent){
-           tspans.push(tspan)
-         }else{
-           textNode.removeChild(tspan);
-         }
+      const tspans = [];
+      textNode.querySelectorAll("tspan").forEach((tspan) => {
+        if (tspan.textContent) {
+          tspans.push(tspan);
+        } else {
+          textNode.removeChild(tspan);
+        }
       });
       let start = 0;
-      tspans.forEach((tspn)=>{
-          tspn.setAttribute("dy",`${start}em`);
-          start += 1.1;
-      })
-    });  
+      tspans.forEach((tspn) => {
+        tspn.setAttribute("dy", `${start}em`);
+        start += 1.1;
+      });
+    });
     let wrapheight = 0;
     textNodes.forEach((textNode, index) => {
-       let tlength = textNode.querySelectorAll("tspan").length;
-       if (tlength > 1){
-         setWrapped(true);
-         if (typeof wrapped === "function") {
-           wrapped(true);
-         }         
-         wrapheight = textNode.getBBox().height > wrapheight?textNode.getBBox().height:wrapheight;
-       }
-    });   
-    if (wrapheight){
+      const tlength = textNode.querySelectorAll("tspan").length;
+      if (tlength > 1) {
+        setWrapped(true);
+        if (typeof wrapped === "function") {
+          wrapped(true);
+        }
+        wrapheight =
+          textNode.getBBox().height > wrapheight
+            ? textNode.getBBox().height
+            : wrapheight;
+      }
+    });
+    if (wrapheight) {
       setwrappedMaxHeight(wrapheight);
-    }  
+    }
   };
 
   useLayoutEffect(() => {
     if (isOverlapping && axisRef.current) {
       const textNodes = axisRef.current.querySelectorAll(
-        `.${FIXED_CLASSNAME_XLABELS}`
+        `.${FIXED_CLASSNAME_XLABELS}`,
       ) as NodeListOf<SVGTextElement>;
       if (textNodes.length > 0) {
         wrap(textNodes, barWidth); // 50 = approximate max width per label before wrapping
       }
     }
-  }, [isOverlapping,axisRef.current,calculateLabelWidths]);
+  }, [isOverlapping, axisRef.current, calculateLabelWidths]);
 
   const renderAxisLabel = (
     formattedValue: string | undefined,
@@ -479,7 +482,7 @@ function XAxis({
 
     const yOffset = showAxisLine ? labelOffset : labelOffset / 2;
 
-/*     if (rotate) {
+    /*     if (rotate) {
       console.log("rotate", rotate);
       console.log("label", label);
       if (typeof rotated === "function") {
@@ -528,10 +531,10 @@ function XAxis({
     ...overLineStyles,
     color: theme.colors.axis.title,
     fill: theme.colors.axis.title,
-  //  dy: showAxisLine
-  //    ? `${labelOffset + 4}px`
-  //    : `${labelOffset + (!rotate ? 10 : 62)}px`,
-    dy : isWrapped ? wrappedMaxHeight : 10
+    //  dy: showAxisLine
+    //    ? `${labelOffset + 4}px`
+    //    : `${labelOffset + (!rotate ? 10 : 62)}px`,
+    dy: isWrapped ? wrappedMaxHeight : 10,
   };
 
   const mergedTickLabelProps = {
@@ -546,7 +549,7 @@ function XAxis({
   }
 
   return (
-    <g ref={axisRef} id = "axis">
+    <g ref={axisRef} id="axis">
       <AxisBottom
         scale={scale}
         top={top}

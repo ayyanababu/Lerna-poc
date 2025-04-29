@@ -18,8 +18,6 @@ import YAxis from "../YAxis";
 import mockBarLineChartData from "./mockData";
 import { BarLineChartProps, BarLineData } from "./types";
 
-
-
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.2;
@@ -130,7 +128,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
   const leftMax = Math.max(...chartData.map((d) => d.yAxisLeft), 0);
   const rightMax = Math.max(...chartData.map((d) => d.yAxisRight), 0);
-  const [Wrapped,setWrapped] = useState(false);
+  const [Wrapped, setWrapped] = useState(false);
 
   useEffect(() => {
     if (parentRef.current && activatesizing) {
@@ -320,7 +318,6 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       ? (defaultBarWidth - actualBarWidth) / 2
       : 0;
   const circleRadius = Math.min(4, actualBarWidth / 4);
-  let offsets = [];
 
   const handleBarMouseMove =
     (value: number, index: number) => (event: React.MouseEvent) => {
@@ -508,17 +505,17 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         const us = usedRects.filter(
           (r: { x1: number; x2: number }, i: number) => i === index + 2,
         );
-        console.log(usedRects)
-        console.log(rect)
-        console.log("nusa",us);
+        console.log(usedRects);
+        console.log(rect);
+        console.log("nusa", us);
         const isOverlapping = us.some(
           (r: { x1: number; x2: number }) => rect.x2 >= r.x1 && rect.x2 <= r.x2,
         );
-        console.log("barus",us)
-        console.log("barrect",usedRects)
-        console.log("barrett",rect)
-        console.log(label)
-        console.log("over",isOverlapping)
+        console.log("barus", us);
+        console.log("barrect", usedRects);
+        console.log("barrett", rect);
+        console.log(label);
+        console.log("over", isOverlapping);
         if (!isOverlapping) {
           node.textContent = label;
           node.setAttribute("display", "block");
@@ -592,13 +589,13 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         }
       }
     });
-    let tnodelast = textNodes[textNodes.length-1];
+    const tnodelast = textNodes[textNodes.length - 1];
     let tnodalastminsone = null;
-    if (textNodes[textNodes.length-2]){
-      tnodalastminsone = textNodes[textNodes.length-2];
-    } 
-    if (tnodalastminsone){
-      console.log("doing this")
+    if (textNodes[textNodes.length - 2]) {
+      tnodalastminsone = textNodes[textNodes.length - 2];
+    }
+    if (tnodalastminsone) {
+      console.log("doing this");
       const bbox1 = tnodelast.getBBox();
       let x1 = 0;
       const pnode1 = tnodelast.parentNode as Element;
@@ -630,13 +627,15 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       const rect2 = {
         x1: x2 - ADD_ADJUST_WIDTH,
         x2: x2 + bbox1.width + ADD_ADJUST_WIDTH,
-      };      
-      if (rect1.x1 >= rect2.x1 && rect1.x1 <= rect2.x1){
-        console.log("overlappi")
+      };
+      if (rect1.x1 >= rect2.x1 && rect1.x1 <= rect2.x1) {
+        console.log("overlappi");
         const truncated =
-          tnodelast.textContent.slice(0, Math.floor(tnodelast.textContent.length * TRUNCATE_RATIO)) +
-          truncatedLabelSuffix;
-        tnodelast.textContent = truncated;  
+          tnodelast.textContent.slice(
+            0,
+            Math.floor(tnodelast.textContent.length * TRUNCATE_RATIO),
+          ) + truncatedLabelSuffix;
+        tnodelast.textContent = truncated;
       }
     }
   };
@@ -745,7 +744,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
   useEffect(() => {
     return;
-  }, [xScale, axis_bottom.current,AXISX_ROTATE]);
+  }, [xScale, axis_bottom.current, AXISX_ROTATE]);
 
   useEffect(() => {
     if (!axis_left.current || !leftScale) return;
@@ -755,7 +754,8 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
     setTimeout(() => {
       const textNodes: SVGTextElement[] = Array.from(
-        axis_left.current?.querySelectorAll(".visx-axis-left visx-axis-tick") || [],
+        axis_left.current?.querySelectorAll(".visx-axis-left visx-axis-tick") ||
+          [],
       );
 
       if (!textNodes.length) return;
@@ -772,7 +772,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       textNodes.forEach((node, i) => {
         if (
           i > 0 &&
-          i  < textNodes.length - 1 &&
+          i < textNodes.length - 1 &&
           node &&
           node.parentNode.nodeName.toUpperCase() !== nodenametocheck
         ) {
@@ -1067,27 +1067,27 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
           DEFAULT_MARGIN.top -
           DEFAULT_MARGIN.bottom -
           bottomaxisheight;
-        setdrawableChartHeight(hgt-50);
+        setdrawableChartHeight(hgt - 50);
       }, 200);
     }
   };
 
-  const wrapped = (wrapped:boolean) =>{
-    setTimeout(()=>{
+  const wrapped = (wrapped: boolean) => {
+    setTimeout(() => {
       if (wrapped && chartSvgRef.current && axis_bottom.current) {
-          setWrapped(wrapped);
-          const bottomaxisheight = axis_bottom.current.getBBox().height;
-          const hgt =
-            height -
-            DEFAULT_MARGIN.top -
-            DEFAULT_MARGIN.bottom -
-            bottomaxisheight
-            - bottomHeight
-            console.log("wrap",wrapped);
-          setdrawableChartHeight(hgt-10);
-      }   
-    },300)
-  }
+        setWrapped(wrapped);
+        const bottomaxisheight = axis_bottom.current.getBBox().height;
+        const hgt =
+          height -
+          DEFAULT_MARGIN.top -
+          DEFAULT_MARGIN.bottom -
+          bottomaxisheight -
+          bottomHeight;
+        console.log("wrap", wrapped);
+        setdrawableChartHeight(hgt + 10);
+      }
+    }, 300);
+  };
 
   if (chartData.length === 0) return <div>No data to display.</div>;
 
@@ -1146,7 +1146,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
               addGap={BASE_ADJUST_WIDTH}
               rotated={rotated}
               wrapped={wrapped}
-              barWidth={actualBarWidth+10}
+              barWidth={actualBarWidth + 10}
             />
           </g>
           {showGrid && (
@@ -1174,15 +1174,15 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
               <g id="bars">
                 {chartData.map((d, index) => {
                   let barX = (xScale(d.xAxis) ?? 0) + xOffset;
-                  if (index === 0 || index === chartData.length-1){
-                    if (index === 0){
-                       barX = barX - (BASE_ADJUST_WIDTH)
-                    }else{
-                       barX = barX + (BASE_ADJUST_WIDTH * 1.5)               
+                  if (index === 0 || index === chartData.length - 1) {
+                    if (index === 0) {
+                      barX = barX - BASE_ADJUST_WIDTH;
+                    } else {
+                      barX = barX + BASE_ADJUST_WIDTH * 1.5;
                     }
-                  }else{
-                    barX = barX + (BASE_ADJUST_WIDTH/2)                 
-                  }  
+                  } else {
+                    barX = barX + BASE_ADJUST_WIDTH / 2;
+                  }
                   const barHeight =
                     drawableChartHeight - (leftScale(d.yAxisLeft) ?? 0);
                   const barY = drawableChartHeight - barHeight;
