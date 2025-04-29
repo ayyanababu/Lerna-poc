@@ -765,11 +765,20 @@ function VerticalStackedBar({
             actualBarWidth = Math.min(calculatedBarWidth, maxBarWidth);
 
             // If the bar width is limited, center it
-            const barX =
+            let barX =
               actualBarWidth < calculatedBarWidth
                 ? (xScale(category) || 0) +
                   (calculatedBarWidth - actualBarWidth) / 2
                 : xScale(category) || 0;
+            if (index === 0 || index === filteredData.length - 1) {
+                 if (index === 0) {
+                    barX = barX - BASE_ADJUST_WIDTH;
+                  } else {
+                    barX = barX + BASE_ADJUST_WIDTH * 1.5;
+                  }
+            } else {
+                  barX = barX + BASE_ADJUST_WIDTH / 2;
+            }                
 
             // Calculate dynamic radius based on bar width
             const dynamicRadius = Math.min(

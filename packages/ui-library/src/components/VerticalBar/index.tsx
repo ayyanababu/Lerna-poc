@@ -794,10 +794,19 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
             const calculatedBarWidth = xScale.bandwidth();
             barwidth = getOptimalBarWidth(calculatedBarWidth);
-            const barX =
+            let barX =
               barwidth < calculatedBarWidth
                 ? (xScale(d.label) || 0) + (calculatedBarWidth - barwidth) / 2
                 : xScale(d.label) || 0;
+            if (index === 0 || index === filteredData.length - 1) {
+                  if (index === 0) {
+                     barX = barX - BASE_ADJUST_WIDTH;
+                  } else {
+                     barX = barX + BASE_ADJUST_WIDTH * 1.5;
+                  }
+            } else {
+                  barX = barX + BASE_ADJUST_WIDTH / 2;
+            }                               
             const barHeight = drawableChartHeight - yScale(value);
             const barY = yScale(value);
             const isHovered = hoveredBar === index;

@@ -20,7 +20,7 @@ import { BarLineChartProps, BarLineData } from "./types";
 
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
-const SCALE_PADDING = 1.2;
+const SCALE_PADDING = 1.3;
 const MAX_BAR_WIDTH = 16;
 const DEFAULT_BAR_RADIUS = 4;
 const TRUNCATE_RATIO = 0.5;
