@@ -883,7 +883,7 @@ body:not(.dark) {
                                     isLoading={dataLoading.verticalBar}
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,
-                                        isVisible: true,
+                                        isVisible: false,
                                     }}
                                     tooltipProps={{}}
                                 />
