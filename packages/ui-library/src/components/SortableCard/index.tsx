@@ -66,6 +66,7 @@ const SortableCard = forwardRef<HTMLDivElement, SortableCardProps>(
             padding: "4px",
             height,
             width,
+            pb: "0px",
             ...(props?.sx || {}),
           }}
         >

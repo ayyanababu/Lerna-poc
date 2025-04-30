@@ -61,6 +61,8 @@ export default function SortableComponent({
     };
   }, []);
 
+  console.log("class",className)
+
   return (
     <Box
       ref={containerRef}

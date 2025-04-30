@@ -154,7 +154,7 @@ const fetchStackedBarData = (): Promise<StackedBarItem[]> =>
                     },
                 },
                 {
-                    label: 'Stale Priced',
+                    label: 'Stale Priced sdf sdf  sdfsf ',
                     data: {
                         stalePriced:
                             Math.floor(Math.random() * 100000000) + 2500,
@@ -208,7 +208,7 @@ const fetchBarLineData = (): Promise<BarLineData> =>
     new Promise((resolve) => {
         setTimeout(() => {
             const actionTypes = [
-                'Dividend (NNA)',
+                'Dividend (NNA) test this test',
                 'Dividend (NCA)',
                 'Dividend (NEA)',
   //              'Stock Split (NCA)',
@@ -240,17 +240,41 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
                     value: 10000000,
                 }, // 20-40
                 {
-                    label: 'Stale Price',
-                    value: 15000000,
-                }, // 35-60
+                    label: 'Priced',
+                    value: 1000,
+                }, // 20-40     
                 {
-                    label: 'Priced/Auto',
-                    value: 10000000,
-                }, // 10-20
+                    label: 'Low Priced',
+                    value: 100000,
+                }, // 20-40       
                 {
-                    label: 'Priced/Manual',
-                    value: 50000000,
-                }, // 5-13
+                    label: 'Priced ddd',
+                    value: 1000,
+                }, // 20-40     
+                {
+                    label: 'Priced adad',
+                    value: 1000,
+                }, // 20-40     
+                {
+                    label: 'Priced 12122',
+                    value: 1000,
+                }, // 20-40     
+                {
+                    label: 'Priced aasdd',
+                    value: 1000,
+                }, // 20-40     
+                {
+                    label: 'Priced ggg',
+                    value: 1000,
+                }, // 20-40     
+                {
+                    label: 'Priced sss',
+                    value: 1000,
+                }, // 20-40     
+                {
+                    label: 'Priced ttt',
+                    value: 1000,
+                }, // 20-40                         
             ]);
         }, 1300);
     });
@@ -859,7 +883,7 @@ body:not(.dark) {
                                     isLoading={dataLoading.verticalBar}
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,
-                                        isVisible: true,
+                                        isVisible: false,
                                     }}
                                     tooltipProps={{}}
                                 />
