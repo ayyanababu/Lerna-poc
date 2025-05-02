@@ -93,6 +93,7 @@ function Legends({
         gap: variant === "compact" ? "8px" : "8px",
         backgroundColor: theme.colors.legend.background,
         borderRadius: "4px",
+        zIndex: 1,
         ...positionStyles,
       }}
     >
