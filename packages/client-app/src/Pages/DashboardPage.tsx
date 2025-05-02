@@ -791,8 +791,8 @@ body:not(.dark) {
                                         '#9ac7ea',
                                     ]}
                                     isLoading={dataLoading.stackedBar}
-                                    showYAxis={false}
-                                    showXAxis={false}
+                                    showYAxis={true}
+                                    showXAxis={true}
                                     maxBarWidth={230}
                                 />
                             </SortableCard>
