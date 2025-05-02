@@ -8,6 +8,7 @@ import {
     Legends,
     Sortable,
     SortableCard,
+    
     TreeMapChart,
     VerticalBarChart,
     VerticalGroupedBarChart,
@@ -16,6 +17,7 @@ import {
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { ThemeContext } from '../App';
 import ReconciliationCard from '../components/DashboardPage/ReconciliationCard';
+import { Box, } from '@mui/material';
 
 // Define types for our chart data
 type DonutDataItem = {
@@ -201,7 +203,7 @@ const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> =>
                     };
                 }),
             ]);
-        }, 1700);
+        }, 0);
     });
 
 const fetchBarLineData = (): Promise<BarLineData> =>
@@ -484,9 +486,24 @@ function DashboardPage() {
         children: [],
     });
     const [stackedBarData, setStackedBarData] = useState<StackedBarItem[]>([]);
+    const [selectedData, setSelectedData] = useState<StackedBarItem[] | []>([]);
     const [horizontalStackedData, setHorizontalStackedData] = useState<
         StackedBarItem[]
     >([]);
+    const computedData = useMemo<StackedBarItem[]>(() => ([{
+        
+            label: "hi",
+            data: {
+                futures:
+                    Math.floor(Math.random() * 100) + 0,
+                fixedIncome:
+                    Math.floor(Math.random() * 100) + 0,
+                others: Math.floor(Math.random() * 100) + 0,
+            },
+        
+    }]), []);
+
+
     const [barLineData, setBarLineData] = useState<BarLineData>({
         xAxislabel: 'Corporate Action',
         yAxisLeftLabel: 'Number of Actions',
@@ -771,6 +788,9 @@ body:not(.dark) {
                                     type="full"
                                     title="Transaction Capture"
                                     isLoading={dataLoading.donut}
+                                    legendsProps={{
+                                        position: Legends.Position.LEFT,
+                                    }}
                                 />
                             </SortableCard>
 
@@ -798,27 +818,74 @@ body:not(.dark) {
                             </SortableCard>
 
                             <SortableCard height={200} width={'100%'}>
-                                <HorizontalStackedBarChart
-                                    data={horizontalStackedData}
-                                    groupKeys={[
-                                        'futures',
-                                        'options',
-                                        'forwards',
-                                        'fixedIncome',
-                                        'others',
-                                    ]}
-                                    title="Expiry and Settlements"
-                                    colors={[
-                                        '#a0c8e9',
-                                        '#56b9b8',
-                                        '#f2ce7a',
-                                        '#4e79bb',
-                                        '#9aa4b3',
-                                    ]}
-                                    isLoading={dataLoading.horizontalStacked}
-                                    maxBarHeight={32}
-                                    removeBothAxis
-                                />
+                                <div style={{
+                                    
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                    
+                                }}>
+
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '8px',
+                                        }}>
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                gap: '8px',
+                                                width: '100%',
+                                                overflowX: 'auto',
+                                            }}>
+                                            {[
+                                                'Position',
+                                                'Cash Rec',
+                                                // 'TRS MTM',
+                                                // 'TRS Cash',
+                                                // 'TRS Payment',
+                                                // 'Market Value',
+                                                'Repo',
+                                                'FX Positions',
+                                            ].map((label, index) => (
+                                                <button onClick={()=>{
+                                                    if (index == 0 ){
+                                                        setSelectedData(horizontalStackedData)
+                                                    } else if (index === 2) {
+                                                        setSelectedData([])
+                                                    } else  {
+                                                        setSelectedData(computedData)
+                                                    }
+                                                }}>
+                                                    {label}
+                                                </button>
+                                            ))}
+                                        </Box>
+                                    </div>
+                                    <HorizontalStackedBarChart
+                                        data={
+                                            selectedData
+                                            }
+                                        groupKeys={[
+                                            'futures',
+                                            'options',
+                                            'forwards',
+                                            'fixedIncome',
+                                            'others',
+                                        ]}
+                                        title="Expiry and Settlements"
+                                        colors={[
+                                            '#a0c8e9',
+                                            '#56b9b8',
+                                            '#f2ce7a',
+                                            '#4e79bb',
+                                            '#9aa4b3',
+                                        ]}
+                                        isLoading={dataLoading.horizontalStacked}
+                                        maxBarHeight={32}
+                                        removeBothAxis
+                                    />
+                                </div>
                             </SortableCard>
 
                             <SortableCard height={400} width={'100%'}>

@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+ 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -803,10 +803,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       }
     }, 300);
   };
-
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
+  const showNoData = !isLoading && (!_data || !_data.length || !_groupKeys.length);
 
   return (
     <ChartWrapper
@@ -834,186 +831,190 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
       minRenderHeight={removeBothAxis ? 0 : 200}
     >
-      <svg
-        ref={chartSvgRef}
-        width={adjustedChartWidth || width}
-        height={adjustedChartHeight || height}
-      >
-        {isLoading && <SvgShimmer />}
+      {showNoData ? (
+        <div>No data to display.</div>
+      ) : (
+        <svg
+          ref={chartSvgRef}
+          width={adjustedChartWidth || width}
+          height={adjustedChartHeight || height}
+        >
+          {isLoading && <SvgShimmer />}
 
-        {/* Use the dynamicMargin for top/left */}
-        <Group top={dynamicMargin.top} left={dynamicMargin.left}>
-          <g ref={axis_left}>
-            <YAxis
-              scale={categoryScale}
-              tickStroke={theme.colors.axis.line}
-              hideAxisLine
-              numTicks={calculatedNumTicks}
-              showTicks={showTicks}
-              isLoading={isLoading}
-              isVisible={!removeBothAxis}
-              {...yAxisProps}
-            />
-          </g>
-          <g ref={axis_bottom}>
-            <XAxis
-              scale={xScale}
-              top={innerHeight}
-              showTicks={hideIndex.length === groupKeys.length || showTicks}
+          {/* Use the dynamicMargin for top/left */}
+          <Group top={dynamicMargin.top} left={dynamicMargin.left}>
+            <g ref={axis_left}>
+              <YAxis
+                scale={categoryScale}
+                tickStroke={theme.colors.axis.line}
+                hideAxisLine
+                numTicks={calculatedNumTicks}
+                showTicks={showTicks}
+                isLoading={isLoading}
+                isVisible={!removeBothAxis}
+                {...yAxisProps}
+              />
+            </g>
+            <g ref={axis_bottom}>
+              <XAxis
+                scale={xScale}
+                top={innerHeight}
+                showTicks={hideIndex.length === groupKeys.length || showTicks}
+                numTicks={5}
+                isLoading={isLoading}
+                availableWidth={innerWidth}
+                showAxisLine={showXAxis}
+                tickLength={0}
+                isVisible={!removeBothAxis}
+                {...xAxisProps}
+                addGap={BASE_ADJUST_WIDTH}
+                rotated={rotated}
+                wrapped={wrapped}
+                barWidth={barwidth}
+              />
+            </g>
+            <Grid
+              height={innerHeight}
+              xScale={xScale}
+              showHorizontal={false}
+              showVertical
               numTicks={5}
               isLoading={isLoading}
-              availableWidth={innerWidth}
-              showAxisLine={showXAxis}
-              tickLength={0}
-              isVisible={!removeBothAxis}
-              {...xAxisProps}
-              addGap={BASE_ADJUST_WIDTH}
-              rotated={rotated}
-              wrapped={wrapped}
-              barWidth={barwidth}
+              {...gridProps}
             />
-          </g>
-          <Grid
-            height={innerHeight}
-            xScale={xScale}
-            showHorizontal={false}
-            showVertical
-            numTicks={5}
-            isLoading={isLoading}
-            {...gridProps}
-          />
 
-          {filteredData.map((catData, categoryIndex) => {
-            const category = String(catData.label);
-            // bar thickness with clamp
-            const rawBarHeight = categoryScale.bandwidth();
-            // Use custom barWidth if provided, otherwise use default with maximum limit
-            const actualBarHeight = Math.min(rawBarHeight, maxBarHeight);
-            // center if clamped
-            const bandY = categoryScale(category) || 0;
-            const barY = bandY + (rawBarHeight - actualBarHeight) / 2;
+            {filteredData.map((catData, categoryIndex) => {
+              const category = String(catData.label);
+              // bar thickness with clamp
+              const rawBarHeight = categoryScale.bandwidth();
+              // Use custom barWidth if provided, otherwise use default with maximum limit
+              const actualBarHeight = Math.min(rawBarHeight, maxBarHeight);
+              // center if clamped
+              const bandY = categoryScale(category) || 0;
+              const barY = bandY + (rawBarHeight - actualBarHeight) / 2;
 
-            return activeKeys.map((groupKey, groupIndex) => {
-              const seriesData = stackedData.find((s) => s.key === groupKey);
-              if (!seriesData) return null;
+              return activeKeys.map((groupKey, groupIndex) => {
+                const seriesData = stackedData.find((s) => s.key === groupKey);
+                if (!seriesData) return null;
 
-              const [x0, x1] = seriesData[categoryIndex];
-              barwidth = xScale(x1) - xScale(x0);
-              const barX = xScale(x0);
-              const value = x1 - x0;
-              if (!value) return null;
+                const [x0, x1] = seriesData[categoryIndex];
+                barwidth = xScale(x1) - xScale(x0);
+                const barX = xScale(x0);
+                const value = x1 - x0;
+                if (!value) return null;
 
-              const isHoveredGroup = hoveredGroupKey === groupKey;
-              const barOpacity =
-                hoveredGroupKey && !isHoveredGroup
-                  ? REDUCED_OPACITY
-                  : DEFAULT_OPACITY;
+                const isHoveredGroup = hoveredGroupKey === groupKey;
+                const barOpacity =
+                  hoveredGroupKey && !isHoveredGroup
+                    ? REDUCED_OPACITY
+                    : DEFAULT_OPACITY;
 
-              // figure out if it's the rightmost bar
-              let rightmostKey = activeKeys[0];
-              let maxX1 = 0;
-              stackedData.forEach((s) => {
-                const x1Val = s[categoryIndex]?.[1] || 0;
-                if (x1Val > maxX1) {
-                  maxX1 = x1Val;
-                  rightmostKey = s.key;
-                }
-              });
-
-              // figure out if it's the leftmost bar
-              let leftmostKey = activeKeys[0];
-              let minX0 = Infinity;
-              stackedData.forEach((s) => {
-                const x0Val = s[categoryIndex]?.[0] || 0;
-                if (x0Val < minX0) {
-                  minX0 = x0Val;
-                  leftmostKey = s.key;
-                }
-              });
-
-              const isRightmostBar = seriesData.key === rightmostKey;
-              const isLeftmostBar = seriesData.key === leftmostKey;
-
-              const dynamicRadius = Math.min(
-                DEFAULT_BAR_RADIUS,
-                actualBarHeight / 2,
-              );
-              // if rightmost => round corners
-              const pathProps = isRightmostBar
-                ? {
-                    d: `
-                M ${barX},${barY + actualBarHeight}
-                L ${barX},${barY}
-                L ${barX + barwidth - dynamicRadius},${barY}
-                Q ${barX + barwidth},${barY} ${barX + barwidth},${barY + dynamicRadius}
-                L ${barX + barwidth},${barY + actualBarHeight - dynamicRadius}
-                Q ${barX + barwidth},${barY + actualBarHeight} ${barX + barwidth - dynamicRadius},${
-                  barY + actualBarHeight
-                }
-                Z
-              `,
+                // figure out if it's the rightmost bar
+                let rightmostKey = activeKeys[0];
+                let maxX1 = 0;
+                stackedData.forEach((s) => {
+                  const x1Val = s[categoryIndex]?.[1] || 0;
+                  if (x1Val > maxX1) {
+                    maxX1 = x1Val;
+                    rightmostKey = s.key;
                   }
-                : isLeftmostBar
+                });
+
+                // figure out if it's the leftmost bar
+                let leftmostKey = activeKeys[0];
+                let minX0 = Infinity;
+                stackedData.forEach((s) => {
+                  const x0Val = s[categoryIndex]?.[0] || 0;
+                  if (x0Val < minX0) {
+                    minX0 = x0Val;
+                    leftmostKey = s.key;
+                  }
+                });
+
+                const isRightmostBar = seriesData.key === rightmostKey;
+                const isLeftmostBar = seriesData.key === leftmostKey;
+
+                const dynamicRadius = Math.min(
+                  DEFAULT_BAR_RADIUS,
+                  actualBarHeight / 2,
+                );
+                // if rightmost => round corners
+                const pathProps = isRightmostBar
                   ? {
                       d: `
-              M ${barX + dynamicRadius},${barY + actualBarHeight}
-              Q ${barX},${barY + actualBarHeight} ${barX},${barY + actualBarHeight - dynamicRadius}
-              L ${barX},${barY + dynamicRadius}
-              Q ${barX},${barY} ${barX + dynamicRadius},${barY}
-              L ${barX + barwidth},${barY}
-              L ${barX + barwidth},${barY + actualBarHeight}
-              Z
-              `,
+                  M ${barX},${barY + actualBarHeight}
+                  L ${barX},${barY}
+                  L ${barX + barwidth - dynamicRadius},${barY}
+                  Q ${barX + barwidth},${barY} ${barX + barwidth},${barY + dynamicRadius}
+                  L ${barX + barwidth},${barY + actualBarHeight - dynamicRadius}
+                  Q ${barX + barwidth},${barY + actualBarHeight} ${barX + barwidth - dynamicRadius},${
+                    barY + actualBarHeight
+                  }
+                  Z
+                `,
                     }
-                  : undefined;
-
-              return (
-                <React.Fragment key={`stacked-${category}-${groupKey}`}>
-                  <CustomBar
-                    x={barX}
-                    y={barY}
-                    width={barwidth}
-                    height={actualBarHeight}
-                    fill={
-                      isLoading
-                        ? `url(#${shimmerGradientId})`
-                        : groupColorScale(groupKey)
-                    }
-                    opacity={barOpacity}
-                    pathProps={pathProps}
-                    onMouseMove={handleMouseMove(groupKey, value)}
-                    onMouseLeave={handleMouseLeave}
-                    {...barProps}
-                    onClick={(event) => {
-                      if (barProps?.onClick) {
-                        barProps.onClick(event);
+                  : isLeftmostBar
+                    ? {
+                        d: `
+                M ${barX + dynamicRadius},${barY + actualBarHeight}
+                Q ${barX},${barY + actualBarHeight} ${barX},${barY + actualBarHeight - dynamicRadius}
+                L ${barX},${barY + dynamicRadius}
+                Q ${barX},${barY} ${barX + dynamicRadius},${barY}
+                L ${barX + barwidth},${barY}
+                L ${barX + barwidth},${barY + actualBarHeight}
+                Z
+                `,
                       }
-                      if (onClick) {
-                        onClick(event, filteredData[categoryIndex], [
-                          categoryIndex,
-                          groupIndex,
-                        ]);
-                      }
-                    }}
-                  />
+                    : undefined;
 
-                  {barX > xScale(0) && (
-                    <line
-                      x1={barX}
-                      y1={barY}
-                      x2={barX}
-                      y2={barY + actualBarHeight}
-                      stroke={theme.colors.common.stroke}
-                      strokeWidth={strokeWidth}
-                      pointerEvents="none"
+                return (
+                  <React.Fragment key={`stacked-${category}-${groupKey}`}>
+                    <CustomBar
+                      x={barX}
+                      y={barY}
+                      width={barwidth}
+                      height={actualBarHeight}
+                      fill={
+                        isLoading
+                          ? `url(#${shimmerGradientId})`
+                          : groupColorScale(groupKey)
+                      }
+                      opacity={barOpacity}
+                      pathProps={pathProps}
+                      onMouseMove={handleMouseMove(groupKey, value)}
+                      onMouseLeave={handleMouseLeave}
+                      {...barProps}
+                      onClick={(event) => {
+                        if (barProps?.onClick) {
+                          barProps.onClick(event);
+                        }
+                        if (onClick) {
+                          onClick(event, filteredData[categoryIndex], [
+                            categoryIndex,
+                            groupIndex,
+                          ]);
+                        }
+                      }}
                     />
-                  )}
-                </React.Fragment>
-              );
-            });
-          })}
-        </Group>
-      </svg>
+
+                    {barX > xScale(0) && (
+                      <line
+                        x1={barX}
+                        y1={barY}
+                        x2={barX}
+                        y2={barY + actualBarHeight}
+                        stroke={theme.colors.common.stroke}
+                        strokeWidth={strokeWidth}
+                        pointerEvents="none"
+                      />
+                    )}
+                  </React.Fragment>
+                );
+              });
+            })}
+          </Group>
+        </svg>
+      )}
     </ChartWrapper>
   );
 };
