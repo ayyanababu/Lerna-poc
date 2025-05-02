@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+ 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { curveLinear } from "@visx/curve";
 import { Group } from "@visx/group";
@@ -69,6 +69,8 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   barProps,
   timestampProps,
   timestamp,
+  onLineClick,
+  onBarClick
 }) => {
   const { theme } = useTheme();
   const colors = _colors ?? {
@@ -1228,6 +1230,10 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                       `,
                       }}
                       {...barProps}
+                      onClick={(event) => {
+                        if (barProps?.onClick) barProps.onClick(event);
+                        if (onBarClick) onBarClick(event, d, index);
+                      }}
                     />
                   );
                 })}
@@ -1267,6 +1273,9 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                       ? REDUCED_OPACITY
                       : DEFAULT_OPACITY
                   }
+                  onClick={(event) => {
+                    if (onLineClick) onLineClick(event, d, index);
+                  }}
                 />
               ))}
 
@@ -1283,6 +1292,9 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                 }
                 stroke={isLoading ? `url(#${shimmerGradientId})` : colors.line}
                 shapeRendering="geometricPrecision"
+                onClick={(event) => {
+                  if (onLineClick) onLineClick(event, chartData, -1);
+                }}
               />
             </>
           )}
