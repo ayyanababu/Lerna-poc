@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+ 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -15,6 +15,7 @@ import XAxis from "../XAxis";
 import YAxis from "../YAxis";
 import { mockHorizontalBarChartData } from "./mockdata";
 import { DataPoint, HorizontalBarChartProps } from "./types";
+import ErrorBoundary from "../ErrorBoundary";
 
 const DEFAULT_MARGIN = {
   top: 0,
@@ -841,4 +842,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   );
 };
 
-export default HorizontalBarChart;
+const HorizontalBarChartComponent = (props: HorizontalBarChartProps) => {
+  return (
+    <ErrorBoundary>
+      <HorizontalBarChart {...props} />
+    </ErrorBoundary>
+  );
+};
+
+export default HorizontalBarChartComponent;

@@ -12,6 +12,7 @@ import SvgShimmer, { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { TooltipData } from "../Tooltip/types";
 import { mockFullDonutData, mockSemiDonutData } from "./ShimmerMock";
 import { DonutChartProps, DonutData } from "./types";
+import ErrorBoundary from "../ErrorBoundary";
 
 function DonutChart({
   data: _data,
@@ -212,4 +213,10 @@ function DonutChart({
   );
 }
 
-export default DonutChart;
+export default function DonutChartComponent(props: DonutChartProps) {
+  return (
+    <ErrorBoundary>
+      <DonutChart {...props} />
+    </ErrorBoundary>
+  );
+}

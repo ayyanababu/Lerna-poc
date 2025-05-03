@@ -1,4 +1,3 @@
- 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { curveLinear } from "@visx/curve";
 import { Group } from "@visx/group";
@@ -17,6 +16,7 @@ import XAxis from "../XAxis";
 import YAxis from "../YAxis";
 import mockBarLineChartData from "./mockData";
 import { BarLineChartProps, BarLineData } from "./types";
+import ErrorBoundary from "../ErrorBoundary";
 
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
@@ -1304,4 +1304,12 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   );
 };
 
-export default BarLineChart;
+const BarLineChartComponent = (props: BarLineChartProps) => {
+  return (
+    <ErrorBoundary>
+      <BarLineChart {...props} />
+    </ErrorBoundary>
+  );
+};
+
+export default BarLineChartComponent;

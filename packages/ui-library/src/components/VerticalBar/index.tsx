@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+ 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -15,6 +15,7 @@ import XAxis from "../XAxis";
 import YAxis from "../YAxis";
 import mockVerticalBarChartData from "./mockdata";
 import { DataPoint, VerticalBarChartProps } from "./types";
+import ErrorBoundary from "../ErrorBoundary";
 
 const DEFAULT_MARGIN = {
   top: 5,
@@ -869,4 +870,12 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   );
 };
 
-export default VerticalBarChart;
+const VerticalBarChartComponent = (props: VerticalBarChartProps) => {
+  return (
+    <ErrorBoundary>
+      <VerticalBarChart {...props} />
+    </ErrorBoundary>
+  );
+};
+
+export default VerticalBarChartComponent;

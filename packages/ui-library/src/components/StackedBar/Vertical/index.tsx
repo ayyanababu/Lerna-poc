@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+ 
 import React, {
   useCallback,
   useEffect,
@@ -23,6 +23,7 @@ import XAxis from "../../XAxis";
 import YAxis from "../../YAxis";
 import { mockVerticalStackedBarChartData } from "./mockdata";
 import { VerticalStackedBarChartProps } from "./types";
+import ErrorBoundary from "../../ErrorBoundary";
 
 const DEFAULT_MARGIN = {
   top: 20,
@@ -890,4 +891,12 @@ function VerticalStackedBar({
   );
 }
 
-export default VerticalStackedBar;
+function VerticalStackedBarComponent(props: VerticalStackedBarChartProps) {
+  return (
+      <ErrorBoundary>
+        <VerticalStackedBar {...props} />
+      </ErrorBoundary>
+  );
+}
+
+export default VerticalStackedBarComponent;

@@ -2,13 +2,14 @@ import {
     BarLineChart,
     ChartThemeProvider,
     DonutChart,
+    ErrorBoundary,
     HorizontalBarChart,
     HorizontalGroupedBarChart,
     HorizontalStackedBarChart,
     Legends,
     Sortable,
     SortableCard,
-    
+    Title,
     TreeMapChart,
     VerticalBarChart,
     VerticalGroupedBarChart,
@@ -18,6 +19,7 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import { ThemeContext } from '../App';
 import ReconciliationCard from '../components/DashboardPage/ReconciliationCard';
 import { Box, } from '@mui/material';
+import BrokenComponent from '../components/DashboardPage/BrokenComponent';
 
 // Define types for our chart data
 type DonutDataItem = {
@@ -891,6 +893,13 @@ body:not(.dark) {
                                 </div>
                             </SortableCard>
 
+                            <SortableCard height={400} width={'100%'}>
+                                <Title>This is an broken component</Title>
+                                <ErrorBoundary>
+                                    <BrokenComponent />
+                                </ErrorBoundary>
+                            </SortableCard>
+                            
                             <SortableCard height={400} width={'100%'}>
                                 <BarLineChart
                                     data={barLineData}
