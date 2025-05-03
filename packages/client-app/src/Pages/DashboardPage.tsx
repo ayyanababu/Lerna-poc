@@ -817,7 +817,7 @@ body:not(.dark) {
                                 />
                             </SortableCard>
 
-                            <SortableCard height={200} width={'100%'}>
+                            <SortableCard height={400} width={'100%'}>
                                 <div style={{
                                     
                                         display: 'flex',

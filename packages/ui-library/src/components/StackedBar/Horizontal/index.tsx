@@ -832,7 +832,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       minRenderHeight={removeBothAxis ? 0 : 200}
     >
       {showNoData ? (
-        <div>No data to display.</div>
+        null
       ) : (
         <svg
           ref={chartSvgRef}
