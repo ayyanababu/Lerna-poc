@@ -90,9 +90,9 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                 flex: "1 1 auto",
                 minHeight: 0,
                 // Gap between chart and legends based on position
-                // commented by VNS
                 gap: position === LegendPosition.BOTTOM ? "12px" : "20px",
-                marginTop: title ? "12px" : "0px", // Add 12px gap only if title exists
+                marginTop: title ? "12px" : "0px",
+                width: "100%",
                 ...(isHorizontal
                   ? {
                       flexDirection:
@@ -109,12 +109,24 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
               }}
             >
               {!isLoading && (
-                <Legends
-                  {...legendsProps}
-                  position={position}
-                  colorScale={colorScale}
-                  data={legendData}
-                />
+                <Box
+                  sx={{
+                    flex: isHorizontal ? "0 0 calc(50% - 10px)" : "1 1 auto",
+                    width: isHorizontal ? "calc(50% - 10px)" : "100%",
+                    minWidth: isHorizontal ? "calc(50% - 10px)" : "100%",
+                    display: "flex",
+                    flexDirection: 'column',
+                    justifyContent: "center",
+                    alignItems: "baseline",
+                  }}
+                >
+                  <Legends
+                    {...legendsProps}
+                    position={position}
+                    colorScale={colorScale}
+                    data={legendData}
+                  />
+                </Box>
               )}
               <Box
                 ref={(el) => {
@@ -127,10 +139,12 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                 }}
                 sx={{
                   position: "relative",
-                  height:  "100%",
-                  width: isHorizontal ?  "50%" : "100%",
+                  height: "100%",
+                  width: !isLoading && isHorizontal ? "calc(50% - 10px)" : "100%",
+                  minWidth: !isLoading && isHorizontal ? "calc(50% - 10px)" : "100%",
+                  maxWidth: !isLoading && isHorizontal ? "calc(50% - 10px)" : "100%",
                   display: "flex",
-                  flex: isHorizontal ?  "1 1 50%": "1 1 100%",
+                  flex: !isLoading && isHorizontal ? "0 0 calc(50% - 10px)" : "1 1 auto",
                   minHeight: 0,
                 }}
               >

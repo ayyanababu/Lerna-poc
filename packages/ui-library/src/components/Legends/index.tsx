@@ -94,7 +94,7 @@ function Legends({
         backgroundColor: theme.colors.legend.background,
         borderRadius: "4px",
         zIndex: 1,
-        ...positionStyles,
+        // ...positionStyles,
       }}
     >
       <LegendOrdinal

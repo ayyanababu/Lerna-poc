@@ -775,6 +775,9 @@ body:not(.dark) {
                 <div className="container">
                     {
                         <Sortable className="my-cards" styles={{
+                            0: {
+                                gridColumn: 'span 1',
+                            },
                             3: {
                                 gridColumn: 'span 1',
                             },
