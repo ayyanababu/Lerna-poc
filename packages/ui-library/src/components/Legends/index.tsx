@@ -15,6 +15,7 @@ function Legends({
   setHovered,
   position = LegendPosition.TOP,
   onClick,
+  isLabelClickable = false,
   isLoading = false,
   doStrike = false,
   isVisible = true,
@@ -28,7 +29,7 @@ function Legends({
 
   const handleToggleItem = useCallback(
     (index: number) => {
-      if (setHideIndex && hideIndex) {
+      if (setHideIndex && hideIndex && !isLabelClickable) {
         setHideIndex((prev) =>
           prev.includes(index)
             ? prev.filter((idx) => idx !== index)
@@ -36,7 +37,7 @@ function Legends({
         );
       }
     },
-    [data, setHideIndex, hideIndex],
+    [data, setHideIndex, hideIndex, isLabelClickable],
   );
 
   const handleMouseOver = useCallback(
@@ -68,7 +69,6 @@ function Legends({
         backgroundColor: theme.colors.legend.background,
         borderRadius: "4px",
         zIndex: 1,
-        // ...positionStyles,
       }}
     >
       <LegendOrdinal

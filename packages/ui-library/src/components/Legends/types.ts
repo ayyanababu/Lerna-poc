@@ -45,6 +45,7 @@ export interface LegendsProps {
   setHovered?: React.Dispatch<React.SetStateAction<string | null>>;
   position?: LegendPositionType;
   onClick?: (data: LegendData, legend: string, index: number) => void;
+  isLabelClickable?: boolean;
   isLoading?: boolean;
   doStrike?: boolean;
   isVisible?: boolean;
