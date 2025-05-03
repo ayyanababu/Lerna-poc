@@ -17,6 +17,7 @@ import XAxis from "../XAxis";
 import YAxis from "../YAxis";
 import mockBarLineChartData from "./mockData";
 import { BarLineChartProps, BarLineData } from "./types";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
@@ -28,7 +29,8 @@ let AXISX_ROTATE = false;
 const AXISY_ROTATE = true;
 const AXISY1_ROTATE = true;
 const BASE_ADJUST_WIDTH = 5; // used to fix the check width for the overlap of xaxis
-const BASE_ADJUST_HEIGHT = 0; // used to fix the check width for the overlap of yaxis
+const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
+const BASE_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
 const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
 const bottomHeightAddOnSpace = 0;
 const titleHeightAddOnSpace = 0;
@@ -973,4 +975,23 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   );
 };
 
-export default BarLineChart;
+const BarLineChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & BarLineChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
+  return (
+    <BarLineChart {...props} />
+  );
+};
+
+export default BarLineChartComponent;

@@ -12,6 +12,7 @@ import SvgShimmer, { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { TooltipData } from "../Tooltip/types";
 import mockTreeMapChartData from "./mockdata";
 import { TreeMapChartProps, TreeMapNode } from "./types";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 type RectNode = HierarchyNode<TreeMapNode> & {
   x0: number;
@@ -447,4 +448,23 @@ const TreeMapChart = ({
   );
 };
 
-export default TreeMapChart;
+const TreeMapChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & TreeMapChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
+  return (
+    <TreeMapChart {...props} />
+  );
+};
+
+export default TreeMapChartComponent;

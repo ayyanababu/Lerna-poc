@@ -17,6 +17,7 @@ import XAxis from "../../XAxis";
 import YAxis from "../../YAxis";
 import { mockHorizontalStackedBarChartData } from "./mockdata";
 import { HorizontalStackedBarChartProps } from "./types";
+import ErrorFallback from "../../ErrorBoundary/ErrorFallback";
 
 interface DynamicMargin {
   top: number;
@@ -883,4 +884,24 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
   );
 };
 
-export default HorizontalStackedBar;
+
+function HorizontalStackedBarComponent({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & HorizontalStackedBarChartProps) {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
+  return (
+    <HorizontalStackedBar {...props} />
+  );
+}
+
+export default HorizontalStackedBarComponent;

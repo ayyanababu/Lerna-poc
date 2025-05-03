@@ -15,6 +15,7 @@ import XAxis from "../XAxis";
 import YAxis from "../YAxis";
 import { mockHorizontalBarChartData } from "./mockdata";
 import { DataPoint, HorizontalBarChartProps } from "./types";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 const DEFAULT_MARGIN = {
   top: 0,
@@ -676,4 +677,23 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   );
 };
 
-export default HorizontalBarChart;
+const HorizontalBarChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & HorizontalBarChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
+  return (
+    <HorizontalBarChart {...props} />
+  );
+};
+
+export default HorizontalBarChartComponent;

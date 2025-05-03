@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -15,6 +14,7 @@ import XAxis from "../XAxis";
 import YAxis from "../YAxis";
 import mockVerticalBarChartData from "./mockdata";
 import { DataPoint, VerticalBarChartProps } from "./types";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 const DEFAULT_MARGIN = {
   top: 5,
@@ -677,4 +677,23 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   );
 };
 
-export default VerticalBarChart;
+const VerticalBarChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & VerticalBarChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
+  return (
+    <VerticalBarChart {...props} />
+  );
+};
+
+export default VerticalBarChartComponent;
