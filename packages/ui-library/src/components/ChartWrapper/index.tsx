@@ -1,4 +1,3 @@
-// import { common } from '@arcesium/react-mui-commons/theme/colors';
 import React, { forwardRef, useEffect, useRef } from "react";
 import { Box, Stack } from "@mui/material";
 import { scaleOrdinal } from "@visx/scale";
@@ -10,6 +9,8 @@ import Timestamp from "../Timestamp";
 import Title from "../Title";
 import { Tooltip } from "../Tooltip";
 import { ChartWrapperProps } from "./types";
+import DotLoader from "../DotLoader/DotLoader";
+import useTheme from "../../hooks/useTheme";
 
 const defaultColorScale = scaleOrdinal<string, string>({
   domain: ["default"],
@@ -30,6 +31,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
     },
     ref,
   ) => {
+    const { theme } = useTheme()
     const containerRef = useRef<HTMLDivElement>(null);
     const [canRender, setCanRender] = React.useState(true);
 
@@ -61,73 +63,6 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
       };
     }, []);
 
-    const renderContent = React.useCallback(
-      () => (
-        <>
-          {/* Only render title if it exists */}
-          {!isLoading && title && <Title title={title} {...titleProps} />}
-          <Box
-            sx={{
-              position: "relative",
-              display: "flex",
-              flex: "1 1 auto",
-              minHeight: 0,
-              // Gap between chart and legends based on position
-              // commented by VNS
-              gap: position === LegendPosition.BOTTOM ? "12px" : "20px",
-              marginTop: title ? "12px" : "0px", // Add 12px gap only if title exists
-              ...(position === LegendPosition.LEFT ||
-              position === LegendPosition.RIGHT
-                ? {
-                    flexDirection:
-                      position === LegendPosition.LEFT ? "row" : "row-reverse",
-                  }
-                : {
-                    flexDirection:
-                      position === LegendPosition.TOP
-                        ? "column"
-                        : "column-reverse",
-                  }),
-            }}
-          >
-            <Legends
-              {...legendsProps}
-              position={position}
-              colorScale={colorScale}
-              data={legendData}
-            />
-            <Box
-              ref={ref}
-              sx={{
-                position: "relative",
-                height: "100%",
-                width: "100%",
-                display: "flex",
-                flex: "1 1 100%",
-                minHeight: 0,
-              }}
-            >
-              {children}
-            </Box>
-          </Box>
-          {timestampProps?.timestamp && <Timestamp {...timestampProps} />}
-        </>
-      ),
-      [
-        title,
-        titleProps,
-        legendsProps,
-        tooltipProps,
-        timestampProps,
-        position,
-        colorScale,
-        legendData,
-        toolTipData,
-        children,
-        ref,
-      ],
-    );
-
     return (
       <Stack
         sx={{
@@ -142,7 +77,78 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
         ref={containerRef}
       >
         {canRender ? (
-          renderContent()
+          <>
+            {/* Only render title if it exists */}
+            {!isLoading && title && <Title title={title} {...titleProps} />}
+            
+            <Box
+              sx={{
+                position: "relative",
+                display: "flex",
+                flex: "1 1 auto",
+                minHeight: 0,
+                // Gap between chart and legends based on position
+                // commented by VNS
+                gap: position === LegendPosition.BOTTOM ? "12px" : "20px",
+                marginTop: title ? "12px" : "0px", // Add 12px gap only if title exists
+                ...(position === LegendPosition.LEFT ||
+                position === LegendPosition.RIGHT
+                  ? {
+                      flexDirection:
+                        position === LegendPosition.LEFT
+                          ? "row"
+                          : "row-reverse",
+                    }
+                  : {
+                      flexDirection:
+                        position === LegendPosition.TOP
+                          ? "column"
+                          : "column-reverse",
+                    }),
+              }}
+            >
+              {!isLoading && (
+                <Legends
+                  {...legendsProps}
+                  position={position}
+                  colorScale={colorScale}
+                  data={legendData}
+                />
+              )}
+              <Box
+                ref={ref}
+                sx={{
+                  position: "relative",
+                  height: "100%",
+                  width: "100%",
+                  display: "flex",
+                  flex: "1 1 100%",
+                  minHeight: 0,
+                }}
+              >
+                {isLoading ? (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                      width: "100%",
+                      // backgroundColor: `${theme.colors.common.text}08`,
+                      // borderRadius: "8px",
+                    }}
+                  >
+                    <DotLoader />
+                  </Box>
+                ) : legendData.length > 0 ? (
+                  children
+                ) : (
+                  <div>No data to display.</div>
+                )}
+              </Box>
+            </Box>
+            {timestampProps?.timestamp && <Timestamp {...timestampProps} />}
+          </>
         ) : (
           <p> Cannot Render the chart under this size</p>
         )}
