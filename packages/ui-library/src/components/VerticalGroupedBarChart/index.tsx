@@ -862,9 +862,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   //    }
   // };
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
+  const noData = !isLoading && (!_data || _data.length === 0);
 
   return (
     <ChartWrapper
@@ -891,6 +889,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       }}
       timestampProps={{ timestamp, isLoading }}
     >
+      {noData ?  null : (
       <svg
         ref={chartSvgRef}
         width={adjustedChartWidth || width}
@@ -992,6 +991,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
               })}
         </Group>
       </svg>
+    )}
     </ChartWrapper>
   );
 };

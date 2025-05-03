@@ -804,7 +804,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       }
     }, 300);
   };
-  const showNoData = !isLoading && (!_data || !_data.length || !_groupKeys.length);
+  const noData = !isLoading && (!_data || !_data.length || !_groupKeys.length);
 
   return (
     <ChartWrapper
@@ -832,7 +832,7 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
       minRenderHeight={removeBothAxis ? 0 : 200}
     >
-      {showNoData ? (
+      {noData ? (
         null
       ) : (
         <svg

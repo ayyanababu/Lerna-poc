@@ -208,9 +208,7 @@ const TreeMapChart = ({
     return brightness > 128 ? "#000000" : "#ffffff";
   };
 
-  if (!_data) {
-    return <div>No data to display.</div>;
-  }
+  const noData = !isLoading && (!_data || _data.children.length === 0);
 
   return (
     <ChartWrapper
@@ -247,7 +245,7 @@ const TreeMapChart = ({
       }}
       timestampProps={{ isLoading, ...timestampProps }}
     >
-      {/* The outer SVG container needs to be rounded */}
+      {noData ? null : ( 
       <svg
         width={width}
         height={height}
@@ -444,6 +442,7 @@ const TreeMapChart = ({
           )}
         </Group>
       </svg>
+      )}
     </ChartWrapper>
   );
 };

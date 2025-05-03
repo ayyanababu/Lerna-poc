@@ -914,9 +914,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     }
   }; */
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
+  const noData = !isLoading && (!_data || _data.length === 0 || (!_groupKeys || _groupKeys.length === 0));
 
   return (
     <ChartWrapper
@@ -943,6 +941,8 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
       }}
       timestampProps={{ timestamp, isLoading }}
     >
+      {noData ? null : (
+        
       <svg
         ref={chartSvgRef}
         width={adjustedChartWidth || width}
@@ -1002,6 +1002,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
           {renderGroupedBars()}
         </Group>
       </svg>
+      )}
     </ChartWrapper>
   );
 };

@@ -1091,7 +1091,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     }, 300);
   };
 
-  if (chartData.length === 0) return <div>No data to display.</div>;
+  const noData = !isLoading && (!chartData || chartData.length === 0);
 
   return (
     <ChartWrapper
@@ -1122,6 +1122,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       }}
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
     >
+      {noData ? null : (
       <svg
         ref={chartSvgRef}
         width={adjustedChartWidth || width}
@@ -1300,6 +1301,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
           )}
         </Group>
       </svg>
+      )}
     </ChartWrapper>
   );
 };

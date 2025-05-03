@@ -710,9 +710,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     }, 300);
   };
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
+  const noData = !isLoading && (!data || data.length === 0);
 
   return (
     <ChartWrapper
@@ -747,6 +745,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       }}
       timestampProps={{ isLoading, ...timestampProps }}
     >
+      {noData ? null : (
       <svg
         ref={chartSvgRef}
         width={adjustedChartWidth || width}
@@ -838,6 +837,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           })}
         </Group>
       </svg>
+      )}
     </ChartWrapper>
   );
 };

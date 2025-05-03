@@ -685,9 +685,7 @@ function VerticalStackedBar({
     }
   }, [isLoading, hideTooltip, setHoveredGroupKey]);
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
+  const noData = !isLoading && (!_data || _data.length === 0);
 
   return (
     <ChartWrapper
@@ -714,179 +712,181 @@ function VerticalStackedBar({
       }}
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
     >
-      <svg
-        ref={chartSvgRef}
-        width={adjustedChartWidth || width}
-        height={adjustedChartHeight || height}
-      >
-        {isLoading && <SvgShimmer />}
-
-        <Group top={DEFAULT_MARGIN.top} left={yAxisLabelWidth}>
-          <g ref={axis_left}>
-            <YAxis
-              scale={yScale}
+      {noData ? null : (
+        <svg
+          ref={chartSvgRef}
+          width={adjustedChartWidth || width}
+          height={adjustedChartHeight || height}
+        >
+          {isLoading && <SvgShimmer />}
+  
+          <Group top={DEFAULT_MARGIN.top} left={yAxisLabelWidth}>
+            <g ref={axis_left}>
+              <YAxis
+                scale={yScale}
+                isLoading={isLoading}
+                showTicks={showTicks}
+                showAxisLine={showYAxis}
+                {...yAxisProps}
+              />
+            </g>
+  
+            <Grid
+              width={innerWidth}
+              yScale={yScale}
+              numTicks={5}
               isLoading={isLoading}
-              showTicks={showTicks}
-              showAxisLine={showYAxis}
-              {...yAxisProps}
+              {...gridProps}
             />
-          </g>
-
-          <Grid
-            width={innerWidth}
-            yScale={yScale}
-            numTicks={5}
-            isLoading={isLoading}
-            {...gridProps}
-          />
-          <g ref={axis_bottom}>
-            <XAxis
-              scale={xScale}
-              top={innerHeight}
-              isLoading={isLoading}
-              showTicks={showTicks}
-              showAxisLine={showXAxis}
-              labels={filteredData.map((d) => String(d.label))}
-              availableWidth={innerWidth}
-              // autoRotate
-              forceFullLabels
-              addGap={BASE_ADJUST_WIDTH}
-              {...xAxisProps}
-              rotated={rotated}
-              wrapped={wrapped}
-              barWidth={actualBarWidth + 20}
-            />
-          </g>
-
-          {filteredData.map((categoryData, index) => {
-            const category = String(categoryData.label);
-            // Calculate bar width with maximum limit
-            const calculatedBarWidth = xScale.bandwidth();
-            // Use custom barWidth if provided, otherwise use default with maximum limit
-            actualBarWidth = Math.min(calculatedBarWidth, maxBarWidth);
-
-            // If the bar width is limited, center it
-            let barX =
-              actualBarWidth < calculatedBarWidth
-                ? (xScale(category) || 0) +
-                  (calculatedBarWidth - actualBarWidth) / 2
-                : xScale(category) || 0;
-            if (index === 0 || index === filteredData.length - 1) {
-                 if (index === 0) {
-                    barX = barX - BASE_ADJUST_WIDTH;
-                  } else {
-                    barX = barX + BASE_ADJUST_WIDTH * 1.5;
-                  }
-            } else {
-                  barX = barX + BASE_ADJUST_WIDTH / 2;
-            }                
-
-            // Calculate dynamic radius based on bar width
-            const dynamicRadius = Math.min(
-              DEFAULT_BAR_RADIUS,
-              actualBarWidth / 2,
-            );
-
-            return activeKeys.map((groupKey, groupIndex) => {
-              const seriesData = stackedData.find((s) => s.key === groupKey);
-              if (!seriesData) return null;
-
-              const categoryIndex = filteredData.findIndex(
-                (d) => d.label === categoryData.label,
+            <g ref={axis_bottom}>
+              <XAxis
+                scale={xScale}
+                top={innerHeight}
+                isLoading={isLoading}
+                showTicks={showTicks}
+                showAxisLine={showXAxis}
+                labels={filteredData.map((d) => String(d.label))}
+                availableWidth={innerWidth}
+                // autoRotate
+                forceFullLabels
+                addGap={BASE_ADJUST_WIDTH}
+                {...xAxisProps}
+                rotated={rotated}
+                wrapped={wrapped}
+                barWidth={actualBarWidth + 20}
+              />
+            </g>
+  
+            {filteredData.map((categoryData, index) => {
+              const category = String(categoryData.label);
+              // Calculate bar width with maximum limit
+              const calculatedBarWidth = xScale.bandwidth();
+              // Use custom barWidth if provided, otherwise use default with maximum limit
+              actualBarWidth = Math.min(calculatedBarWidth, maxBarWidth);
+  
+              // If the bar width is limited, center it
+              let barX =
+                actualBarWidth < calculatedBarWidth
+                  ? (xScale(category) || 0) +
+                    (calculatedBarWidth - actualBarWidth) / 2
+                  : xScale(category) || 0;
+              if (index === 0 || index === filteredData.length - 1) {
+                   if (index === 0) {
+                      barX = barX - BASE_ADJUST_WIDTH;
+                    } else {
+                      barX = barX + BASE_ADJUST_WIDTH * 1.5;
+                    }
+              } else {
+                    barX = barX + BASE_ADJUST_WIDTH / 2;
+              }                
+  
+              // Calculate dynamic radius based on bar width
+              const dynamicRadius = Math.min(
+                DEFAULT_BAR_RADIUS,
+                actualBarWidth / 2,
               );
-              if (categoryIndex === -1) return null;
-
-              const [y0, y1] = seriesData[categoryIndex];
-              const barHeight = yScale(y0) - yScale(y1);
-              const barY = yScale(y1);
-              const value = y1 - y0;
-
-              if (!value) return null;
-
-              const isHoveredGroup = hoveredGroupKey === groupKey;
-              const barOpacity =
-                hoveredGroupKey && !isHoveredGroup
-                  ? REDUCED_OPACITY
-                  : DEFAULT_OPACITY;
-
-              // Determine if this is the top bar in the stack
-              const isTopBar =
-                seriesData.key ===
-                stackedData.reduce((topKey, current) => {
-                  const currentY1 = current[categoryIndex]?.[1] || 0;
-                  const topY1 =
-                    stackedData.find((s) => s.key === topKey)?.[
-                      categoryIndex
-                    ]?.[1] || 0;
-                  return currentY1 > topY1 ? current.key : topKey;
-                }, activeKeys[0]);
-
-              return (
-                <React.Fragment key={`stacked-${category}-${groupKey}`}>
-                  <CustomBar
-                    key={`stacked-${category}-${groupKey}`}
-                    x={barX}
-                    y={barY}
-                    width={actualBarWidth}
-                    height={barHeight}
-                    fill={
-                      isLoading
-                        ? `url(#${shimmerGradientId})`
-                        : colorScale(groupKey)
-                    }
-                    opacity={barOpacity}
-                    pathProps={
-                      isTopBar
-                        ? {
-                            d: `
-                                M ${barX},${barY + barHeight}
-                                L ${barX + actualBarWidth},${barY + barHeight}
-                                L ${barX + actualBarWidth},${barY + dynamicRadius}
-                                Q ${barX + actualBarWidth},${barY} ${
-                                  barX + actualBarWidth - dynamicRadius
-                                },${barY}
-                                L ${barX + dynamicRadius},${barY}
-                                Q ${barX},${barY} ${barX},${barY + dynamicRadius}
-                                L ${barX},${barY + barHeight}
-                                Z
-                            `,
-                          }
-                        : undefined
-                    }
-                    rx={0}
-                    onMouseMove={handleMouseMove(groupKey, value)}
-                    onMouseLeave={handleMouseLeave}
-                    {...barProps}
-                    onClick={(event) => {
-                      if (barProps?.onClick) {
-                        barProps.onClick(event);
+  
+              return activeKeys.map((groupKey, groupIndex) => {
+                const seriesData = stackedData.find((s) => s.key === groupKey);
+                if (!seriesData) return null;
+  
+                const categoryIndex = filteredData.findIndex(
+                  (d) => d.label === categoryData.label,
+                );
+                if (categoryIndex === -1) return null;
+  
+                const [y0, y1] = seriesData[categoryIndex];
+                const barHeight = yScale(y0) - yScale(y1);
+                const barY = yScale(y1);
+                const value = y1 - y0;
+  
+                if (!value) return null;
+  
+                const isHoveredGroup = hoveredGroupKey === groupKey;
+                const barOpacity =
+                  hoveredGroupKey && !isHoveredGroup
+                    ? REDUCED_OPACITY
+                    : DEFAULT_OPACITY;
+  
+                // Determine if this is the top bar in the stack
+                const isTopBar =
+                  seriesData.key ===
+                  stackedData.reduce((topKey, current) => {
+                    const currentY1 = current[categoryIndex]?.[1] || 0;
+                    const topY1 =
+                      stackedData.find((s) => s.key === topKey)?.[
+                        categoryIndex
+                      ]?.[1] || 0;
+                    return currentY1 > topY1 ? current.key : topKey;
+                  }, activeKeys[0]);
+  
+                return (
+                  <React.Fragment key={`stacked-${category}-${groupKey}`}>
+                    <CustomBar
+                      key={`stacked-${category}-${groupKey}`}
+                      x={barX}
+                      y={barY}
+                      width={actualBarWidth}
+                      height={barHeight}
+                      fill={
+                        isLoading
+                          ? `url(#${shimmerGradientId})`
+                          : colorScale(groupKey)
                       }
-                      if (onClick) {
-                        onClick(event, filteredData[index], [
-                          index,
-                          groupIndex,
-                        ]);
+                      opacity={barOpacity}
+                      pathProps={
+                        isTopBar
+                          ? {
+                              d: `
+                                  M ${barX},${barY + barHeight}
+                                  L ${barX + actualBarWidth},${barY + barHeight}
+                                  L ${barX + actualBarWidth},${barY + dynamicRadius}
+                                  Q ${barX + actualBarWidth},${barY} ${
+                                    barX + actualBarWidth - dynamicRadius
+                                  },${barY}
+                                  L ${barX + dynamicRadius},${barY}
+                                  Q ${barX},${barY} ${barX},${barY + dynamicRadius}
+                                  L ${barX},${barY + barHeight}
+                                  Z
+                              `,
+                            }
+                          : undefined
                       }
-                    }}
-                  />
-
-                  {!isTopBar && (
-                    <line
-                      x1={barX}
-                      y1={barY}
-                      x2={barX + actualBarWidth}
-                      y2={barY}
-                      stroke={theme.colors.common.stroke}
-                      strokeWidth={strokeWidth}
-                      pointerEvents="none"
+                      rx={0}
+                      onMouseMove={handleMouseMove(groupKey, value)}
+                      onMouseLeave={handleMouseLeave}
+                      {...barProps}
+                      onClick={(event) => {
+                        if (barProps?.onClick) {
+                          barProps.onClick(event);
+                        }
+                        if (onClick) {
+                          onClick(event, filteredData[index], [
+                            index,
+                            groupIndex,
+                          ]);
+                        }
+                      }}
                     />
-                  )}
-                </React.Fragment>
-              );
-            });
-          })}
-        </Group>
-      </svg>
+  
+                    {!isTopBar && (
+                      <line
+                        x1={barX}
+                        y1={barY}
+                        x2={barX + actualBarWidth}
+                        y2={barY}
+                        stroke={theme.colors.common.stroke}
+                        strokeWidth={strokeWidth}
+                        pointerEvents="none"
+                      />
+                    )}
+                  </React.Fragment>
+                );
+              });
+            })}
+          </Group>
+        </svg>
+      )}     
     </ChartWrapper>
   );
 }

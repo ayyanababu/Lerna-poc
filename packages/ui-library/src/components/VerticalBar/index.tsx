@@ -731,9 +731,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     }, 300);
   };
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
+  const noData = !isLoading && (!_data || _data.length === 0);
 
   return (
     <ChartWrapper
@@ -767,7 +765,8 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         ...tooltipProps,
       }}
       timestampProps={{ isLoading, ...timestampProps }}
-    >
+    > 
+    {noData ? null : (
       <svg
         ref={chartSvgRef}
         width={adjustedChartWidth || width}
@@ -866,6 +865,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           })}
         </Group>
       </svg>
+      )}
     </ChartWrapper>
   );
 };
