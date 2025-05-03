@@ -1,4 +1,3 @@
- 
 import React, {
   useCallback,
   useEffect,
@@ -24,6 +23,7 @@ import YAxis from "../../YAxis";
 import { mockVerticalStackedBarChartData } from "./mockdata";
 import { VerticalStackedBarChartProps } from "./types";
 import ErrorBoundary from "../../ErrorBoundary";
+import ErrorFallback from "../../ErrorBoundary/ErrorFallback";
 
 const DEFAULT_MARGIN = {
   top: 20,
@@ -891,12 +891,25 @@ function VerticalStackedBar({
   );
 }
 
-function VerticalStackedBarComponent(props: VerticalStackedBarChartProps) {
+const VerticalStackedBarComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & VerticalStackedBarChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
   return (
-      <ErrorBoundary>
-        <VerticalStackedBar {...props} />
-      </ErrorBoundary>
+    <ErrorBoundary>
+      <VerticalStackedBar {...props} />
+    </ErrorBoundary>
   );
-}
+};
 
 export default VerticalStackedBarComponent;

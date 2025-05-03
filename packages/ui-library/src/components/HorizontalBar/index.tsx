@@ -1,4 +1,3 @@
- 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -16,6 +15,7 @@ import YAxis from "../YAxis";
 import { mockHorizontalBarChartData } from "./mockdata";
 import { DataPoint, HorizontalBarChartProps } from "./types";
 import ErrorBoundary from "../ErrorBoundary";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 const DEFAULT_MARGIN = {
   top: 0,
@@ -842,7 +842,20 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   );
 };
 
-const HorizontalBarChartComponent = (props: HorizontalBarChartProps) => {
+const HorizontalBarChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & HorizontalBarChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
   return (
     <ErrorBoundary>
       <HorizontalBarChart {...props} />

@@ -13,6 +13,7 @@ import { TooltipData } from "../Tooltip/types";
 import mockTreeMapChartData from "./mockdata";
 import { TreeMapChartProps, TreeMapNode } from "./types";
 import ErrorBoundary from "../ErrorBoundary";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 type RectNode = HierarchyNode<TreeMapNode> & {
   x0: number;
@@ -447,7 +448,20 @@ const TreeMapChart = ({
   );
 };
 
-const TreeMapChartComponent = (props: TreeMapChartProps) => {
+const TreeMapChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & TreeMapChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
   return (
     <ErrorBoundary>
       <TreeMapChart {...props} />

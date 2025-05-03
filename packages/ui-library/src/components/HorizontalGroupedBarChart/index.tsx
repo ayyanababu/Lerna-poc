@@ -1,4 +1,3 @@
- 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AxisBottom, AxisLeft } from "@visx/axis";
 import { Group } from "@visx/group";
@@ -15,6 +14,7 @@ import { TooltipData } from "../Tooltip/types";
 import { mockVerticalGroupedBarChartData } from "../VerticalGroupedBarChart/mockdata";
 import { HorizontalGroupedBarChartProps } from "./types";
 import ErrorBoundary from "../ErrorBoundary";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 const DEFAULT_MARGIN = {
   top: 0,
@@ -1007,7 +1007,20 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
   );
 };
 
-const HorizontalGroupedBarChartComponent = (props: HorizontalGroupedBarChartProps) => {
+const HorizontalGroupedBarChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & HorizontalGroupedBarChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
   return (
     <ErrorBoundary>
       <HorizontalGroupedBarChart {...props} />
