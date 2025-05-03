@@ -76,7 +76,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
           gap: "0px", // Removed parent gap to control internal gaps more precisely
           flex: 1,
         }}
-        // ref={containerRef}
+        ref={containerRef}
       >
         {canRender ? (
           <>
@@ -129,14 +129,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                 </Box>
               )}
               <Box
-                ref={(el) => {
-                  if (containerRef) containerRef.current = el;
-                  if (typeof ref === 'function') {
-                    ref(el);
-                  } else if (ref) {
-                    ref.current = el;
-                  }
-                }}
+                ref={ref}
                 sx={{
                   position: "relative",
                   height: "100%",
