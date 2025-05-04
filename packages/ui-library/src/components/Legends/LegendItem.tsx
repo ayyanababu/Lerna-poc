@@ -103,7 +103,7 @@ function LegendItem({
         {!hideValues &&
           (isLoading
             ? "loadingloading"
-            : ` (${formatNumberWithCommas(valueText)})`)}
+            : ` (${valueText?formatNumberWithCommas(valueText):''})`)}
       </Typography>
       <ArrowOutwardIcon
         className="arrow-icon"

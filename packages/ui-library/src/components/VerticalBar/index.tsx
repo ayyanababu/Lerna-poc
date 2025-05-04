@@ -690,7 +690,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     if (rotate && chartSvgRef.current) {
       setTimeout(() => {
         const legendHeight = bottomHeight;
-        const bottomaxisheight = axis_bottom.current.getBBox().height - 30;
+        const bottomaxisheight = axis_bottom?.current?.getBBox().height;
         const hgt =
           height -
           DEFAULT_MARGIN.top -
