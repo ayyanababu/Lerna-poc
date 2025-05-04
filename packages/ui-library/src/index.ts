@@ -9,6 +9,6 @@ export { default as HorizontalStackedBarChart } from "./components/StackedBar/Ho
 export { default as VerticalStackedBarChart } from "./components/StackedBar/Vertical";
 export { default as Title } from "./components/Title";
 export { default as TreeMapChart } from "./components/TreeMapChart";
-export { default as VerticalBarChart } from "./components/VerticalBar";
+export { default as VerticalBarChart } from "./components/RVerticalBar";
 export { default as VerticalGroupedBarChart } from "./components/VerticalGroupedBarChart";
 export { ChartThemeProvider } from "./context/ChartThemeProvider";

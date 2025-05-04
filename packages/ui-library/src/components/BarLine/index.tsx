@@ -1136,7 +1136,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
               showAxisLine={showXAxis}
               labels={chartData.map((d) => String(d.xAxis))}
               availableWidth={drawableChartWidth}
-              label={xAxislabel}
+              label={xAxislabel} 
               labelProps={{
                 verticalAnchor: "start",
                 dy: 60,
