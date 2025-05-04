@@ -553,7 +553,7 @@ function XAxis({
       <AxisBottom
         scale={scale}
         top={top}
-        stroke={theme.colors.axis.line}
+        stroke={ `${theme.colors.axis.line}${showAxisLine ? "4D" : ""}`}
         tickStroke={theme.colors.axis.line}
         tickValues={tickValues === null ? undefined : tickValues}
         tickLabelProps={mergedTickLabelProps}

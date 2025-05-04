@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -15,6 +14,8 @@ import XAxis from "../XAxis";
 import YAxis from "../YAxis";
 import mockVerticalBarChartData from "./mockdata";
 import { DataPoint, VerticalBarChartProps } from "./types";
+import ErrorBoundary from "../ErrorBoundary";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 const DEFAULT_MARGIN = {
   top: 5,
@@ -114,19 +115,19 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       setTimeout(() => {
         const legendboxtimer = setInterval(() => {
           if (
-            parentRef.current.parentNode &&
-            parentRef.current.parentNode.querySelectorAll("div")[0]
+            parentRef?.current?.parentNode &&
+            parentRef?.current?.parentNode.querySelectorAll("div")[0]
           ) {
             console.log("parent",parentRef.current )
             const legendbox =
-              parentRef.current.parentNode.querySelectorAll("div")[0];
+              parentRef?.current?.parentNode.querySelectorAll("div")[0];
             const lb = legendbox.querySelectorAll("div");
             if (lb.length === 0){
               clearInterval(legendboxtimer);
             }
             const lheight = lb[lb.length - 1].offsetTop  - lb[0].offsetTop;
             const spans =
-              parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
+              parentRef?.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
                 "span",
               );
             const lastSpan = spans ? spans[spans.length - 1] : null;
@@ -140,7 +141,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         }, 2000);
         const titleboxtimer = setInterval(() => {
           const titlebox =
-            parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
+            parentRef?.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
               ".MuiTypography-h6",
             );
           if (titlebox) {
@@ -730,9 +731,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     }, 300);
   };
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
+  const noData = !isLoading && (!_data || _data.length === 0);
 
   return (
     <ChartWrapper
@@ -766,7 +765,8 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         ...tooltipProps,
       }}
       timestampProps={{ isLoading, ...timestampProps }}
-    >
+    > 
+    {noData ? null : (
       <svg
         ref={chartSvgRef}
         width={adjustedChartWidth || width}
@@ -865,8 +865,30 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           })}
         </Group>
       </svg>
+      )}
     </ChartWrapper>
   );
 };
 
-export default VerticalBarChart;
+const VerticalBarChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & VerticalBarChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
+  return (
+    <ErrorBoundary>
+      <VerticalBarChart {...props} />
+    </ErrorBoundary>
+  );
+};
+
+export default VerticalBarChartComponent;

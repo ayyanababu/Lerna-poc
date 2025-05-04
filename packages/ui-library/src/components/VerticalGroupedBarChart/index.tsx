@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AxisBottom, AxisLeft } from "@visx/axis";
 import { Group } from "@visx/group";
@@ -15,6 +14,8 @@ import SvgShimmer from "../Shimmer/SvgShimmer";
 import { TooltipData } from "../Tooltip/types";
 import { mockVerticalGroupedBarChartData } from "./mockdata";
 import { VerticalGroupedBarChartProps } from "./types";
+import ErrorBoundary from "../ErrorBoundary";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 const DEFAULT_MARGIN = {
   top: 20,
@@ -91,13 +92,13 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       setTimeout(() => {
         const legendboxtimer = setInterval(() => {
           if (
-            parentRef.current.parentNode &&
-            parentRef.current.parentNode.querySelectorAll("div")[0]
+            parentRef?.current?.parentNode &&
+            parentRef?.current?.parentNode.querySelectorAll("div")[0]
           ) {
             const legendbox =
-              parentRef.current.parentNode.querySelectorAll("div")[0];
+              parentRef?.current?.parentNode.querySelectorAll("div")[0];
             const spans =
-              parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
+              parentRef?.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
                 "span",
               );
             const lastSpan = spans ? spans[spans.length - 1] : null;
@@ -111,7 +112,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         }, 10);
         const titleboxtimer = setInterval(() => {
           const titlebox =
-            parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
+            parentRef?.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
               ".MuiTypography-h6",
             );
           if (titlebox) {
@@ -861,9 +862,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   //    }
   // };
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
+  const noData = !isLoading && (!_data || _data.length === 0);
 
   return (
     <ChartWrapper
@@ -890,6 +889,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       }}
       timestampProps={{ timestamp, isLoading }}
     >
+      {noData ?  null : (
       <svg
         ref={chartSvgRef}
         width={adjustedChartWidth || width}
@@ -991,8 +991,30 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
               })}
         </Group>
       </svg>
+    )}
     </ChartWrapper>
   );
 };
 
-export default VerticalGroupedBarChart;
+const VerticalGroupedBarChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & VerticalGroupedBarChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
+  return (
+    <ErrorBoundary>
+      <VerticalGroupedBarChart {...props} />
+    </ErrorBoundary>
+  );
+};
+
+export default VerticalGroupedBarChartComponent;

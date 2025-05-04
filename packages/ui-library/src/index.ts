@@ -1,3 +1,4 @@
+export { default as ErrorBoundary } from "./components/ErrorBoundary";
 export { default as BarLineChart } from "./components/BarLine";
 export { default as DonutChart } from "./components/Donut";
 export { default as HorizontalBarChart } from "./components/HorizontalBar";

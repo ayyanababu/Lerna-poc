@@ -4,6 +4,7 @@ import DashboardPage from './Pages/DashboardPage';
 import { ThemeProvider } from '@mui/material';
 import darkTheme from './themeUtils/colors/default/dark';
 import lightTheme from './themeUtils/colors/default/light';
+import "./App.css"
 
 interface IThemeContext {
     mode: 'dark' | 'light';

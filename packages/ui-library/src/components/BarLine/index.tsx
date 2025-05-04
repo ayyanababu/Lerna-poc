@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { curveLinear } from "@visx/curve";
 import { Group } from "@visx/group";
@@ -17,6 +16,8 @@ import XAxis from "../XAxis";
 import YAxis from "../YAxis";
 import mockBarLineChartData from "./mockData";
 import { BarLineChartProps, BarLineData } from "./types";
+import ErrorBoundary from "../ErrorBoundary";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
@@ -30,7 +31,7 @@ const AXISY_ROTATE = true;
 const AXISY1_ROTATE = true;
 const BASE_ADJUST_WIDTH = 5; // used to fix the check width for the overlap of xaxis
 const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
-const BASE_ADJUST_HEIGHT = 0; // used to fix the check width for the overlap of yaxis
+const BASE_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
 const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
 const bottomHeightAddOnSpace = 0;
 const titleHeightAddOnSpace = 0;
@@ -69,6 +70,8 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   barProps,
   timestampProps,
   timestamp,
+  onLineClick,
+  onBarClick
 }) => {
   const { theme } = useTheme();
   const colors = _colors ?? {
@@ -135,13 +138,13 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       setTimeout(() => {
         const legendboxtimer = setInterval(() => {
           if (
-            parentRef.current.parentNode &&
-            parentRef.current.parentNode.querySelectorAll("div")[0]
+            parentRef?.current?.parentNode &&
+            parentRef?.current?.parentNode.querySelectorAll("div")[0]
           ) {
             const legendbox =
-              parentRef.current.parentNode.querySelectorAll("div")[0];
+              parentRef?.current?.parentNode.querySelectorAll("div")[0];
             const spans =
-              parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
+              parentRef?.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
                 "span",
               );
             const lastSpan = spans ? spans[spans.length - 1] : null;
@@ -155,7 +158,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         }, 10);
         const titleboxtimer = setInterval(() => {
           const titlebox =
-            parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
+            parentRef?.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
               ".MuiTypography-h6",
             );
           if (titlebox) {
@@ -1089,7 +1092,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     }, 300);
   };
 
-  if (chartData.length === 0) return <div>No data to display.</div>;
+  const noData = !isLoading && (!chartData || chartData.length === 0);
 
   return (
     <ChartWrapper
@@ -1120,6 +1123,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       }}
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
     >
+      {noData ? null : (
       <svg
         ref={chartSvgRef}
         width={adjustedChartWidth || width}
@@ -1228,6 +1232,10 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                       `,
                       }}
                       {...barProps}
+                      onClick={(event) => {
+                        if (barProps?.onClick) barProps.onClick(event);
+                        if (onBarClick) onBarClick(event, d, index);
+                      }}
                     />
                   );
                 })}
@@ -1267,6 +1275,9 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                       ? REDUCED_OPACITY
                       : DEFAULT_OPACITY
                   }
+                  onClick={(event) => {
+                    if (onLineClick) onLineClick(event, d, index);
+                  }}
                 />
               ))}
 
@@ -1283,13 +1294,38 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                 }
                 stroke={isLoading ? `url(#${shimmerGradientId})` : colors.line}
                 shapeRendering="geometricPrecision"
+                onClick={(event) => {
+                  if (onLineClick) onLineClick(event, chartData, -1);
+                }}
               />
             </>
           )}
         </Group>
       </svg>
+      )}
     </ChartWrapper>
   );
 };
 
-export default BarLineChart;
+const BarLineChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & BarLineChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
+  return (
+    <ErrorBoundary>
+      <BarLineChart {...props} />
+    </ErrorBoundary>
+  );
+};
+
+export default BarLineChartComponent;

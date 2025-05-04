@@ -12,6 +12,8 @@ import SvgShimmer, { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { TooltipData } from "../Tooltip/types";
 import { mockFullDonutData, mockSemiDonutData } from "./ShimmerMock";
 import { DonutChartProps, DonutData } from "./types";
+import ErrorBoundary from "../ErrorBoundary";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 function DonutChart({
   data: _data,
@@ -212,4 +214,25 @@ function DonutChart({
   );
 }
 
-export default DonutChart;
+const DonutChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & DonutChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
+  return (
+    <ErrorBoundary>
+      <DonutChart {...props} />
+    </ErrorBoundary>
+  );
+};
+
+export default DonutChartComponent;

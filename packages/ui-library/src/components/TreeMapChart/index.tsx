@@ -12,6 +12,8 @@ import SvgShimmer, { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { TooltipData } from "../Tooltip/types";
 import mockTreeMapChartData from "./mockdata";
 import { TreeMapChartProps, TreeMapNode } from "./types";
+import ErrorBoundary from "../ErrorBoundary";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 type RectNode = HierarchyNode<TreeMapNode> & {
   x0: number;
@@ -207,9 +209,7 @@ const TreeMapChart = ({
     return brightness > 128 ? "#000000" : "#ffffff";
   };
 
-  if (!_data) {
-    return <div>No data to display.</div>;
-  }
+  const noData = !isLoading && (!_data || _data.children.length === 0);
 
   return (
     <ChartWrapper
@@ -246,7 +246,7 @@ const TreeMapChart = ({
       }}
       timestampProps={{ isLoading, ...timestampProps }}
     >
-      {/* The outer SVG container needs to be rounded */}
+      {noData ? null : ( 
       <svg
         width={width}
         height={height}
@@ -443,8 +443,30 @@ const TreeMapChart = ({
           )}
         </Group>
       </svg>
+      )}
     </ChartWrapper>
   );
 };
 
-export default TreeMapChart;
+const TreeMapChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & TreeMapChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
+  return (
+    <ErrorBoundary>
+      <TreeMapChart {...props} />
+    </ErrorBoundary>
+  );
+};
+
+export default TreeMapChartComponent;

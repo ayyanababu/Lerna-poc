@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -15,6 +14,8 @@ import XAxis from "../XAxis";
 import YAxis from "../YAxis";
 import { mockHorizontalBarChartData } from "./mockdata";
 import { DataPoint, HorizontalBarChartProps } from "./types";
+import ErrorBoundary from "../ErrorBoundary";
+import ErrorFallback from "../ErrorBoundary/ErrorFallback";
 
 const DEFAULT_MARGIN = {
   top: 0,
@@ -109,13 +110,13 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       setTimeout(() => {
         const legendboxtimer = setInterval(() => {
           if (
-            parentRef.current.parentNode &&
-            parentRef.current.parentNode.querySelectorAll("div")[0]
+            parentRef?.current?.parentNode &&
+            parentRef?.current?.parentNode.querySelectorAll("div")[0]
           ) {
             const legendbox =
-              parentRef.current.parentNode.querySelectorAll("div")[0];
+              parentRef?.current?.parentNode.querySelectorAll("div")[0];
             const spans =
-              parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
+              parentRef?.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
                 "span",
               );
             const lastSpan = spans ? spans[spans.length - 1] : null;
@@ -129,7 +130,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         }, 10);
         const titleboxtimer = setInterval(() => {
           const titlebox =
-            parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
+            parentRef?.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
               ".MuiTypography-h6",
             );
           if (titlebox) {
@@ -709,9 +710,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     }, 300);
   };
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
+  const noData = !isLoading && (!data || data.length === 0);
 
   return (
     <ChartWrapper
@@ -746,6 +745,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       }}
       timestampProps={{ isLoading, ...timestampProps }}
     >
+      {noData ? null : (
       <svg
         ref={chartSvgRef}
         width={adjustedChartWidth || width}
@@ -837,8 +837,30 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
           })}
         </Group>
       </svg>
+      )}
     </ChartWrapper>
   );
 };
 
-export default HorizontalBarChart;
+const HorizontalBarChartComponent = ({
+  isError,
+  errorMessage,
+  ...props
+}: {
+  isError: boolean;
+  errorMessage: string;
+} & HorizontalBarChartProps) => {
+  if (isError) {
+    return (
+      <ErrorFallback message={errorMessage} />
+    );
+  }
+
+  return (
+    <ErrorBoundary>
+      <HorizontalBarChart {...props} />
+    </ErrorBoundary>
+  );
+};
+
+export default HorizontalBarChartComponent;

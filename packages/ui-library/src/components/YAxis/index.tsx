@@ -98,7 +98,7 @@ function YAxis({
   return (
     <AxisComponent
       scale={scale}
-      stroke={theme.colors.axis.line}
+      stroke={ `${theme.colors.axis.line}${showAxisLine ? "4D" : ""}`}
       tickStroke={theme.colors.axis.line}
       tickLabelProps={() => ({
         textAnchor,

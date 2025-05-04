@@ -1,5 +1,4 @@
-import React, { useCallback, useMemo } from "react";
-import { SxProps, Theme } from "@mui/material";
+import React, { useCallback } from "react";
 import Box from "@mui/material/Box";
 import { LegendOrdinal } from "@visx/legend";
 
@@ -16,6 +15,7 @@ function Legends({
   setHovered,
   position = LegendPosition.TOP,
   onClick,
+  isLabelClickable = false,
   isLoading = false,
   doStrike = false,
   isVisible = true,
@@ -24,37 +24,12 @@ function Legends({
 }: LegendsProps) {
   const { theme } = useTheme();
 
-  const positionStyles = useMemo((): SxProps<Theme> => {
-    switch (position) {
-      case "left":
-        return {
-          position: "absolute",
-          left: 0,
-          top: "50%",
-          transform: "translateY(-50%)",
-          maxWidth: "150px",
-        };
-      case "right":
-        return {
-          position: "absolute",
-          right: 0,
-          top: "50%",
-          transform: "translateY(-50%)",
-          maxWidth: "150px",
-        };
-      case "bottom":
-      case "top":
-      default:
-        return {};
-    }
-  }, [position]);
-
   const flexDirection =
     position === "left" || position === "right" ? "column" : "row";
 
   const handleToggleItem = useCallback(
     (index: number) => {
-      if (setHideIndex && hideIndex) {
+      if (setHideIndex && hideIndex && isLabelClickable) {
         setHideIndex((prev) =>
           prev.includes(index)
             ? prev.filter((idx) => idx !== index)
@@ -62,7 +37,7 @@ function Legends({
         );
       }
     },
-    [data, setHideIndex, hideIndex],
+    [data, setHideIndex, hideIndex, isLabelClickable],
   );
 
   const handleMouseOver = useCallback(
@@ -93,7 +68,7 @@ function Legends({
         gap: variant === "compact" ? "8px" : "8px",
         backgroundColor: theme.colors.legend.background,
         borderRadius: "4px",
-        ...positionStyles,
+        zIndex: 1,
       }}
     >
       <LegendOrdinal

@@ -138,4 +138,16 @@ export interface BarLineChartProps {
    * @default true
    */
   showXAxis?: boolean;
+  
+  onLineClick?: (
+    event: React.MouseEvent<SVGGElement, MouseEvent>,
+    data: BarLineDataPoint | BarLineDataPoint[],
+    index: number
+  ) => void;
+
+  onBarClick?: (
+      event: React.MouseEvent<SVGGElement, MouseEvent>,
+      data: BarLineDataPoint,
+      index: number
+  ) => void;
 }
