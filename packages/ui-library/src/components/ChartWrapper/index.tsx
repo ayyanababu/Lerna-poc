@@ -155,7 +155,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                   >
                     <DotLoader />
                   </Box>
-                ) : (legendData.length > 0 && children) ? (
+                ) : (legendData?.length > 0 && children) ? (
                   children
                 ) : (
                   <Box
