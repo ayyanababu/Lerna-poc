@@ -29,7 +29,7 @@ function Legends({
 
   const handleToggleItem = useCallback(
     (index: number) => {
-      if (setHideIndex && hideIndex && !isLabelClickable) {
+      if (setHideIndex && hideIndex && isLabelClickable) {
         setHideIndex((prev) =>
           prev.includes(index)
             ? prev.filter((idx) => idx !== index)
