@@ -53,9 +53,11 @@ function LegendItem({
     <Box
       sx={{
         backgroundColor: markerColor,
-        borderRadius: "20px",
+        borderRadius: "4px",
         width: "12px",
         height: "12px",
+        aspectRatio: "1/1",
+        display: "flex",
       }}
       onClick={() => onToggle?.()}
       className={isLoading ? shimmerClassName : ""}
