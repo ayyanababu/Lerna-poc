@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { SxProps, Theme } from '@mui/material';
 import { LegendOrdinal } from '@visx/legend';
 import { LegendPosition, LegendsProps, LegendVariant } from './types';
@@ -36,10 +36,17 @@ function Legends({
 //  const flexDirection =
 //    position === 'left' || position === 'right' ? 'column' : 'row';
 
+  useEffect(()=>{
+    console.log("hide index",hideIndex)
+
+  },[hideIndex])
+
   
   const handleToggleItem = useCallback(
     (index: number) => {
+      console.log("indexa",index)      
       if (setHideIndex && hideIndex) {
+        console.log("hit index");
         setHideIndex((prev) =>
           prev.includes(index)
             ? prev.filter((idx) => idx !== index)
@@ -52,7 +59,7 @@ function Legends({
 
   const handleMouseOver = useCallback(
     (labelText: string) => {
-      console.log(labelText)
+      console.log("labeltext",labelText)
       if (setHovered) {
         setHovered(labelText);
       }
@@ -81,8 +88,8 @@ function Legends({
                 isLegendRendered(true);
               }           
               const isHidden = hideIndex?.includes(index);
-              const isHoveredOther = hovered && !hovered.includes(label.label);
               let lb = {index:index,label:label.label,value:String(label.value),datum:label.label,text:label.label}
+              const isHoveredOther = hovered && !(hovered === lb.label);
               return (
                 <LegendItem 
                   key={`legend-${label.label}-${label.value}`}
@@ -94,7 +101,7 @@ function Legends({
                   isLoading={isLoading}
                   doStrike={doStrike}
                   variant={variant}
-                  onToggle={() => handleToggleItem(index)}
+                  onToggle={() => handleToggleItem(lb.index)}
                   onMouseOver={() => handleMouseOver(lb.text)}
                   onMouseLeave={handleMouseLeave}
                   hideValues={hideValues}

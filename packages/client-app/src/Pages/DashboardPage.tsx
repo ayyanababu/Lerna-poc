@@ -249,15 +249,15 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
                 }, // 20-40       
                 {
                     label: 'Priced ddd',
-                    value: 1000,
+                    value: 10000000,
                 }, // 20-40     
                 {
                     label: 'Priced adad',
-                    value: 1000,
+                    value: 1000000,
                 }, // 20-40     
                 {
                     label: 'Priced 12122',
-                    value: 1000,
+                    value: 99999,
                 }, // 20-40     
                 {
                     label: 'Priced aasdd',
@@ -265,15 +265,15 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
                 }, // 20-40     
                 {
                     label: 'Priced ggg',
-                    value: 1000,
+                    value: 999999,
                 }, // 20-40     
                 {
                     label: 'Priced sss',
-                    value: 1000,
+                    value: 777777,
                 }, // 20-40     
                 {
                     label: 'Priced ttt',
-                    value: 1000,
+                    value: 222222,
                 }, // 20-40                         
             ]);
         }, 1300);

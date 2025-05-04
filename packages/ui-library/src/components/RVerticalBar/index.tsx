@@ -44,6 +44,8 @@ const titleHeightAddOnSpace = 0;
 const truncatedLabelSuffix = "..";
 const activatesizing = false;
 const nodenametocheck = "SVG";
+const eachLegendGap = 23;
+const legendScrollingAfer = 3;
 
 /* const getEstimatedYAxisWidth = (maxValue: number, averageCharWidth = 7) => {
   const formattedValue = formatNumberWithSuffix(maxValue);
@@ -137,7 +139,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   );
 
 
-
   /*   const margin = useMemo(() => {
       if (!width) return DEFAULT_MARGIN;
   
@@ -215,7 +216,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       }),
     [innerHeight, maxValue],
   );
-
+console.log("domain",xScale.domain())
   const legendData = useMemo(
     () => data.map((d) => ({ label: d.label, value: d.value })),
     [data],
@@ -440,7 +441,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       }
       const axisLeft = chartSvgRef?.current?.querySelector(".visx-axis-left") as SVGGElement;
       if (axisLeft) {
-        setLegendLeft(axisLeft.getBBox().x)
+        setLegendLeft(axisLeft.getBBox().x+10)
       }  
     }
     if (legend_ref && legend_ref.current && legendsProps?.isVisible){
@@ -471,15 +472,15 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
   const {
     position = LegendPosition.BOTTOM,
-    hovered = hoveredBar !== null ? legendData?.[hoveredBar]?.label : null,
+    hovered = hoveredBar !== null && hoveredBar !== -1 ? legendData?.[hoveredBar]?.label : null,
     setHovered = (label) => {
       console.log("hovered");
       console.log(label);
       const hoveredIndex = legendData?.findIndex(
         (item) => item.label === label,
       );
-      hoveredIndex !== -1 ? hoveredIndex : null
-      setHoveredBar(hoveredIndex !== null ? hoveredIndex : null);
+      hoveredIndex !== null ? hoveredIndex : null
+      setHoveredBar(hoveredIndex !== null && hoveredIndex !== -1 ? hoveredIndex : null);
     }
  } = legendsProps || {};
 
@@ -535,9 +536,10 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           {filteredData.map((d, index) => {
             const value = Number(d.value);
             if (Number.isNaN(value)) return null;
-
+            console.log("valx",value)
             const calculatedBarWidth = xScale.bandwidth();
             barwidth = getOptimalBarWidth(calculatedBarWidth);
+            console.log(barwidth);
             let barX =
               barwidth < calculatedBarWidth
                 ? (xScale(d.label) || 0) + (calculatedBarWidth - barwidth) / 2
@@ -550,16 +552,16 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 }
             } else {
                 barX = barX + BASE_ADJUST_WIDTH / 2;
-            }                     
-            console.log("draw",drawableChartHeight);          
+            }                      
+            console.log("barx",barX);       
             const barHeight = drawableChartHeight - yScale(value);
-            console.log(barHeight);
             const barY = yScale(value);
             const isHovered = hoveredBar === index;
             const barOpacity =
-              hoveredBar !== null  && !isHovered
+              hoveredBar !== null && hoveredBar !== -1  && !isHovered
                 ? REDUCED_OPACITY
                 : DEFAULT_OPACITY;
+             console.log("bopac",barOpacity)   
             const radius = Math.min(
               DEFAULT_BAR_RADIUS,
               barwidth / 2,
@@ -604,11 +606,11 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           </g>
           <g  ref={legend_ref}>
              {legendsProps?.isVisible?            
-             <foreignObject x={`${legendLeft}`} y={`${legendPosition + 20}`} width={`${innerWidth}`} height="100">
+             <foreignObject x={`${legendLeft}`} y={`${legendPosition + 20}`} width={`${innerWidth}`} height={(eachLegendGap * legendScrollingAfer)+20}>
              {
               React.createElement('div', {
                 xmlns: 'http://www.w3.org/1999/xhtml',
-                style: { width: '100%', height: '100%' , overflowY:"auto", overflowX:"hidden" }
+                style: { width: '100%', height: '65%' , overflowY:"auto", overflowX:"hidden" }
               }, <svg>
                    <Legends
                      {...legendsProps}
@@ -621,6 +623,8 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                      isLoading={isLoading}
                      setHovered={setHovered}
                      isLegendRendered={isLegendRendered}
+                     eachLegendGap={eachLegendGap}
+                     scrollbarAfter={legendScrollingAfer}
                    />
                  </svg>
               )}   
