@@ -1,7 +1,7 @@
 import React from "react";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { Box, Typography } from "@mui/material";
-import { capitalize, lowerCase } from "lodash-es";
+import { startCase } from "lodash-es";
 
 import useTheme from "../../hooks/useTheme";
 import { formatNumberWithCommas } from "../../utils/number";
@@ -23,6 +23,7 @@ function LegendItem({
   hideValues = false,
   onArrowClick,
   hideLegendLableClick = true,
+  showArrow = true,
 }: LegendItemProps) {
   const { theme } = useTheme();
 
@@ -45,7 +46,7 @@ function LegendItem({
   if (isLoading) {
     displayText = "loading";
   } else if (label?.datum) {
-    displayText = capitalize(lowerCase(label.datum));
+    displayText = startCase(label.datum);
   }
 
   const valueText =
@@ -103,19 +104,21 @@ function LegendItem({
         {!hideValues &&
           (isLoading
             ? "loadingloading"
-            : ` (${valueText?formatNumberWithCommas(valueText):''})`)}
+            : ` (${valueText ? formatNumberWithCommas(valueText) : ""})`)}
       </Typography>
-      <ArrowOutwardIcon
-        className="arrow-icon"
-        sx={{
-          height: "16px",
-          width: "16px",
-          color: theme.colors.legend.text,
-          opacity: 0,
-          transition: "opacity 0.250s ease-in-out",
-        }}
-        onClick={() => onArrowClick?.()}
-      />
+      {showArrow && (
+        <ArrowOutwardIcon
+          className="arrow-icon"
+          sx={{
+            height: "16px",
+            width: "16px",
+            color: theme.colors.legend.text,
+            opacity: 0,
+            transition: "opacity 0.250s ease-in-out",
+          }}
+          onClick={() => onArrowClick?.()}
+        />
+      )}
     </Box>
   );
 
@@ -142,7 +145,7 @@ function LegendItem({
           }}
           className={isLoading ? shimmerClassName : ""}
           onClick={!hideLegendLableClick ? () => onToggle?.() : undefined}
-          >
+        >
           {displayText}
         </Typography>
       </Box>
@@ -168,17 +171,19 @@ function LegendItem({
           >
             {isLoading ? "loadingloading" : formatNumberWithCommas(valueText)}
           </Typography>
-          <ArrowOutwardIcon
-            sx={{
-              height: "16px",
-              width: "16px",
-              color: theme.colors.legend.text,
-              opacity: 0,
-              transition: "opacity 0.250s ease-in-out",
-            }}
-            className="arrow-icon"
-            onClick={() => onArrowClick?.()}
-          />
+          {showArrow && (
+            <ArrowOutwardIcon
+              sx={{
+                height: "16px",
+                width: "16px",
+                color: theme.colors.legend.text,
+                opacity: 0,
+                transition: "opacity 0.250s ease-in-out",
+              }}
+              className="arrow-icon"
+              onClick={() => onArrowClick?.()}
+            />
+          )}
         </Box>
       )}
     </>

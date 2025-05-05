@@ -853,6 +853,7 @@ body:not(.dark) {
                                     ]}
                                     isLoading={dataLoading.verticalBar}
                                     legendsProps={{
+                                        showArrow: false,
                                         position: Legends.Position.BOTTOM,
                                         isVisible: true,
                                         eachLegendGap: 23,

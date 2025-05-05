@@ -58,6 +58,7 @@ export interface LegendsProps {
   generateAxis?: (selectedLegends:number[]) => void;
   legendBoxWidth?:number;
   hideLegendLableClick?: boolean;
+  showArrow?: boolean;
 }
 
 export interface LegendItemProps {
@@ -79,4 +80,5 @@ export interface LegendItemProps {
   generateAxis?: (selectedLegends:number[]) => void;
   showIcon:boolean;
   hideLegendLableClick?: boolean;
+  showArrow?: boolean;
 }

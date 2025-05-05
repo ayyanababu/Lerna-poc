@@ -22,6 +22,7 @@ function Legends({
   variant = LegendVariant.COMPACT,
   hideValues = false,
   hideLegendLableClick = true,
+  showArrow = true,
 }: LegendsProps) {
   const { theme } = useTheme();
 
@@ -134,6 +135,7 @@ function Legends({
                     }
                   }}
                   hideLegendLableClick={hideLegendLableClick}
+                  showArrow={showArrow}
                 />
               );
             })}

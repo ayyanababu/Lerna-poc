@@ -24,6 +24,7 @@ function Legends({
   generateAxis,
   legendBoxWidth,
   hideLegendLableClick = true,
+  showArrow = true,
 }: LegendsProps) {
   const [showicon,setShowIcon] = useState(false);
   const legends_ref = useRef<SVGGElement | null>(null);
@@ -188,6 +189,7 @@ function Legends({
                   generateAxis={generateAxis}
                   showIcon={showicon}
                   hideLegendLableClick={hideLegendLableClick}
+                  showArrow={showArrow}
                 />
               );
             })}
