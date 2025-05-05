@@ -74,7 +74,7 @@ function LegendItem({
         let textwidth = text_ref.current.getBBox().width;
         let x = text_ref.current.getBBox().x + (textwidth)
         setStrikeLineX2(x); 
-        setIconPositionX(x-5);
+        setIconPositionX(x-7);
     }
   },[text_ref.current]);
 
