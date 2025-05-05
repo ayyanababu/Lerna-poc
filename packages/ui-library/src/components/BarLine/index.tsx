@@ -771,9 +771,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       }
     }, 300);
   };
-
-  if (chartData.length === 0) return <div>No data to display.</div>;
-
+  
   return (
     <ChartWrapper
       ref={parentRef}
@@ -802,6 +800,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         ...tooltipProps,
       }}
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
+      isDataEmpty={chartData.length === 0}
     >
       <svg
         ref={chartSvgRef}

@@ -59,4 +59,5 @@ export interface ChartWrapperProps {
   legendsProps?: LegendsProps;
   tooltipProps?: TooltipProps;
   timestampProps?: TimestampProps;
+  isDataEmpty?: boolean;
 }

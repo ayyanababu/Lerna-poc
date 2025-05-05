@@ -887,9 +887,6 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     }
   }, [categoryScale, axisLeft.current]);
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
 
   return (
     <ChartWrapper
@@ -915,6 +912,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
         ...tooltipProps,
       }}
       timestampProps={{ timestamp, isLoading }}
+      isDataEmpty={!_data || _data.length === 0}
     >
       <svg
         ref={chartSvgRef}

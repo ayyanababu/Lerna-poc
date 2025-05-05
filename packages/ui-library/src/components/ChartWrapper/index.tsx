@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useRef } from "react";
-import { Box, Stack } from "@mui/material";
+import { Box, Box, Stack } from "@mui/material";
 import { scaleOrdinal } from "@visx/scale";
 
 import { common } from "../../theme/theme";
@@ -28,6 +28,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
       tooltipProps,
       timestampProps,
       minRenderHeight = 200,
+      isDataEmpty,
     },
     ref,
   ) => {
@@ -76,7 +77,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
           gap: "0px", // Removed parent gap to control internal gaps more precisely
           flex: 1,
         }}
-        // ref={containerRef}
+        ref={containerRef}
       >
         {canRender ? (
           <>
@@ -117,14 +118,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                 />
               )}
               <Box
-                ref={(el) => {
-                  if (containerRef) containerRef.current = el;
-                  if (typeof ref === 'function') {
-                    ref(el);
-                  } else if (ref) {
-                    ref.current = el;
-                  }
-                }}
+                ref={ref}
                 sx={{
                   position: "relative",
                   height:  "100%",
@@ -148,7 +142,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                   >
                     <DotLoader />
                   </Box>
-                ) : (legendData.length > 0 && children) ? (
+                ) : (!isDataEmpty) ? (
                   children
                 ) : (
                   <Box

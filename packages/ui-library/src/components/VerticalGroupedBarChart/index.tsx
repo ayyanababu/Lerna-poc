@@ -861,10 +861,6 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   //    }
   // };
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
-
   return (
     <ChartWrapper
       ref={parentRef}
@@ -889,6 +885,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         ...tooltipProps,
       }}
       timestampProps={{ timestamp, isLoading }}
+      isDataEmpty={data.length === 0}
     >
       <svg
         ref={chartSvgRef}

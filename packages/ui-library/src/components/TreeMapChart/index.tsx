@@ -13,6 +13,7 @@ import { TooltipData } from "../Tooltip/types";
 import mockTreeMapChartData from "./mockdata";
 import { TreeMapChartProps, TreeMapNode } from "./types";
 import ErrorFallback from "../ErrorBoundary/ErrorFallback";
+import React from "react";
 
 type RectNode = HierarchyNode<TreeMapNode> & {
   x0: number;
@@ -208,10 +209,6 @@ const TreeMapChart = ({
     return brightness > 128 ? "#000000" : "#ffffff";
   };
 
-  if (!_data) {
-    return <div>No data to display.</div>;
-  }
-
   return (
     <ChartWrapper
       minRenderHeight={50}
@@ -246,6 +243,7 @@ const TreeMapChart = ({
         ...tooltipProps,
       }}
       timestampProps={{ isLoading, ...timestampProps }}
+      isDataEmpty={!_data || !_data?.children?.length}
     >
       {/* The outer SVG container needs to be rounded */}
       <svg

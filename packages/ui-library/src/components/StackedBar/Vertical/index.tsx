@@ -566,10 +566,6 @@ function VerticalStackedBar({
     }
   }, [isLoading, hideTooltip, setHoveredGroupKey]);
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
-
   return (
     <ChartWrapper
       ref={parentRef}
@@ -594,6 +590,7 @@ function VerticalStackedBar({
         ...tooltipProps,
       }}
       timestampProps={{ timestamp, isLoading, ...timestampProps }}
+      isDataEmpty={!data?.length}
     >
       <svg
         ref={chartSvgRef}
