@@ -50,6 +50,8 @@ export interface LegendsProps {
   isVisible?: boolean;
   variant?: LegendVariantType;
   hideValues?: boolean;
+  hideLegendLableClick?: boolean;
+  showArrow?: boolean;
 }
 
 export interface LegendItemProps {
@@ -66,4 +68,6 @@ export interface LegendItemProps {
   onMouseLeave?: () => void;
   hideValues?: boolean;
   onArrowClick?: () => void;
+  hideLegendLableClick?: boolean;
+  showArrow?: boolean;
 }

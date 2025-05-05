@@ -853,6 +853,7 @@ body:not(.dark) {
                                     ]}
                                     isLoading={dataLoading.verticalBar}
                                     legendsProps={{
+                                        showArrow: false,
                                         position: Legends.Position.BOTTOM,
                                         isVisible: true,
                                         eachLegendGap: 23,
@@ -884,8 +885,9 @@ body:not(.dark) {
                                     title={'Trade Volume'}
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,
-                                        doStrike: true,
+                                        doStrike: false,
                                         isVisible: true,
+                                        hideLegendLableClick: false,
                                     }}
                                     tooltipProps={{}}
                                 />

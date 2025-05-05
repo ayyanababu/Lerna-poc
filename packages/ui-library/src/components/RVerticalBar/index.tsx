@@ -21,7 +21,7 @@ import { LegendPosition } from "../Legends/types";
 
 const DEFAULT_MARGIN = {
   top: 5,
-  right: 25,
+  right: 75,
   bottom: 50,
   left: 25,
 };
@@ -444,7 +444,7 @@ console.log("domain",xScale.domain())
 
   const isLegendRendered = useCallback((renderedStatus: boolean) => {
     if (renderedStatus) {
-      setlegendBoxWidth(innerWidth-20);
+      setlegendBoxWidth(innerWidth - 20);
       const axisBottom = chartSvgRef?.current?.querySelector(".visx-axis-bottom") as SVGGElement;
       let moveY = 0;
       if (axisBottom) {
@@ -645,7 +645,7 @@ console.log("domain",xScale.domain())
           </g>
           <g  ref={legend_ref}>
              {legendsProps?.isVisible?
-             <foreignObject x={`${legendLeft}`} y={`${legendPosition + 20}`} width={`${innerWidth}`} height={legendsHeight}>
+             <foreignObject x={`${legendLeft}`} y={`${legendPosition + 20}`} width={`${innerWidth+DEFAULT_MARGIN.right}`} height={legendsHeight}>
              {
               React.createElement('div', {
                 xmlns: 'http://www.w3.org/1999/xhtml',
