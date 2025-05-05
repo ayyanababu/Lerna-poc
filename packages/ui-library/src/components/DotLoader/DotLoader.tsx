@@ -26,7 +26,7 @@ const DotLoader = ({
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: '50%',
-        backgroundColor: color ?color : `${theme.colors.common.text}a0`,
+        backgroundColor: color ? color : `${theme.colors.axis.line}`,
         animation: `dotSequence ${speed}s ease-in-out infinite`,
     };
 
