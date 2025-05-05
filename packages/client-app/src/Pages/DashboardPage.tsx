@@ -235,47 +235,18 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
     new Promise((resolve) => {
         setTimeout(() => {
             resolve([
-                {
-                    label: 'Not Priced',
-                    value: 10000000,
-                }, // 20-40
-                {
-                    label: 'Priced',
-                    value: 1000,
-                }, // 20-40     
-                {
-                    label: 'Low Priced',
-                    value: 100000,
-                }, // 20-40       
-                {
-                    label: 'Priced ddd',
-                    value: 10000000,
-                }, // 20-40     
-                {
-                    label: 'Priced adad',
-                    value: 1000000,
-                }, // 20-40     
-                {
-                    label: 'Priced 12122',
-                    value: 99999,
-                }, // 20-40     
-                {
-                    label: 'Priced aasdd',
-                    value: 1000,
-                }, // 20-40     
-                {
-                    label: 'Priced ggg',
-                    value: 999999,
-                }, // 20-40     
-                {
-                    label: 'Priced sss',
-                    value: 777777,
-                }, // 20-40     
-                {
-                    label: 'Priced ttt',
-                    value: 222222,
-                }, // 20-40                         
-            ]);
+                { label: 'Priced Alpha', value: 123000000 },
+                { label: 'Priced Beta', value: 245000000 },
+                { label: 'Priced Gamma', value: 367000000 },
+                { label: 'Priced Delta', value: 489000000 },
+                { label: 'Priced Epsilon', value: 511000000 },
+                { label: 'Priced Zeta', value: 633000000 },
+                { label: 'Priced Eta', value: 755000000 },
+                { label: 'Priced Theta', value: 877000000 },
+                { label: 'Priced Iota', value: 921000000 },
+                { label: 'Priced Kappa', value: 999000000 }
+              ]
+              );
         }, 1300);
     });
 
@@ -840,7 +811,7 @@ body:not(.dark) {
                                     maxBarWidth={32}
                                 />
                             </SortableCard>
-                            
+
                             <SortableCard height={400} width={'100%'}>
                                 <DonutChart
                                     data={semiDonutData}
@@ -885,14 +856,14 @@ body:not(.dark) {
                                         position: Legends.Position.BOTTOM,
                                         isVisible: true,
                                         eachLegendGap: 23,
-                                        scrollbarAfter: -1,
+                                        scrollbarAfter: 3,
                                         legendsHeight:.5, // 50% height incase of -1 and if left out 0 it will show all the legends without scrollbar
                                         onClick: (data, legend, index) => {
                                             console.log(
                                                 `Clicked ${legend} at index ${index}`,
                                                 data,
                                             );
-                                        },                                        
+                                        },
                                     }}
                                     tooltipProps={{}}
                                 />

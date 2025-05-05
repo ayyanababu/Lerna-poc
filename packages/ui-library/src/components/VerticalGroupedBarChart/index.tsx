@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AxisBottom, AxisLeft } from "@visx/axis";
 import { Group } from "@visx/group";
@@ -59,8 +59,8 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     width = 0,
     height = 0,
   } = useParentSize({ debounceTime: 150 });
-  const axis_bottom = useRef<SVGGElement | null>(null);
-  const axis_left = useRef<SVGGElement | null>(null);
+  const axisBottom = useRef<SVGGElement | null>(null);
+  const axisLeft = useRef<SVGGElement | null>(null);
   const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
 
   const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
@@ -87,23 +87,23 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     useTooltip<TooltipData[]>();
 
   useEffect(() => {
-    if (parentRef.current && activatesizing) {
+    if (parentRef?.current && activatesizing) {
       setTimeout(() => {
         const legendboxtimer = setInterval(() => {
           if (
-            parentRef.current.parentNode &&
-            parentRef.current.parentNode.querySelectorAll("div")[0]
+            parentRef?.current?.parentNode &&
+            parentRef?.current?.parentNode.querySelectorAll("div")[0]
           ) {
             const legendbox =
-              parentRef.current.parentNode.querySelectorAll("div")[0];
+              parentRef?.current?.parentNode.querySelectorAll("div")[0];
             const spans =
-              parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
+              parentRef?.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
                 "span",
               );
             const lastSpan = spans ? spans[spans.length - 1] : null;
             setBottomHeight(
               legendbox.offsetHeight +
-                lastSpan.offsetHeight +
+                (lastSpan?.offsetHeight || 0) +
                 bottomHeightAddOnSpace,
             );
             clearInterval(legendboxtimer);
@@ -111,7 +111,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         }, 10);
         const titleboxtimer = setInterval(() => {
           const titlebox =
-            parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
+            parentRef?.current?.parentNode?.parentNode?.querySelector<HTMLSpanElement>(
               ".MuiTypography-h6",
             );
           if (titlebox) {
@@ -121,7 +121,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         }, 10);
       }, 100);
     }
-  }, [parentRef.current]);
+  }, [parentRef?.current]);
 
   const { data, groupKeys } = useMemo(
     () =>
@@ -373,7 +373,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node.parentNode.nodeName.toUpperCase() !== nodenametocheck) {
+      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
         const label = node.dataset.fulltext || node.textContent || "";
         let truncated = label;
         if (label.length > 3) {
@@ -390,7 +390,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         if (pnode.getAttribute("transform")) {
           x =
             +pnode
-              .getAttribute("transform")
+              .getAttribute("transform")!
               .split("translate(")[1]
               .split(",")[0] + bbox.x;
         } else {
@@ -419,7 +419,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
           if (pnode.getAttribute("transform")) {
             x =
               +pnode
-                .getAttribute("transform")
+                .getAttribute("transform")!
                 .split("translate(")[1]
                 .split(",")[0] + bbox.x;
           } else {
@@ -458,7 +458,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
             if (pnode.getAttribute("transform")) {
               x =
                 +pnode
-                  .getAttribute("transform")
+                  .getAttribute("transform")!
                   .split("translate(")[1]
                   .split(",")[0] + bbox.x;
             } else {
@@ -496,7 +496,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node.parentNode.nodeName.toUpperCase() !== nodenametocheck) {
+      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
         const label = node.dataset.fulltext || node.textContent || "";
         //  const truncated =
         //    label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
@@ -509,7 +509,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         if (pnode.getAttribute("transform")) {
           y =
             +pnode
-              .getAttribute("transform")
+              .getAttribute("transform")!
               .split("translate(")[1]
               .split(")")[0]
               .split(",")[1] + bbox.y;
@@ -541,14 +541,14 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   };
 
   useEffect(() => {
-    if (!axis_bottom.current || !valueScale) return;
+    if (!axisBottom.current || !valueScale) return;
     if (AXISX_ROTATE) {
       return;
     }
 
     setTimeout(() => {
       const textNodes: SVGTextElement[] = Array.from(
-        axis_bottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
+        axisBottom.current?.querySelectorAll(".visx-axis-bottom text") || [],
       );
 
       if (!textNodes.length) return;
@@ -567,7 +567,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
           i !== 0 &&
           i !== textNodes.length - 1 &&
           node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+          node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
         ) {
           const bbox = node.getBBox();
           const pnode = node.parentNode as Element;
@@ -575,7 +575,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
           if (pnode.getAttribute("transform")) {
             x =
               +pnode
-                .getAttribute("transform")
+                .getAttribute("transform")!
                 .split("translate(")[1]
                 .split(",")[0] + bbox.x;
           } else {
@@ -594,7 +594,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       const showAndTruncate = (node: SVGTextElement, index: number) => {
         if (
           node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+          node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
         ) {
           const label = node.dataset.fulltext || node.textContent || "";
           let truncated = label;
@@ -609,7 +609,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
           if (pnode.getAttribute("transform")) {
             x =
               +pnode
-                .getAttribute("transform")
+                .getAttribute("transform")!
                 .split("translate(")[1]
                 .split(",")[0] + bbox.x;
           } else {
@@ -646,7 +646,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       textNodes.forEach((node) => {
         if (
           node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+          node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
         ) {
           const bbox = node.getBBox();
           const pnode = node.parentNode as Element;
@@ -654,7 +654,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
           if (pnode.getAttribute("transform")) {
             x =
               +pnode
-                .getAttribute("transform")
+                .getAttribute("transform")!
                 .split("translate(")[1]
                 .split(",")[0] + bbox.x;
           } else {
@@ -673,12 +673,12 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       ).length;
       console.log("axisadd", axisadded);
       if (trueCount < 3) {
-        const ntextnodes = [];
+        const ntextnodes: SVGTextElement[] = [];
         const midcount = Math.round((textNodes.length - 1) / 2);
         textNodes.forEach((node, index) => {
           if (
             node &&
-            node.parentNode.nodeName.toUpperCase() !== nodenametocheck &&
+            node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck &&
             (index === 0 ||
               index === midcount ||
               index === textNodes.length - 1)
@@ -699,15 +699,15 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         truncateXAxis(ntextnodes, usedRects, axisadded, true);
       }
     }, 500);
-  }, [valueScale, axis_bottom.current, AXISX_ROTATE]);
+  }, [valueScale, axisBottom.current, AXISX_ROTATE]);
 
   useEffect(() => {
-    if (!axis_left.current || !categoryScale) return;
+    if (!axisLeft.current || !categoryScale) return;
     if (AXISY_ROTATE) {
       return;
     }
     const textNodes: SVGTextElement[] = Array.from(
-      axis_left.current?.querySelectorAll(".visx-axis-left text") || [],
+      axisLeft.current?.querySelectorAll(".visx-axis-left text") || [],
     );
 
     if (!textNodes.length) return;
@@ -726,7 +726,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         i !== 0 &&
         i !== textNodes.length - 1 &&
         node &&
-        node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
       ) {
         const bbox = node.getBoundingClientRect();
         const pnode = node.parentNode as Element;
@@ -734,7 +734,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         if (pnode.getAttribute("transform")) {
           y =
             +pnode
-              .getAttribute("transform")
+              .getAttribute("transform")!
               .split("translate(")[1]
               .split(")")[0]
               .split(",")[1] + bbox.y;
@@ -752,7 +752,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     const firstNode = textNodes[0];
     const lastNode = textNodes[textNodes.length - 1];
     const showAndTruncate = (node: SVGTextElement, index: number) => {
-      if (node && node.parentNode.nodeName.toUpperCase() !== nodenametocheck) {
+      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
         const label = node.dataset.fulltext || node.textContent || "";
         //     const truncated =
         //       label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
@@ -762,7 +762,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         if (pnode.getAttribute("transform")) {
           y =
             +pnode
-              .getAttribute("transform")
+              .getAttribute("transform")!
               .split("translate(")[1]
               .split(")")[0]
               .split(",")[1] + bbox.y;
@@ -794,14 +794,14 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
 
     usedRects = [];
     textNodes.forEach((node) => {
-      if (node && node.parentNode.nodeName.toUpperCase() !== nodenametocheck) {
+      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
         const bbox = node.getBoundingClientRect();
         const pnode = node.parentNode as Element;
         let y = 0;
         if (pnode.getAttribute("transform")) {
           y =
             +pnode
-              .getAttribute("transform")
+              .getAttribute("transform")!
               .split("translate(")[1]
               .split(")")[0]
               .split(",")[1] + bbox.y;
@@ -821,12 +821,12 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
     ).length;
     console.log("trued", trueCount);
     if (trueCount < 3) {
-      const ntextnodes = [];
+      const ntextnodes: SVGTextElement[] = [];
       const midcount = Math.round((textNodes.length - 1) / 2);
       textNodes.forEach((node, index) => {
         if (
           node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck &&
+          node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck &&
           (index === 0 || index === midcount || index === textNodes.length - 1)
         ) {
           const full = node.dataset.fulltext || node.textContent || "";
@@ -844,7 +844,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
         );
       truncateYAxis(ntextnodes, usedRects, axisadded, true);
     }
-  }, [categoryScale, axis_left.current]);
+  }, [categoryScale, axisLeft.current]);
 
   //const rotated = (rotate: boolean) => {
   //      AXISX_ROTATE = rotate;
@@ -854,7 +854,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
   //         const svg = chartSvgRef.current;
   //         const bbox = svg.getBBox();
   //         const legendHeight = bottomHeight
-  //         let bottomaxisheight = axis_bottom.current.getBBox().height;
+  //         let bottomaxisheight = axisBottom?.current?.getBBox().height;
   //        const hgt = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom - bottomaxisheight;
   //    setdrawableChartHeight(hgt);
   //      },200);
@@ -897,7 +897,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
       >
         {isLoading && <SvgShimmer />}
         <Group top={DEFAULT_MARGIN.top}>
-          <g ref={axis_left} transform={`translate(${yAxisLabelWidth},0)`}>
+          <g ref={axisLeft} transform={`translate(${yAxisLabelWidth},0)`}>
             <AxisLeft
               scale={valueScale}
               stroke={theme.colors.axis.line}
@@ -911,7 +911,7 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
               hideTicks={!showTicks}
             />
           </g>
-          <g ref={axis_bottom} transform={`translate(${yAxisLabelWidth},0)`}>
+          <g ref={axisBottom} transform={`translate(${yAxisLabelWidth},0)`}>
             <AxisBottom
               scale={categoryScale}
               top={drawableChartHeight}

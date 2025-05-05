@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { curveLinear } from "@visx/curve";
 import { Group } from "@visx/group";
@@ -23,32 +23,18 @@ const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.3;
 const MAX_BAR_WIDTH = 16;
 const DEFAULT_BAR_RADIUS = 4;
-const TRUNCATE_RATIO = 0.5;
 const TICK_LABEL_PADDING = 8;
 let AXISX_ROTATE = false;
 const AXISY_ROTATE = true;
 const AXISY1_ROTATE = true;
 const BASE_ADJUST_WIDTH = 5; // used to fix the check width for the overlap of xaxis
-const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
 const BASE_ADJUST_HEIGHT = 0; // used to fix the check width for the overlap of yaxis
 const ADD_ADJUST_HEIGHT = 0; // used to check the overlap of yaxis
 const bottomHeightAddOnSpace = 0;
 const titleHeightAddOnSpace = 0;
-const truncatedLabelSuffix = "..";
 const activatesizing = true;
 const nodenametocheck = "SVG";
 
-//const fontSize = 10;
-//const labelPadding = 8;
-
-//function getLabelWidth(label: string) {
-//  return label ? label.length * fontSize * 0.6 + labelPadding : 0;
-//}
-
-//function getTickWidth(value: number) {
-//  const formatted = value.toLocaleString();
-//  return formatted.length * fontSize * 0.6 + labelPadding;
-//}
 
 const BarLineChart: React.FC<BarLineChartProps> = ({
   data: _data,
@@ -91,9 +77,9 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   } = useParentSize({ debounceTime: 150 });
   const [maxLabelWidthLeft, setMaxLabelWidthLeft] = useState<number>(60);
   //  const [maxLabelWidthRight, setMaxLabelWidthRight] = useState<number>(60);
-  const axis_bottom = useRef<SVGGElement | null>(null);
-  const axis_left = useRef<SVGGElement | null>(null);
-  const axis_right = useRef<SVGGElement | null>(null);
+  const axisBottom = useRef<SVGGElement | null>(null);
+  const axisLeft = useRef<SVGGElement | null>(null);
+  const axisRight = useRef<SVGGElement | null>(null);
   const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(
     null,
   );
@@ -128,26 +114,26 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
   const leftMax = Math.max(...chartData.map((d) => d.yAxisLeft), 0);
   const rightMax = Math.max(...chartData.map((d) => d.yAxisRight), 0);
-  const [Wrapped, setWrapped] = useState(false);
+  const [, setWrapped] = useState(false);
 
   useEffect(() => {
-    if (parentRef.current && activatesizing) {
+    if (parentRef?.current && activatesizing) {
       setTimeout(() => {
         const legendboxtimer = setInterval(() => {
           if (
-            parentRef.current.parentNode &&
-            parentRef.current.parentNode.querySelectorAll("div")[0]
+            parentRef?.current?.parentNode &&
+            parentRef?.current?.parentNode.querySelectorAll("div")[0]
           ) {
             const legendbox =
-              parentRef.current.parentNode.querySelectorAll("div")[0];
+              parentRef?.current?.parentNode.querySelectorAll("div")[0];
             const spans =
-              parentRef.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
+              parentRef?.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
                 "span",
               );
             const lastSpan = spans ? spans[spans.length - 1] : null;
             setBottomHeight(
               legendbox.offsetHeight +
-                lastSpan.offsetHeight +
+                (lastSpan?.offsetHeight || 0) +
                 bottomHeightAddOnSpace,
             );
             clearInterval(legendboxtimer);
@@ -155,7 +141,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         }, 10);
         const titleboxtimer = setInterval(() => {
           const titlebox =
-            parentRef.current?.parentNode?.parentNode.querySelector<HTMLSpanElement>(
+            parentRef?.current?.parentNode?.parentNode?.querySelector<HTMLSpanElement>(
               ".MuiTypography-h6",
             );
           if (titlebox) {
@@ -165,37 +151,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         }, 10);
       }, 100);
     }
-  }, [parentRef.current]);
-
-  //  const yAxisLeftTickWidth = getTickWidth(leftMax);
-  //  const yAxisRightTickWidth = getTickWidth(rightMax);
-  //  const yAxisLeftLabelWidth = getLabelWidth(yAxisLeftLabel);
-  //  const yAxisRightLabelWidth = getLabelWidth(yAxisRightLabel);
-
-  /*   const margin = useMemo(
-    () => ({
-      ...DEFAULT_MARGIN,
-      left: Math.max(
-        DEFAULT_MARGIN.left,
-        yAxisLeftTickWidth + yAxisLeftLabelWidth,
-      ),
-      right: Math.max(
-        DEFAULT_MARGIN.right,
-        yAxisRightTickWidth + yAxisRightLabelWidth,
-      ),
-    }),
-    [
-      DEFAULT_MARGIN,
-      isLoading,
-      yAxisLeftTickWidth,
-      yAxisRightTickWidth,
-      yAxisLeftLabelWidth,
-      yAxisRightLabelWidth,
-    ],
-  );
- */
-  //  const drawableWidth = width - DEFAULT_MARGIN.left - DEFAULT_MARGIN.right;
-  //  const drawableHeight = height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom;
+  }, [parentRef?.current]);
 
   useEffect(() => {
     const yAxisLabelWidthLeft = maxLabelWidthLeft + TICK_LABEL_PADDING;
@@ -304,11 +260,6 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       (node) => (node as SVGGraphicsElement).getBBox().width,
     );
     setMaxLabelWidthLeft(Math.max(...widthsleft, 0));
-    //  const nodesright = chartSvgRef.current.querySelectorAll(".visx-axis-right");
-    //    const widthsright = Array.from(nodesright).map(
-    //      (node) => (node as SVGGraphicsElement).getBBox().width,
-    //    );
-    //    setMaxLabelWidthRight(Math.max(...widthsright, 0));
   }, [data, width, height]);
 
   const defaultBarWidth = xScale.bandwidth();
@@ -344,93 +295,6 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     }
   };
 
-  /*   useEffect(() => {
-    if (!chartSvgRef.current || !width || !height) return;
-
-    const titleHeight =
-      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
-      0;
-    const legendHeight =
-      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
-      0;
-
-    // Measure right Y-axis tick label widths
-    const rightAxisTicks = chartSvgRef.current.querySelectorAll(
-      ".visx-axis-right text",
-    );
-    const rightTickWidths = Array.from(rightAxisTicks).map(
-      (node) => (node as SVGGraphicsElement).getBBox().width,
-    );
-    const maxRightTickWidth = Math.max(...rightTickWidths, 0);
-
-    // Measure right Y-axis main label
-    const rightAxisLabel = chartSvgRef.current.querySelector(
-      ".visx-axis-right-label",
-    );
-    const rightLabelWidth = rightAxisLabel
-      ? (rightAxisLabel as SVGGraphicsElement).getBBox().width
-      : 0;
-
-    // Calculate extended right margin
-    const newRightMargin =
-      Math.max(DEFAULT_MARGIN.right, maxRightTickWidth + rightLabelWidth + 10) +
-      DEFAULT_MARGIN.left;
-
-    // Calculate total width including right margin
-    const updatedWidth = Math.max(
-      width,
-      margin.left + drawableChartWidth + newRightMargin,
-    );
-
-    // Calculate height based on chart, title and legend
-    const updatedHeight =
-      Math.max(
-        DEFAULT_MARGIN.top +
-          drawableChartHeight +
-          DEFAULT_MARGIN.bottom +
-          legendHeight +
-          titleHeight,
-        height,
-      ) + 5;
-
-    setAdjustedChartHeight(updatedHeight);
-    setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, drawableChartWidth, DEFAULT_MARGIN]);
- */
-  /*   useEffect(() => {
-    if (!chartSvgRef.current || !width || !height) return;
-    const svg = chartSvgRef.current;
-    const bbox = svg.getBBox();
-    const titleHeight =
-      document.querySelector(".chart-title")?.getBoundingClientRect().height ||
-      0;
-    const legendHeight =
-      document.querySelector(".chart-legend")?.getBoundingClientRect().height ||
-      0;
-    let updatedHeight =
-      Math.max(
-        DEFAULT_MARGIN.top +
-          bbox.height +
-          DEFAULT_MARGIN.bottom +
-          legendHeight +
-          titleHeight,
-        height,
-      ) + 5;
-    const updatedWidth = Math.max(
-      width,
-      DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
-    );
-    if (AXISY_ROTATE) {
-      updatedHeight =
-        updatedHeight -
-        (
-          chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
-        ).getBBox().height;
-    }
-    setAdjustedChartHeight(updatedHeight);
-    setAdjustedChartWidth(updatedWidth);
-  }, [data, width, height, DEFAULT_MARGIN, isLoading, innerWidth]);
- */
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
     const svg = chartSvgRef.current;
@@ -468,178 +332,6 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     titleHeight,
   ]);
 
-  const truncateXAxis = (
-    textNodes: SVGTextElement[],
-    usedRects: { x1: number; x2: number }[],
-    axisadded: { [key: number]: boolean },
-    centeronly: boolean,
-  ) => {
-    textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node.parentNode.nodeName.toUpperCase() !== nodenametocheck) {
-        const label = node.dataset.fulltext || node.textContent || "";
-        let truncated = label;
-        if (label.length > 3) {
-          truncated =
-            label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) +
-            truncatedLabelSuffix;
-        }
-        const original = node.textContent;
-        // node.textContent = truncated;
-        const bbox = node.getBBox();
-        node.textContent = original;
-        let x = 0;
-        const pnode = node.parentNode as Element;
-        if (pnode.getAttribute("transform")) {
-          x =
-            +pnode
-              .getAttribute("transform")
-              .split("translate(")[1]
-              .split(",")[0] + bbox.x;
-        } else {
-          x = +bbox.x;
-        }
-        const rect = {
-          x1: x - ADD_ADJUST_WIDTH,
-          x2: x + bbox.width + ADD_ADJUST_WIDTH,
-        };
-        const us = usedRects.filter(
-          (r: { x1: number; x2: number }, i: number) => i === index + 2,
-        );
-        console.log(usedRects);
-        console.log(rect);
-        console.log("nusa", us);
-        const isOverlapping = us.some(
-          (r: { x1: number; x2: number }) => rect.x2 >= r.x1 && rect.x2 <= r.x2,
-        );
-        console.log("barus", us);
-        console.log("barrect", usedRects);
-        console.log("barrett", rect);
-        console.log(label);
-        console.log("over", isOverlapping);
-        if (!isOverlapping) {
-          node.textContent = label;
-          node.setAttribute("display", "block");
-          axisadded[index + 1] = true;
-        } else {
-          axisadded[index + 1] = false;
-          node.textContent = truncated;
-          const bbox = node.getBBox();
-          let x = 0;
-          const pnode = node.parentNode as Element;
-          if (pnode.getAttribute("transform")) {
-            x =
-              +pnode
-                .getAttribute("transform")
-                .split("translate(")[1]
-                .split(",")[0] + bbox.x;
-          } else {
-            x = +bbox.x;
-          }
-          const rect = {
-            x1: x - ADD_ADJUST_WIDTH,
-            x2: x + bbox.width + ADD_ADJUST_WIDTH,
-          };
-          const isOverlapping = usedRects.some(
-            (r: { x1: number; x2: number }) =>
-              rect.x2 >= r.x1 && rect.x2 <= r.x2,
-          );
-          if (!isOverlapping) {
-            node.textContent = truncated;
-            node.setAttribute("display", "block");
-            axisadded[index + 1] = true;
-          } else {
-            axisadded[index + 1] = false;
-            let newtruncated = truncated;
-            if (truncated.length > 3) {
-              newtruncated =
-                truncated.slice(
-                  0,
-                  Math.floor(truncated.length * TRUNCATE_RATIO * 0.5),
-                ) + truncatedLabelSuffix;
-            }
-            node.textContent = newtruncated;
-            let x = 0;
-            const pnode = node.parentNode as Element;
-            if (pnode.getAttribute("transform")) {
-              x =
-                +pnode
-                  .getAttribute("transform")
-                  .split("translate(")[1]
-                  .split(",")[0] + bbox.x;
-            } else {
-              x = +bbox.x;
-            }
-            const rect = {
-              x1: x - ADD_ADJUST_WIDTH,
-              x2: x + bbox.width + ADD_ADJUST_WIDTH,
-            };
-            const isOverlapping = usedRects.some(
-              (r: { x1: number; x2: number }) =>
-                rect.x2 >= r.x1 && rect.x2 <= r.x2,
-            );
-            if (isOverlapping) {
-              axisadded[index + 1] = false;
-              if (!centeronly) {
-                // node.setAttribute("display", "none");
-              }
-            } else {
-              axisadded[index + 1] = true;
-            }
-          }
-        }
-      }
-    });
-    const tnodelast = textNodes[textNodes.length - 1];
-    let tnodalastminsone = null;
-    if (textNodes[textNodes.length - 2]) {
-      tnodalastminsone = textNodes[textNodes.length - 2];
-    }
-    if (tnodalastminsone) {
-      console.log("doing this");
-      const bbox1 = tnodelast.getBBox();
-      let x1 = 0;
-      const pnode1 = tnodelast.parentNode as Element;
-      if (pnode1.getAttribute("transform")) {
-        x1 =
-          +pnode1
-            .getAttribute("transform")
-            .split("translate(")[1]
-            .split(",")[0] + bbox1.x;
-      } else {
-        x1 = +bbox1.x;
-      }
-      const rect1 = {
-        x1: x1 - ADD_ADJUST_WIDTH,
-        x2: x1 + bbox1.width + ADD_ADJUST_WIDTH,
-      };
-      const bbox2 = tnodalastminsone.getBBox();
-      let x2 = 0;
-      const pnode2 = tnodalastminsone.parentNode as Element;
-      if (pnode2.getAttribute("transform")) {
-        x2 =
-          +pnode1
-            .getAttribute("transform")
-            .split("translate(")[1]
-            .split(",")[0] + bbox1.x;
-      } else {
-        x2 = +bbox2.x;
-      }
-      const rect2 = {
-        x1: x2 - ADD_ADJUST_WIDTH,
-        x2: x2 + bbox1.width + ADD_ADJUST_WIDTH,
-      };
-      if (rect1.x1 >= rect2.x1 && rect1.x1 <= rect2.x1) {
-        console.log("overlappi");
-        const truncated =
-          tnodelast.textContent.slice(
-            0,
-            Math.floor(tnodelast.textContent.length * TRUNCATE_RATIO),
-          ) + truncatedLabelSuffix;
-        tnodelast.textContent = truncated;
-      }
-    }
-  };
-
   const truncateYAxis = (
     textNodes: SVGTextElement[],
     usedRects: { y1: number; y2: number }[],
@@ -647,12 +339,9 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node.parentNode.nodeName.toUpperCase() !== nodenametocheck) {
+      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
         const label = node.dataset.fulltext || node.textContent || "";
-        //  const truncated =
-        //    label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
         const original = node.textContent;
-        // node.textContent = truncated;
         const bbox = node.getBoundingClientRect();
         node.textContent = original;
         let y = 0;
@@ -660,7 +349,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         if (pnode.getAttribute("transform")) {
           y =
             +pnode
-              .getAttribute("transform")
+              .getAttribute("transform")!
               .split("translate(")[1]
               .split(")")[0]
               .split(",")[1] + bbox.y;
@@ -698,12 +387,9 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node.parentNode.nodeName.toUpperCase() !== nodenametocheck) {
+      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
         const label = node.dataset.fulltext || node.textContent || "";
-        //    const truncated =
-        //      label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
         const original = node.textContent;
-        // node.textContent = truncated;
         const bbox = node.getBoundingClientRect();
         node.textContent = original;
         let y = 0;
@@ -711,7 +397,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         if (pnode.getAttribute("transform")) {
           y =
             +pnode
-              .getAttribute("transform")
+              .getAttribute("transform")!
               .split("translate(")[1]
               .split(")")[0]
               .split(",")[1] + bbox.y;
@@ -744,17 +430,17 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
   useEffect(() => {
     return;
-  }, [xScale, axis_bottom.current, AXISX_ROTATE]);
+  }, [xScale, axisBottom.current, AXISX_ROTATE]);
 
   useEffect(() => {
-    if (!axis_left.current || !leftScale) return;
+    if (!axisLeft.current || !leftScale) return;
     if (AXISY_ROTATE) {
       return;
     }
 
     setTimeout(() => {
       const textNodes: SVGTextElement[] = Array.from(
-        axis_left.current?.querySelectorAll(".visx-axis-left visx-axis-tick") ||
+        axisLeft.current?.querySelectorAll(".visx-axis-left visx-axis-tick") ||
           [],
       );
 
@@ -774,7 +460,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
           i > 0 &&
           i < textNodes.length - 1 &&
           node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+          node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
         ) {
           const bbox = node.getBBox();
           const pnode = node.parentNode as Element;
@@ -782,7 +468,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
           if (pnode.getAttribute("transform")) {
             y =
               +pnode
-                .getAttribute("transform")
+                .getAttribute("transform")!
                 .split("translate(")[1]
                 .split(")")[0]
                 .split(",")[1] + bbox.y;
@@ -802,18 +488,16 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       const showAndTruncate = (node: SVGTextElement, index: number) => {
         if (
           node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+          node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
         ) {
           const label = node.dataset.fulltext || node.textContent || "";
-          //      const truncated =
-          //        label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
           const bbox = node.getBBox();
           const pnode = node.parentNode as Element;
           let y = 0;
           if (pnode.getAttribute("transform")) {
             y =
               +pnode
-                .getAttribute("transform")
+                .getAttribute("transform")!
                 .split("translate(")[1]
                 .split(")")[0]
                 .split(",")[1] + bbox.y;
@@ -847,7 +531,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       textNodes.forEach((node) => {
         if (
           node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+          node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
         ) {
           const bbox = node.getBBox();
           const pnode = node.parentNode as Element;
@@ -855,7 +539,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
           if (pnode.getAttribute("transform")) {
             y =
               +pnode
-                .getAttribute("transform")
+                .getAttribute("transform")!
                 .split("translate(")[1]
                 .split(")")[0]
                 .split(",")[1] + bbox.y;
@@ -874,12 +558,12 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         (value) => value === true,
       ).length;
       if (trueCount < 3) {
-        const ntextnodes = [];
+        const ntextnodes: SVGTextElement[] = [];
         const midcount = Math.round((textNodes.length - 1) / 2);
         textNodes.forEach((node, index) => {
           if (
             node &&
-            node.parentNode.nodeName.toUpperCase() !== nodenametocheck &&
+            node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck &&
             (index === 0 ||
               index === midcount ||
               index === textNodes.length - 1)
@@ -900,17 +584,17 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         truncateYAxis(ntextnodes, usedRects, axisadded, true);
       }
     }, 500);
-  }, [leftScale, axis_left.current]);
+  }, [leftScale, axisLeft.current]);
 
   useEffect(() => {
-    if (!axis_left.current || !rightScale) return;
+    if (!axisLeft.current || !rightScale) return;
     if (AXISY1_ROTATE) {
       return;
     }
 
     setTimeout(() => {
       const textNodes: SVGTextElement[] = Array.from(
-        axis_right.current?.querySelectorAll(".visx-axis-right text") || [],
+        axisRight.current?.querySelectorAll(".visx-axis-right text") || [],
       );
 
       if (!textNodes.length) return;
@@ -929,7 +613,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
           i !== 0 &&
           i !== textNodes.length - 1 &&
           node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+          node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
         ) {
           const bbox = node.getBBox();
           const pnode = node.parentNode as Element;
@@ -937,7 +621,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
           if (pnode.getAttribute("transform")) {
             y =
               +pnode
-                .getAttribute("transform")
+                .getAttribute("transform")!
                 .split("translate(")[1]
                 .split(")")[0]
                 .split(",")[1] + bbox.y;
@@ -957,18 +641,16 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       const showAndTruncate = (node: SVGTextElement, index: number) => {
         if (
           node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+          node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
         ) {
           const label = node.dataset.fulltext || node.textContent || "";
-          //  const truncated =
-          //    label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
           const bbox = node.getBBox();
           const pnode = node.parentNode as Element;
           let y = 0;
           if (pnode.getAttribute("transform")) {
             y =
               +pnode
-                .getAttribute("transform")
+                .getAttribute("transform")!
                 .split("translate(")[1]
                 .split(")")[0]
                 .split(",")[1] + bbox.y;
@@ -1002,7 +684,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       textNodes.forEach((node) => {
         if (
           node &&
-          node.parentNode.nodeName.toUpperCase() !== nodenametocheck
+          node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
         ) {
           const bbox = node.getBBox();
           const pnode = node.parentNode as Element;
@@ -1010,7 +692,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
           if (pnode.getAttribute("transform")) {
             y =
               +pnode
-                .getAttribute("transform")
+                .getAttribute("transform")!
                 .split("translate(")[1]
                 .split(")")[0]
                 .split(",")[1] + bbox.y;
@@ -1029,12 +711,12 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         (value) => value === true,
       ).length;
       if (trueCount < 3) {
-        const ntextnodes = [];
+        const ntextnodes: SVGTextElement[] = [];
         const midcount = Math.round((textNodes.length - 1) / 2);
         textNodes.forEach((node, index) => {
           if (
             node &&
-            node.parentNode.nodeName.toUpperCase() !== nodenametocheck &&
+            node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck &&
             (index === 0 ||
               index === midcount ||
               index === textNodes.length - 1)
@@ -1055,18 +737,18 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
         truncateY1Axis(ntextnodes, usedRects, axisadded, true);
       }
     }, 500);
-  }, [rightScale, axis_left.current]);
+  }, [rightScale, axisLeft.current]);
 
   const rotated = (rotate: boolean) => {
     AXISX_ROTATE = rotate;
-    if (rotate && chartSvgRef.current && axis_bottom.current) {
+    if (rotate && chartSvgRef.current && axisBottom.current) {
       setTimeout(() => {
-        const bottomaxisheight = axis_bottom.current.getBBox().height;
+        const bottomaxisheight = axisBottom?.current?.getBBox().height;
         const hgt =
           height -
           DEFAULT_MARGIN.top -
           DEFAULT_MARGIN.bottom -
-          bottomaxisheight;
+          (bottomaxisheight || 0);
         setdrawableChartHeight(hgt - 50);
       }, 200);
     }
@@ -1074,16 +756,15 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
   const wrapped = (wrapped: boolean) => {
     setTimeout(() => {
-      if (wrapped && chartSvgRef.current && axis_bottom.current) {
+      if (wrapped && chartSvgRef.current && axisBottom.current) {
         setWrapped(wrapped);
-        const bottomaxisheight = axis_bottom.current.getBBox().height;
+        const bottomaxisheight = axisBottom?.current?.getBBox().height;
         const hgt =
           height -
           DEFAULT_MARGIN.top -
           DEFAULT_MARGIN.bottom -
           bottomaxisheight -
           bottomHeight;
-        console.log("wrap", wrapped);
         setdrawableChartHeight(hgt + 10);
       }
     }, 300);
@@ -1127,7 +808,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       >
         {isLoading && <SvgShimmer />}
         <Group top={DEFAULT_MARGIN.top} left={DEFAULT_MARGIN.left}>
-          <g ref={axis_bottom}>
+          <g ref={axisBottom}>
             <XAxis
               scale={xScale}
               top={drawableChartHeight - (AXISX_ROTATE ? 10 : 0)}
@@ -1136,7 +817,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
               showAxisLine={showXAxis}
               labels={chartData.map((d) => String(d.xAxis))}
               availableWidth={drawableChartWidth}
-              label={xAxislabel} 
+              label={xAxislabel}
               labelProps={{
                 verticalAnchor: "start",
                 dy: 60,
@@ -1161,7 +842,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
           {!hideChart.includes(0) && (
             <>
-              <g ref={axis_left}>
+              <g ref={axisLeft}>
                 <YAxis
                   scale={leftScale}
                   hideTicks={!showTicks}
@@ -1237,7 +918,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
 
           {!hideChart.includes(1) && (
             <>
-              <g ref={axis_right}>
+              <g ref={axisRight}>
                 <YAxis
                   isRightYAxis
                   left={drawableChartWidth}

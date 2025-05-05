@@ -21,7 +21,6 @@ const ADD_ADJUST_WIDTH = 0;
 
 function XAxis({
   availableWidth = 0,
-  rotated,
   hideAllTicks = false,
   isLoading = false,
   labels: providedLabels,
@@ -43,7 +42,7 @@ function XAxis({
   const { theme } = useTheme();
   const axisRef = useRef<SVGGElement>(null);
   const [isOverlapping, setIsOverlapping] = useState(false);
-  const [averageWidthPerChar, setAverageWidthPerChar] = useState(6);
+  const [averageWidthPerChar] = useState(6);
   const [isWrapped, setWrapped] = useState(false);
   const [wrappedMaxHeight, setwrappedMaxHeight] = useState(0);
 
@@ -61,11 +60,6 @@ function XAxis({
           calculateLabelWidths(ref);
           return;
         }
-
-        //   let lastRight = 0;
-        //   let overlapping = false;
-        //    let widthSum = 0;
-        //    let totalChars = 0;
         const usedRects: { x1: number; x2: number }[] = [];
         nodeList.forEach((node: SVGTextElement) => {
           console.log(node);
@@ -75,7 +69,7 @@ function XAxis({
           if (pnode.getAttribute("transform")) {
             x =
               +pnode
-                .getAttribute("transform")
+                .getAttribute("transform")!
                 .split("translate(")[1]
                 .split(",")[0] + bbox.x;
           } else {
@@ -103,7 +97,7 @@ function XAxis({
               if (pnode.getAttribute("transform")) {
                 x =
                   +pnode
-                    .getAttribute("transform")
+                    .getAttribute("transform")!
                     .split("translate(")[1]
                     .split(",")[0] + bbox.x;
               } else {
@@ -205,11 +199,8 @@ function XAxis({
   }, [availableWidth, numTicks, scale, providedLabels, averageWidthPerChar]);
 
   const {
-    angle,
     evenPositionsMap,
     formatLabel,
-    rotate,
-    textAnchor,
     tickValues,
   } = useMemo(() => {
     const scaleLabels =
@@ -217,11 +208,7 @@ function XAxis({
       (scale.domain && typeof scale.domain === "function"
         ? scale.domain().map(String)
         : []);
-    // Calculate available width per label
     const availableWidthPerLabel = availableWidth / scaleLabels.length;
-    //    const maxLabelChars = Math.floor(
-    //     availableWidthPerLabel / averageWidthPerChar,
-    //   );
     const maxLabelLength = Math.max(
       ...scaleLabels.map((label) => String(label).length),
     );
@@ -233,29 +220,18 @@ function XAxis({
         evenPositionsMap: null,
         formatLabel: (label: string): string => {
           return String(label);
-          //              if (typeof label !== "string") return String(label);
-          //             return label.length > MAX_LABEL_CHARS
-          //               ? `${label.substring(0, MAX_LABEL_CHARS - 3)}...`
-          //               : label;
         },
         rotate: false,
         textAnchor: "middle",
         tickValues: [],
       };
     }
-    //  console.log(dynamicNumTicks, "dynamicNumTicks");
-    //  console.log(scaleLabels.length,"scale")
     if (scaleLabels.length < dynamicNumTicks || isOverlapping) {
       return {
         angle: 0,
         evenPositionsMap: null,
         formatLabel: (label: string): string => {
           return String(label);
-          //          if (typeof label !== "string") return String(label);
-
-          //          return label.length > maxLabelChars && isOverlapping
-          //            ? `${label.substring(0, maxLabelChars - 3)}...`
-          //            : label;
         },
         rotate: false,
         textAnchor: "middle",
@@ -266,20 +242,12 @@ function XAxis({
       scaleLabels.length <= dynamicNumTicks * 2 ||
       availableWidthPerLabel > estimatedMaxLabelWidth * 0.6
     ) {
-      //      const rotatedCharLimit = Math.min(
-      //        MAX_LABEL_CHARS,
-      //        Math.floor((availableWidthPerLabel * 3.5) / averageWidthPerChar),
-      //     );
 
       return {
         angle: -45,
         evenPositionsMap: null,
         formatLabel: (label: string): string => {
           return String(label);
-          //     if (typeof label !== "string") return String(label);
-          //      return label.length > rotatedCharLimit
-          //        ? `${label.substring(0, rotatedCharLimit - 3)}...`
-          //        : label;
         },
         rotate: true,
         textAnchor: "end",
@@ -316,25 +284,11 @@ function XAxis({
       positions.set(scaleLabels[indicesToShow[0]], availableWidth / 2);
     }
 
-    // Calculate how many characters we can show based on available space
-
-    //const rotatedSpaceFactor = 1.8;
-    //    const maxCharsPerLabel = Math.floor(
-    //      (availableWidthPerLabel * rotatedSpaceFactor) / averageWidthPerChar,
-    //    );
-
-    //    const charLimit = Math.min(MAX_LABEL_CHARS, Math.max(8, maxCharsPerLabel));
-
     return {
       angle: -45,
       evenPositionsMap: positions,
       formatLabel: (label: string): string => {
         return String(label);
-        //    if (typeof label !== "string") return String(label);
-
-        //       return label.length > charLimit
-        //         ? `${label.substring(0, charLimit - 3)}...`
-        //         : label;
       },
       rotate: true,
       textAnchor: "end",
@@ -410,8 +364,8 @@ function XAxis({
     if (typeof wrapped === "function") {
       wrapped(false);
     }
-    textNodes.forEach((textNode, index) => {
-      const tspans = [];
+    textNodes.forEach((textNode) => {
+      const tspans: SVGTextElement[] = [];
       textNode.querySelectorAll("tspan").forEach((tspan) => {
         if (tspan.textContent) {
           tspans.push(tspan);
@@ -426,7 +380,7 @@ function XAxis({
       });
     });
     let wrapheight = 0;
-    textNodes.forEach((textNode, index) => {
+    textNodes.forEach((textNode) => {
       const tlength = textNode.querySelectorAll("tspan").length;
       if (tlength > 1) {
         setWrapped(true);
@@ -481,34 +435,6 @@ function XAxis({
         : tickProps.x;
 
     const yOffset = showAxisLine ? labelOffset : labelOffset / 2;
-
-    /*     if (rotate) {
-      console.log("rotate", rotate);
-      console.log("label", label);
-      if (typeof rotated === "function") {
-        rotated(true);
-      }
-      return (
-        <g transform={`translate(${xPos},${tickProps.y})`}>
-          <text
-            className={isLoading ? shimmerClassName : ""}
-            fill={
-              isLoading ? `url(#${shimmerGradientId})` : theme.colors.axis.label
-            }
-            style={textStyle}
-            textAnchor={textAnchor}
-            transform={`rotate(${angle})`}
-            dy="0.5em"
-            dx="0.32em"
-          >
-            {label}
-          </text>
-        </g>
-      );
-    }
-    if (typeof rotated === "function") {
-      rotated(false);
-    } */
     return (
       <g transform={`translate(${xPos},${tickProps.y})`}>
         <text
@@ -531,9 +457,6 @@ function XAxis({
     ...overLineStyles,
     color: theme.colors.axis.title,
     fill: theme.colors.axis.title,
-    //  dy: showAxisLine
-    //    ? `${labelOffset + 4}px`
-    //    : `${labelOffset + (!rotate ? 10 : 62)}px`,
     dy: isWrapped ? wrappedMaxHeight : 10,
   };
 

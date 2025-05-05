@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+ 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -21,8 +21,8 @@ import { LegendPosition } from "../Legends/types";
 
 const DEFAULT_MARGIN = {
   top: 5,
-  right: 10,
-  bottom: 25,
+  right: 25,
+  bottom: 50,
   left: 25,
 };
 
@@ -33,7 +33,7 @@ const REDUCED_OPACITY = 0.3;
 const SCALE_PADDING = 1.02;
 const TRUNCATE_RATIO = 0.5;
 const TICK_LABEL_PADDING = 8;
-let AXISX_ROTATE = false;
+const AXISX_ROTATE = false;
 const AXISY_ROTATE = true;
 const BASE_ADJUST_WIDTH = 5; // used to fix the check width for the overlap of xaxis
 const ADD_ADJUST_WIDTH = 0; // used to check the overlap of xaxis
@@ -82,9 +82,9 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   if (!width){
       width = parentRef?.current?.offsetWidth ?? 0;
   }
-  if (!height){   
-      height = parentRef?.current?.offsetHeight ?? 0;    
-  }    
+  if (!height){
+      height = parentRef?.current?.offsetHeight ?? 0;
+  }
 
   const data = useMemo<DataPoint[]>(
     () => (isLoading ? mockVerticalBarChartData : _data),
@@ -123,7 +123,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const [legendsHeight,setLegendsHeight] = useState(0)
   const [refreshAxis,setrefreshAxis] = useState(0);
 
-  let rotateincrease = 0;
+  const rotateincrease = 0;
   let barwidth = 0;
 
 
@@ -144,14 +144,14 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
   /*   const margin = useMemo(() => {
       if (!width) return DEFAULT_MARGIN;
-  
+
       const maxValue = Math.max(
         0,
         ...filteredData.map((d) => Number(d.value) || 0),
       );
       const averageCharWidth = 7;
       const yAxisWidth = getEstimatedYAxisWidth(maxValue, averageCharWidth);
-  
+
       const xLabels = filteredData.map((d) => String(d.label));
       const totalLabelWidth = xLabels.join("").length * averageCharWidth;
       const needsRotation = xLabels.length > 5 || totalLabelWidth >= width;
@@ -159,14 +159,14 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         ...xLabels.map((label) => label.length),
         0,
       );
-  
+
       const rotationAdjustment = needsRotation
         ? Math.min(
             5 + (maxXLabelLength > 10 ? (maxXLabelLength - 10) * 1.5 : 0),
             35,
           )
         : 0;
-  
+
       return {
         top: DEFAULT_MARGIN.top,
         right: DEFAULT_MARGIN.right,
@@ -233,7 +233,7 @@ console.log("domain",xScale.domain())
         range: colors, // Ensure colors is a string[]
       });
     }
-  
+
     return scaleOrdinal<string, string>({
       domain: filteredData.map((_, index) => index.toString()), // Domain based on index
       range: theme.colors.charts.bar, // Ensure this is a string[]
@@ -389,15 +389,15 @@ console.log("domain",xScale.domain())
     if (wrapped && chartSvgRef.current && axis_bottom.current) {
       setWrapped(wrapped);
       setRecalculate(true);
-  
+
       const bottomaxisheight = axis_bottom.current.getBBox().height;
-  
+
       let legendHeight = 0;
       if (legend_ref && legend_ref.current) {
         legendHeight = legend_ref.current.getBBox().height;
         console.log("lheight", legendHeight);
       }
-  
+
       const hgt =
         height -
         DEFAULT_MARGIN.top -
@@ -405,13 +405,13 @@ console.log("domain",xScale.domain())
         - legendHeight
         console.log("hgt2",hgt)
       setdrawableChartHeight(hgt); // Uncomment if needed
-  
+
       let moveY = 0;
-  
+
       if (overall_chart && overall_chart.current) {
         console.log("bbox",overall_chart.current.getBBox())
-        moveY = overall_chart.current.getBBox().height;  
-        setLegendPosition(moveY);          
+        moveY = overall_chart.current.getBBox().height;
+        setLegendPosition(moveY);
       }
     }
   }, [
@@ -436,7 +436,7 @@ console.log("domain",xScale.domain())
       } else {
         if (scrollbarAfter && scrollbarAfter < 0){
           setLegendsHeight(calculatedLegendHeight - DEFAULT_MARGIN.bottom);
-        }  
+        }
       }
     }
   }, [legendsProps, setLegendsHeight]);
@@ -449,7 +449,7 @@ console.log("domain",xScale.domain())
       let moveY = 0;
       if (axisBottom) {
         const axisBottomBBox = axisBottom.getBBox();
-        if (axisBottom && axisBottom.getAttribute("transform")){              
+        if (axisBottom && axisBottom.getAttribute("transform")){
           const transform = axisBottom.getAttribute("transform");
           if (transform) {
             const translateY = parseFloat(transform.split("translate(")[1].split(",")[1]);
@@ -457,36 +457,36 @@ console.log("domain",xScale.domain())
           }
         } else {
           moveY = +axisBottomBBox.y + axisBottomBBox.height;
-        }        
+        }
         setLegendPosition(moveY);
       }
       const axisLeft = chartSvgRef?.current?.querySelector(".visx-axis-left") as SVGGElement;
       if (axisLeft) {
         setLegendLeft(axisLeft.getBBox().x+10)
-      }  
+      }
     }
     if (legend_ref && legend_ref.current && legendsProps?.isVisible){
       let bottomaxisheight = 0;
       if (axis_bottom && axis_bottom.current){
          bottomaxisheight = axis_bottom.current.getBBox().height;
-      }   
+      }
       let legendHeight = 0;
       if (legend_ref && legend_ref.current){
          legendHeight = legend_ref?.current?.getBBox().height
-      }   
+      }
       console.log("legend",legendHeight)
       const hgt =
         height -
         DEFAULT_MARGIN.top -
-        DEFAULT_MARGIN.bottom 
+        DEFAULT_MARGIN.bottom
  //       bottomaxisheight
 //          -bottomHeight
         - legendHeight
       console.log("hgt1",hgt)
-      setdrawableChartHeight(hgt);      
+      setdrawableChartHeight(hgt);
     }
   }, [chartSvgRef, setLegendPosition,axis_bottom.current,XAxis]);
-  
+
   if (!isLoading && (!_data || _data.length === 0)) {
     return <div>No data to display.</div>;
   }
@@ -505,11 +505,11 @@ console.log("domain",xScale.domain())
     }
  } = legendsProps || {};
 
- const generateAxis = useCallback((selectedLegends: number[]) => { 
+ const generateAxis = useCallback((selectedLegends: number[]) => {
     if (selectedLegends && selectedLegends.length > 0){
       setrefreshAxis(selectedLegends.length)
     }else{
-      setrefreshAxis(selectedLegends.length)   
+      setrefreshAxis(selectedLegends.length)
     }
  }, [chartSvgRef, setLegendPosition,axis_bottom.current,XAxis]);
 
@@ -520,7 +520,7 @@ console.log("domain",xScale.domain())
        setLegendsHeight(legendsHeight * drawableChartHeight)
      }
    }
-  },[]);  
+  },[]);
 
 
   return (
@@ -545,7 +545,7 @@ console.log("domain",xScale.domain())
       >
         {isLoading && <SvgShimmer />}
         <Group top={DEFAULT_MARGIN.top} left={yAxisLabelWidth}>
-          <g ref={overall_chart}> 
+          <g ref={overall_chart}>
           <g ref={axis_left}>
             <YAxis scale={yScale} isLoading={isLoading} {...yAxisProps} />
           </g>
@@ -558,7 +558,7 @@ console.log("domain",xScale.domain())
           />
           <g ref={axis_bottom}>
             <XAxis
-              key={refreshAxis} 
+              key={refreshAxis}
               scale={xScale}
               top={drawableChartHeight}
               isLoading={isLoading}
@@ -592,7 +592,7 @@ console.log("domain",xScale.domain())
                 }
             } else {
                 barX = barX + BASE_ADJUST_WIDTH / 2;
-            }                        
+            }
             const barHeight = drawableChartHeight - yScale(value);
             const barY = yScale(value);
             const isHovered = hoveredBar === index;
@@ -600,7 +600,7 @@ console.log("domain",xScale.domain())
               hoveredBar !== null && hoveredBar !== -1  && !isHovered
                 ? REDUCED_OPACITY
                 : DEFAULT_OPACITY;
-             console.log("bopac",barOpacity)   
+             console.log("bopac",barOpacity)
             const radius = Math.min(
               DEFAULT_BAR_RADIUS,
               barwidth / 2,
@@ -638,13 +638,13 @@ console.log("domain",xScale.domain())
                   if (onClick) onClick(event, d, index);
                 }}
               />
-           
+
             );
           })}
           </g>
           </g>
           <g  ref={legend_ref}>
-             {legendsProps?.isVisible?            
+             {legendsProps?.isVisible?
              <foreignObject x={`${legendLeft}`} y={`${legendPosition + 20}`} width={`${innerWidth}`} height={legendsHeight}>
              {
               React.createElement('div', {
@@ -668,7 +668,7 @@ console.log("domain",xScale.domain())
                      generateAxis={generateAxis}
                    />
                  </svg>
-              )}   
+              )}
             </foreignObject>:''}
            </g>
         </Group>

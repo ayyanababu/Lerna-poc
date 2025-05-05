@@ -19,18 +19,14 @@ function LegendItem({
   onToggle,
   onMouseOver,
   onMouseLeave,
-  hideValues = false, 
+  hideValues = false,
   markerColor,
   onArrowClick,
   eachLegendGap,
   showIcon
 }: LegendItemProps) {
- // const markerColor =
- //   (data && index !== undefined && data[index]?.color) ||
- //   label?.value ||
- //   '#fff';
-  const [strikeLineX2,setStrikeLineX2] = useState(0);
-  const [strikeLineY2,setStrikeLineY2] = useState(0);  
+  const [,setStrikeLineX2] = useState(0);
+  const [,setStrikeLineY2] = useState(0);
   const [iconPositionX,setIconPositionX] = useState(0);
   console.log("show",showIcon)
 
@@ -68,12 +64,12 @@ function LegendItem({
 
   useEffect(()=>{
     if (text_ref.current){
-        let textheight = text_ref.current.getBBox().height;
-        let y = text_ref.current.getBBox().y + (textheight/2)
+        const textheight = text_ref.current.getBBox().height;
+        const y = text_ref.current.getBBox().y + (textheight/2)
         setStrikeLineY2(y);
-        let textwidth = text_ref.current.getBBox().width;
-        let x = text_ref.current.getBBox().x + (textwidth)
-        setStrikeLineX2(x); 
+        const textwidth = text_ref.current.getBBox().width;
+        const x = text_ref.current.getBBox().x + (textwidth)
+        setStrikeLineX2(x);
         setIconPositionX(x-5);
     }
   },[text_ref.current]);
@@ -112,8 +108,8 @@ function LegendItem({
              transition: "opacity 0.250s ease-in-out",
            }}
            className="arrow-icon"
-           onClick={() => onArrowClick?.()}/> 
-         )}        
+           onClick={() => onArrowClick?.()}/>
+         )}
        </foreignObject>:
        <foreignObject x = {iconPositionX} y = "-2" width="16" height="16">
            {React.createElement('div', {
@@ -128,9 +124,9 @@ function LegendItem({
              transition: "opacity 0.250s ease-in-out",
            }}
            className="arrow-icon"
-           onClick={() => onArrowClick?.()}/> 
-         )}        
-       </foreignObject> }  
+           onClick={() => onArrowClick?.()}/>
+         )}
+       </foreignObject> }
       </g>
     </>
   );
@@ -145,7 +141,7 @@ function LegendItem({
         filter: !doStrike && isHidden ? 'grayscale(100%) opacity(0.5)' : 'none',
       }}
     >
-      {renderMarker()}       
+      {renderMarker()}
       {renderText()}
     </g>
   );
