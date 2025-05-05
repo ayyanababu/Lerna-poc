@@ -995,14 +995,16 @@ const VerticalGroupedBarChart: React.FC<VerticalGroupedBarChartProps> = ({
 const VerticalGroupedBarChartComponent = ({
   isError,
   errorMessage,
+  errorDescription,
   ...props
 }: {
   isError: boolean;
   errorMessage: string;
+  errorDescription?: string;
 } & VerticalGroupedBarChartProps) => {
   if (isError) {
     return (
-      <ErrorFallback message={errorMessage} />
+      <ErrorFallback message={errorMessage} description={errorDescription} />
     );
   }
 

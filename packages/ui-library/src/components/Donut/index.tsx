@@ -216,14 +216,16 @@ function DonutChart({
 const DonutChartComponent = ({
   isError,
   errorMessage,
+  errorDescription,
   ...props
 }: {
   isError: boolean;
   errorMessage: string;
+  errorDescription?: string;
 } & DonutChartProps) => {
   if (isError) {
     return (
-      <ErrorFallback message={errorMessage} />
+      <ErrorFallback message={errorMessage} description={errorDescription} />
     );
   }
 

@@ -677,14 +677,16 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 const HorizontalBarChartComponent = ({
   isError,
   errorMessage,
+  errorDescription,
   ...props
 }: {
   isError: boolean;
   errorMessage: string;
+  errorDescription?: string;
 } & HorizontalBarChartProps) => {
   if (isError) {
     return (
-      <ErrorFallback message={errorMessage} />
+      <ErrorFallback message={errorMessage} description={errorDescription} />
     );
   }
 

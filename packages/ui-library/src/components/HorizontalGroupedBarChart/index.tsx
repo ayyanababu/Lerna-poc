@@ -980,14 +980,16 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
 const HorizontalGroupedBarChartComponent = ({
   isError,
   errorMessage,
+  errorDescription,
   ...props
 }: {
   isError: boolean;
   errorMessage: string;
+  errorDescription?: string;
 } & HorizontalGroupedBarChartProps) => {
   if (isError) {
     return (
-      <ErrorFallback message={errorMessage} />
+      <ErrorFallback message={errorMessage} description={errorDescription} />
     );
   }
 

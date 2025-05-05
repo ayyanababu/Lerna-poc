@@ -449,14 +449,16 @@ const TreeMapChart = ({
 const TreeMapChartComponent = ({
   isError,
   errorMessage,
+  errorDescription,
   ...props
 }: {
   isError: boolean;
   errorMessage: string;
+  errorDescription?: string;
 } & TreeMapChartProps) => {
   if (isError) {
     return (
-      <ErrorFallback message={errorMessage} />
+      <ErrorFallback message={errorMessage} description={errorDescription} />
     );
   }
 

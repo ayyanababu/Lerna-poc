@@ -770,6 +770,7 @@ body:not(.dark) {
 
                             <SortableCard height={200} width={'100%'}>
                                 <HorizontalStackedBarChart
+                                    isError
                                     data={horizontalStackedData}
                                     groupKeys={[
                                         'futures',
