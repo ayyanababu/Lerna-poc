@@ -91,7 +91,7 @@ function Legends({
   const wrapLegendsText = useCallback(() => {
     console.log("lref", legends_ref.current);
   
-    if (legends_ref.current && legendBoxWidth) {
+    if (legends_ref.current && legendBoxWidth && legendBoxWidth > 0) {
       let positions: { start: number; end: number; x1: number; y1: number; x2: number; y2: number; residue:number; status:string }[] = [];
       const gs = legends_ref.current.querySelectorAll("g");
   
@@ -109,6 +109,7 @@ function Legends({
         let next = 0
         for (next = start+1; next < gs.length; next++) {
           const g = gs[next];
+          console.log(gs)
           const bbox = g.getBBox();
           const transform = g.getAttribute("transform");
           console.log(transform);

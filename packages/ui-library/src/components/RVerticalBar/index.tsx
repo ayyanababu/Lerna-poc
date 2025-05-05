@@ -411,7 +411,7 @@ console.log("domain",xScale.domain())
       if (overall_chart && overall_chart.current) {
         console.log("bbox",overall_chart.current.getBBox())
         moveY = overall_chart.current.getBBox().height;
-        setLegendPosition(moveY);
+        setLegendPosition(moveY - DEFAULT_MARGIN.bottom);
       }
     }
   }, [
@@ -427,15 +427,16 @@ console.log("domain",xScale.domain())
   const generatedLegendHeight = useCallback((calculatedLegendHeight: number) => {
     if (legendsProps) {
       const { scrollbarAfter, eachLegendGap } = legendsProps;
+      console.log("each",scrollbarAfter)
       if (typeof scrollbarAfter === 'number' && typeof eachLegendGap === 'number') {
         if (scrollbarAfter < 0) {
-            setLegendsHeight(calculatedLegendHeight - DEFAULT_MARGIN.bottom);
+            setLegendsHeight(calculatedLegendHeight);
         } else {
-          setLegendsHeight(scrollbarAfter * eachLegendGap - DEFAULT_MARGIN.bottom);
+          setLegendsHeight(scrollbarAfter * eachLegendGap );
         }
       } else {
         if (scrollbarAfter && scrollbarAfter < 0){
-          setLegendsHeight(calculatedLegendHeight - DEFAULT_MARGIN.bottom);
+          setLegendsHeight(calculatedLegendHeight);
         }
       }
     }

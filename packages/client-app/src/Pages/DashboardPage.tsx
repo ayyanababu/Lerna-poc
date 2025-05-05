@@ -235,8 +235,8 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
     new Promise((resolve) => {
         setTimeout(() => {
             resolve([
-                { label: 'Priced Alpha', value: 123000000 },
-                { label: 'Priced Beta', value: 245000000 },
+                { label: 'Priced', value: 123 },
+                { label: 'Priced Beta', value: 2450 },
                 { label: 'Priced Gamma', value: 367000000 },
                 { label: 'Priced Delta', value: 489000000 },
                 { label: 'Priced Epsilon', value: 511000000 },
@@ -857,7 +857,7 @@ body:not(.dark) {
                                         isVisible: true,
                                         eachLegendGap: 23,
                                         scrollbarAfter: 3,
-                                        legendsHeight:.5, // 50% height incase of -1 and if left out 0 it will show all the legends without scrollbar
+                                        legendsHeight:0.5, // 50% height incase of -1 and if left out 0 it will show all the legends without scrollbar
                                         onClick: (data, legend, index) => {
                                             console.log(
                                                 `Clicked ${legend} at index ${index}`,
