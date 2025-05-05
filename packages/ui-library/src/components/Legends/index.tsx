@@ -21,6 +21,7 @@ function Legends({
   isVisible = true,
   variant = LegendVariant.COMPACT,
   hideValues = false,
+  hideLegendLableClick = true,
 }: LegendsProps) {
   const { theme } = useTheme();
 
@@ -93,6 +94,7 @@ function Legends({
         gap: variant === "compact" ? "8px" : "8px",
         backgroundColor: theme.colors.legend.background,
         borderRadius: "4px",
+        zIndex: 9999,
         ...positionStyles,
       }}
     >
@@ -131,6 +133,7 @@ function Legends({
                       onClick(data, label.text, index);
                     }
                   }}
+                  hideLegendLableClick={hideLegendLableClick}
                 />
               );
             })}

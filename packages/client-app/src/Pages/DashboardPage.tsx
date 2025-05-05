@@ -884,8 +884,9 @@ body:not(.dark) {
                                     title={'Trade Volume'}
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,
-                                        doStrike: true,
+                                        doStrike: false,
                                         isVisible: true,
+                                        hideLegendLableClick: false,
                                     }}
                                     tooltipProps={{}}
                                 />

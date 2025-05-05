@@ -22,7 +22,8 @@ function Legends({
   eachLegendGap,
   generatedLegendHeight,
   generateAxis,
-  legendBoxWidth
+  legendBoxWidth,
+  hideLegendLableClick = true,
 }: LegendsProps) {
   const [showicon,setShowIcon] = useState(false);
   const legends_ref = useRef<SVGGElement | null>(null);
@@ -47,13 +48,13 @@ function Legends({
     console.log("hide index",hideIndex)
     if (generateAxis && hideIndex){
       generateAxis(hideIndex);
-    }  
+    }
   },[hideIndex])
 
-  
+
   const handleToggleItem = useCallback(
     (index: number) => {
-      console.log("indexa",index)      
+      console.log("indexa",index)
       if (setHideIndex && hideIndex) {
         console.log("hit index");
         setHideIndex((prev) =>
@@ -90,13 +91,13 @@ function Legends({
 
   const wrapLegendsText = useCallback(() => {
     console.log("lref", legends_ref.current);
-  
+
     if (legends_ref.current && legendBoxWidth) {
-      let positions: { start: number; end: number; x1: number; y1: number; x2: number; y2: number; residue:number; status:string }[] = [];
+      const positions: { start: number; end: number; x1: number; y1: number; x2: number; y2: number; residue:number; status:string }[] = [];
       const gs = legends_ref.current.querySelectorAll("g");
-  
+
       let start = 0;
-      let nexted = 0;
+      const nexted = 0;
       while (start < gs.length) {
         let reswidth: number = legendBoxWidth as number;
         console.log("leg",legendBoxWidth )
@@ -129,23 +130,23 @@ function Legends({
         //    end = next;
           } else {
             x2 = tx + bbox.width;
-            y2 = ty;            
-            positions.push({ start:next-1, end:next-1, x1, y1, x2, y2, residue: reswidth - (gmain.width + tx + 20 + bbox.width), status:"nill" });            
+            y2 = ty;
+            positions.push({ start:next-1, end:next-1, x1, y1, x2, y2, residue: reswidth - (gmain.width + tx + 20 + bbox.width), status:"nill" });
             break;
           }
         }
         start = next;
       }
-  
+
       console.log("positions", positions);
     }
   }, [legends_ref.current, legendBoxWidth, eachLegendGap]);
-  
+
 
   useEffect(()=>{
     if (eachLegendGap && data && generatedLegendHeight){
       generatedLegendHeight(data.length * eachLegendGap)
-    }  
+    }
   },[data,generatedLegendHeight])
 
   return (
@@ -158,15 +159,15 @@ function Legends({
               if (index === data.length - 1 && isLegendRendered) {
                 wrapLegendsText();
                 isLegendRendered(true);
-              }           
+              }
               const isHidden = hideIndex?.includes(index);
-              let lb = {index:index,label:label.label,value:String(label.value),datum:label.label,text:label.label}
+              const lb = {index:index,label:label.label,value:String(label.value),datum:label.label,text:label.label}
               const isHoveredOther = hovered && !(hovered === lb.label);
               return (
-                <LegendItem 
+                <LegendItem
                   key={`legend-${label.label}-${label.value}`}
                   label={lb}
-                  index={index} 
+                  index={index}
                   data={data}
                   isHidden={isHidden}
                   isHoveredOther={!!isHoveredOther}
@@ -186,6 +187,7 @@ function Legends({
                   eachLegendGap={eachLegendGap}
                   generateAxis={generateAxis}
                   showIcon={showicon}
+                  hideLegendLableClick={hideLegendLableClick}
                 />
               );
             })}

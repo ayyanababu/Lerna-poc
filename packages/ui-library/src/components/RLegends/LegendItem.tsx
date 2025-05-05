@@ -22,7 +22,8 @@ function LegendItem({
   markerColor,
   onArrowClick,
   eachLegendGap,
-  showIcon
+  showIcon,
+  hideLegendLableClick = true,
 }: LegendItemProps) {
   const [,setStrikeLineX2] = useState(0);
   const [,setStrikeLineY2] = useState(0);
@@ -49,7 +50,7 @@ function LegendItem({
       cy={6}
       r={6}
       fill={markerColor}
-      onClick={onToggle}
+      onClick={!hideLegendLableClick ? onToggle : undefined}
       onMouseOver={onMouseOver}
       onMouseLeave={onMouseLeave}
       style={{
@@ -84,9 +85,8 @@ function LegendItem({
           dy=".35em"
           fill={theme.theme.colors.legend.text}
           className='MuiTypography-root MuiTypography-caption css-19buuys-MuiTypography-root'
-
-          onClick={onToggle}
-        >
+          onClick={!hideLegendLableClick ? onToggle : undefined}
+          >
           {displayText}
           {!hideValues &&
           (isLoading

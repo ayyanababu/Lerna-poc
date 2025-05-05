@@ -22,8 +22,10 @@ function LegendItem({
   onMouseLeave,
   hideValues = false,
   onArrowClick,
+  hideLegendLableClick = true,
 }: LegendItemProps) {
   const { theme } = useTheme();
+
   const itemStyles = {
     display: "flex",
     flexDirection: "column",
@@ -57,7 +59,7 @@ function LegendItem({
         width: "12px",
         height: "12px",
       }}
-      onClick={() => onToggle?.()}
+      onClick={!hideLegendLableClick ? () => onToggle?.() : undefined}
       className={isLoading ? shimmerClassName : ""}
     />
   );
@@ -94,7 +96,7 @@ function LegendItem({
           letterSpacing: "0.4px",
           paddingTop: "1px",
         }}
-        onClick={() => onToggle?.()}
+        onClick={!hideLegendLableClick ? () => onToggle?.() : undefined}
         className={isLoading ? shimmerClassName : ""}
       >
         {displayText}
@@ -139,8 +141,8 @@ function LegendItem({
             paddingTop: "1px",
           }}
           className={isLoading ? shimmerClassName : ""}
-          onClick={() => onToggle?.()}
-        >
+          onClick={!hideLegendLableClick ? () => onToggle?.() : undefined}
+          >
           {displayText}
         </Typography>
       </Box>
@@ -161,7 +163,7 @@ function LegendItem({
               fontWeight: 700,
               color: theme.colors.legend.text,
             }}
-            onClick={() => onToggle?.()}
+            onClick={!hideLegendLableClick ? () => onToggle?.() : undefined}
             className={isLoading ? shimmerClassName : ""}
           >
             {isLoading ? "loadingloading" : formatNumberWithCommas(valueText)}
