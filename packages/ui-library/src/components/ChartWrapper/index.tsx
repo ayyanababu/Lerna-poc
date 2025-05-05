@@ -36,7 +36,9 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const [canRender, setCanRender] = React.useState(true);
 
-    const isHorizontal = legendsProps?.position === LegendPosition.LEFT || legendsProps?.position === LegendPosition.RIGHT;
+    const isHorizontal =
+      legendsProps?.position === LegendPosition.LEFT ||
+      legendsProps?.position === LegendPosition.RIGHT;
 
     const {
       colorScale = defaultColorScale,
@@ -121,10 +123,10 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                 ref={ref}
                 sx={{
                   position: "relative",
-                  height:  "100%",
-                  width: isHorizontal ?  "50%" : "100%",
+                  height: "100%",
+                  width: isHorizontal ? "50%" : "100%",
                   display: "flex",
-                  flex: isHorizontal ?  "1 1 50%": "1 1 100%",
+                  flex: isHorizontal ? "1 1 50%" : "1 1 100%",
                   minHeight: 0,
                 }}
               >
@@ -142,7 +144,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                   >
                     <DotLoader />
                   </Box>
-                ) : (!isDataEmpty) ? (
+                ) : !isDataEmpty ? (
                   children
                 ) : (
                   <Box
@@ -163,32 +165,28 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                     }}
                   >
                     <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
                       xmlns="http://www.w3.org/2000/svg"
+                      width="32"
+                      height="32"
+                      fill={theme.colors.common.text}
+                      viewBox="0 0 256 256"
                     >
                       <path
+                        d="M216,80c0,26.51-39.4,48-88,48S40,106.51,40,80s39.4-48,88-48S216,53.49,216,80Z"
                         opacity="0.2"
-                        d="M20.25 7.5C20.25 9.98531 16.5562 12 12 12C7.44375 12 3.75 9.98531 3.75 7.5C3.75 5.01469 7.44375 3 12 3C16.5562 3 20.25 5.01469 20.25 7.5Z"
-                        fill={theme.colors.common.text}
-                      />
-                      <path
-                        d="M12 2.25C6.95344 2.25 3 4.55625 3 7.5V16.5C3 19.4438 6.95344 21.75 12 21.75C17.0466 21.75 21 19.4438 21 16.5V7.5C21 4.55625 17.0466 2.25 12 2.25ZM19.5 12C19.5 12.9019 18.7612 13.8216 17.4741 14.5238C16.0247 15.3141 14.0803 15.75 12 15.75C9.91969 15.75 7.97531 15.3141 6.52594 14.5238C5.23875 13.8216 4.5 12.9019 4.5 12V10.44C6.09938 11.8463 8.83406 12.75 12 12.75C15.1659 12.75 17.9006 11.8425 19.5 10.44V12ZM6.52594 4.97625C7.97531 4.18594 9.91969 3.75 12 3.75C14.0803 3.75 16.0247 4.18594 17.4741 4.97625C18.7612 5.67844 19.5 6.59812 19.5 7.5C19.5 8.40188 18.7612 9.32156 17.4741 10.0237C16.0247 10.8141 14.0803 11.25 12 11.25C9.91969 11.25 7.97531 10.8141 6.52594 10.0237C5.23875 9.32156 4.5 8.40188 4.5 7.5C4.5 6.59812 5.23875 5.67844 6.52594 4.97625ZM17.4741 19.0238C16.0247 19.8141 14.0803 20.25 12 20.25C9.91969 20.25 7.97531 19.8141 6.52594 19.0238C5.23875 18.3216 4.5 17.4019 4.5 16.5V14.94C6.09938 16.3463 8.83406 17.25 12 17.25C15.1659 17.25 17.9006 16.3425 19.5 14.94V16.5C19.5 17.4019 18.7612 18.3216 17.4741 19.0238Z"
-                        fill={theme.colors.common.text}
-                      />
+                      ></path>
+                      <path d="M128,24C74.17,24,32,48.6,32,80v96c0,31.4,42.17,56,96,56s96-24.6,96-56V80C224,48.6,181.83,24,128,24Zm80,104c0,9.62-7.88,19.43-21.61,26.92C170.93,163.35,150.19,168,128,168s-42.93-4.65-58.39-13.08C55.88,147.43,48,137.62,48,128V111.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64ZM69.61,53.08C85.07,44.65,105.81,40,128,40s42.93,4.65,58.39,13.08C200.12,60.57,208,70.38,208,80s-7.88,19.43-21.61,26.92C170.93,115.35,150.19,120,128,120s-42.93-4.65-58.39-13.08C55.88,99.43,48,89.62,48,80S55.88,60.57,69.61,53.08ZM186.39,202.92C170.93,211.35,150.19,216,128,216s-42.93-4.65-58.39-13.08C55.88,195.43,48,185.62,48,176V159.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64V176C208,185.62,200.12,195.43,186.39,202.92Z"></path>
                     </svg>
 
                     <span
                       style={{
                         color: theme.colors.common.text,
-                        fontFamily: 'Roboto',
-                        fontStyle: 'normal', 
+                        fontFamily: "Roboto",
+                        fontStyle: "normal",
                         fontWeight: 400,
-                        fontSize: '12px',
-                        lineHeight: '143%',
-                        letterSpacing: '0.4px',
+                        fontSize: "12px",
+                        lineHeight: "143%",
+                        letterSpacing: "0.4px",
                       }}
                     >
                       There are no {title} data available

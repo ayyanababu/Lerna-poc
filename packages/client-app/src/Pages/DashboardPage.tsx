@@ -747,7 +747,7 @@ body:not(.dark) {
 
                             <SortableCard height={400} width={'100%'}>
                                 <VerticalStackedBarChart
-                                    data={stackedBarData}
+                                    data={[]}
                                     groupKeys={[
                                         'notPriced',
                                         'stalePriced',
