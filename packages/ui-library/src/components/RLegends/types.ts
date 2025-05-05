@@ -51,6 +51,11 @@ export interface LegendsProps {
   variant?: LegendVariantType;
   hideValues?: boolean;
   isLegendRendered?: (renderedStautus:boolean) => void;
+  eachLegendGap?: number;
+  scrollbarAfter?: number;
+  legendsHeight?: number;
+  generatedLegendHeight?: (height: number) => void;
+  generateAxis?: (selectedLegends:number[]) => void;
 }
 
 export interface LegendItemProps {
@@ -68,4 +73,7 @@ export interface LegendItemProps {
   hideValues?: boolean;
   onArrowClick?: () => void;
   markerColor:string;
+  eachLegendGap?: number;
+  generateAxis?: (selectedLegends:number[]) => void;
+  showIcon:boolean;
 }

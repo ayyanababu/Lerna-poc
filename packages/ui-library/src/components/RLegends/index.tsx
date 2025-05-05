@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { SxProps, Theme } from '@mui/material';
 import { LegendOrdinal } from '@visx/legend';
 import { LegendPosition, LegendsProps, LegendVariant } from './types';
@@ -19,7 +19,12 @@ function Legends({
   variant = LegendVariant.COMPACT,
   hideValues = false,
   isLegendRendered,
+  eachLegendGap,
+  generatedLegendHeight,
+  generateAxis
 }: LegendsProps) {
+  const [showicon,setShowIcon] = useState(false);
+
   const positionStyles = useMemo(() => {
     switch (position) {
       case 'left':
@@ -38,7 +43,9 @@ function Legends({
 
   useEffect(()=>{
     console.log("hide index",hideIndex)
-
+    if (generateAxis && hideIndex){
+      generateAxis(hideIndex);
+    }  
   },[hideIndex])
 
   
@@ -59,7 +66,7 @@ function Legends({
 
   const handleMouseOver = useCallback(
     (labelText: string) => {
-      console.log("labeltext",labelText)
+      setShowIcon(true)
       if (setHovered) {
         setHovered(labelText);
       }
@@ -68,15 +75,23 @@ function Legends({
   );
 
   const handleMouseLeave = useCallback(() => {
+    setShowIcon(false)
     if (setHovered) {
       setHovered(null);
     }
   }, [setHovered]);
 
+
   if (!data || !colorScale || !setHideIndex || !setHovered || !isVisible) {
     return null;
   }
-  console.log("labele",data);
+
+  useEffect(()=>{
+    if (eachLegendGap && data && generatedLegendHeight){
+      generatedLegendHeight(data.length * eachLegendGap)
+    }  
+  },[data,generatedLegendHeight])
+
   return (
     <g transform={positionStyles}>
       <>
@@ -111,6 +126,9 @@ function Legends({
                       onClick(data, lb.text, index);
                     }
                   }}
+                  eachLegendGap={eachLegendGap}
+                  generateAxis={generateAxis}
+                  showIcon={showicon}
                 />
               );
             })}

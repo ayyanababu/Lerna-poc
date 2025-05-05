@@ -38,6 +38,7 @@ function XAxis({
   tickLabelProps: externalTickLabelProps,
   tickLength = 5,
   labelOffset = 8,
+  refreshAxis,
   ...props
 }: XAxisProps): JSX.Element | null {
   const { theme } = useTheme();

@@ -6,7 +6,7 @@ import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
 import { useTooltip } from "@visx/tooltip";
 
 import useTheme from "../../hooks/useTheme";
-import { ChartWrapper } from "../ChartWrapper";
+import ChartWrapper from "../ChartWrapper";
 import CustomBar from "../CustomBar";
 import Grid from "../Grid";
 import SvgShimmer from "../Shimmer/SvgShimmer";
@@ -120,6 +120,9 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const bar_ref = useRef<SVGGElement | null>(null)
   const overall_chart = useRef<SVGGElement | null>(null)
   const [legendLeft,setLegendLeft] = useState(0)
+  const [legendsHeight,setLegendsHeight] = useState(0)
+  const [refreshAxis,setrefreshAxis] = useState(0);
+
   let rotateincrease = 0;
   let barwidth = 0;
 
@@ -214,7 +217,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         range: [drawableChartHeight, 0],
         nice: true,
       }),
-    [innerHeight, maxValue],
+    [drawableChartHeight, maxValue],
   );
 console.log("domain",xScale.domain())
   const legendData = useMemo(
@@ -399,6 +402,7 @@ console.log("domain",xScale.domain())
         height -
         DEFAULT_MARGIN.top -
         DEFAULT_MARGIN.bottom
+        - legendHeight
         console.log("hgt2",hgt)
       setdrawableChartHeight(hgt); // Uncomment if needed
   
@@ -419,6 +423,23 @@ console.log("domain",xScale.domain())
     setRecalculate,
     setLegendPosition,
   ]);
+
+  const generatedLegendHeight = useCallback((calculatedLegendHeight: number) => {
+    if (legendsProps) {
+      const { scrollbarAfter, eachLegendGap } = legendsProps;
+      if (typeof scrollbarAfter === 'number' && typeof eachLegendGap === 'number') {
+        if (scrollbarAfter < 0) {
+            setLegendsHeight(calculatedLegendHeight - DEFAULT_MARGIN.bottom);
+        } else {
+          setLegendsHeight(scrollbarAfter * eachLegendGap - DEFAULT_MARGIN.bottom);
+        }
+      } else {
+        if (scrollbarAfter && scrollbarAfter < 0){
+          setLegendsHeight(calculatedLegendHeight - DEFAULT_MARGIN.bottom);
+        }  
+      }
+    }
+  }, [legendsProps, setLegendsHeight]);
 
   const isLegendRendered = useCallback((renderedStatus: boolean) => {
     if (renderedStatus) {
@@ -484,6 +505,23 @@ console.log("domain",xScale.domain())
     }
  } = legendsProps || {};
 
+ const generateAxis = useCallback((selectedLegends: number[]) => { 
+    if (selectedLegends && selectedLegends.length > 0){
+      setrefreshAxis(selectedLegends.length)
+    }else{
+      setrefreshAxis(selectedLegends.length)   
+    }
+ }, [chartSvgRef, setLegendPosition,axis_bottom.current,XAxis]);
+
+ useEffect(()=>{
+   if (legendsProps){
+     const { legendsHeight, scrollbarAfter } = legendsProps;
+     if (legendsHeight && legendsHeight !== 0 && scrollbarAfter && scrollbarAfter < 0 ){
+       setLegendsHeight(legendsHeight * drawableChartHeight)
+     }
+   }
+  },[]);  
+
 
   return (
     <ChartWrapper
@@ -520,6 +558,7 @@ console.log("domain",xScale.domain())
           />
           <g ref={axis_bottom}>
             <XAxis
+              key={refreshAxis} 
               scale={xScale}
               top={drawableChartHeight}
               isLoading={isLoading}
@@ -530,6 +569,7 @@ console.log("domain",xScale.domain())
               rotated={rotated}
               wrapped={wrapped}
               barWidth={barwidth}
+              refreshAxis={refreshAxis}
             />
           </g>
           <g ref = {bar_ref}>
@@ -552,8 +592,7 @@ console.log("domain",xScale.domain())
                 }
             } else {
                 barX = barX + BASE_ADJUST_WIDTH / 2;
-            }                      
-            console.log("barx",barX);       
+            }                        
             const barHeight = drawableChartHeight - yScale(value);
             const barY = yScale(value);
             const isHovered = hoveredBar === index;
@@ -606,12 +645,12 @@ console.log("domain",xScale.domain())
           </g>
           <g  ref={legend_ref}>
              {legendsProps?.isVisible?            
-             <foreignObject x={`${legendLeft}`} y={`${legendPosition + 20}`} width={`${innerWidth}`} height={(eachLegendGap * legendScrollingAfer)+20}>
+             <foreignObject x={`${legendLeft}`} y={`${legendPosition + 20}`} width={`${innerWidth}`} height={legendsHeight}>
              {
               React.createElement('div', {
                 xmlns: 'http://www.w3.org/1999/xhtml',
-                style: { width: '100%', height: '65%' , overflowY:"auto", overflowX:"hidden" }
-              }, <svg>
+                style: { width: '100%', height: '100%' , overflowY:"auto", overflowX:"hidden" }
+              }, <svg style = {{width:"100%",height:`${Number(legendsHeight) * 1.3}px`}}>
                    <Legends
                      {...legendsProps}
                      position={position}
@@ -623,8 +662,10 @@ console.log("domain",xScale.domain())
                      isLoading={isLoading}
                      setHovered={setHovered}
                      isLegendRendered={isLegendRendered}
-                     eachLegendGap={eachLegendGap}
-                     scrollbarAfter={legendScrollingAfer}
+                     eachLegendGap={legendsProps?.eachLegendGap}
+                     scrollbarAfter={legendsProps?.scrollbarAfter}
+                     generatedLegendHeight={generatedLegendHeight}
+                     generateAxis={generateAxis}
                    />
                  </svg>
               )}   

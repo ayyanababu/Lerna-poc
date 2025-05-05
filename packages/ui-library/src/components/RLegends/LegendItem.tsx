@@ -21,7 +21,9 @@ function LegendItem({
   onMouseLeave,
   hideValues = false, 
   markerColor,
-  onArrowClick
+  onArrowClick,
+  eachLegendGap,
+  showIcon
 }: LegendItemProps) {
  // const markerColor =
  //   (data && index !== undefined && data[index]?.color) ||
@@ -30,9 +32,12 @@ function LegendItem({
   const [strikeLineX2,setStrikeLineX2] = useState(0);
   const [strikeLineY2,setStrikeLineY2] = useState(0);  
   const [iconPositionX,setIconPositionX] = useState(0);
+  console.log("show",showIcon)
 
   const text_ref = useRef<SVGGElement>(null);
   const theme = useTheme();
+
+
   let displayText = '';
   if (isLoading) {
     displayText = 'loading';
@@ -69,7 +74,7 @@ function LegendItem({
         let textwidth = text_ref.current.getBBox().width;
         let x = text_ref.current.getBBox().x + (textwidth)
         setStrikeLineX2(x); 
-        setIconPositionX(x+10);
+        setIconPositionX(x+5);
     }
   },[text_ref.current]);
 
@@ -98,7 +103,7 @@ function LegendItem({
 
   return (
     <g
-      transform={`translate(0, ${index * 23})`}
+      transform={`translate(0, ${eachLegendGap?index * eachLegendGap:0})`}
       onMouseOver={onMouseOver}
       onMouseLeave={onMouseLeave}
       style={{
@@ -109,7 +114,8 @@ function LegendItem({
       }}
     >
       {renderMarker()}
-      <foreignObject x = {iconPositionX} width="16" height="16">
+      {showIcon ?
+      <foreignObject x = {iconPositionX} y = "-2" width="16" height="16">
          {
           React.createElement('div', {
             xmlns: 'http://www.w3.org/1999/xhtml',
@@ -119,13 +125,13 @@ function LegendItem({
              height: "16px",
              width: "16px",
              color: theme.theme.colors.legend.text,
-             opacity: 0,
+             opacity: `${!isHoveredOther?1:0}`,
              transition: "opacity 0.250s ease-in-out",
            }}
            className="arrow-icon"
            onClick={() => onArrowClick?.()}/> 
         )}        
-      </foreignObject>          
+      </foreignObject> :''}         
       {renderText()}
     </g>
   );

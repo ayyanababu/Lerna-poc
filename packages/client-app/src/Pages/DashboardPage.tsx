@@ -884,6 +884,9 @@ body:not(.dark) {
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,
                                         isVisible: true,
+                                        eachLegendGap: 23,
+                                        scrollbarAfter: -1,
+                                        legendsHeight:.5  // 50% height incase of -1 and if left out 0 it will show all the legends without scrollbar
                                     }}
                                     tooltipProps={{}}
                                 />
