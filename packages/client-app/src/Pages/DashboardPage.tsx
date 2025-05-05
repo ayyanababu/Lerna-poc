@@ -886,7 +886,13 @@ body:not(.dark) {
                                         isVisible: true,
                                         eachLegendGap: 23,
                                         scrollbarAfter: -1,
-                                        legendsHeight:.5  // 50% height incase of -1 and if left out 0 it will show all the legends without scrollbar
+                                        legendsHeight:.5, // 50% height incase of -1 and if left out 0 it will show all the legends without scrollbar
+                                        onClick: (data, legend, index) => {
+                                            console.log(
+                                                `Clicked ${legend} at index ${index}`,
+                                                data,
+                                            );
+                                        },                                        
                                     }}
                                     tooltipProps={{}}
                                 />

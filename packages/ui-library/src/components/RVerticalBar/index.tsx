@@ -17,7 +17,7 @@ import mockVerticalBarChartData from "./mockdata";
 import { DataPoint, VerticalBarChartProps } from "./types";
 import Legends from '../RLegends'
 import { LegendPosition } from "../Legends/types";
-import { common } from "../../theme/theme";
+
 
 const DEFAULT_MARGIN = {
   top: 5,
@@ -650,7 +650,7 @@ console.log("domain",xScale.domain())
               React.createElement('div', {
                 xmlns: 'http://www.w3.org/1999/xhtml',
                 style: { width: '100%', height: '100%' , overflowY:"auto", overflowX:"hidden" }
-              }, <svg style = {{width:"100%",height:`${Number(legendsHeight) * 1.3}px`}}>
+              }, <svg style = {{width:"100%",height:`${Number(legendsHeight) * 1.1 + DEFAULT_MARGIN.bottom}px`}}>
                    <Legends
                      {...legendsProps}
                      position={position}
