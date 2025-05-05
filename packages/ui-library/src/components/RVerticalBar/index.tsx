@@ -1,4 +1,4 @@
- 
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -122,8 +122,8 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const [legendLeft,setLegendLeft] = useState(0)
   const [legendsHeight,setLegendsHeight] = useState(0)
   const [refreshAxis,setrefreshAxis] = useState(0);
-
   const rotateincrease = 0;
+  const [legendBoxWidth,setlegendBoxWidth] = useState(0);
   let barwidth = 0;
 
 
@@ -443,8 +443,7 @@ console.log("domain",xScale.domain())
 
   const isLegendRendered = useCallback((renderedStatus: boolean) => {
     if (renderedStatus) {
-      console.log("hit render")
-      console.log(hoveredBar)
+      setlegendBoxWidth(innerWidth-20);
       const axisBottom = chartSvgRef?.current?.querySelector(".visx-axis-bottom") as SVGGElement;
       let moveY = 0;
       if (axisBottom) {
@@ -666,6 +665,7 @@ console.log("domain",xScale.domain())
                      scrollbarAfter={legendsProps?.scrollbarAfter}
                      generatedLegendHeight={generatedLegendHeight}
                      generateAxis={generateAxis}
+                     legendBoxWidth={legendBoxWidth}
                    />
                  </svg>
               )}

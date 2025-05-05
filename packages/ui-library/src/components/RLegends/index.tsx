@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { SxProps, Theme } from '@mui/material';
 import { LegendOrdinal } from '@visx/legend';
 import { LegendPosition, LegendsProps, LegendVariant } from './types';
@@ -21,9 +21,11 @@ function Legends({
   isLegendRendered,
   eachLegendGap,
   generatedLegendHeight,
-  generateAxis
+  generateAxis,
+  legendBoxWidth
 }: LegendsProps) {
   const [showicon,setShowIcon] = useState(false);
+  const legends_ref = useRef<SVGGElement | null>(null);
 
   const positionStyles = useMemo(() => {
     switch (position) {
@@ -86,6 +88,60 @@ function Legends({
     return null;
   }
 
+  const wrapLegendsText = useCallback(() => {
+    console.log("lref", legends_ref.current);
+  
+    if (legends_ref.current && legendBoxWidth) {
+      let positions: { start: number; end: number; x1: number; y1: number; x2: number; y2: number; residue:number; status:string }[] = [];
+      const gs = legends_ref.current.querySelectorAll("g");
+  
+      let start = 0;
+      let nexted = 0;
+      while (start < gs.length) {
+        let reswidth: number = legendBoxWidth as number;
+        console.log("leg",legendBoxWidth )
+        let x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+       // let end = start;
+        if (start >= gs.length){
+          break;
+        }
+        const gmain = gs[start].getBBox();
+        let next = 0
+        for (next = start+1; next < gs.length; next++) {
+          const g = gs[next];
+          const bbox = g.getBBox();
+          const transform = g.getAttribute("transform");
+          console.log(transform);
+          const [tx, ty] = transform?.match(/translate\(([^,]+),\s*([^)]+)\)/)?.slice(1).map(Number) || [0, 0];
+          x1 = tx;
+          y1 = ty;
+          console.log(start);
+          console.log(next)
+          console.log(y1);
+          console.log(gmain.width)
+          console.log(bbox.width)
+          if (reswidth - (gmain.width + tx + 20 + bbox.width) >= 0) {
+            console.log("gm",gmain.width)
+            reswidth -= gmain.width + tx + 20 + bbox.width;
+            x2 = tx + bbox.width;
+            y2 = ty;
+            positions.push({ start:start, end:next, x1, y1, x2, y2, residue : reswidth, status:"done" });
+        //    end = next;
+          } else {
+            x2 = tx + bbox.width;
+            y2 = ty;            
+            positions.push({ start:next-1, end:next-1, x1, y1, x2, y2, residue: reswidth - (gmain.width + tx + 20 + bbox.width), status:"nill" });            
+            break;
+          }
+        }
+        start = next;
+      }
+  
+      console.log("positions", positions);
+    }
+  }, [legends_ref.current, legendBoxWidth, eachLegendGap]);
+  
+
   useEffect(()=>{
     if (eachLegendGap && data && generatedLegendHeight){
       generatedLegendHeight(data.length * eachLegendGap)
@@ -93,13 +149,14 @@ function Legends({
   },[data,generatedLegendHeight])
 
   return (
-    <g transform={positionStyles}>
+    <g ref={legends_ref} transform={positionStyles}>
       <>
             {data.map((label, index) => {
               if (index > data.length - 1) {
                 return null;
               }
               if (index === data.length - 1 && isLegendRendered) {
+                wrapLegendsText();
                 isLegendRendered(true);
               }           
               const isHidden = hideIndex?.includes(index);

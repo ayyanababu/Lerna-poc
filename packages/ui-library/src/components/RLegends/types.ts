@@ -56,6 +56,7 @@ export interface LegendsProps {
   legendsHeight?: number;
   generatedLegendHeight?: (height: number) => void;
   generateAxis?: (selectedLegends:number[]) => void;
+  legendBoxWidth?:number;
 }
 
 export interface LegendItemProps {

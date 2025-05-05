@@ -1,5 +1,4 @@
 import React,{useEffect, useRef, useState} from 'react';
-import { Box, Typography } from '@mui/material';
 import { capitalize, lowerCase } from 'lodash-es';
 import { formatNumberWithCommas } from '../../utils/number';
 import { LegendItemProps, LegendVariant } from './types';
@@ -70,7 +69,7 @@ function LegendItem({
         const textwidth = text_ref.current.getBBox().width;
         const x = text_ref.current.getBBox().x + (textwidth)
         setStrikeLineX2(x);
-        setIconPositionX(x-5);
+        setIconPositionX(x-7);
     }
   },[text_ref.current]);
 
