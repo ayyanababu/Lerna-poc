@@ -444,7 +444,7 @@ console.log("domain",xScale.domain())
 
   const isLegendRendered = useCallback((renderedStatus: boolean) => {
     if (renderedStatus) {
-      setlegendBoxWidth(innerWidth - 20);
+      setlegendBoxWidth(innerWidth + DEFAULT_MARGIN.right);
       const axisBottom = chartSvgRef?.current?.querySelector(".visx-axis-bottom") as SVGGElement;
       let moveY = 0;
       if (axisBottom) {
@@ -494,14 +494,14 @@ console.log("domain",xScale.domain())
   const {
     position = LegendPosition.BOTTOM,
     hovered = hoveredBar !== null && hoveredBar !== -1 ? legendData?.[hoveredBar]?.label : null,
-    setHovered = (label) => {
+    setHovered = (label:string) => {
       console.log("hovered");
       console.log(label);
       const hoveredIndex = legendData?.findIndex(
         (item) => item.label === label,
       );
-      hoveredIndex !== null ? hoveredIndex : null
-      setHoveredBar(hoveredIndex !== null && hoveredIndex !== -1 ? hoveredIndex : null);
+    //  hoveredIndex !== null ? hoveredIndex : null
+      setHoveredBar(hoveredIndex !== undefined && hoveredIndex !== -1 ? hoveredIndex : null);
     }
  } = legendsProps || {};
 

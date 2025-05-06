@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { SxProps, Theme } from '@mui/material';
-import { LegendOrdinal } from '@visx/legend';
+//import { SxProps, Theme } from '@mui/material';
+//import { LegendOrdinal } from '@visx/legend';
 import { LegendPosition, LegendsProps, LegendVariant } from './types';
 import LegendItem from './LegendItem';
 
@@ -94,7 +94,7 @@ function Legends({
     console.log("lref", legends_ref.current);
   
     if (legends_ref.current && legendBoxWidth && legendBoxWidth > 0) {
-      let positions: {
+      const positions: {
         start: number;
         end: number;
         x1: number;
@@ -109,7 +109,6 @@ function Legends({
       const gs = legends_ref.current.querySelectorAll(".legendItems");
 
       let start = 0;
-      const nexted = 0;
       while (start < gs.length) {
         let reswidth: number = legendBoxWidth as number;
         console.log("leg",legendBoxWidth )
@@ -128,12 +127,18 @@ function Legends({
           const [tx, ty] = transform?.match(/translate\(([^,]+),\s*([^)]+)\)/)?.slice(1).map(Number) || [0, 0];
           x1 = tx;
           y1 = ty;
-          if (reswidth - (gmain.width + tx + 10 + bbox.width) >= 0) {
+          if (reswidth - (gmain.width + 10 + bbox.width) >= 0) {
             console.log("gm",gmain.width)
-            reswidth -= gmain.width + tx + 10 + bbox.width;
-            x2 = tx + bbox.width - 10;
+            reswidth -= gmain.width  + 10 + bbox.width;
+            x2 = gmain.width  + 10;
             y2 = ty;
-            positions.push({ start:start, end:next, x1, y1, x2, y2, residue : reswidth, status:"done", source1:gs[start] as SVGGElement, source2:gs[next] as SVGGElement });
+            y1 = 0;
+            y2 = 0;
+            if (eachLegendGap){            
+              y1 = start * eachLegendGap;
+              y2 = start * eachLegendGap;
+            }  
+            positions.push({ start:start, end:next, x1 : 0, y1, x2, y2, residue : reswidth, status:"done", source1:gs[start] as SVGGElement, source2:gs[next] as SVGGElement });
         //    end = next;
           } else {
             x2 = tx + bbox.width;
@@ -219,7 +224,7 @@ function Legends({
                   generateAxis={generateAxis}
                   showIcon={showIcon}
                   hideLegendLableClick={hideLegendLableClick}
-                  showArrow={showIcon}
+                  showArrow={showArrow}
                 />
               );
             })}
