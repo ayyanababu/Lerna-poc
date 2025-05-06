@@ -150,7 +150,7 @@ function Legends({
                }
             });
             if (!foundkey){
-              positions.push({ start:next-1, end:next-1, x1, y1, x2, y2, residue: reswidth - (gmain.width + tx + 20 + bbox.width), status:"nill", source1:gs[start] as SVGGElement, source2:gs[start] as SVGGElement });
+              positions.push({ start:next-1, end:next-1, x1:0, y1, x2:0, y2, residue: reswidth - (gmain.width + tx + 20 + bbox.width), status:"nill", source1:gs[start] as SVGGElement, source2:gs[start] as SVGGElement });
             }  
             break;
           }
@@ -167,7 +167,7 @@ function Legends({
         }else{
           console.log('ypos',ypos)
           console.log(position.source1.getAttribute("transform"))
-          position.source1.setAttribute("transform",`translate(${position.source1.getAttribute("transform")?.split('translate(')[1].split(",")[0]},${ypos})`)
+          position.source1.setAttribute("transform",`translate(${position.x2},${ypos})`)
           console.log(position.source1.getAttribute("transform"))
         }
         if (eachLegendGap){

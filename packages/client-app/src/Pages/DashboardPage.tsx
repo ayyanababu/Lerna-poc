@@ -235,7 +235,7 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
     new Promise((resolve) => {
         setTimeout(() => {
             resolve([
-                { label: 'Priced', value: 123 },
+                { label: 'Priced', value: 1230000 },
                 { label: 'Priced Beta', value: 2450 },
                 { label: 'Priced Gamma', value: 367000000 },
                 { label: 'Priced Delta', value: 489000000 },
