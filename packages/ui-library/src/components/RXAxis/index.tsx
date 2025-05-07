@@ -39,6 +39,8 @@ function XAxis({
   tickLength = 5,
   labelOffset = 8,
   refreshAxis,
+  barsList,
+  chartWidth,
   ...props
 }: XAxisProps): JSX.Element | null {
   const { theme } = useTheme();
@@ -69,7 +71,6 @@ function XAxis({
         //    let totalChars = 0;
         const usedRects: { x1: number; x2: number }[] = [];
         nodeList.forEach((node: SVGTextElement) => {
-          console.log(node);
           const pnode = node.parentNode as SVGElement;
           let x = 0;
           if (pnode && pnode.getAttribute("transform")){
@@ -90,7 +91,6 @@ function XAxis({
           };
           usedRects.push(rect);
         });
-        console.log("xaxisused", usedRects);
         const nodeIndices = Array.from(
           { length: nodeList.length },
           (_, i) => i,
@@ -98,7 +98,6 @@ function XAxis({
         let isOverlappings = false;
         nodeIndices.forEach((index: number) => {
           nodeList.forEach((node: SVGTextElement, nindex: number) => {
-            console.log(node.textContent);
             if (index !== nindex) {
               const bbox = node.getBBox();
               let x = 0;
@@ -129,7 +128,6 @@ function XAxis({
             }
           });
         });
-        console.log("overlaps", isOverlappings);
         if (isOverlappings) {
           setIsOverlapping(true);
         } else {
@@ -352,8 +350,50 @@ function XAxis({
     isOverlapping,
   ]);
 
-  const wrap = (textNodes: NodeListOf<SVGTextElement>, width: number) => {
+  const wrap = (textNodes: NodeListOf<SVGTextElement>) => {
+    const widths:number[] = [];
+    interface domaincheck{
+      name:string;
+      status:boolean;
+    }
+    const domainCheck:domaincheck[] = []
+    scale.domain().forEach((dmn)=>{
+      domainCheck.push({name:dmn,status:false});      
+    });
+    barsList?.forEach((barw,index)=>{
+       if (index === barsList.length - 1){
+           const x:number = barw.x;
+           widths.push(chartWidth-x)
+       }else{
+           let domainfound = true;
+           domainCheck.map((dmn)=>{
+             const dmns = dmn;
+             if (dmn.name === barw.label && !dmn.status){
+               if (index > 1){
+                 if (barsList[index].x === barsList[index-1].x){
+                   domainfound = true;
+                 }else{
+                   domainfound = false;
+                 }
+                 dmns.status = true;
+               }else{
+                 domainfound = false;
+                 dmns.status = true;        
+               }  
+             }
+             return dmns
+           });
+           if (!domainfound){
+             const x1:number = barw.x;
+             const x2:number = barsList[index+1].x;
+             const diffwidth = x2 - x1;
+             widths.push(diffwidth);
+           }   
+       }
+    })    
+    let windex = -1;
     textNodes.forEach((textNode, index) => {
+      windex++;
       const text = d3.select(textNode);
       const words = text.text().split(/\s+/).reverse();
       let word;
@@ -364,11 +404,11 @@ function XAxis({
       const dy = 1;
 
       let x = 0;
-      if (index === 0 || index === textNodes.length - 1) {
-        if (index === 0) {
+      if (windex === 0 || windex === textNodes.length - 1) {
+        if (windex === 0) {
           x = x - addGap;
         }
-        if (index === textNodes.length - 1) {
+        if (windex === textNodes.length - 1) {
           x = x + addGap * 1.5;
         }
       } else {
@@ -385,7 +425,7 @@ function XAxis({
       while ((word = words.pop())) {
         line.push(word);
         tspan.text(line.join(" "));
-        if (tspan.node()!.getComputedTextLength() > width) {
+        if (tspan.node()!.getComputedTextLength() > widths[windex]) {
           line.pop();
           tspan.text(line.join(" "));
           line = [word];
@@ -413,7 +453,7 @@ function XAxis({
     if (typeof wrapped === "function") {
       wrapped(false);
     }
-    textNodes.forEach((textNode, index) => {
+    textNodes.forEach((textNode) => {
       const tspans: SVGTSpanElement[] = [];
       textNode.querySelectorAll("tspan").forEach((tspan) => {
         if (tspan.textContent) {
@@ -429,7 +469,7 @@ function XAxis({
       });
     });
     let wrapheight = 0;
-    textNodes.forEach((textNode, index) => {
+    textNodes.forEach((textNode) => {
       const tlength = textNode.querySelectorAll("tspan").length;
       if (tlength > 1) {
         setWrapped(true);
@@ -453,7 +493,7 @@ function XAxis({
         `.${FIXED_CLASSNAME_XLABELS}`,
       ) as NodeListOf<SVGTextElement>;
       if (textNodes.length > 0) {
-        wrap(textNodes, barWidth); // 50 = approximate max width per label before wrapping
+        wrap(textNodes); // 50 = approximate max width per label before wrapping
       }
     }
   }, [isOverlapping, axisRef.current, calculateLabelWidths]);
@@ -550,7 +590,6 @@ function XAxis({
   if (!isVisible) {
     return null;
   }
-console.log("prps",props)
   return (
     <g ref={axisRef} id="axis">
       <AxisBottom
