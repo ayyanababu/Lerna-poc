@@ -12,7 +12,7 @@ export default [
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ["*/.{js,jsx,ts,tsx}"],
+    files: ["**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -78,7 +78,8 @@ export default [
       "no-nested-ternary": "error",
       "no-restricted-globals": ["error", "event", "fdescribe"], // Add others as needed
       "no-global-assign": "error",
-      "no-shadow": "error",
+      "no-shadow": "off", // Disable base rule
+      "@typescript-eslint/no-shadow": ["error"],
       "no-unused-vars": [
         "error",
         { vars: "all", args: "after-used", ignoreRestSiblings: true },
@@ -102,31 +103,56 @@ export default [
       ],
       "@typescript-eslint/naming-convention": [
         "error",
+        // Functions can be PascalCase (React components) or camelCase (regular functions)
         {
           selector: "function",
-          format: ["PascalCase", "camelCase"], // Accept both for functions
+          format: ["PascalCase", "camelCase"],
           filter: {
             regex: "^[A-Z]",
             match: true,
           },
         },
+        // Variables should be camelCase, UPPER_CASE, or snake_case
         {
           selector: "variable",
-          format: ["camelCase"],
+          format: ["camelCase", "UPPER_CASE", "snake_case"], // Added snake_case here
           leadingUnderscore: "allow",
           filter: {
             regex: "^[A-Z]",
             match: false,
           },
         },
+        // Allow PascalCase for variables that are React components
         {
-          selector: "typeLike", // Includes enum, class, interface, typeAlias
+          selector: "variable",
+          format: ["PascalCase"],
+          filter: {
+            regex: "^[A-Z][A-Za-z]+$",
+            match: true,
+          },
+        },
+        // Types, interfaces, etc. should be PascalCase
+        {
+          selector: "typeLike",
           format: ["PascalCase"],
         },
+        // Parameters should be camelCase or snake_case
         {
           selector: "parameter",
-          format: ["camelCase"],
+          format: ["camelCase", "snake_case"], // Added snake_case here
           leadingUnderscore: "allow",
+        },
+        // Properties should be camelCase, PascalCase, UPPER_CASE, or snake_case
+        {
+          selector: "property",
+          format: ["camelCase", "PascalCase", "UPPER_CASE", "snake_case"], // Added snake_case here
+          leadingUnderscore: "allow",
+        },
+        // Allow destructured properties to keep their original format
+        {
+          selector: "variable",
+          modifiers: ["destructured"],
+          format: null,
         },
       ],
       // Assignment & mutation
@@ -141,6 +167,8 @@ export default [
       // Shadowing
       "no-shadow": "off", // Disable base rule
       "@typescript-eslint/no-shadow": ["error"],
+      "react-hooks/exhaustive-deps": "off", // Consider changing to "warn" for better practices
+      "react-hooks/rules-of-hooks": "error", // Added this rule
     },
   },
   {
