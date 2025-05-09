@@ -52,7 +52,6 @@ export interface XAxisProps extends AxisBottomProps {
   addGap: number;
   barWidth: number;
   wrapped: (wrapped: boolean) => void;
-  rotated: (rotate: boolean) => void;
   refreshAxis:number;
   barsList?:{x:number, width:number, label:string}[];
   chartWidth:number;

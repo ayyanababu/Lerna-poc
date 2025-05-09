@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 //import { LegendOrdinal } from '@visx/legend';
 import { LegendPosition, LegendsProps, LegendVariant } from './types';
 import LegendItem from './LegendItem';
-import { gt } from 'lodash-es';
+
 
 function Legends({
   colorScale,
@@ -88,8 +88,12 @@ function Legends({
     return null;
   }
 
-  const wrapLegendsText = useCallback(() => {  
+  const wrapLegendsText = () => {  
+    console.log("hit wrap")
+    console.log(legends_ref)
+    console.log(legendBoxWidth)
     if (legends_ref.current && legendBoxWidth && legendBoxWidth > 0) {
+      console.log("hit wrap1")
       const gs = legends_ref.current.querySelectorAll(".legendItems");
       const donestatus: { [key: number]: { element: SVGGElement, status: boolean } } = {};
       gs.forEach((gt,index)=>{
@@ -103,15 +107,12 @@ function Legends({
       let row = 0;
       let addwidth = 0;
       let newwidth = 0;
-      console.log("lwidth",legendBoxWidth)
       while (start < gs.length) {
          if (legendBoxWidth > 600){
-           addwidth += (gs[start] as SVGGElement).getBBox().width - 20;
+           addwidth += (gs[start] as SVGGElement).getBBox().width - 20 + 8;
          }else{
-           addwidth += (gs[start] as SVGGElement).getBBox().width;
+           addwidth += (gs[start] as SVGGElement).getBBox().width + 8;
          }   
-         console.log("w",(gs[start] as SVGGElement).getBBox().width)
-         console.log("addwidth",addwidth)
          if (addwidth > legendBoxWidth){                
              row++;
              addwidth = 0;
@@ -121,8 +122,8 @@ function Legends({
              }             
              if (eachLegendGap){             
                positions[row].push({object:gs[start],row:row,x:newwidth,y:row * eachLegendGap,cwidth:newwidth+(gs[start] as SVGGElement).getBoundingClientRect().width,width:(gs[start] as SVGGElement).getBoundingClientRect().width})
-               newwidth += (gs[start] as SVGGElement).getBBox().width;
-               addwidth += (gs[start] as SVGGElement).getBBox().width;
+               newwidth += (gs[start] as SVGGElement).getBBox().width + 8;
+               addwidth += (gs[start] as SVGGElement).getBBox().width + 8;
              }      
              console.log("row",row);
              console.log("cwidth",addwidth);                               
@@ -132,7 +133,7 @@ function Legends({
            }
            if (eachLegendGap){
              positions[row].push({object:gs[start],row:row,x:newwidth,y:row * eachLegendGap,cwidth:newwidth+(gs[start] as SVGGElement).getBoundingClientRect().width,width:(gs[start] as SVGGElement).getBoundingClientRect().width})
-             newwidth += (gs[start] as SVGGElement).getBBox().width;
+             newwidth += (gs[start] as SVGGElement).getBBox().width + 8;
            }  
          }
          start++;
@@ -147,7 +148,7 @@ function Legends({
         generatedLegendHeight(legends_ref.current.getBBox().height) 
       }  
     }  
-  }, [legends_ref.current, legendBoxWidth, eachLegendGap]);
+  }
 
 
   useEffect(()=>{
