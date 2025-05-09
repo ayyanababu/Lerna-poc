@@ -1,16 +1,24 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "lib": ["ES2023", "dom"],
+    "lib": ["ES2023", "dom", "dom.iterable"],
     "module": "ESNext",
     "declaration": true,
     "outDir": "./dist",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "rootDir": "./src"
   },
-  "include": ["src"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
