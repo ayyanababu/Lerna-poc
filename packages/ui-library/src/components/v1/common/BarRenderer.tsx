@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo } from "react";
 
-import CustomBar from "../../components/CustomBar";
-import type { BarRendererProps, BarsList } from "./types";
+import CustomBar from "../../CustomBar";
+import type { BarRendererProps } from "./BarRenderer.types";
+import { BarsList } from "./types";
 
 const DEFAULT_BAR_RADIUS = 4;
 

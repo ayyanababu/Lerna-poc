@@ -1,35 +1,9 @@
 import React from "react";
-import { ScaleBand, ScaleLinear } from "d3";
 
-import XAxis from "../../components/RXAxis";
-import YAxis from "../../components/RYAxis";
-
-// Types
-interface BarsList {
-  x: number;
-  width: number;
-  label: string;
-}
-
-interface XAxisProps {
-  scale: ScaleBand<string>;
-  top: number;
-  isLoading: boolean;
-  availableWidth: number;
-  forceFullLabels?: boolean;
-  addGap: number;
-  wrapped: (wrapped: boolean) => void;
-  barWidth: number;
-  refreshAxis: number;
-  chartWidth: number;
-  barsList?: BarsList[];
-}
-
-interface YAxisProps {
-  scale: ScaleLinear<number, number>;
-  isLoading: boolean;
-  [key: string]: any; // For additional props
-}
+import XAxis from "../XAxis";
+import { XAxisProps } from "../XAxis/types";
+import YAxis from "../YAxis";
+import { YAxisProps } from "../YAxis/types";
 
 // X-Axis Component
 const XAxisComponent: React.FC<XAxisProps> = ({
@@ -48,13 +22,13 @@ const XAxisComponent: React.FC<XAxisProps> = ({
 }) => {
   return (
     <XAxis
+      {...props}
       key={refreshAxis}
       scale={scale}
       top={top}
       isLoading={isLoading}
       availableWidth={availableWidth}
       forceFullLabels={forceFullLabels}
-      {...props}
       addGap={addGap}
       wrapped={wrapped}
       barWidth={barWidth}

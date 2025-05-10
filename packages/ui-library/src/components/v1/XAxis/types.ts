@@ -1,5 +1,7 @@
 import { AxisBottom } from "@visx/axis";
 
+import { BarsList } from "../common/types";
+
 type AxisBottomProps = Parameters<typeof AxisBottom>[0];
 export interface XAxisProps extends AxisBottomProps {
   /**
@@ -53,6 +55,6 @@ export interface XAxisProps extends AxisBottomProps {
   barWidth: number;
   wrapped: (wrapped: boolean) => void;
   refreshAxis: number;
-  barsList?: { x: number; width: number; label: string }[];
+  barsList?: BarsList[];
   chartWidth: number;
 }

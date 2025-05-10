@@ -10,20 +10,20 @@ import { useParentSize } from "@visx/responsive";
 import { scaleOrdinal } from "@visx/scale";
 import { useTooltip } from "@visx/tooltip";
 
-import useTheme from "../../hooks/useTheme";
-import AxisManager from "../../utils/components/AxisManager";
-import BarRenderer from "../../utils/components/BarRenderer";
-import LegendManager from "../../utils/components/LegendManager";
-import { BarsList } from "../../utils/components/types";
-import useChartDimensions from "../../utils/hooks/useChartDimensions";
-import useChartScales from "../../utils/hooks/useChartScales";
-import ChartWrapper from "../ChartWrapper";
-import Grid from "../Grid";
-import { LegendPosition } from "../Legends/types";
-import SvgShimmer from "../Shimmer/SvgShimmer";
-import { TooltipData } from "../Tooltip/types";
+import useChartDimensions from "../../../hooks/useChartDimensions";
+import useChartScales from "../../../hooks/useChartScales";
+import useTheme from "../../../hooks/useTheme";
+import ChartWrapper from "../../ChartWrapper";
+import Grid from "../../Grid";
+import { LegendPosition } from "../../Legends/types";
+import SvgShimmer from "../../Shimmer/SvgShimmer";
+import { TooltipData } from "../../Tooltip/types";
+import AxisManager from "../common/AxisManager";
+import BarRenderer from "../common/BarRenderer";
+import LegendManager from "../common/LegendManager";
+import { BarsList, DataPoint } from "../common/types";
 import mockVerticalBarChartData from "./mockdata";
-import { DataPoint, VerticalBarChartProps } from "./types";
+import { VerticalBarChartProps } from "./types";
 
 const defaultMargin = {
   top: 5,
@@ -72,6 +72,8 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     () => (isLoading ? mockVerticalBarChartData : _data),
     [isLoading, _data],
   );
+
+  console.log("##### verticalbar", parentRef, width, height, data);
 
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);

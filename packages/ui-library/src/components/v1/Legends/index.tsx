@@ -7,8 +7,6 @@ import React, {
 } from "react";
 
 import LegendItem from "./LegendItem";
-//import { SxProps, Theme } from '@mui/material';
-//import { LegendOrdinal } from '@visx/legend';
 import { LegendPosition, LegendsProps, LegendVariant } from "./types";
 
 function Legends({

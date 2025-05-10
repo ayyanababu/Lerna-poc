@@ -1,19 +1,22 @@
-import { LegendPosition } from "../../components/RLegends/types";
+import { SetStateAction } from "react";
+import { scaleOrdinal } from "d3";
+
+import { LegendPosition, LegendsProps } from "../Legends/types";
 
 export interface LegendDataItem {
   label: string;
-  value: any;
+  value: number;
 }
 
 export interface LegendManagerProps {
-  legendsProps?: any;
+  legendsProps?: LegendsProps;
   position: LegendPosition | "top" | "bottom" | "left" | "right";
   legendData: LegendDataItem[];
-  colorScale: (index: string) => string;
+  colorScale?: ReturnType<typeof scaleOrdinal<string, string>>;
   hideIndex: number[];
   setHideIndex: (indices: number[]) => void;
   hovered: string | null;
-  setHovered: (label: string) => void;
+  setHovered?: (label: string) => void;
   isLoading: boolean;
   isLegendRendered: (status: boolean) => void;
   generatedLegendHeight: (height: number) => void;

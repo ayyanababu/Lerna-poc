@@ -1,4 +1,7 @@
 import { AxisBottom } from "@visx/axis";
+import { ScaleBand } from "d3";
+
+import { BarsList } from "../v1/common/BarRenderer.types";
 
 type AxisBottomProps = Parameters<typeof AxisBottom>[0];
 export interface XAxisProps extends AxisBottomProps {
@@ -53,4 +56,10 @@ export interface XAxisProps extends AxisBottomProps {
   barWidth: number;
   wrapped: (wrapped: boolean) => void;
   rotated: (rotate: boolean) => void;
+  scale: ScaleBand<string>;
+  top: number;
+  refreshAxis: number;
+  chartWidth: number;
+  barsList?: BarsList[];
+  lineOpacity?: number;
 }

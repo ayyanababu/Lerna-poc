@@ -1,10 +1,10 @@
 import React from "react";
 import { AxisLeft, AxisRight } from "@visx/axis";
 
-import useTheme from "../../hooks/useTheme";
-import { formatNumberWithSuffix, isNumeric } from "../../utils/number";
-import { shimmerClassName } from "../Shimmer/Shimmer";
-import { shimmerGradientId } from "../Shimmer/SvgShimmer";
+import useTheme from "../../../hooks/useTheme";
+import { formatNumberWithSuffix, isNumeric } from "../../../utils/number";
+import { shimmerClassName } from "../../Shimmer/Shimmer";
+import { shimmerGradientId } from "../../Shimmer/SvgShimmer";
 import { YAxisProps } from "./types";
 
 const MAX_LABEL_CHARS = 15; // Or however many you want before truncating
