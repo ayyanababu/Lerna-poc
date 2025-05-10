@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { startCase } from "lodash-es";
 
-import useTheme from "../../hooks/useTheme";
-import { formatNumberWithCommas } from "../../utils/number";
+import useTheme from "../../../hooks/useTheme";
+import { formatNumberWithCommas } from "../../../utils/number";
 import { LegendItemProps } from "./types";
 
 function LegendItem({

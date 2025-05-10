@@ -1,8 +1,8 @@
 import React from "react";
 import { ScaleBand, ScaleLinear } from "d3";
 
-import XAxis from "../../components/RXAxis";
-import YAxis from "../../components/RYAxis";
+import XAxis from "../RXAxis";
+import YAxis from "../RYAxis";
 
 // Types
 interface BarsList {

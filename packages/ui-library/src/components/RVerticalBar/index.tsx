@@ -11,12 +11,12 @@ import { scaleOrdinal } from "@visx/scale";
 import { useTooltip } from "@visx/tooltip";
 
 import useTheme from "../../hooks/useTheme";
-import AxisManager from "../../utils/components/AxisManager";
-import BarRenderer from "../../utils/components/BarRenderer";
-import LegendManager from "../../utils/components/LegendManager";
-import { BarsList } from "../../utils/components/types";
-import useChartDimensions from "../../utils/hooks/useChartDimensions";
-import useChartScales from "../../utils/hooks/useChartScales";
+import AxisManager from "../Helpers/components/AxisManager";
+import BarRenderer from "../Helpers/components/BarRenderer";
+import LegendManager from "../Helpers/components/LegendManager";
+import { BarsList } from "../Helpers/components/types";
+import useChartDimensions from "../Helpers/hooks/useChartDimensions";
+import useChartScales from "../Helpers/hooks/useChartScales";
 import ChartWrapper from "../ChartWrapper";
 import Grid from "../Grid";
 import { LegendPosition } from "../Legends/types";

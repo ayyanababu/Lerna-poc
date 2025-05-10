@@ -1,6 +1,6 @@
 import React from "react";
 
-import Legends from "../../components/RLegends";
+import Legends from "../RLegends";
 import type { LegendManagerProps } from "./types";
 
 const LegendManager: React.FC<LegendManagerProps> = ({

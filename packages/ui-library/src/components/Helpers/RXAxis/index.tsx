@@ -8,10 +8,10 @@ import React, {
 import { AxisBottom } from "@visx/axis";
 import * as d3 from "d3";
 
-import useTheme from "../../hooks/useTheme";
-import { formatNumberWithSuffix, isNumeric } from "../../utils/number";
-import { shimmerClassName } from "../Shimmer/Shimmer";
-import { shimmerGradientId } from "../Shimmer/SvgShimmer";
+import useTheme from "../../../hooks/useTheme";
+import { formatNumberWithSuffix, isNumeric } from "../../../utils/number";
+import { shimmerClassName } from "../../Shimmer/Shimmer";
+import { shimmerGradientId } from "../../Shimmer/SvgShimmer";
 import { XAxisProps } from "./types";
 
 //const MAX_LABEL_CHARS = 15;
