@@ -61,8 +61,20 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
       };
     }, []);
 
-    const renderContent = React.useCallback(
-      () => (
+    return (
+      <Stack
+        sx={{
+          position: "relative",
+          height: "100%",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: "0px", // Removed parent gap to control internal gaps more precisely
+          flex: 1,
+        }}
+        ref={containerRef}
+      >
+        {canRender ? (
         <>
           {/* Only render title if it exists */}
           {!isLoading && title && <Title title={title} {...titleProps} />}
@@ -81,6 +93,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                 ? {
                     flexDirection:
                       position === LegendPosition.LEFT ? "row" : "row-reverse",
+                    alignItems: "center",
                   }
                 : {
                     flexDirection:
@@ -101,9 +114,10 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
               sx={{
                 position: "relative",
                 height: "100%",
-                width: "100%",
+                width: (position === LegendPosition.LEFT || position === LegendPosition.RIGHT) ? "60%" : "100%",
+                maxWidth: (position === LegendPosition.LEFT || position === LegendPosition.RIGHT) ? "60%" : "100%",
                 display: "flex",
-                flex: "1 1 100%",
+                flex: (position === LegendPosition.LEFT || position === LegendPosition.RIGHT) ? "1 1 60%" : "1 1 100%",
                 minHeight: 0,
               }}
             >
@@ -112,37 +126,6 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
           </Box>
           {timestampProps?.timestamp && <Timestamp {...timestampProps} />}
         </>
-      ),
-      [
-        title,
-        titleProps,
-        legendsProps,
-        tooltipProps,
-        timestampProps,
-        position,
-        colorScale,
-        legendData,
-        toolTipData,
-        children,
-        ref,
-      ],
-    );
-
-    return (
-      <Stack
-        sx={{
-          position: "relative",
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          gap: "0px", // Removed parent gap to control internal gaps more precisely
-          flex: 1,
-        }}
-        ref={containerRef}
-      >
-        {canRender ? (
-          renderContent()
         ) : (
           <p> Cannot Render the chart under this size</p>
         )}
