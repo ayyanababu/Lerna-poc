@@ -4,6 +4,7 @@ import { scaleOrdinal } from "@visx/scale";
 export enum LegendVariant {
   COMPACT = "compact",
   EXPANDED = "expanded",
+  TABULAR = "tabular",
 }
 
 export enum LegendPosition {
@@ -13,7 +14,7 @@ export enum LegendPosition {
   RIGHT = "right",
 }
 
-export type LegendVariantType = LegendVariant | "compact" | "expanded";
+export type LegendVariantType = LegendVariant;
 export type LegendPositionType =
   | LegendPosition
   | "top"

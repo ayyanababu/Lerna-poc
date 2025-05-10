@@ -771,6 +771,10 @@ body:not(.dark) {
                                     type="full"
                                     title="Transaction Capture"
                                     isLoading={dataLoading.donut}
+                                    legendsProps={{
+                                        position: Legends.Position.LEFT,
+                                        variant: Legends.Variant.TABULAR
+                                    }}
                                 />
                             </SortableCard>
 
