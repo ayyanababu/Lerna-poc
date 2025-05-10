@@ -198,11 +198,7 @@ function XAxis({
     return Math.max(4, scaleLabels.length);
   }, [availableWidth, numTicks, scale, providedLabels, averageWidthPerChar]);
 
-  const {
-    evenPositionsMap,
-    formatLabel,
-    tickValues,
-  } = useMemo(() => {
+  const { evenPositionsMap, formatLabel, tickValues } = useMemo(() => {
     const scaleLabels =
       providedLabels ||
       (scale.domain && typeof scale.domain === "function"
@@ -242,7 +238,6 @@ function XAxis({
       scaleLabels.length <= dynamicNumTicks * 2 ||
       availableWidthPerLabel > estimatedMaxLabelWidth * 0.6
     ) {
-
       return {
         angle: -45,
         evenPositionsMap: null,
@@ -317,13 +312,13 @@ function XAxis({
       let x = 0;
       if (index === 0 || index === textNodes.length - 1) {
         if (index === 0) {
-          x = x - addGap;
+          x -= addGap;
         }
         if (index === textNodes.length - 1) {
-          x = x + addGap * 1.5;
+          x += addGap * 1.5;
         }
       } else {
-        x = x + addGap / 2;
+        x += addGap / 2;
       }
 
       let tspan = text
@@ -343,13 +338,13 @@ function XAxis({
           let x = 0;
           if (index === 0 || index === textNodes.length - 1) {
             if (index === 0) {
-              x = x - addGap;
+              x -= addGap;
             }
             if (index === textNodes.length - 1) {
-              x = x + addGap * 1.5;
+              x += addGap * 1.5;
             }
           } else {
-            x = x + addGap / 2;
+            x += addGap / 2;
           }
           tspan = text
             .append("tspan")

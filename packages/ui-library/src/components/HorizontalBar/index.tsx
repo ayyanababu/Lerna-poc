@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -306,11 +305,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
     );
     if (AXISY_ROTATE) {
-      updatedHeight =
-        updatedHeight -
-        (
-          chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
-        ).getBBox().height;
+      updatedHeight -= (
+        chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
+      ).getBBox().height;
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
@@ -332,7 +329,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         const original = node.textContent;
         const bbox = node.getBoundingClientRect();
@@ -428,7 +428,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     const firstNode = textNodes[0];
     const lastNode = textNodes[textNodes.length - 1];
     const showAndTruncate = (node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         const bbox = node.getBoundingClientRect();
         const pnode = node.parentNode as Element;
@@ -468,7 +471,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
     usedRects = [];
     textNodes.forEach((node) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const bbox = node.getBoundingClientRect();
         const pnode = node.parentNode as Element;
         let y = 0;
@@ -522,9 +528,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   const rotated = (rotate: boolean) => {
     AXISX_ROTATE = rotate;
     if (rotate && chartSvgRef.current) {
-      setTimeout(() => {
-
-      }, 200);
+      setTimeout(() => {}, 200);
     }
   };
 

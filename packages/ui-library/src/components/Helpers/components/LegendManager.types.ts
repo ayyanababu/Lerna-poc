@@ -1,4 +1,4 @@
-import { LegendPosition } from '../../components/RLegends/types';
+import { LegendPosition } from "../../components/RLegends/types";
 
 export interface LegendDataItem {
   label: string;

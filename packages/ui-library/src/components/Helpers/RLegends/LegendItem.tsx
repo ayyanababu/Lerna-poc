@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import {  startCase } from "lodash-es";
-import { formatNumberWithCommas } from "../../utils/number";
-import { LegendItemProps, LegendVariant } from "./types";
-import useTheme from "../../hooks/useTheme";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
+import { startCase } from "lodash-es";
+
+import useTheme from "../../hooks/useTheme";
+import { formatNumberWithCommas } from "../../utils/number";
+import { LegendItemProps } from "./types";
 
 function LegendItem({
   label,
@@ -13,7 +14,7 @@ function LegendItem({
   isHoveredOther = false,
   isLoading = false,
   doStrike = false,
-  variant = LegendVariant.COMPACT,
+  // variant = LegendVariant.COMPACT,
   onToggle,
   onMouseOver,
   onMouseLeave,

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from "react";
+import { ScaleBand, ScaleLinear } from "d3";
+
 import XAxis from "../../components/RXAxis";
 import YAxis from "../../components/RYAxis";
-import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
-import { ScaleBand, ScaleLinear } from 'd3';
 
 // Types
 interface BarsList {
@@ -23,7 +23,6 @@ interface XAxisProps {
   refreshAxis: number;
   chartWidth: number;
   barsList?: BarsList[];
-  [key: string]: any; // For additional props
 }
 
 interface YAxisProps {
@@ -47,15 +46,6 @@ const XAxisComponent: React.FC<XAxisProps> = ({
   barsList = [],
   ...props
 }) => {
-  const [localBarsList, setLocalBarsList] = useState<BarsList[]>([]);
-  
-  // Update the bars list when external data changes
-  useEffect(() => {
-    if (barsList && barsList.length > 0) {
-      setLocalBarsList(barsList);
-    }
-  }, [barsList]);
-
   return (
     <XAxis
       key={refreshAxis}
@@ -70,7 +60,7 @@ const XAxisComponent: React.FC<XAxisProps> = ({
       barWidth={barWidth}
       refreshAxis={refreshAxis}
       chartWidth={chartWidth}
-      barsList={localBarsList}
+      barsList={barsList}
     />
   );
 };
@@ -81,19 +71,13 @@ const YAxisComponent: React.FC<YAxisProps> = ({
   isLoading,
   ...props
 }) => {
-  return (
-    <YAxis 
-      scale={scale} 
-      isLoading={isLoading} 
-      {...props} 
-    />
-  );
+  return <YAxis scale={scale} isLoading={isLoading} {...props} />;
 };
 
 // Export both axis components
 const AxisManager = {
   XAxis: XAxisComponent,
-  YAxis: YAxisComponent
+  YAxis: YAxisComponent,
 };
 
 export default AxisManager;

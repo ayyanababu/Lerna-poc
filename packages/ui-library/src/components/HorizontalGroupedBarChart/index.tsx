@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AxisBottom, AxisLeft } from "@visx/axis";
 import { Group } from "@visx/group";
@@ -316,11 +315,9 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
       DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
     );
     if (AXISY_ROTATE) {
-      updatedHeight =
-        updatedHeight -
-        (
-          chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
-        ).getBBox().height;
+      updatedHeight -= (
+        chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
+      ).getBBox().height;
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
@@ -424,7 +421,10 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         let truncated = label;
         if (label.length > 3) {
@@ -539,7 +539,10 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         //  const truncated =
         //    label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
@@ -794,7 +797,10 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     const firstNode = textNodes[0];
     const lastNode = textNodes[textNodes.length - 1];
     const showAndTruncate = (node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         //     const truncated =
         //       label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
@@ -836,7 +842,10 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
 
     usedRects = [];
     textNodes.forEach((node) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const bbox = node.getBoundingClientRect();
         const pnode = node.parentNode as Element;
         let y = 0;

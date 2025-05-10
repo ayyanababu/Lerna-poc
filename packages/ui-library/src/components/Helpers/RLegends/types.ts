@@ -50,13 +50,13 @@ export interface LegendsProps {
   isVisible?: boolean;
   variant?: LegendVariantType;
   hideValues?: boolean;
-  isLegendRendered?: (renderedStautus:boolean) => void;
+  isLegendRendered?: (renderedStautus: boolean) => void;
   eachLegendGap?: number;
   scrollbarAfter?: number;
   legendsHeight?: number;
   generatedLegendHeight?: (height: number) => void;
-  generateAxis?: (selectedLegends:number[]) => void;
-  legendBoxWidth?:number;
+  generateAxis?: (selectedLegends: number[]) => void;
+  legendBoxWidth?: number;
   hideLegendLableClick?: boolean;
   showArrow?: boolean;
 }
@@ -71,14 +71,14 @@ export interface LegendItemProps {
   doStrike?: boolean;
   variant?: LegendVariantType;
   onToggle?: () => void;
-  onMouseOver?: () => void
+  onMouseOver?: () => void;
   onMouseLeave?: () => void;
   hideValues?: boolean;
   onArrowClick?: () => void;
-  markerColor:string;
+  markerColor: string;
   eachLegendGap?: number;
-  generateAxis?: (selectedLegends:number[]) => void;
-  showArrow?:boolean;
-  showIcon?:boolean;
+  generateAxis?: (selectedLegends: number[]) => void;
+  showArrow?: boolean;
+  showIcon?: boolean;
   hideLegendLableClick?: boolean;
 }

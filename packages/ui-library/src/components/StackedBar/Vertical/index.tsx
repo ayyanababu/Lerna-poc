@@ -1,4 +1,3 @@
-
 import React, {
   useCallback,
   useEffect,
@@ -279,11 +278,9 @@ function VerticalStackedBar({
       DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
     );
     if (AXISX_ROTATE) {
-      updatedHeight =
-        updatedHeight -
-        (
-          chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
-        ).getBBox().height;
+      updatedHeight -= (
+        chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
+      ).getBBox().height;
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
@@ -304,7 +301,10 @@ function VerticalStackedBar({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         //  const truncated =
         //    label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
@@ -407,7 +407,10 @@ function VerticalStackedBar({
     const firstNode = textNodes[0];
     const lastNode = textNodes[textNodes.length - 1];
     const showAndTruncate = (node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         //     const truncated =
         //       label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
@@ -449,7 +452,10 @@ function VerticalStackedBar({
 
     usedRects = [];
     textNodes.forEach((node) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const bbox = node.getBoundingClientRect();
         const pnode = node.parentNode as Element;
         let y = 0;
@@ -653,13 +659,13 @@ function VerticalStackedBar({
                   (calculatedBarWidth - actualBarWidth) / 2
                 : xScale(category) || 0;
             if (index === 0 || index === filteredData.length - 1) {
-                 if (index === 0) {
-                    barX = barX - BASE_ADJUST_WIDTH;
-                  } else {
-                    barX = barX + BASE_ADJUST_WIDTH * 1.5;
-                  }
+              if (index === 0) {
+                barX -= BASE_ADJUST_WIDTH;
+              } else {
+                barX += BASE_ADJUST_WIDTH * 1.5;
+              }
             } else {
-                  barX = barX + BASE_ADJUST_WIDTH / 2;
+              barX += BASE_ADJUST_WIDTH / 2;
             }
 
             // Calculate dynamic radius based on bar width

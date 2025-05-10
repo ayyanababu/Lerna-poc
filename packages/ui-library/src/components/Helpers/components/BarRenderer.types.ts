@@ -1,4 +1,5 @@
 import { ScaleBand, ScaleLinear } from "d3";
+
 import { DataPoint } from "../../components/HorizontalBar/types";
 
 export interface BarsList {
@@ -16,12 +17,16 @@ export interface BarRendererProps {
   isLoading: boolean;
   maxBarWidth: number;
   drawableChartHeight: number;
-  handleBarMouseMove: (value: number, color: string, index: number) => (event: React.MouseEvent) => void;
+  handleBarMouseMove: (
+    value: number,
+    color: string,
+    index: number,
+  ) => (event: React.MouseEvent) => void;
   handleBarMouseLeave: () => void;
-  DEFAULT_OPACITY: number;
-  REDUCED_OPACITY: number;
-  BASE_ADJUST_WIDTH: number;
+  defaultOpacity: number;
+  reducedOpacity: number;
+  baseAdjustWidth: number;
   barProps?: any;
   onClick?: (event: React.MouseEvent, data: DataPoint, index: number) => void;
-  TransferBarList:(barlist)=>void
+  transferBarList: (barlist: BarsList[]) => void;
 }

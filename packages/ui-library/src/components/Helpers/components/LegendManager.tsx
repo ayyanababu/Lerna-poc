@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-import Legends from '../../components/RLegends';
-import type {LegendManagerProps, LegendDataItem} from './types'
+import React from "react";
+
+import Legends from "../../components/RLegends";
+import type { LegendManagerProps } from "./types";
 
 const LegendManager: React.FC<LegendManagerProps> = ({
   legendsProps,
@@ -17,7 +18,6 @@ const LegendManager: React.FC<LegendManagerProps> = ({
   generateAxis,
   legendLeft,
   legendTopPosition,
-  innerWidth,
   legendHeight,
   calculatedLegendHeight,
   legendBoxWidth,
@@ -27,21 +27,26 @@ const LegendManager: React.FC<LegendManagerProps> = ({
     return null;
   }
   return (
-    <foreignObject 
-      x={`${legendLeft}`} 
-      y={`${legendTopPosition + 20}`} 
-      width={`${legendBoxWidth}`} 
+    <foreignObject
+      x={`${legendLeft}`}
+      y={`${legendTopPosition + 20}`}
+      width={`${legendBoxWidth}`}
       height={legendHeight}
     >
-      {React.createElement('div', {
-        xmlns: 'http://www.w3.org/1999/xhtml',
-        style: { 
-          width: '100%', 
-          height: '100%', 
-          overflowY: "auto", 
-          overflowX: "hidden" 
-        }
-      }, <svg style={{ width: "100%", height: `${calculatedLegendHeight-5}px` }}>
+      {React.createElement(
+        "div",
+        {
+          xmlns: "http://www.w3.org/1999/xhtml",
+          style: {
+            width: "100%",
+            height: "100%",
+            overflowY: "auto",
+            overflowX: "hidden",
+          },
+        },
+        <svg
+          style={{ width: "100%", height: `${calculatedLegendHeight - 5}px` }}
+        >
           <Legends
             {...legendsProps}
             position={position}
@@ -59,7 +64,7 @@ const LegendManager: React.FC<LegendManagerProps> = ({
             generateAxis={generateAxis}
             legendBoxWidth={legendBoxWidth}
           />
-        </svg>
+        </svg>,
       )}
     </foreignObject>
   );

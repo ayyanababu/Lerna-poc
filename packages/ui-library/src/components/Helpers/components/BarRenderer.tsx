@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from "react";
+
 import CustomBar from "../../components/CustomBar";
-import type { BarRendererProps, BarsList } from './types';
+import type { BarRendererProps, BarsList } from "./types";
 
 const DEFAULT_BAR_RADIUS = 4;
 
@@ -15,89 +16,90 @@ const BarRenderer: React.FC<BarRendererProps> = ({
   drawableChartHeight,
   handleBarMouseMove,
   handleBarMouseLeave,
-  DEFAULT_OPACITY,
-  REDUCED_OPACITY,
-  BASE_ADJUST_WIDTH,
+  defaultOpacity,
+  reducedOpacity,
+  baseAdjustWidth,
   barProps,
   onClick,
-  TransferBarList,
+  transferBarList,
 }) => {
   // Function to calculate optimal bar width
   const getOptimalBarWidth = (calculatedWidth: number) =>
     Math.min(calculatedWidth, maxBarWidth);
-    
+
   // Store bar positions and widths for use by the X-axis component
   const barsList = useMemo<BarsList[]>(() => {
     return filteredData.map((d, index) => {
       const calculatedBarWidth = xScale.bandwidth();
       const barwidth = getOptimalBarWidth(calculatedBarWidth);
-      
-      let barX = barwidth < calculatedBarWidth
-        ? (xScale(d.label) || 0) + (calculatedBarWidth - barwidth) / 2
-        : xScale(d.label) || 0;
-        
+
+      let barX =
+        barwidth < calculatedBarWidth
+          ? (xScale(d.label) || 0) + (calculatedBarWidth - barwidth) / 2
+          : xScale(d.label) || 0;
+
       if (index === 0) {
-        barX = barX - BASE_ADJUST_WIDTH;
+        barX -= baseAdjustWidth;
       } else if (index === filteredData.length - 1) {
-        barX = barX + BASE_ADJUST_WIDTH * 1.5;
+        barX += baseAdjustWidth * 1.5;
       } else {
-        barX = barX + BASE_ADJUST_WIDTH / 2;
+        barX += baseAdjustWidth / 2;
       }
-      
+
       return {
         x: barX,
         width: barwidth,
-        label: d.label
+        label: d.label,
       };
     });
-   
-  }, [filteredData, xScale, maxBarWidth, BASE_ADJUST_WIDTH]);
+  }, [filteredData, xScale, maxBarWidth, baseAdjustWidth]);
 
-  useEffect(()=>{
-    if ( TransferBarList){
-       TransferBarList(barsList)
-    }   
-  },[barsList])
+  useEffect(() => {
+    if (transferBarList) {
+      transferBarList(barsList);
+    }
+  }, [barsList]);
 
   return (
     <>
       {filteredData.map((d, index) => {
         const value = Number(d.value);
         if (Number.isNaN(value)) return null;
-        
+
         const calculatedBarWidth = xScale.bandwidth();
         const barwidth = getOptimalBarWidth(calculatedBarWidth);
-        
+
         // Calculate bar position
-        let barX = barwidth < calculatedBarWidth
-          ? (xScale(d.label) || 0) + (calculatedBarWidth - barwidth) / 2
-          : xScale(d.label) || 0;
-          
+        let barX =
+          barwidth < calculatedBarWidth
+            ? (xScale(d.label) || 0) + (calculatedBarWidth - barwidth) / 2
+            : xScale(d.label) || 0;
+
         if (index === 0) {
-          barX = barX - BASE_ADJUST_WIDTH;
+          barX -= baseAdjustWidth;
         } else if (index === filteredData.length - 1) {
-          barX = barX + BASE_ADJUST_WIDTH * 1.5;
+          barX += baseAdjustWidth * 1.5;
         } else {
-          barX = barX + BASE_ADJUST_WIDTH / 2;
+          barX += baseAdjustWidth / 2;
         }
-        
+
         // Calculate bar dimensions
         const barHeight = drawableChartHeight - yScale(value);
         const barY = yScale(value);
-        
+
         // Calculate visual properties
         const isHovered = hoveredBar === index;
         const barOpacity =
           hoveredBar !== null && hoveredBar !== -1 && !isHovered
-            ? REDUCED_OPACITY
-            : DEFAULT_OPACITY;
-            
+            ? reducedOpacity
+            : defaultOpacity;
+
         const radius = Math.min(
           DEFAULT_BAR_RADIUS,
           barwidth / 2,
           barHeight > 0 ? barHeight : 0,
         );
-        
+
         const barColor = d.color || colorScale(index.toString());
 
         return (

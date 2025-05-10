@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -104,7 +103,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     height - DEFAULT_MARGIN.top - DEFAULT_MARGIN.bottom,
   );
   const [, setWrapped] = useState(false);
-  const [recalculate,setRecalculate] = useState(true);
+  const [recalculate, setRecalculate] = useState(true);
 
   let rotateincrease = 0;
   let barwidth = 0;
@@ -117,23 +116,21 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             parentRef?.current?.parentNode &&
             parentRef?.current?.parentNode.querySelectorAll("div")[0]
           ) {
-            console.log("parent",parentRef?.current )
+            console.log("parent", parentRef?.current);
             const legendbox =
               parentRef?.current?.parentNode.querySelectorAll("div")[0];
             const lb = legendbox.querySelectorAll("div");
-            if (lb.length === 0){
+            if (lb.length === 0) {
               clearInterval(legendboxtimer);
             }
-            const lheight = lb[lb.length - 1].offsetTop  - lb[0].offsetTop;
+            const lheight = lb[lb.length - 1].offsetTop - lb[0].offsetTop;
             const spans =
               parentRef?.current?.parentNode?.parentNode?.querySelectorAll<HTMLSpanElement>(
                 "span",
               );
             const lastSpan = spans ? spans[spans.length - 1] : null;
             setBottomHeight(
-                lheight +
-                (lastSpan?.offsetHeight || 0) +
-                bottomHeightAddOnSpace,
+              lheight + (lastSpan?.offsetHeight || 0) + bottomHeightAddOnSpace,
             );
             clearInterval(legendboxtimer);
           }
@@ -150,7 +147,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         }, 2000);
       }, 1000);
     }
-  }, [parentRef?.current,recalculate]);
+  }, [parentRef?.current, recalculate]);
 
   useEffect(() => {
     if (!chartSvgRef.current) return;
@@ -271,11 +268,9 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
     );
     if (AXISX_ROTATE) {
-      updatedHeight =
-        updatedHeight -
-        (
-          chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
-        ).getBBox().height;
+      updatedHeight -= (
+        chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
+      ).getBBox().height;
     }
     setAdjustedChartHeight(updatedHeight + rotateincrease);
     setAdjustedChartWidth(updatedWidth);
@@ -297,7 +292,10 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         //  const truncated =
         //    label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
@@ -396,7 +394,10 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     const firstNode = textNodes[0];
     const lastNode = textNodes[textNodes.length - 1];
     const showAndTruncate = (node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         const bbox = node.getBoundingClientRect();
         const pnode = node.parentNode as Element;
@@ -436,7 +437,10 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
     usedRects = [];
     textNodes.forEach((node) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const bbox = node.getBoundingClientRect();
         const pnode = node.parentNode as Element;
         let y = 0;
@@ -529,10 +533,10 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           height -
           DEFAULT_MARGIN.top -
           DEFAULT_MARGIN.bottom -
-          bottomaxisheight
-          -bottomHeight
-        console.log("bottom",bottomHeight);
-        console.log("hgt",hgt)
+          bottomaxisheight -
+          bottomHeight;
+        console.log("bottom", bottomHeight);
+        console.log("hgt", hgt);
         setinnerHeight(hgt);
       }
     }, 300);
@@ -617,13 +621,13 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 ? (xScale(d.label) || 0) + (calculatedBarWidth - barwidth) / 2
                 : xScale(d.label) || 0;
             if (index === 0 || index === filteredData.length - 1) {
-                if (index === 0) {
-                    barX = barX - BASE_ADJUST_WIDTH;
-                } else {
-                    barX = barX + BASE_ADJUST_WIDTH * 1.5;
-                }
+              if (index === 0) {
+                barX -= BASE_ADJUST_WIDTH;
+              } else {
+                barX += BASE_ADJUST_WIDTH * 1.5;
+              }
             } else {
-                barX = barX + BASE_ADJUST_WIDTH / 2;
+              barX += BASE_ADJUST_WIDTH / 2;
             }
             const barHeight = drawableChartHeight - yScale(value);
             const barY = yScale(value);

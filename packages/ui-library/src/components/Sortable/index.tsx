@@ -61,7 +61,7 @@ export default function SortableComponent({
     };
   }, []);
 
-  console.log("class",className)
+  console.log("class", className);
 
   return (
     <Box

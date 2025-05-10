@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
@@ -444,7 +443,10 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         const original = node.textContent;
         const bbox = node.getBoundingClientRect();
@@ -540,7 +542,10 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
     const firstNode = textNodes[0];
     const lastNode = textNodes[textNodes.length - 1];
     const showAndTruncate = (node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         //     const truncated =
         //       label.slice(0, Math.floor(label.length * TRUNCATE_RATIO)) + "…";
@@ -582,7 +587,10 @@ const HorizontalStackedBar: React.FC<HorizontalStackedBarChartProps> = ({
 
     usedRects = [];
     textNodes.forEach((node) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const bbox = node.getBoundingClientRect();
         const pnode = node.parentNode as Element;
         let y = 0;

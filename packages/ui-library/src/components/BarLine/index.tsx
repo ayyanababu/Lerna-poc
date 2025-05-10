@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { curveLinear } from "@visx/curve";
 import { Group } from "@visx/group";
@@ -34,7 +33,6 @@ const bottomHeightAddOnSpace = 0;
 const titleHeightAddOnSpace = 0;
 const activatesizing = true;
 const nodenametocheck = "SVG";
-
 
 const BarLineChart: React.FC<BarLineChartProps> = ({
   data: _data,
@@ -198,11 +196,9 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
     );
     if (AXISY_ROTATE) {
-      updatedHeight =
-        updatedHeight -
-        (
-          chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
-        ).getBBox().height;
+      updatedHeight -= (
+        chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
+      ).getBBox().height;
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
@@ -314,11 +310,9 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       DEFAULT_MARGIN.left + innerWidth + DEFAULT_MARGIN.right,
     );
     if (AXISX_ROTATE) {
-      updatedHeight =
-        updatedHeight -
-        (
-          chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
-        ).getBBox().height;
+      updatedHeight -= (
+        chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
+      ).getBBox().height;
     }
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);
@@ -339,7 +333,10 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         const original = node.textContent;
         const bbox = node.getBoundingClientRect();
@@ -387,7 +384,10 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
     centeronly: boolean,
   ) => {
     textNodes.slice(1, -1).forEach((node: SVGTextElement, index: number) => {
-      if (node && node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck) {
+      if (
+        node &&
+        node?.parentNode?.nodeName.toUpperCase() !== nodenametocheck
+      ) {
         const label = node.dataset.fulltext || node.textContent || "";
         const original = node.textContent;
         const bbox = node.getBoundingClientRect();
@@ -857,12 +857,12 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
                   let barX = (xScale(d.xAxis) ?? 0) + xOffset;
                   if (index === 0 || index === chartData.length - 1) {
                     if (index === 0) {
-                      barX = barX - BASE_ADJUST_WIDTH;
+                      barX -= BASE_ADJUST_WIDTH;
                     } else {
-                      barX = barX + BASE_ADJUST_WIDTH * 1.5;
+                      barX += BASE_ADJUST_WIDTH * 1.5;
                     }
                   } else {
-                    barX = barX + BASE_ADJUST_WIDTH / 2;
+                    barX += BASE_ADJUST_WIDTH / 2;
                   }
                   const barHeight =
                     drawableChartHeight - (leftScale(d.yAxisLeft) ?? 0);

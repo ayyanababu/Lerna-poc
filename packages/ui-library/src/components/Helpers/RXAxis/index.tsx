@@ -14,7 +14,6 @@ import { shimmerClassName } from "../Shimmer/Shimmer";
 import { shimmerGradientId } from "../Shimmer/SvgShimmer";
 import { XAxisProps } from "./types";
 
-
 //const MAX_LABEL_CHARS = 15;
 const FIXED_CLASSNAME_XLABELS = "fixed-classname-xlabels";
 const BASE_ADJUST_WIDTH = 0;
@@ -46,7 +45,7 @@ function XAxis({
   const { theme } = useTheme();
   const axisRef = useRef<SVGGElement>(null);
   const [isOverlapping, setIsOverlapping] = useState(false);
-  const [averageWidthPerChar, setAverageWidthPerChar] = useState(6);
+  const averageWidthPerChar = 6;
   const [isWrapped, setWrapped] = useState(false);
   const [wrappedMaxHeight, setwrappedMaxHeight] = useState(0);
 
@@ -65,21 +64,24 @@ function XAxis({
           return;
         }
         const usedRects: { x1: number; x2: number }[] = [];
-        nodeList.forEach((node: SVGTextElement) => {
-          const pnode = node.parentNode as SVGElement;
+        nodeList.forEach((node: Element) => {
+          const textNode = node as SVGTextElement;
+          const pnode = textNode.parentNode as SVGElement;
           let x = 0;
-          if (pnode && pnode.getAttribute("transform")){
-            const bbox = node.getBBox();            
+          if (pnode && pnode.getAttribute("transform")) {
+            const bbox = textNode.getBBox();
             const transform = pnode.getAttribute("transform");
             if (transform) {
-              const translateX = parseFloat(transform.split("translate(")[1].split(",")[0]);
+              const translateX = parseFloat(
+                transform.split("translate(")[1].split(",")[0],
+              );
               x = translateX + bbox.x;
             }
           } else {
-            const bbox = node.getBBox();   
+            const bbox = textNode.getBBox();
             x = +bbox.x;
           }
-          const bbox = node.getBBox();     
+          const bbox = textNode.getBBox();
           const rect = {
             x1: x - BASE_ADJUST_WIDTH,
             x2: x + bbox.width + BASE_ADJUST_WIDTH,
@@ -92,15 +94,18 @@ function XAxis({
         );
         let isOverlappings = false;
         nodeIndices.forEach((index: number) => {
-          nodeList.forEach((node: SVGTextElement, nindex: number) => {
+          nodeList.forEach((node: Element, nindex: number) => {
             if (index !== nindex) {
-              const bbox = node.getBBox();
+              const textNode = node as SVGTextElement;
+              const bbox = textNode.getBBox();
               let x = 0;
               const pnode = node.parentNode as SVGElement;
-              if (pnode && pnode.getAttribute("transform")){              
+              if (pnode && pnode.getAttribute("transform")) {
                 const transform = pnode.getAttribute("transform");
                 if (transform) {
-                  const translateX = parseFloat(transform.split("translate(")[1].split(",")[0]);
+                  const translateX = parseFloat(
+                    transform.split("translate(")[1].split(",")[0],
+                  );
                   x = translateX + bbox.x;
                 }
               } else {
@@ -113,12 +118,12 @@ function XAxis({
                 x1: x - ADD_ADJUST_WIDTH,
                 x2: x + bbox.width + ADD_ADJUST_WIDTH,
               };
-              const isOverlapping = us.some(
+              const isOverLapping = us.some(
                 (r: { x1: number; x2: number }) =>
                   !(rect.x2 >= r.x1 && rect.x2 <= r.x2),
               );
-              if (isOverlapping) {
-                isOverlappings = isOverlapping;
+              if (isOverLapping) {
+                isOverlappings = isOverLapping;
               }
             }
           });
@@ -147,7 +152,19 @@ function XAxis({
 
       return resizeObserver.unobserve(axisRef.current);
     }
+    return () => {};
   }, []);
+
+  useLayoutEffect(() => {
+    if (isOverlapping && axisRef.current) {
+      const textNodes = axisRef.current.querySelectorAll(
+        `.${FIXED_CLASSNAME_XLABELS}`,
+      ) as NodeListOf<SVGTextElement>;
+      if (textNodes.length > 0) {
+        wrap(textNodes); // 50 = approximate max width per label before wrapping
+      }
+    }
+  }, [isOverlapping, axisRef.current, calculateLabelWidths]);
 
   const overLineStyles = {
     fontSize: "10px",
@@ -186,11 +203,11 @@ function XAxis({
   }, [availableWidth, numTicks, scale, providedLabels, averageWidthPerChar]);
 
   const {
-    angle,
+    //    angle,
     evenPositionsMap,
     formatLabel,
-    rotate,
-    textAnchor,
+    //    rotate,
+    //    textAnchor,
     tickValues,
   } = useMemo(() => {
     const scaleLabels =
@@ -293,46 +310,47 @@ function XAxis({
   ]);
 
   const wrap = (textNodes: NodeListOf<SVGTextElement>) => {
-    const widths:number[] = [];
-    interface domaincheck{
-      name:string;
-      status:boolean;
+    const widths: number[] = [];
+    interface DomainCheck {
+      name: string;
+      status: boolean;
     }
-    const domainCheck:domaincheck[] = []
-    scale.domain().forEach((dmn)=>{
-      domainCheck.push({name:dmn,status:false});      
+    const domainCheck: DomainCheck[] = [];
+    scale.domain().forEach((dmn) => {
+      domainCheck.push({ name: dmn, status: false });
     });
-    barsList?.forEach((barw,index)=>{
-       if (index === barsList.length - 1){
-           const x:number = barw.x;
-           widths.push(chartWidth-x)
-       }else{
-           let domainfound = true;
-           domainCheck.map((dmn)=>{
-             const dmns = dmn;
-             if (dmn.name === barw.label && !dmn.status){
-               if (index > 1){
-                 if (barsList[index].x === barsList[index-1].x){
-                   domainfound = true;
-                 }else{
-                   domainfound = false;
-                 }
-                 dmns.status = true;
-               }else{
-                 domainfound = false;
-                 dmns.status = true;        
-               }  
-             }
-             return dmns
-           });
-           if (!domainfound){
-             const x1:number = barw.x;
-             const x2:number = barsList[index+1].x;
-             const diffwidth = x2 - x1;
-             widths.push(diffwidth);
-           }   
-       }
-    })    
+    console.log(barsList);
+    barsList?.forEach((barw, index) => {
+      if (index === barsList.length - 1) {
+        const x: number = barw.x;
+        widths.push(chartWidth - x);
+      } else {
+        let domainfound = true;
+        domainCheck.map((dmn) => {
+          const dmns = dmn;
+          if (dmn.name === barw.label && !dmn.status) {
+            if (index > 1) {
+              if (barsList[index].x === barsList[index - 1].x) {
+                domainfound = true;
+              } else {
+                domainfound = false;
+              }
+              dmns.status = true;
+            } else {
+              domainfound = false;
+              dmns.status = true;
+            }
+          }
+          return dmns;
+        });
+        if (!domainfound) {
+          const x1: number = barw.x;
+          const x2: number = barsList[index + 1].x;
+          const diffwidth = x2 - x1;
+          widths.push(diffwidth);
+        }
+      }
+    });
     let windex = -1;
     textNodes.forEach((textNode, index) => {
       windex++;
@@ -344,23 +362,22 @@ function XAxis({
       const lineHeight = 1.1; // ems
       const y = 1;
       const dy = 1;
-
-      let x = 0;
+      let xwrap: number = 0;
       if (windex === 0 || windex === textNodes.length - 1) {
         if (windex === 0) {
-          x = x - addGap;
+          xwrap -= addGap;
         }
         if (windex === textNodes.length - 1) {
-          x = x + addGap * 1.5;
+          xwrap += addGap * 1.5;
         }
       } else {
-        x = x + addGap / 2;
+        xwrap += addGap / 2;
       }
 
       let tspan = text
         .text(null)
         .append("tspan")
-        .attr("x", x)
+        .attr("x", xwrap)
         .attr("y", y)
         .attr("dy", dy + "em");
 
@@ -371,20 +388,20 @@ function XAxis({
           line.pop();
           tspan.text(line.join(" "));
           line = [word];
-          let x = 0;
+          xwrap = 0;
           if (index === 0 || index === textNodes.length - 1) {
             if (index === 0) {
-              x = x - addGap;
+              xwrap -= addGap;
             }
             if (index === textNodes.length - 1) {
-              x = x + addGap * 1.5;
+              xwrap += addGap * 1.5;
             }
           } else {
-            x = x + addGap / 2;
+            xwrap += addGap / 2;
           }
           tspan = text
             .append("tspan")
-            .attr("x", x)
+            .attr("x", xwrap)
             .attr("y", y)
             .attr("dy", ++lineNumber * lineHeight + dy + "em")
             .text(word);
@@ -405,7 +422,7 @@ function XAxis({
         }
       });
       let start = 0;
-      tspans.forEach((tspn:SVGTSpanElement) => {
+      tspans.forEach((tspn: SVGTSpanElement) => {
         tspn?.setAttribute("dy", `${start}em`);
         start += 1.1;
       });
@@ -428,17 +445,6 @@ function XAxis({
       setwrappedMaxHeight(wrapheight);
     }
   };
-
-  useLayoutEffect(() => {
-    if (isOverlapping && axisRef.current) {
-      const textNodes = axisRef.current.querySelectorAll(
-        `.${FIXED_CLASSNAME_XLABELS}`,
-      ) as NodeListOf<SVGTextElement>;
-      if (textNodes.length > 0) {
-        wrap(textNodes); // 50 = approximate max width per label before wrapping
-      }
-    }
-  }, [isOverlapping, axisRef.current, calculateLabelWidths]);
 
   const renderAxisLabel = (
     formattedValue: string | undefined,
