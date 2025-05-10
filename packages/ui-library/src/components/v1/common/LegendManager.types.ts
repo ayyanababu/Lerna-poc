@@ -1,4 +1,3 @@
-import { SetStateAction } from "react";
 import { scaleOrdinal } from "d3";
 
 import { LegendPosition, LegendsProps } from "../Legends/types";
