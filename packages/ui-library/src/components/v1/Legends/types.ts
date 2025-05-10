@@ -1,4 +1,4 @@
-import React, { SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { scaleOrdinal } from "@visx/scale";
 
 export enum LegendVariant {
@@ -40,9 +40,9 @@ export interface LegendsProps {
   colorScale?: ReturnType<typeof scaleOrdinal<string, string>>;
   data?: LegendData;
   hideIndex?: number[];
-  setHideIndex?: React.Dispatch<SetStateAction<number[]>>;
+  setHideIndex: Dispatch<SetStateAction<number[]>>; // ← match the setter type
   hovered?: string | null;
-  setHovered?: React.Dispatch<React.SetStateAction<string | null>>;
+  setHovered: (label: string) => void;
   position?: LegendPositionType;
   onClick?: (data: LegendData, legend: string, index: number) => void;
   isLoading?: boolean;

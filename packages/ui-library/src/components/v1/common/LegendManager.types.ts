@@ -1,4 +1,5 @@
-import { scaleOrdinal } from "d3";
+import { Dispatch, SetStateAction } from "react";
+import { scaleOrdinal } from "@visx/scale";
 
 import { LegendPosition, LegendsProps } from "../Legends/types";
 
@@ -13,9 +14,9 @@ export interface LegendManagerProps {
   legendData: LegendDataItem[];
   colorScale?: ReturnType<typeof scaleOrdinal<string, string>>;
   hideIndex: number[];
-  setHideIndex: (indices: number[]) => void;
+  setHideIndex: Dispatch<SetStateAction<number[]>>;
   hovered: string | null;
-  setHovered?: (label: string) => void;
+  setHovered: (label: string) => void;
   isLoading: boolean;
   isLegendRendered: (status: boolean) => void;
   generatedLegendHeight: (height: number) => void;

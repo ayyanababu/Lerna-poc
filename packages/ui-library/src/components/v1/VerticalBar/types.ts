@@ -15,7 +15,7 @@ export interface VerticalBarChartProps {
   colors?: string[];
   isLoading?: boolean;
   titleProps?: Partial<TitleProps>;
-  legendsProps?: Partial<LegendsProps>;
+  legendsProps?: LegendsProps;
   tooltipProps?: Partial<TooltipProps>;
   xAxisProps?: Partial<XAxisProps>;
   yAxisProps?: Partial<YAxisProps>;
