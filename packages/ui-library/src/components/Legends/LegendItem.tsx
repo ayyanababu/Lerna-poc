@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material";
 import { startCase } from "lodash-es";
 
 import useTheme from "../../hooks/useTheme";
-import { formatNumberWithCommas } from "../../utils/number";
+import { capitalizeWord, formatNumberWithCommas } from "../../utils/number";
 import { shimmerClassName } from "../Shimmer/Shimmer";
 import { LegendItemProps, LegendVariant } from "./types";
 
@@ -46,7 +46,7 @@ function LegendItem({
   if (isLoading) {
     displayText = "loading";
   } else if (label?.datum) {
-    displayText = startCase(label.datum);
+    displayText = capitalizeWord(label.datum);
   }
 
   const valueText =

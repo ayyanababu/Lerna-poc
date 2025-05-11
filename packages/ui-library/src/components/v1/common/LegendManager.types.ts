@@ -6,6 +6,7 @@ import { LegendPosition, LegendsProps } from "../Legends/types";
 export interface LegendDataItem {
   label: string;
   value: number;
+  color?: string;
 }
 
 export interface LegendManagerProps {

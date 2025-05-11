@@ -225,7 +225,7 @@ function Legends({
               onMouseOver={() => handleMouseOver(lb.text)}
               onMouseLeave={handleMouseLeave}
               hideValues={hideValues}
-              markerColor={colorScale(label.label)}
+              markerColor={label.color || colorScale(label.label)}
               onArrowClick={() => {
                 if (onClick && data) {
                   onClick(data, lb.text, index);
