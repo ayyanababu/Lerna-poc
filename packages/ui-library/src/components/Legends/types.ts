@@ -15,12 +15,7 @@ export enum LegendPosition {
 }
 
 export type LegendVariantType = LegendVariant;
-export type LegendPositionType =
-  | LegendPosition
-  | "top"
-  | "bottom"
-  | "left"
-  | "right";
+export type LegendPositionType = LegendPosition;
 
 export type LegendItem = {
   label: string;

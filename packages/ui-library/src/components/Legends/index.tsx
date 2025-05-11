@@ -67,6 +67,7 @@ function Legends({
         gap: variant === "compact" ? "8px" : "8px",
         backgroundColor: theme.colors.legend.background,
         borderRadius: "4px",
+        width: [LegendPosition.LEFT, LegendPosition.RIGHT].includes(position) ? "40%" : "unset",
       }}
     >
       <LegendOrdinal

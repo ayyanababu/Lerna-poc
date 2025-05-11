@@ -94,6 +94,7 @@ export const ChartWrapper = forwardRef<HTMLDivElement, ChartWrapperProps>(
                     flexDirection:
                       position === LegendPosition.LEFT ? "row" : "row-reverse",
                     alignItems: "center",
+                    justifyContent: "space-between",
                   }
                 : {
                     flexDirection:
