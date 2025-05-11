@@ -21,7 +21,6 @@ const useChartDimensions = ({
   defaultMargin,
   chartSvgRef,
 }: ChartDimensionsProps) => {
-  const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
   const [drawableChartHeight, setDrawableChartHeight] = useState<number>(0);
   const [legendTopPosition, setTopLegendPosition] = useState<number>(0);
   const [legendLeft, setLegendLeft] = useState<number>(0);
@@ -35,16 +34,6 @@ const useChartDimensions = ({
   const [adjustedChartHeight, setAdjustedChartHeight] = useState<number | null>(
     null,
   );
-
-  // Calculate maxLabelWidth from y-axis labels
-  useEffect(() => {
-    if (!chartSvgRef.current) return;
-    const nodes = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
-    const widths = Array.from(nodes).map(
-      (node) => (node as SVGGraphicsElement).getBBox().width,
-    );
-    setMaxLabelWidth(Math.max(...widths, 0));
-  }, [width, height, chartSvgRef]);
 
   // Calculate adjusted chart dimensions
   useEffect(() => {
