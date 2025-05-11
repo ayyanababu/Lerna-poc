@@ -56,6 +56,7 @@ function LegendItem({
         borderRadius: "4px",
         width: "12px",
         height: "12px",
+        flexShrink: 0
       }}
       onClick={() => onToggle?.()}
       className={isLoading ? shimmerClassName : ""}
