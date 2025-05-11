@@ -36,7 +36,7 @@ const DEFAULT_MAX_BAR_WIDTH = 16;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const TICK_LABEL_PADDING = 8;
-const BASE_ADJUST_WIDTH = 5;
+const BASE_ADJUST_WIDTH = 8;
 
 const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   data: _data,
@@ -75,6 +75,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
   console.log("##### verticalbar", parentRef, width, height, data);
 
+  const [yAxisLabelWidth, setYAxisLabelWidth] = useState<number>(defaultMargin.left + TICK_LABEL_PADDING);
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
@@ -87,7 +88,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const [barList, setBarList] = useState<BarsList[]>([]);
 
   const {
-    maxLabelWidth,
     drawableChartHeight,
     setDrawableChartHeight,
     legendTopPosition,
@@ -112,7 +112,23 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     overall_chart,
   });
 
-  const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
+  
+  useEffect(() => {
+    const svg = document.querySelector("svg");
+    if (!isLoading && svg) {
+      const axisLefts = svg.querySelector(".visx-axis-left");
+
+      if (axisLefts) {
+        const nodes = axisLefts.querySelectorAll("text");
+        const widths = Array.from(nodes).map(
+          (node) => (node as SVGGraphicsElement).getBBox().width
+        );
+        const maxWidth = Math.max(...widths, 0) + TICK_LABEL_PADDING;
+        setYAxisLabelWidth(maxWidth);
+      }
+    }
+  }, [isLoading]);
+  
   const innerWidth = width - defaultMargin.right;
 
   useEffect(() => {
