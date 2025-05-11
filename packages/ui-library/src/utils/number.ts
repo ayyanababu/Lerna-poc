@@ -31,3 +31,11 @@ export function formatNumberWithCommas(value: number | string): string {
     useGrouping: true,
   });
 }
+
+export function capitalizeWord(value: string): string {
+  if(value == null){
+    return '';
+  }
+
+  return value.split(' ').map(word => capitalize(word)).join(' ');
+}
