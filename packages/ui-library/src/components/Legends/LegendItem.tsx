@@ -84,49 +84,60 @@ function LegendItem({
         borderBottom: `1px solid ${theme.colors.common.border}`,
         paddingBottom: "8px",
         ">*:first-child": {
-          marginTop: "1px"
-        }
+          marginTop: "1px",
+        },
       }}
     >
       {renderMarker()}
-      <Typography
-        variant="caption"
+      <Box
         sx={{
-          margin: 0,
-          textDecoration: doStrike && isHidden ? "line-through" : "none",
-          color: theme.colors.legend.text,
-          lineHeight: "normal",
-          letterSpacing: "0.4px",
-          paddingTop: "1px",
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: "4px",
+          alignItems: "start",
+          justifyContent: "space-between",
+          width: "100%",
         }}
-        onClick={() => onToggle?.()}
-        className={isLoading ? shimmerClassName : ""}
       >
-        {displayText}
-      </Typography>
-      <Typography
-        variant="subtitle1"
-        sx={{
-          margin: 0,
-          textDecoration: doStrike && isHidden ? "line-through" : "none",
-          color: theme.colors.legend.text,
-          paddingTop: "1px",
-          fontFamily: "Roboto",
-          fontStyle: "normal",
-          lineHeight: "normal",
-          fontWeight: 500,
-          fontSize: "12px",
-          letterSpacing: "0.4px",
-          marginLeft: 'auto'
-        }}
-        onClick={() => onToggle?.()}
-        className={isLoading ? shimmerClassName : ""}
-      >
-        {!hideValues &&
-          (isLoading
-            ? "loadingloading"
-            : `${valueText ? formatNumberWithCommas(valueText) : ""}`)}
-      </Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            margin: 0,
+            textDecoration: doStrike && isHidden ? "line-through" : "none",
+            color: theme.colors.legend.text,
+            lineHeight: "normal",
+            letterSpacing: "0.4px",
+            paddingTop: "1px",
+          }}
+          onClick={() => onToggle?.()}
+          className={isLoading ? shimmerClassName : ""}
+        >
+          {displayText}
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            margin: 0,
+            textDecoration: doStrike && isHidden ? "line-through" : "none",
+            color: theme.colors.legend.text,
+            paddingTop: "1px",
+            fontFamily: "Roboto",
+            fontStyle: "normal",
+            lineHeight: "normal",
+            fontWeight: 500,
+            fontSize: "12px",
+            letterSpacing: "0.4px",
+          }}
+          onClick={() => onToggle?.()}
+          className={isLoading ? shimmerClassName : ""}
+        >
+          {!hideValues &&
+            (isLoading
+              ? "loadingloading"
+              : `${valueText ? formatNumberWithCommas(valueText) : ""}`)}
+        </Typography>
+      </Box>
       <ArrowOutwardIcon
         className="arrow-icon"
         sx={{
@@ -180,7 +191,7 @@ function LegendItem({
         {!hideValues &&
           (isLoading
             ? "loadingloading"
-            : ` (${valueText?formatNumberWithCommas(valueText):''})`)}
+            : ` (${valueText ? formatNumberWithCommas(valueText) : ""})`)}
       </Typography>
       <ArrowOutwardIcon
         className="arrow-icon"
