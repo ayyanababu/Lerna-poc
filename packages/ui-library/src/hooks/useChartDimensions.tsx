@@ -36,44 +36,16 @@ const useChartDimensions = ({
     null,
   );
 
-  // Calculate maxLabelWidth from y-axis labels
-  useEffect(() => {
-    if (!chartSvgRef.current) return;
-    const nodes = chartSvgRef.current.querySelectorAll(".visx-axis-left text");
-    const widths = Array.from(nodes).map(
-      (node) => (node as SVGGraphicsElement).getBBox().width,
-    );
-    setMaxLabelWidth(Math.max(...widths, 0));
-  }, [width, height, chartSvgRef]);
 
   // Calculate adjusted chart dimensions
   useEffect(() => {
     if (!chartSvgRef.current || !width || !height) return;
-    const svg = chartSvgRef.current;
-    const bbox = svg.getBBox();
+  //  const svg = chartSvgRef.current;
+  //  const bbox = svg.getBBox();
 
-    let updatedHeight = Math.max(
-      defaultMargin.top + bbox.height + defaultMargin.bottom,
-      height,
-    );
+    let updatedHeight = height - defaultMargin.top  - defaultMargin.bottom;
 
-    const updatedWidth = Math.max(
-      width,
-      defaultMargin.left + (width - defaultMargin.right) + defaultMargin.right,
-    );
-
-    // Adjust for x-axis rotation if needed
-    const axisx_rotate = false; // This could be parameterized
-    if (
-      axisx_rotate &&
-      chartSvgRef.current.querySelector(".visx-axis-bottom")
-    ) {
-      updatedHeight -= (
-        chartSvgRef.current.querySelector(".visx-axis-bottom") as SVGGElement
-      ).getBBox().height;
-    }
-
-    updatedHeight = height + defaultMargin.top + defaultMargin.bottom;
+    const updatedWidth =  width - defaultMargin.left - defaultMargin.right;
 
     setAdjustedChartHeight(updatedHeight);
     setAdjustedChartWidth(updatedWidth);

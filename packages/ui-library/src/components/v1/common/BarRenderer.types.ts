@@ -24,4 +24,5 @@ export interface BarRendererProps {
   barProps?: CustomBarProps;
   onClick?: (event: React.MouseEvent, data: DataPoint, index: number) => void;
   transferBarList: (barlist: BarsList[]) => void;
+
 }

@@ -48,10 +48,19 @@ const YAxisComponent: React.FC<YAxisProps> = ({
   return <YAxis scale={scale} isLoading={isLoading} {...props} />;
 };
 
+const Y1AxisComponent: React.FC<YAxisProps> = ({
+  scale,
+  isLoading,
+  ...props
+}) => {
+  return <YAxis scale={scale} isLoading={isLoading} {...props} />;
+};
+
 // Export both axis components
 const AxisManager = {
   XAxis: XAxisComponent,
   YAxis: YAxisComponent,
+  Y1Axis:Y1AxisComponent
 };
 
 export default AxisManager;

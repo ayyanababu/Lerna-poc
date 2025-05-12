@@ -36,6 +36,7 @@ export interface LinearScaleInterface {
 export interface ChartScales {
   xScale: BandScaleInterface;
   yScale: LinearScaleInterface;
+  y1Scale: LinearScaleInterface;
 }
 
 interface ChartScalesProps {
@@ -140,17 +141,25 @@ const useChartScales = ({
   innerWidth,
   drawableChartHeight,
 }: ChartScalesProps): ChartScales => {
-  const maxValue = useMemo(
+  const maxY1Value = useMemo(
     () =>
-      Math.max(0, ...filteredData.map((d) => Number(d.value) || 0)) *
+      Math.max(0, ...filteredData.map((d) => d.value?Number(d.value) : d.yAxisLeft?Number(d.yAxisLeft):0)) *
       SCALE_PADDING,
     [filteredData],
   );
+  console.log(maxY1Value);
+  console.log(filteredData)
+  const maxY2Value = useMemo(
+    () =>
+      Math.max(0, ...filteredData.map((d) => Number(d.yAxisRight) || 0)) *
+      SCALE_PADDING,
+    [filteredData],
+  );  
 
   // Create and enhance the xScale
   const xScale = useMemo(() => {
     const scale = scaleBand<string>({
-      domain: filteredData.map((d) => String(d.label)),
+      domain: filteredData.map((d) => String(d.label || d.xAxis)),
       range: [0, innerWidth],
       padding: 0.6,
       round: true,
@@ -162,15 +171,26 @@ const useChartScales = ({
   // Create and enhance the yScale
   const yScale = useMemo(() => {
     const scale = scaleLinear<number>({
-      domain: [0, maxValue],
+      domain: [0, maxY1Value],
       range: [drawableChartHeight, 0],
       nice: true,
     });
 
     return enhanceVisxLinearScale(scale);
-  }, [drawableChartHeight, maxValue]);
+  }, [drawableChartHeight, maxY1Value]);
 
-  return { xScale, yScale };
+  const y1Scale = useMemo(() => {
+    const scale = scaleLinear<number>({
+      domain: [0, maxY2Value],
+      range: [drawableChartHeight, 0],
+      nice: true,
+    });
+
+    return enhanceVisxLinearScale(scale);
+  }, [drawableChartHeight, maxY2Value]);  
+console.log("yscale",yScale);
+console.log("y1scale",y1Scale)
+  return { xScale, yScale, y1Scale };
 };
 
 export default useChartScales;

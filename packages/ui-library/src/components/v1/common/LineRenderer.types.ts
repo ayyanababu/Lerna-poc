@@ -1,36 +1,24 @@
+import { TooltipProps, GridProps } from "@mui/material";
 import { CSSProperties } from "react";
 import { CustomBarProps } from "../../CustomBar/types";
-import { GridProps } from "../../Grid/types";
 import { TimestampProps } from "../../Timestamp/types";
 import { TitleProps } from "../../Title/types";
-import { TooltipProps } from "../../Tooltip/types";
-import { XAxisProps } from "../../XAxis/types";
-import { YAxisProps } from "../../YAxis/types";
-import { DataPoint } from "../common/types";
 import { LegendsProps } from "../Legends/types";
-import { BarLineData } from "../common/LineRenderer.types";
+import { XAxisProps } from "../XAxis/types";
+import { YAxisProps } from "../YAxis/types";
 
-export interface VerticalBarChartProps {
-  data: DataPoint[];
-  type?:string;
-  title?: string;
-  margin?: { top: number; right: number; bottom: number; left: number };
-  colors?: string[];
-  isLoading?: boolean;
-  titleProps?: Partial<TitleProps>;
-  legendsProps?: LegendsProps;
-  tooltipProps?: Partial<TooltipProps>;
-  xAxisProps?: Partial<XAxisProps>;
-  yAxisProps?: Partial<YAxisProps>;
-  gridProps?: Partial<GridProps>;
-  timestampProps?: Partial<TimestampProps>;
-  barProps?: Partial<CustomBarProps>;
-  maxBarWidth?: number;
-  onClick?: (
-    event: React.MouseEvent<SVGGElement, MouseEvent>,
-    data: DataPoint,
-    index: number,
-  ) => void;
+export interface BarLineDataPoint {
+  xAxis: string;
+  yAxisLeft: number;
+  yAxisRight: number;
+  barColor?: string;
+}
+
+export interface BarLineData {
+  xAxislabel: string;
+  yAxisLeftLabel: string;
+  yAxisRightLabel: string;
+  chartData: BarLineDataPoint[];
 }
 
 export interface BarLineChartProps {
@@ -149,9 +137,3 @@ export interface BarLineChartProps {
    */
   showXAxis?: boolean;
 }
-
-
-
-
-
-

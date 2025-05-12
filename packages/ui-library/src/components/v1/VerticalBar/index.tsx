@@ -20,15 +20,17 @@ import SvgShimmer from "../../Shimmer/SvgShimmer";
 import { TooltipData } from "../../Tooltip/types";
 import AxisManager from "../common/AxisManager";
 import BarRenderer from "../common/BarRenderer";
+import LineRenderer from "../common/LineRenderer";
 import LegendManager from "../common/LegendManager";
 import { BarsList, DataPoint } from "../common/types";
 import mockVerticalBarChartData from "./mockdata";
-import { VerticalBarChartProps } from "./types";
+import mockBarLineChartData from "../../BarLine/mockData";
+import { VerticalBarChartProps, BarLineData } from "./types";
 
 const defaultMargin = {
   top: 5,
   right: 40,
-  bottom: 50,
+  bottom: 10,
   left: 25,
 };
 
@@ -41,6 +43,7 @@ const BASE_ADJUST_WIDTH = 5;
 const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   data: _data,
   title,
+  type,
   colors = [],
   isLoading = false,
   titleProps,
@@ -87,7 +90,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const [barList, setBarList] = useState<BarsList[]>([]);
 
   const {
-    maxLabelWidth,
     drawableChartHeight,
     setDrawableChartHeight,
     legendTopPosition,
@@ -112,8 +114,22 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     overall_chart,
   });
 
-  const yAxisLabelWidth = maxLabelWidth + TICK_LABEL_PADDING;
+  let yAxisLabelWidth = defaultMargin.left + TICK_LABEL_PADDING;
+  // if (axis_left.current){
+  //   const nodes = axis_left.current.querySelectorAll(".visx-axis-left text");
+  //   const widths = Array.from(nodes).map(
+  //     (node) => (node as SVGGraphicsElement).getBoundingClientRect().width,
+  //   );
+  //   yAxisLabelWidth =  Math.max(...widths, 0) + TICK_LABEL_PADDING;
+  // }    
   const innerWidth = width - defaultMargin.right;
+
+  const bardata = useMemo<BarLineData>(
+    () => (isLoading ? mockBarLineChartData : _data),
+    [isLoading, _data],
+  );  
+
+  const { xAxislabel, yAxisLeftLabel, yAxisRightLabel, chartData } = bardata;
 
   useEffect(() => {
     if (legendsProps) {
@@ -154,7 +170,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     tooltipOpen,
   } = useTooltip<TooltipData[]>();
 
-  const { xScale, yScale } = useChartScales({
+  const { xScale, yScale, y1Scale } = useChartScales({
     filteredData,
     innerWidth,
     drawableChartHeight,
@@ -164,10 +180,23 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const typedXscale = xScale as any;
   const typedYscale = yScale as any;
 
-  const legendData = useMemo(
-    () => data.map((d) => ({ label: d.label, value: d.value })),
-    [data],
-  );
+  const legendData = useMemo(() => {
+    if (yAxisLeftLabel !== undefined && yAxisRightLabel !== undefined) {
+      return [
+        { label: yAxisLeftLabel, value: 0 },
+        { label: yAxisRightLabel, value: 0 },
+        ...data.map((d) => ({
+          label: d.label || d.yAxisLeftLabel || '',
+          value: d.value,
+        })),
+      ];
+    } else {
+      return data.map((d) => ({
+        label: d.label || d.yAxisLeftLabel || '',
+        value: d.value,
+      }));
+    }  
+  }, [data, yAxisLeftLabel, yAxisRightLabel]);
 
   const colorScale = useMemo(() => {
     if (colors?.length) {
@@ -187,17 +216,31 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     (value: number, color: string, index: number) =>
       (event: React.MouseEvent) => {
         if (!isLoading) {
-          showTooltip({
-            tooltipData: [
-              {
-                label: filteredData[index].label,
-                value,
-                color,
-              },
-            ],
-            tooltipLeft: event.clientX,
-            tooltipTop: event.clientY,
-          });
+          if (chartData && chartData[index]){
+            const { yAxisLeft, yAxisRight } = chartData[index];            
+            const toolTipdata = [
+              { label: yAxisLeftLabel, value: yAxisLeft, color: colors.bar },
+              { label: yAxisRightLabel, value: yAxisRight, color: colors.line },
+            ];
+            showTooltip({
+              tooltipData: toolTipdata,
+              tooltipLeft: event.clientX,
+              tooltipTop: event.clientY,
+            });               
+          }else{
+            showTooltip({
+              tooltipData: [
+                {
+                  label: filteredData[index].label,
+                  value,
+                  color,
+                },
+              ],
+              tooltipLeft: event.clientX,
+              tooltipTop: event.clientY,
+            });
+         
+          }  
           setHoveredBar(index);
         }
       },
@@ -217,15 +260,13 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         let legendhgt = 0;
         if (legend_ref && legend_ref.current) {
           const currentLegendHeight = (legend_ref.current as SVGGElement)
-            .querySelector("div")
-            ?.querySelector("svg");
           if (currentLegendHeight) {
             legendhgt = currentLegendHeight.getBBox().height;
           }
         }
 
         const hgt =
-          height - defaultMargin.top - defaultMargin.bottom - legendhgt;
+          height - defaultMargin.top - defaultMargin.bottom - legendhgt - axis_bottom.current.getBBox().height + TICK_LABEL_PADDING;
         setDrawableChartHeight(hgt);
 
         let moveY = 0;

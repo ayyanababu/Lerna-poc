@@ -235,7 +235,7 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
     new Promise((resolve) => {
         setTimeout(() => {
             resolve([
-                { label: 'Priced', value: 123 },
+                { label: 'Priced hahf  shs fsh s   sdh dsh   h ds fhsf sh', value: 123 },
                 { label: 'Priced', value: 2450 },
                 { label: 'Priced', value: 36700 },
                 { label: 'Priced', value: 48900 },
@@ -527,7 +527,7 @@ function DashboardPage() {
                     fetchVerticalGroupedBarData(),
                     fetchHorizontalGroupedBarData(),
                 ]);
-
+console.log("barline",barLineResult)
                 // Update state with fetched data
                 setDonutData(donutResult);
                 setSemiDonutData(semiDonutResult);
@@ -841,7 +841,7 @@ body:not(.dark) {
 
 
                             {/* VerticalBarChart example */}
-                            <SortableCard height={400} width={'100%'}>
+                            <SortableCard height={400} width={'300'}>
                                 <VerticalBarChart
                                     data={verticalBarData}
                                     title="Valuation"
@@ -852,6 +852,7 @@ body:not(.dark) {
                                         '#93a3bc',
                                     ]}
                                     isLoading={dataLoading.verticalBar}
+                                    type="vertical bar"
                                     legendsProps={{
                                         showArrow: false,
                                         position: Legends.Position.BOTTOM,
