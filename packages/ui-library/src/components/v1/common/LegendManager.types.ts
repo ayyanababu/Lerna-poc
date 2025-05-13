@@ -6,6 +6,7 @@ import { LegendPosition, LegendsProps } from "../Legends/types";
 export interface LegendDataItem {
   label: string;
   value: number;
+  color?: string;
 }
 
 export interface LegendManagerProps {
@@ -24,7 +25,7 @@ export interface LegendManagerProps {
   legendLeft: number;
   legendTopPosition: number;
   innerWidth: number;
-  legendHeight: number;
+  legendBoxHeight: number;
   calculatedLegendHeight: number;
   legendBoxWidth: number;
 }

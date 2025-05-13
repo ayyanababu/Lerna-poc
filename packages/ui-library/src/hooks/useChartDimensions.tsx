@@ -21,7 +21,6 @@ const useChartDimensions = ({
   defaultMargin,
   chartSvgRef,
 }: ChartDimensionsProps) => {
-  const [maxLabelWidth, setMaxLabelWidth] = useState<number>(60);
   const [drawableChartHeight, setDrawableChartHeight] = useState<number>(0);
   const [legendTopPosition, setTopLegendPosition] = useState<number>(0);
   const [legendLeft, setLegendLeft] = useState<number>(0);
@@ -37,28 +36,14 @@ const useChartDimensions = ({
   );
 
 
-  // Calculate adjusted chart dimensions
-  useEffect(() => {
-    if (!chartSvgRef.current || !width || !height) return;
-  //  const svg = chartSvgRef.current;
-  //  const bbox = svg.getBBox();
-
-    let updatedHeight = height - defaultMargin.top  - defaultMargin.bottom;
-
-    const updatedWidth =  width - defaultMargin.left - defaultMargin.right;
-
-    setAdjustedChartHeight(updatedHeight);
-    setAdjustedChartWidth(updatedWidth);
-  }, [width, height, defaultMargin, chartSvgRef]);
-
   // Set initial drawable chart height
   useEffect(() => {
     setDrawableChartHeight(height - defaultMargin.top - defaultMargin.bottom);
   }, [height, defaultMargin]);
 
+  
+
   return {
-    maxLabelWidth,
-    setMaxLabelWidth,
     drawableChartHeight,
     setDrawableChartHeight,
     legendTopPosition,

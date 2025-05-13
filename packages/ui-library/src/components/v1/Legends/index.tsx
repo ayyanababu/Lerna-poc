@@ -57,10 +57,11 @@ function Legends({
   }, [hideIndex]);
 
   useEffect(() => {
-    if (eachLegendGap && data && generatedLegendHeight) {
-      generatedLegendHeight((data.length - 1) * eachLegendGap - 10);
+    if (eachLegendGap && data && generatedLegendHeight && legends_ref && legends_ref.current) {
+      generatedLegendHeight(legends_ref.current.getBBox().height+10);
+ //    generatedLegendHeight((data.length - 1) * eachLegendGap);
     }
-  }, [data, generatedLegendHeight]);
+  }, [data, generatedLegendHeight,eachLegendGap,isLegendRendered]);
 
   const handleToggleItem = useCallback(
     (index: number) => {
@@ -184,8 +185,8 @@ function Legends({
           );
         });
       });
-      if (generatedLegendHeight) {
-        generatedLegendHeight(legends_ref.current.getBBox().height);
+      if (generatedLegendHeight ) {
+        generatedLegendHeight(legends_ref.current.getBBox().height+10);
       }
     }
   };
@@ -194,13 +195,13 @@ function Legends({
     <g ref={legends_ref} transform={positionStyles}>
       <>
         {data.map((label, index) => {
-          if (index > data.length - 1) {
-            return null;
-          }
           if (index === data.length - 1 && isLegendRendered) {
             wrapLegendsText();
             isLegendRendered(true);
           }
+          if (index > data.length - 1) {
+            return null;
+          }          
           const isHidden = hideIndex?.includes(index);
           const lb = {
             index: index,
@@ -225,7 +226,7 @@ function Legends({
               onMouseOver={() => handleMouseOver(lb.text)}
               onMouseLeave={handleMouseLeave}
               hideValues={hideValues}
-              markerColor={colorScale(label.label)}
+              markerColor={label.color || colorScale(label.label)}
               onArrowClick={() => {
                 if (onClick && data) {
                   onClick(data, lb.text, index);

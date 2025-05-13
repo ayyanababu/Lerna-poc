@@ -26,19 +26,20 @@ import { BarsList, DataPoint } from "../common/types";
 import mockVerticalBarChartData from "./mockdata";
 import mockBarLineChartData from "../../BarLine/mockData";
 import { VerticalBarChartProps, BarLineData } from "./types";
+import React from "react";
 
 const defaultMargin = {
   top: 5,
-  right: 40,
-  bottom: 10,
-  left: 25,
+  right: 20,
+  bottom: 0,
+  left: 50,
 };
 
 const DEFAULT_MAX_BAR_WIDTH = 16;
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const TICK_LABEL_PADDING = 8;
-const BASE_ADJUST_WIDTH = 5;
+const BASE_ADJUST_WIDTH = 8;
 
 const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   data: _data,
@@ -78,6 +79,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
   console.log("##### verticalbar", parentRef, width, height, data);
 
+  const [yAxisLabelWidth, setYAxisLabelWidth] = useState<number>(defaultMargin.left + TICK_LABEL_PADDING);
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
@@ -88,6 +90,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
   const [refreshAxis, setRefreshAxis] = useState(0);
   const [barList, setBarList] = useState<BarsList[]>([]);
+  const [innerWidth,setInnerWidth] = useState(0);
 
   const {
     drawableChartHeight,
@@ -114,15 +117,27 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     overall_chart,
   });
 
-  let yAxisLabelWidth = defaultMargin.left + TICK_LABEL_PADDING;
-  // if (axis_left.current){
-  //   const nodes = axis_left.current.querySelectorAll(".visx-axis-left text");
-  //   const widths = Array.from(nodes).map(
-  //     (node) => (node as SVGGraphicsElement).getBoundingClientRect().width,
-  //   );
-  //   yAxisLabelWidth =  Math.max(...widths, 0) + TICK_LABEL_PADDING;
-  // }    
-  const innerWidth = width - defaultMargin.right;
+  
+  useEffect(() => {
+    const svg = document.querySelector("svg");
+    if (!isLoading && svg) {
+      const axisLefts = svg.querySelector(".visx-axis-left");
+
+      if (axisLefts) {
+        const nodes = axisLefts.querySelectorAll("text");
+        const widths = Array.from(nodes).map(
+          (node) => (node as SVGGraphicsElement).getBBox().width
+        );
+        const maxWidth = Math.max(...widths, 0) + TICK_LABEL_PADDING;
+        setYAxisLabelWidth(maxWidth);
+      }
+    }
+  }, [isLoading]);
+
+
+  useEffect(()=>{
+    setInnerWidth(width - defaultMargin.right - (yAxisLabelWidth>defaultMargin.left?yAxisLabelWidth:defaultMargin.left));
+  },[width,chartSvgRef,axis_left,axis_bottom])  
 
   const bardata = useMemo<BarLineData>(
     () => (isLoading ? mockBarLineChartData : _data),
@@ -257,16 +272,19 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   const wrapped = useCallback(
     (isWrapped: boolean) => {
       if (isWrapped && chartSvgRef.current && axis_bottom.current) {
-        let legendhgt = 0;
+        let legendheight = 0;
         if (legend_ref && legend_ref.current) {
-          const currentLegendHeight = (legend_ref.current as SVGGElement)
-          if (currentLegendHeight) {
-            legendhgt = currentLegendHeight.getBBox().height;
+          const currentLegend = (legend_ref.current as SVGGElement)
+          if (currentLegend) {
+            legendheight = currentLegend.getBBox().height;
           }
         }
-
+        let axisheight = 0;
+        if (axis_bottom && axis_bottom.current) {        
+          axisheight = axis_bottom.current.getBBox().height
+        }  
         const hgt =
-          height - defaultMargin.top - defaultMargin.bottom - legendhgt - axis_bottom.current.getBBox().height + TICK_LABEL_PADDING;
+          height - defaultMargin.top - defaultMargin.bottom - legendheight - axisheight + TICK_LABEL_PADDING;
         setDrawableChartHeight(hgt);
 
         let moveY = 0;
@@ -283,16 +301,16 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       height,
       setDrawableChartHeight,
       setTopLegendPosition,
+      isLoading
     ],
   );
 
-  const generatedLegendHeight = useCallback(
-    (calculatedlegendHeight: number) => {
+  const generatedLegendHeight =  (calculatedlegendHeight: number) => {
       if (legendsProps) {
         setCalculatedLegendHeight(calculatedlegendHeight);
-        if (legendHeight > 0) {
-          return;
-        }
+//        if (legendHeight > 0) {
+//          return;
+//        }
         const { scrollbarAfter, eachLegendGap } = legendsProps;
         if (
           typeof scrollbarAfter === "number" &&
@@ -309,22 +327,20 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           }
         }
       }
-    },
-    [legendsProps],
-  );
+  }  
+   // [legendsProps],
+ // );
 
-  const isLegendRendered = useCallback(
-    (renderedStatus: boolean) => {
+  const isLegendRendered = (renderedStatus: boolean) => {
       if (renderedStatus) {
-        setLegendBoxWidth(innerWidth);
-        const axisBottom = chartSvgRef?.current?.querySelector(
-          ".visx-axis-bottom",
-        ) as SVGGElement;
+        if (chartSvgRef && chartSvgRef.current){
+          setLegendBoxWidth((chartSvgRef?.current?.querySelector("g") as SVGGElement).getBBox().width);
+        }  
         let moveY = 0;
-        if (axisBottom) {
-          const axisBottomBBox = axisBottom.getBBox();
-          if (axisBottom && axisBottom.getAttribute("transform")) {
-            const transform = axisBottom.getAttribute("transform");
+        if (axis_bottom && axis_bottom.current) {
+          const axisBottomBBox = axis_bottom.current.getBBox();
+          if (axis_bottom && axis_bottom.current.getAttribute("transform")) {
+            const transform = axis_bottom.current.getAttribute("transform");
             if (transform) {
               const translateY = parseFloat(
                 transform.split("translate(")[1].split(",")[1],
@@ -334,39 +350,30 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           } else {
             moveY = +axisBottomBBox.y + axisBottomBBox.height;
           }
-          setTopLegendPosition(moveY);
+          setTopLegendPosition(moveY+10);
         }
-        const axisLeft = chartSvgRef?.current?.querySelector(
-          ".visx-axis-left",
-        ) as SVGGElement;
-        if (axisLeft) {
-          setLegendLeft(axisLeft.getBBox().x + 10);
+        if (axis_left && axis_left.current) {
+          setLegendLeft(axis_left.current.getBBox().x);
         }
       }
-
+      let legendcalculatedHeight = 0;
       if (legend_ref && legend_ref.current && legendsProps?.isVisible) {
-        let legendcalculatedHeight = 0;
         if (legend_ref && legend_ref.current) {
           legendcalculatedHeight = legend_ref.current.getBBox().height;
         }
-        const hgt =
+      }   
+      let axisbottomheight:number = 0;
+      if (axis_bottom && axis_bottom.current) {
+        axisbottomheight = (axis_bottom.current as SVGGElement).getBBox().height;
+      }    
+      const hgt =
           height -
           defaultMargin.top -
           defaultMargin.bottom -
-          legendcalculatedHeight;
-        setDrawableChartHeight(hgt);
-      }
-    },
-    [
-      chartSvgRef,
-      height,
-      innerWidth,
-      setLegendBoxWidth,
-      setTopLegendPosition,
-      setLegendLeft,
-      setDrawableChartHeight,
-    ],
-  );
+          legendcalculatedHeight -
+          axisbottomheight
+      setDrawableChartHeight(hgt);
+  };
 
   const generateAxis = useCallback((selectedLegends: number[]) => {
     setRefreshAxis(selectedLegends.length);
@@ -424,11 +431,11 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     >
       <svg
         ref={chartSvgRef}
-        width={adjustedChartWidth || width}
-        height={adjustedChartHeight || height}
+        width="100%"
+        height="100%"
       >
         {isLoading && <SvgShimmer />}
-        <Group top={defaultMargin.top} left={yAxisLabelWidth}>
+        <Group top={defaultMargin.top} left={yAxisLabelWidth>defaultMargin.left?yAxisLabelWidth:defaultMargin.left}>
           <g ref={overall_chart}>
             <g ref={axis_left}>
               <AxisManager.YAxis
@@ -500,7 +507,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
               legendLeft={legendLeft}
               legendTopPosition={legendTopPosition}
               innerWidth={innerWidth}
-              legendHeight={legendHeight}
+              legendBoxHeight={legendHeight}
               calculatedLegendHeight={calculatedLegendHeight}
               legendBoxWidth={legendBoxWidth}
             />

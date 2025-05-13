@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
-import { startCase } from "lodash-es";
 
 import useTheme from "../../../hooks/useTheme";
-import { formatNumberWithCommas } from "../../../utils/number";
+import { capitalizeWord, formatNumberWithCommas } from "../../../utils/number";
 import { LegendItemProps } from "./types";
 
 function LegendItem({
@@ -38,7 +37,7 @@ function LegendItem({
   if (isLoading) {
     displayText = "loading";
   } else if (label?.datum) {
-    displayText = startCase(label.datum);
+    displayText = capitalizeWord(label.datum);
   }
 
   const valueText =

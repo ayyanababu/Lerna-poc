@@ -18,7 +18,7 @@ const LegendManager: React.FC<LegendManagerProps> = ({
   generateAxis,
   legendLeft,
   legendTopPosition,
-  legendHeight,
+  legendBoxHeight,
   calculatedLegendHeight,
   legendBoxWidth,
 }) => {
@@ -29,9 +29,9 @@ const LegendManager: React.FC<LegendManagerProps> = ({
   return (
     <foreignObject
       x={`${legendLeft}`}
-      y={`${legendTopPosition + 20}`}
+      y={`${legendTopPosition}`}
       width={`${legendBoxWidth}`}
-      height={legendHeight}
+      height={legendBoxHeight}
     >
       {React.createElement(
         "div",

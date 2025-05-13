@@ -1,3 +1,5 @@
+import { capitalize } from "lodash";
+
 export const formatNumberWithSuffix = (value: number): string => {
   if (Math.abs(value) >= 1_000_000_000) {
     return `${(value / 1_000_000_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}B`;
@@ -30,4 +32,12 @@ export function formatNumberWithCommas(value: number | string): string {
     maximumFractionDigits: 20,
     useGrouping: true,
   });
+}
+
+export function capitalizeWord(value: string): string {
+  if(value == null){
+    return '';
+  }
+
+  return value.split(' ').map(word => capitalize(word)).join(' ');
 }

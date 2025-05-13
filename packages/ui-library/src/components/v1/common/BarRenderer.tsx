@@ -32,7 +32,7 @@ const BarRenderer: React.FC<BarRendererProps> = ({
   const barsList = useMemo<BarsList[]>(() => {
     return filteredData.map((d, index) => {
       const calculatedBarWidth = xScale.bandwidth();
-      const barwidth = getOptimalBarWidth(calculatedBarWidth);
+      const barwidth = calculatedBarWidth ;
 
       let barX =
         barwidth < calculatedBarWidth
