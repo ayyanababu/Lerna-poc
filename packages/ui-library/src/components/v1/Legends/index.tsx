@@ -41,7 +41,7 @@ function Legends({
       case "right":
         return "translate(100%, 50%)"; // or adjust based on container
       case "bottom":
-        return "translate(0, 0)";
+        return "translate(8, 0)";
       case "top":
       default:
         return "translate(0, 0)";
@@ -102,8 +102,8 @@ function Legends({
     console.log(legends_ref);
     console.log(legendBoxWidth);
     if (legends_ref.current && legendBoxWidth && legendBoxWidth > 0) {
-      console.log("hit wrap1");
       const gs = legends_ref.current.querySelectorAll(".legendItems");
+      console.log("hit wrap1",gs);
       const donestatus: {
         [key: number]: { element: SVGGElement; status: boolean };
       } = {};
@@ -133,6 +133,9 @@ function Legends({
         } else {
           addwidth += (gs[start] as SVGGElement).getBBox().width + 8;
         }
+        console.log("lege widths")
+        console.log(addwidth)
+        console.log(legendBoxWidth)
         if (addwidth > legendBoxWidth) {
           row++;
           addwidth = 0;

@@ -24,16 +24,40 @@ export interface YAxisProps extends AxisLeftProps {
   hideAllTicks?: boolean;
 
   /**
-   * Custom text anchor for labels
+   * Map of even positions for labels
    */
-  textAnchor?: "inherit" | "end" | "start" | "middle";
+  evenPositionsMap?: Map<string, number>;
+
+  /**
+   * Width available for the axis (for auto-rotation calculation)
+   */
+  availableWidth?: number;
+
+  /**
+   * Enable auto rotation of labels based on available space
+   */
+  autoRotate?: boolean;
+
+  /**
+   * The labels to display (used for auto-rotation calculation)
+   */
+  labels?: string[];
 
   /**
    * Whether the axis is visible
    */
   isVisible?: boolean;
-  /**
-   * Whether the axis is on right side of chart
-   */
+  tickLength?: number;
+  labelOffset?: number;
+  forceFullLabels?: boolean;
+  addGap?: number;
+  barWidth?: number | undefined;
+  wrapped?: (wrapped: boolean) => void;
+  refreshAxis?: number;
+  chartWidth?: number;
+  chart?:string|undefined;
+  showYAxis?:boolean;
   isRightYAxis?: boolean;
+  textAnchor?: 'start' | 'end' | 'middle' | 'inherit';
 }
+

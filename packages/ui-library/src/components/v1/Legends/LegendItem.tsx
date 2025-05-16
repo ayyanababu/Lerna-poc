@@ -42,7 +42,7 @@ function LegendItem({
 
   const valueText =
     data && label?.index !== undefined ? data[label.index]?.value : undefined;
-
+    
   const renderMarker = () => (
     <circle
       cx={6}
@@ -88,7 +88,7 @@ function LegendItem({
           {!hideValues &&
             (isLoading
               ? "loadingloading"
-              : ` (${valueText ? formatNumberWithCommas(valueText) : ""})`)}
+              : ` ${valueText ? "("+formatNumberWithCommas(valueText)+")" : ""}`)}
         </text>
         {showIcon ? (
           <foreignObject x={iconPositionX} y="-2" width="16" height="16">

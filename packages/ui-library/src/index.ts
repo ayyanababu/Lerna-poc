@@ -1,9 +1,9 @@
-export { default as BarLineChart } from "./components/BarLine";
+export { default as BarLineChart } from "./components/BarLine/index";
 export { default as DonutChart } from "./components/Donut";
 export { default as HorizontalBarChart } from "./components/HorizontalBar";
 export { default as HorizontalGroupedBarChart } from "./components/HorizontalGroupedBarChart";
 export { default as Legends } from "./components/Legends";
-export { default as VerticalBarChart } from "./components/v1/VerticalBar";
+export { default as VerticalBarChart } from "./components/VerticalBar";
 export { default as Sortable } from "./components/Sortable";
 export { default as SortableCard } from "./components/SortableCard";
 export { default as HorizontalStackedBarChart } from "./components/StackedBar/Horizontal";

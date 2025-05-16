@@ -11,6 +11,7 @@ const CustomBar = ({
   rx,
   ry,
   pathProps,
+  style,
   ...props
 }: CustomBarProps) => {
   if (!isVisible) {
@@ -23,7 +24,7 @@ const CustomBar = ({
     return <path {...pathProps} fill={barFill} {...props} />;
   }
 
-  return <Bar {...props} rx={rx} ry={ry} fill={barFill} />;
+  return <Bar {...props} rx={rx} ry={ry} fill={barFill} style-{...style} />;
 };
 
 export default CustomBar;

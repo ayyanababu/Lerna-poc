@@ -22,41 +22,46 @@ import AxisManager from "../common/AxisManager";
 import BarRenderer from "../common/BarRenderer";
 import LineRenderer from "../common/LineRenderer";
 import LegendManager from "../common/LegendManager";
-import { BarsList, DataPoint } from "../common/types";
-import mockVerticalBarChartData from "./mockdata";
-import mockBarLineChartData from "../../BarLine/mockData";
-import { VerticalBarChartProps, BarLineData } from "./types";
-import React from "react";
+import { BarLineDataPoint, BarsList, DataPoint } from "../common/types";
+//import mockVerticalBarChartData from "./mockdata";
+//import mockBarLineChartData from "../../BarLine/mockData";
+import {BarChartProps, BarLineData } from "./types";
+
 
 const defaultMargin = {
   top: 5,
-  right: 20,
+  right: 0,
   bottom: 0,
-  left: 50,
+  left: 28,
 };
 
-const DEFAULT_MAX_BAR_WIDTH = 16;
+
 const DEFAULT_OPACITY = 1;
 const REDUCED_OPACITY = 0.3;
 const TICK_LABEL_PADDING = 8;
 const BASE_ADJUST_WIDTH = 8;
 
-const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
-  data: _data,
+const Bar: React.FC<BarChartProps> = ({
+  data,
   title,
-  type,
   colors = [],
   isLoading = false,
   titleProps,
+  chartProps,
   legendsProps,
   tooltipProps,
   xAxisProps,
   yAxisProps,
+  y1AxisProps,
   gridProps,
   timestampProps,
   barProps,
   onClick,
-  maxBarWidth = DEFAULT_MAX_BAR_WIDTH,
+  maxBarWidth,
+  showGrid = true,
+  showTicks = false,
+  showXAxis = false,
+  showYAxis = false,
 }) => {
   const { theme } = useTheme();
   let {
@@ -72,25 +77,27 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     height = parentRef?.current?.offsetHeight ?? 0;
   }
 
-  const data = useMemo<DataPoint[]>(
-    () => (isLoading ? mockVerticalBarChartData : _data),
-    [isLoading, _data],
-  );
-
-  console.log("##### verticalbar", parentRef, width, height, data);
-
+ 
   const [yAxisLabelWidth, setYAxisLabelWidth] = useState<number>(defaultMargin.left + TICK_LABEL_PADDING);
-  const [hoveredBar, setHoveredBar] = useState<number | null>(null);
+  const [hoveredBar, setHoveredBar] = useState<number | null >(null);
+  const [hoveredBarOther, setHoveredBarOther] = useState<number | null>(null);
+  const [hoveredLine, setHoveredLine] = useState<number | null>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
   const axis_bottom = useRef<SVGGElement | null>(null);
   const axis_left = useRef<SVGGElement | null>(null);
   const overall_chart = useRef<SVGGElement | null>(null);
   const legend_ref = useRef<SVGGElement | null>(null);
-
-  const [refreshAxis, setRefreshAxis] = useState(0);
+  const line_chart = useRef<SVGGElement | null>(null);
+  const [refreshAxis, setRefreshAxis] = useState<number>(0);
   const [barList, setBarList] = useState<BarsList[]>([]);
-  const [innerWidth,setInnerWidth] = useState(0);
+  const [innerWidth,setInnerWidth] = useState<number>(0);
+  const [hideChart, setHideChart] = useState<number[]>([]);  
+  const [showBar,setShowBar] = useState<boolean>(true);
+  const [showLine,setShowLine] = useState<boolean>(true);
+  const [rightPositionYAxis,setRightPositionYAxis] = useState<number>(0);
+  const [hoveredBarId,setHoveredBarId] = useState<string>("")
+  const [moveforBarLineLegend,setmoveforBarLineLegend] = useState(0);
 
   const {
     drawableChartHeight,
@@ -117,7 +124,24 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     overall_chart,
   });
 
-  
+  useEffect(()=>{
+    if (chartProps && chartProps.variant && chartProps?.variant.toUpperCase() === "BAR AND LINE"){
+       if (hideChart.includes(0)){
+           setShowBar(false)
+       }else{
+           setShowBar(true);
+       }
+       if (hideChart.includes(1)){
+           setShowLine(false)
+       }else{
+           setShowLine(true);
+       }       
+    }else{
+      setShowLine(true);
+      setShowBar(true);
+    }
+  },[hideChart]);
+
   useEffect(() => {
     const svg = document.querySelector("svg");
     if (!isLoading && svg) {
@@ -138,13 +162,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   useEffect(()=>{
     setInnerWidth(width - defaultMargin.right - (yAxisLabelWidth>defaultMargin.left?yAxisLabelWidth:defaultMargin.left));
   },[width,chartSvgRef,axis_left,axis_bottom])  
-
-  const bardata = useMemo<BarLineData>(
-    () => (isLoading ? mockBarLineChartData : _data),
-    [isLoading, _data],
-  );  
-
-  const { xAxislabel, yAxisLeftLabel, yAxisRightLabel, chartData } = bardata;
 
   useEffect(() => {
     if (legendsProps) {
@@ -171,11 +188,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     calculatedLegendHeight,
   ]);
 
-  const filteredData = useMemo(
-    () => data.filter((_, index) => !hideIndex.includes(index)),
-    [data, hideIndex],
-  );
-
   const {
     showTooltip,
     hideTooltip,
@@ -184,6 +196,46 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     tooltipTop,
     tooltipOpen,
   } = useTooltip<TooltipData[]>();
+
+
+  let filteredData:any[] = [];
+  
+  switch (chartProps && chartProps?.variant && chartProps?.variant.toUpperCase()){
+     case "VERTICAL BAR":
+       const typedData = data as DataPoint[];
+       filteredData = useMemo(() => {
+         return typedData.filter((_, index) => !hideIndex.includes(index));
+       }, [typedData, hideIndex]);
+       break;
+     case "BAR AND LINE":
+       if (data && typeof data === "object" && "chartData" in data) {
+         const newdata = data as BarLineData;
+         filteredData = useMemo(() => {
+           return newdata.chartData.filter((_, index) => !hideIndex.includes(index));
+         }, [data.chartData, hideIndex]);
+       }
+       break; 
+     case "VERTICAL STACKED BAR":
+
+     case "HORIZONTAL STACKED BAR":
+
+     case "HORIZONTAL BAR":
+
+  }
+
+
+  let xAxislabel = "";
+  let yAxisLeftLabel = undefined;
+  let yAxisRightLabel = undefined;
+  let chartData:  BarLineDataPoint[] = [];
+
+  if (data && typeof data === "object" && "chartData" in data && chartProps && chartProps?.variant && chartProps?.variant.toUpperCase() === "BAR AND LINE"){
+    const typedData = data as BarLineData;
+    xAxislabel = typedData.xAxislabel;
+    yAxisLeftLabel = typedData.yAxisLeftLabel;
+    yAxisRightLabel = typedData.yAxisRightLabel;
+    chartData = typedData.chartData;
+  }
 
   const { xScale, yScale, y1Scale } = useChartScales({
     filteredData,
@@ -194,16 +246,28 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const typedXscale = xScale as any;
   const typedYscale = yScale as any;
+  const typedY1scale = y1Scale as any;
+
+  let circleRadius = 0;
+  let xOffset = 0;
+
+  if (chartProps && chartProps?.variant && chartProps?.variant.toUpperCase() === "BAR AND LINE"){
+    const defaultBarWidth = xScale.bandwidth();
+    const actualBarWidth = Math.min(defaultBarWidth, maxBarWidth?maxBarWidth:0);
+    xOffset =
+          actualBarWidth < defaultBarWidth
+          ? (defaultBarWidth - actualBarWidth) / 2
+          : 0;
+    circleRadius = Math.min(4, actualBarWidth / 4);      
+  }
+
+  console.log("maindata",data)
 
   const legendData = useMemo(() => {
     if (yAxisLeftLabel !== undefined && yAxisRightLabel !== undefined) {
       return [
         { label: yAxisLeftLabel, value: 0 },
         { label: yAxisRightLabel, value: 0 },
-        ...data.map((d) => ({
-          label: d.label || d.yAxisLeftLabel || '',
-          value: d.value,
-        })),
       ];
     } else {
       return data.map((d) => ({
@@ -212,6 +276,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       }));
     }  
   }, [data, yAxisLeftLabel, yAxisRightLabel]);
+
 
   const colorScale = useMemo(() => {
     if (colors?.length) {
@@ -227,6 +292,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     });
   }, [colors, filteredData, theme.colors.charts.bar]);
 
+
   const handleBarMouseMove = useCallback(
     (value: number, color: string, index: number) =>
       (event: React.MouseEvent) => {
@@ -241,7 +307,17 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
               tooltipData: toolTipdata,
               tooltipLeft: event.clientX,
               tooltipTop: event.clientY,
-            });               
+            });   
+            if (event && event?.target){
+              const element = event.target as HTMLElement
+              const id = element.getAttribute("id")?.split("_")[1];
+              console.log("id",id)
+              if (id){         
+                setHoveredBarId(id)
+              }  
+            }   
+            setHoveredBar(0); 
+            setHoveredBarOther(index);           
           }else{
             showTooltip({
               tooltipData: [
@@ -254,18 +330,18 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
               tooltipLeft: event.clientX,
               tooltipTop: event.clientY,
             });
-         
+            setHoveredBar(index);
           }  
-          setHoveredBar(index);
         }
       },
-    [isLoading, filteredData, showTooltip, setHoveredBar],
+    [isLoading, filteredData, showTooltip, setHoveredBar, setHoveredLine],
   );
 
   const handleBarMouseLeave = useCallback(() => {
     if (!isLoading) {
       hideTooltip();
       setHoveredBar(null);
+      setHoveredLine(null);
     }
   }, [isLoading, hideTooltip]);
 
@@ -333,6 +409,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
 
   const isLegendRendered = (renderedStatus: boolean) => {
       if (renderedStatus) {
+        console.log(chartProps?.variant,"yes")
         if (chartSvgRef && chartSvgRef.current){
           setLegendBoxWidth((chartSvgRef?.current?.querySelector("g") as SVGGElement).getBBox().width);
         }  
@@ -353,13 +430,16 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           setTopLegendPosition(moveY+10);
         }
         if (axis_left && axis_left.current) {
-          setLegendLeft(axis_left.current.getBBox().x);
+          console.log("bbbox",axis_left.current.getBBox())
+          setLegendLeft(axis_left.current.getBBox().x - 8);
         }
       }
       let legendcalculatedHeight = 0;
       if (legend_ref && legend_ref.current && legendsProps?.isVisible) {
         if (legend_ref && legend_ref.current) {
           legendcalculatedHeight = legend_ref.current.getBBox().height;
+          console.log(legend_ref.current);
+          console.log("height leg",legendcalculatedHeight );
         }
       }   
       let axisbottomheight:number = 0;
@@ -395,24 +475,41 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       }
     : undefined;
 
-  if (!isLoading && (!_data || _data.length === 0)) {
-    return <div>No data to display.</div>;
-  }
-
-  const {
+  let {
     position = LegendPosition.BOTTOM,
-    hovered = hoveredBar !== null && hoveredBar !== -1
+    hovered = hoveredBar !== null && hoveredBar > -1
       ? legendData?.[hoveredBar]?.label
       : null,
-    setHovered = (label: string) => {
+    setHovered = (label: string | number | null) => {  
+      const labelStr = label != null ? String(label) : null;
       const hoveredIndex = legendData?.findIndex(
-        (item) => item.label === label,
+        (item) => item.label === labelStr
       );
-      setHoveredBar(
-        hoveredIndex !== undefined && hoveredIndex !== -1 ? hoveredIndex : null,
-      );
-    },
+
+      if (chartProps?.variant?.toUpperCase() === "BAR AND LINE") {
+        if (hoveredIndex === 0) {
+          setHoveredBar(0);
+        } else if (hoveredIndex === 1) {
+          setHoveredLine(1);
+        } else {
+          setHoveredBar(null);
+          setHoveredLine(null);
+        }
+      } else {
+        setHoveredBar(hoveredIndex !== -1 ? hoveredIndex : null);    
+      }
+    }
   } = legendsProps || {};
+
+  const getAxisRight = (axisrightwidth:number) =>{
+     setInnerWidth(width - defaultMargin.right - (yAxisLabelWidth>defaultMargin.left?yAxisLabelWidth:defaultMargin.left) - axisrightwidth);
+     if (chartProps && chartProps.variant){
+       setmoveforBarLineLegend(chartProps?.variant?.toUpperCase() === "BAR AND LINE"?4:0)
+     }   
+     if (chartSvgRef && chartSvgRef.current){
+       setRightPositionYAxis(chartSvgRef.current.getBoundingClientRect().width - defaultMargin.left - defaultMargin.right - axisrightwidth  + 10);
+     }  
+  }
 
   return (
     <ChartWrapper
@@ -441,17 +538,22 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
               <AxisManager.YAxis
                 scale={typedYscale}
                 isLoading={isLoading}
+                hideTicks={!showTicks}
+                hideAxisLine={!showYAxis}
+                label={yAxisLeftLabel}   
+                showYAxis={showYAxis}
+                chart={chartProps?.variant}             
                 {...yAxisProps}
               />
             </g>
 
-            <Grid
+            {showGrid && <Grid
               width={innerWidth}
               yScale={typedYscale}
               isLoading={isLoading}
               showHorizontal
               {...gridProps}
-            />
+            />}
 
             <g ref={axis_bottom}>
               <AxisManager.XAxis
@@ -467,15 +569,19 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
                 refreshAxis={refreshAxis}
                 chartWidth={innerWidth}
                 barsList={barList}
+                showXAxis={showXAxis}
+                chart={chartProps?.variant?chartProps?.variant:''}
+                label={xAxislabel}    
               />
             </g>
 
-            <BarRenderer
+            {showBar && <BarRenderer
               filteredData={filteredData}
               xScale={typedXscale}
               yScale={typedYscale}
               colorScale={colorScale}
               hoveredBar={hoveredBar}
+              hoveredBarOther={hoveredBarOther}
               isLoading={isLoading}
               maxBarWidth={maxBarWidth}
               drawableChartHeight={drawableChartHeight}
@@ -487,8 +593,34 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
               barProps={barProps}
               onClick={wrappedOnClick}
               transferBarList={transferBarList}
-            />
+              chartProps={chartProps?.variant}
+            />}
           </g>
+          {showLine && chartProps && chartProps.variant && chartProps?.variant.toUpperCase() === "BAR AND LINE" ?
+            <g ref={line_chart}>
+             <LineRenderer
+               data={data}
+               xScale={typedXscale}
+               y1Scale={typedY1scale}
+               defaultOpacity={DEFAULT_OPACITY}
+               reducedOpacity={REDUCED_OPACITY} 
+               circleRadius={circleRadius}   
+               getAxisRight={getAxisRight}
+               {...y1AxisProps} 
+               hideIndex={hideChart}
+               setHideIndex={setHideChart}
+               xOffset={xOffset}
+               yAxisRightLabel={yAxisRightLabel}
+               isLoading={isLoading}
+               hoveredLine={hoveredLine}       
+               rightPosition={rightPositionYAxis}
+               lineColor={theme.colors.charts.bar[2]}
+               hideTicks={!showTicks}
+               hideAxisLine={!showYAxis}
+               label={yAxisRightLabel}   
+               chart={chartProps?.variant}      
+             />
+          </g> : ''}
 
           <g ref={legend_ref}>
             <LegendManager
@@ -504,7 +636,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
               isLegendRendered={isLegendRendered}
               generatedLegendHeight={generatedLegendHeight}
               generateAxis={generateAxis}
-              legendLeft={legendLeft}
+              legendLeft={legendLeft + moveforBarLineLegend}
               legendTopPosition={legendTopPosition}
               innerWidth={innerWidth}
               legendBoxHeight={legendHeight}
@@ -518,4 +650,4 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   );
 };
 
-export default VerticalBarChart;
+export default Bar;

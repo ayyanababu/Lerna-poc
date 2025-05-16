@@ -52,9 +52,12 @@ export interface XAxisProps extends AxisBottomProps {
   labelOffset?: number;
   forceFullLabels?: boolean;
   addGap: number;
-  barWidth: number;
+  barWidth: number | undefined;
   wrapped: (wrapped: boolean) => void;
   refreshAxis: number;
   barsList?: BarsList[];
   chartWidth: number;
+  chart:string;
+  showXAxis?:boolean;
+  textAnchor?: 'start' | 'end' | 'middle' | 'inherit';
 }

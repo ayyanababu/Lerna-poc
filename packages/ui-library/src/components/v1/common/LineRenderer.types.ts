@@ -1,3 +1,4 @@
+import React,{SetStateAction} from "react";
 import { TooltipProps, GridProps } from "@mui/material";
 import { CSSProperties } from "react";
 import { CustomBarProps } from "../../CustomBar/types";
@@ -6,6 +7,7 @@ import { TitleProps } from "../../Title/types";
 import { LegendsProps } from "../Legends/types";
 import { XAxisProps } from "../XAxis/types";
 import { YAxisProps } from "../YAxis/types";
+import { ScaleBand, ScaleLinear } from "d3";
 
 export interface BarLineDataPoint {
   xAxis: string;
@@ -21,7 +23,7 @@ export interface BarLineData {
   chartData: BarLineDataPoint[];
 }
 
-export interface BarLineChartProps {
+export interface LineRendererProps {
   /**
    * Data for the chart
    */
@@ -136,4 +138,23 @@ export interface BarLineChartProps {
    * @default true
    */
   showXAxis?: boolean;
+
+  xScale: ScaleBand<string>;
+  y1Scale: ScaleLinear<number, number>;
+  defaultOpacity: number;
+  reducedOpacity: number;
+  circleRadius:number;
+  getAxisRight:(axisrightwidth:number)=>void;
+  setHideIndex?: React.Dispatch<SetStateAction<number[]>>;
+  hideIndex?:number[];
+  y1AxisProps:Partial<YAxisProps>;
+  xOffset?:number;
+  yAxisRightLabel?:string;
+  hoveredLine:string | null | number;
+  chartWidth:number;
+  lineColor:string;
+  hideTicks?:boolean;
+  hideAxisLine?:boolean
+  label?:string;
+  rightPosition:number;
 }

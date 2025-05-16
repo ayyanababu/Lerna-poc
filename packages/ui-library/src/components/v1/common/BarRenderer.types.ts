@@ -8,9 +8,10 @@ export interface BarRendererProps {
   xScale: ScaleBand<string>;
   yScale: ScaleLinear<number, number>;
   colorScale: (index: string) => string;
-  hoveredBar: number | null;
+  hoveredBar: number | null | string;
+  hoveredBarOther: number | null | string;
   isLoading: boolean;
-  maxBarWidth: number;
+  maxBarWidth: number | undefined; 
   drawableChartHeight: number;
   handleBarMouseMove: (
     value: number,
@@ -24,5 +25,8 @@ export interface BarRendererProps {
   barProps?: CustomBarProps;
   onClick?: (event: React.MouseEvent, data: DataPoint, index: number) => void;
   transferBarList: (barlist: BarsList[]) => void;
-
+  chartProps:string|undefined;
 }
+
+export type {BarsList};
+

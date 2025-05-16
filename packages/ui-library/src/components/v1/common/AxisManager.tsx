@@ -18,6 +18,8 @@ const XAxisComponent: React.FC<XAxisProps> = ({
   refreshAxis,
   chartWidth,
   barsList = [],
+  chart,
+  label,
   ...props
 }) => {
   return (
@@ -35,6 +37,8 @@ const XAxisComponent: React.FC<XAxisProps> = ({
       refreshAxis={refreshAxis}
       chartWidth={chartWidth}
       barsList={barsList}
+      chart={chart}
+      label={label}
     />
   );
 };
@@ -43,9 +47,10 @@ const XAxisComponent: React.FC<XAxisProps> = ({
 const YAxisComponent: React.FC<YAxisProps> = ({
   scale,
   isLoading,
+  chart,
   ...props
 }) => {
-  return <YAxis scale={scale} isLoading={isLoading} {...props} />;
+  return <YAxis left={chart && chart.toUpperCase() === "BAR AND LINE"?15:0} scale={scale} isLoading={isLoading} {...props} />;
 };
 
 const Y1AxisComponent: React.FC<YAxisProps> = ({

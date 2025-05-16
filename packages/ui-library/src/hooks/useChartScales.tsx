@@ -188,8 +188,7 @@ const useChartScales = ({
 
     return enhanceVisxLinearScale(scale);
   }, [drawableChartHeight, maxY2Value]);  
-console.log("yscale",yScale);
-console.log("y1scale",y1Scale)
+
   return { xScale, yScale, y1Scale };
 };
 

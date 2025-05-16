@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect,useRef } from "react";
 import { AxisLeft, AxisRight } from "@visx/axis";
 
 import useTheme from "../../../hooks/useTheme";
@@ -32,6 +32,7 @@ function YAxis({
 }: YAxisProps) {
   const { theme } = useTheme();
   const AxisComponent = isRightYAxis ? AxisRight : AxisLeft;
+  const axis = useRef<SVGSVGElement | null>(null);
 
   const tickFormat = (value: number | string) => {
     if (isNumeric(value)) {
@@ -39,6 +40,18 @@ function YAxis({
     }
     return String(value);
   };
+
+  useEffect(()=>{
+    if (!isLoading && axis.current){
+       let xpos:number = Number(axis.current.querySelector("svg")?.getAttribute("x"));
+       if (isRightYAxis){
+         xpos -= 30;
+       }else{
+         xpos += 4;
+       }  
+       axis.current.querySelector("svg")?.setAttribute("x",String(xpos))
+    }
+  },[isLoading,axis])
 
   const renderAxisLabel = (
     formattedValue: string | number | undefined,
@@ -96,6 +109,7 @@ function YAxis({
   }
 
   return (
+  <g id = "axis" ref={axis}>
     <AxisComponent
       scale={scale}
       stroke={theme.colors.axis.line}
@@ -115,6 +129,7 @@ function YAxis({
       labelProps={mergedLabelProps}
       {...props}
     />
+  </g>
   );
 }
 

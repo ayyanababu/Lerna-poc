@@ -1,3 +1,4 @@
+import React,{SetStateAction} from 'react'
 import { CSSProperties } from "react";
 import { CustomBarProps } from "../../CustomBar/types";
 import { GridProps } from "../../Grid/types";
@@ -8,9 +9,11 @@ import { XAxisProps } from "../../XAxis/types";
 import { YAxisProps } from "../../YAxis/types";
 import { DataPoint } from "../common/types";
 import { LegendsProps } from "../Legends/types";
-import { BarLineData } from "../common/LineRenderer.types";
+import { ChartProps } from "../Charts/types";
+import type { BarLineData } from "../common/LineRenderer.types";
+import useTheme from "../../../hooks/useTheme"; 
 
-export interface VerticalBarChartProps {
+export interface BarChartProps {
   data: DataPoint[];
   type?:string;
   title?: string;
@@ -18,26 +21,37 @@ export interface VerticalBarChartProps {
   colors?: string[];
   isLoading?: boolean;
   titleProps?: Partial<TitleProps>;
+  chartProps?:Partial<ChartProps>;
   legendsProps?: LegendsProps;
   tooltipProps?: Partial<TooltipProps>;
   xAxisProps?: Partial<XAxisProps>;
   yAxisProps?: Partial<YAxisProps>;
+  y1AxisProps?: Partial<YAxisProps>;
   gridProps?: Partial<GridProps>;
   timestampProps?: Partial<TimestampProps>;
   barProps?: Partial<CustomBarProps>;
   maxBarWidth?: number;
+  showGrid?:boolean;
+  showXAxis:boolean;
+  showYAxis:boolean;
+  showTicks:boolean;
   onClick?: (
     event: React.MouseEvent<SVGGElement, MouseEvent>,
     data: DataPoint,
     index: number,
   ) => void;
+  theme:ReturnType<typeof useTheme>;
 }
+
+export type {BarLineData};
 
 export interface BarLineChartProps {
   /**
    * Data for the chart
    */
   data: BarLineData;
+  mockdata:BarLineData;
+
 
   title?: string;
 

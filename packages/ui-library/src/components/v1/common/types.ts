@@ -14,6 +14,7 @@ export interface DataPoint {
   yAxisLeftLabel?: string;
   yAxisRightLabel?: string;
   chartData?: BarLineDataPoint[];
+  yAxisLeft?:string;
 }
 
 export interface BarsList {

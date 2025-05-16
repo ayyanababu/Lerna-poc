@@ -26,6 +26,7 @@ const LegendManager: React.FC<LegendManagerProps> = ({
   if (!legendsProps?.isVisible) {
     return null;
   }
+  console.log("hoveringed",hovered);
   return (
     <foreignObject
       x={`${legendLeft}`}

@@ -40,9 +40,9 @@ export interface LegendsProps {
   colorScale?: ReturnType<typeof scaleOrdinal<string, string>>;
   data?: LegendData;
   hideIndex?: number[];
-  setHideIndex: Dispatch<SetStateAction<number[]>>; // ← match the setter type
+  setHideIndex?: Dispatch<SetStateAction<number[]>>
   hovered?: string | null;
-  setHovered: (label: string) => void;
+  setHovered?: (label: string | number | null) => void;
   position?: LegendPositionType;
   onClick?: (data: LegendData, legend: string, index: number) => void;
   isLoading?: boolean;

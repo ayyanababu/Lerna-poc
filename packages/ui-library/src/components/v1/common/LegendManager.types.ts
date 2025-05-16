@@ -17,7 +17,7 @@ export interface LegendManagerProps {
   hideIndex: number[];
   setHideIndex: Dispatch<SetStateAction<number[]>>;
   hovered: string | null;
-  setHovered: (label: string) => void;
+  setHovered: (label: string | number | null) => void
   isLoading: boolean;
   isLegendRendered: (status: boolean) => void;
   generatedLegendHeight: (height: number) => void;

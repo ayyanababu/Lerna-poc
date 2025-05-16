@@ -802,8 +802,14 @@ body:not(.dark) {
                                         variant: 'h6',
                                         align: 'left',
                                     }}
+                                    chartProps={{
+                                      variant : "Bar and Line" 
+                                    }}                                       
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,
+                                        eachLegendGap: 23,
+                                        scrollbarAfter: -1,  
+                                        legendsHeight:1,                                            
                                         doStrike: true,
                                         isVisible: true,
                                     }}
@@ -826,7 +832,7 @@ body:not(.dark) {
                                         gutterBottom: true,
                                     }}
                                     legendsProps={{
-                                        position: Legends.Position.TOP,
+                                        position: Legends.Position.TOP,                                                                           
                                         onClick: (data, legend, index) => {
                                             console.log(
                                                 `Clicked ${legend} at index ${index}`,
@@ -852,7 +858,9 @@ body:not(.dark) {
                                         '#93a3bc',
                                     ]}
                                     isLoading={dataLoading.verticalBar}
-                                    type="vertical bar"
+                                    chartProps={{
+                                      variant : "Vertical Bar" 
+                                    }}    
                                     legendsProps={{
                                         showArrow: false,
                                         position: Legends.Position.BOTTOM,
