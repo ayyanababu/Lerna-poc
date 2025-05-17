@@ -862,10 +862,10 @@ body:not(.dark) {
                                       variant : "Vertical Bar" 
                                     }}    
                                     legendsProps={{
-                                        showArrow: false,
+                                        showArrow: true,
                                         position: Legends.Position.BOTTOM,
                                         isVisible: true,
-                                        eachLegendGap: 23,
+                                        eachLegendGap: 20,
                                         scrollbarAfter: -1,
                                         legendsHeight:1, // 50% height incase of -1 and if left out 0 it will show all the legends without scrollbar
                                         onClick: (data, legend, index) => {

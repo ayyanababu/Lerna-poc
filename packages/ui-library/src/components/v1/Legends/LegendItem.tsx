@@ -20,15 +20,17 @@ function LegendItem({
   hideValues = false,
   markerColor,
   onArrowClick,
-  eachLegendGap,
+  eachLegendGap = 4, // Default gap between legends
   showIcon,
   hideLegendLableClick = true,
   showArrow = true,
 }: LegendItemProps) {
-  const [, setStrikeLineX2] = useState(0);
-  const [, setStrikeLineY2] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [strikeLineX2, setStrikeLineX2] = useState(0);
+  const [strikeLineY2, setStrikeLineY2] = useState(0);
   const [iconPositionX, setIconPositionX] = useState(0);
-  console.log("show", showIcon);
+  const [labelWidth, setLabelWidth] = useState(0);
+  const textElementRef = useRef<SVGTextElement>(null);
 
   const text_ref = useRef<SVGGElement>(null);
   const theme = useTheme();
@@ -42,16 +44,41 @@ function LegendItem({
 
   const valueText =
     data && label?.index !== undefined ? data[label.index]?.value : undefined;
-    
+
+  const handleMouseOver = () => {
+    setIsHovered(true);
+    onMouseOver?.();
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    onMouseLeave?.();
+  };
+
+  useEffect(() => {
+    if (textElementRef.current) {
+      const width = textElementRef.current.getBBox().width;
+      if (width !== labelWidth) setLabelWidth(width);
+    }
+  }, [displayText, valueText, labelWidth]);
+
+  const ICON_WIDTH = 16;
+  const ICON_GAP = 4;
+  const MARKER_SIZE = 12;
+  const MARKER_GAP = 4;
+  const BORDER_RADIUS = 3;
+
   const renderMarker = () => (
-    <circle
-      cx={6}
-      cy={6}
-      r={6}
+    <rect
+      x={0}
+      y={-MARKER_SIZE / 2 + 6}
+      width={MARKER_SIZE}
+      height={MARKER_SIZE}
+      rx={BORDER_RADIUS}
       fill={markerColor}
       onClick={!hideLegendLableClick ? onToggle : undefined}
-      onMouseOver={onMouseOver}
-      onMouseLeave={onMouseLeave}
+      onMouseOver={handleMouseOver}
+      onMouseLeave={handleMouseLeave}
       style={{
         pointerEvents: "fill",
         cursor: "pointer",
@@ -61,23 +88,15 @@ function LegendItem({
     />
   );
 
-  useEffect(() => {
-    if (text_ref.current) {
-      const textheight = text_ref.current.getBBox().height;
-      const y = text_ref.current.getBBox().y + textheight / 2;
-      setStrikeLineY2(y);
-      const textwidth = text_ref.current.getBBox().width;
-      const x = text_ref.current.getBBox().x + textwidth;
-      setStrikeLineX2(x);
-      setIconPositionX(x - 7);
-    }
-  }, [text_ref.current]);
+  const iconX = MARKER_SIZE + MARKER_GAP + labelWidth + ICON_GAP;
 
   const renderText = () => (
     <>
-      <g ref={text_ref} onMouseOver={onMouseOver} onMouseLeave={onMouseLeave}>
+      <g onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
+        {renderMarker()}
         <text
-          x={20}
+          ref={textElementRef}
+          x={MARKER_SIZE + MARKER_GAP}
           y={6}
           dy=".35em"
           fill={theme.theme.colors.legend.text}
@@ -87,63 +106,38 @@ function LegendItem({
           {displayText}
           {!hideValues &&
             (isLoading
-              ? "loadingloading"
-              : ` ${valueText ? "("+formatNumberWithCommas(valueText)+")" : ""}`)}
+              ? ""
+              : ` ${valueText ? "(" + formatNumberWithCommas(valueText) + ")" : ""}`)}
         </text>
-        {showIcon ? (
-          <foreignObject x={iconPositionX} y="-2" width="16" height="16">
-            {React.createElement(
-              "div",
-              {
-                xmlns: "http://www.w3.org/1999/xhtml",
-                style: { width: "100%", height: "100%" },
-              },
-              showArrow && (
-                <ArrowOutwardIcon
-                  sx={{
-                    height: "16px",
-                    width: "16px",
-                    color: theme.theme.colors.legend.text,
-                    visibility: !isHoveredOther ? "visible" : "hidden",
-                    transition: "opacity 0.25s ease-in-out",
-                  }}
-                  className="arrow-icon"
-                  onClick={() => onArrowClick?.()}
-                />
-              ),
-            )}
-          </foreignObject>
-        ) : (
-          <foreignObject x={iconPositionX} y="-2" width="16" height="16">
-            {React.createElement(
-              "div",
-              {
-                xmlns: "http://www.w3.org/1999/xhtml",
-                style: { width: "100%", height: "100%" },
-              },
-              showArrow && (
-                <ArrowOutwardIcon
-                  sx={{
-                    height: "16px",
-                    width: "16px",
-                    color: theme.theme.colors.legend.text,
-                    visibility: "hidden",
-                    transition: "opacity 0.250s ease-in-out",
-                  }}
-                  className="arrow-icon"
-                  onClick={() => onArrowClick?.()}
-                />
-              ),
-            )}
-          </foreignObject>
-        )}
+        <foreignObject 
+          x={iconX}
+          y="-2"
+          width={ICON_WIDTH}
+          height="16"
+        >
+          {showArrow ? (
+            <ArrowOutwardIcon
+              sx={{
+                height: "16px",
+                width: "16px",
+                color: theme.theme.colors.legend.text,
+                visibility: isHovered && !isHoveredOther ? "visible" : "hidden",
+                transition: "opacity 0.25s ease-in-out",
+              }}
+              className="arrow-icon"
+              onClick={() => onArrowClick?.()}
+            />
+          ) : (
+            <div style={{ width: ICON_WIDTH, height: 16 }} />
+          )}
+        </foreignObject>
       </g>
     </>
   );
 
   return (
     <g
-      transform={`translate(0, ${eachLegendGap ? index * eachLegendGap : 0})`}
+      transform={`translate(0, ${index * 14})`}
       className="legendItems"
       style={{
         pointerEvents: "stroke",
@@ -152,7 +146,6 @@ function LegendItem({
         filter: !doStrike && isHidden ? "grayscale(100%) opacity(0.5)" : "none",
       }}
     >
-      {renderMarker()}
       {renderText()}
     </g>
   );
