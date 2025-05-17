@@ -3,7 +3,6 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from "react";
 
 import LegendItem from "./LegendItem";
@@ -24,14 +23,13 @@ function Legends({
   variant = LegendVariant.COMPACT,
   hideValues = false,
   isLegendRendered,
-  eachLegendGap,
+  eachLegendGap = 8,
   generatedLegendHeight,
   generateAxis,
   legendBoxWidth,
   hideLegendLableClick = true,
   showArrow = true,
 }: LegendsProps) {
-  const [showIcon, setShowIcon] = useState(false);
   const legends_ref = useRef<SVGGElement | null>(null);
 
   const positionStyles = useMemo(() => {
@@ -39,7 +37,7 @@ function Legends({
       case "left":
         return "translate(0, 50%)";
       case "right":
-        return "translate(100%, 50%)"; // or adjust based on container
+        return "translate(100%, 50%)";
       case "bottom":
         return "translate(8, 0)";
       case "top":
@@ -47,8 +45,6 @@ function Legends({
         return "translate(0, 0)";
     }
   }, [position]);
-  //  const flexDirection =
-  //    position === 'left' || position === 'right' ? 'column' : 'row';
 
   useEffect(() => {
     if (generateAxis && hideIndex) {
@@ -57,11 +53,16 @@ function Legends({
   }, [hideIndex]);
 
   useEffect(() => {
-    if (eachLegendGap && data && generatedLegendHeight && legends_ref && legends_ref.current) {
-      generatedLegendHeight(legends_ref.current.getBBox().height+10);
- //    generatedLegendHeight((data.length - 1) * eachLegendGap);
+    if (
+      eachLegendGap &&
+      data &&
+      generatedLegendHeight &&
+      legends_ref &&
+      legends_ref.current
+    ) {
+      generatedLegendHeight(legends_ref.current.getBBox().height + 10);
     }
-  }, [data, generatedLegendHeight,eachLegendGap,isLegendRendered]);
+  }, [data, generatedLegendHeight, eachLegendGap, isLegendRendered]);
 
   const handleToggleItem = useCallback(
     (index: number) => {
@@ -78,7 +79,6 @@ function Legends({
 
   const handleMouseOver = useCallback(
     (labelText: string) => {
-      setShowIcon(true);
       if (setHovered) {
         setHovered(labelText);
       }
@@ -87,7 +87,6 @@ function Legends({
   );
 
   const handleMouseLeave = useCallback(() => {
-    setShowIcon(false);
     if (setHovered) {
       setHovered(null);
     }
@@ -98,12 +97,8 @@ function Legends({
   }
 
   const wrapLegendsText = () => {
-    console.log("hit wrap");
-    console.log(legends_ref);
-    console.log(legendBoxWidth);
     if (legends_ref.current && legendBoxWidth && legendBoxWidth > 0) {
       const gs = legends_ref.current.querySelectorAll(".legendItems");
-      console.log("hit wrap1",gs);
       const donestatus: {
         [key: number]: { element: SVGGElement; status: boolean };
       } = {};
@@ -133,9 +128,6 @@ function Legends({
         } else {
           addwidth += (gs[start] as SVGGElement).getBBox().width + 8;
         }
-        console.log("lege widths")
-        console.log(addwidth)
-        console.log(legendBoxWidth)
         if (addwidth > legendBoxWidth) {
           row++;
           addwidth = 0;
@@ -157,8 +149,6 @@ function Legends({
             newwidth += (gs[start] as SVGGElement).getBBox().width + 8;
             addwidth += (gs[start] as SVGGElement).getBBox().width + 8;
           }
-          console.log("row", row);
-          console.log("cwidth", addwidth);
         } else {
           if (!positions[row]) {
             positions[row] = [];
@@ -179,7 +169,6 @@ function Legends({
         }
         start++;
       }
-      console.log("positions", positions);
       Object.keys(positions).forEach((positionkey: string) => {
         positions[positionkey].forEach((rowitem) => {
           rowitem.object.setAttribute(
@@ -188,8 +177,8 @@ function Legends({
           );
         });
       });
-      if (generatedLegendHeight ) {
-        generatedLegendHeight(legends_ref.current.getBBox().height+10);
+      if (generatedLegendHeight) {
+        generatedLegendHeight(legends_ref.current.getBBox().height + 10);
       }
     }
   };
@@ -204,7 +193,7 @@ function Legends({
           }
           if (index > data.length - 1) {
             return null;
-          }          
+          }
           const isHidden = hideIndex?.includes(index);
           const lb = {
             index: index,
@@ -237,7 +226,6 @@ function Legends({
               }}
               eachLegendGap={eachLegendGap}
               generateAxis={generateAxis}
-              showIcon={showIcon}
               hideLegendLableClick={hideLegendLableClick}
               showArrow={showArrow}
             />
