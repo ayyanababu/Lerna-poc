@@ -148,7 +148,7 @@ function Legends({
               object: gs[start],
               row: row,
               x: newwidth,
-              y: row * eachLegendGap,
+              y: (row-1) * eachLegendGap,
               cwidth:
                 newwidth +
                 (gs[start] as SVGGElement).getBoundingClientRect().width,
@@ -168,7 +168,7 @@ function Legends({
               object: gs[start],
               row: row,
               x: newwidth,
-              y: row * eachLegendGap,
+              y: (row-1) * eachLegendGap,
               cwidth:
                 newwidth +
                 (gs[start] as SVGGElement).getBoundingClientRect().width,
