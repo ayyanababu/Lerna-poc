@@ -290,13 +290,20 @@ body:not(.dark) {
     gap: 10px;
     margin: 20px 0;
     padding: 12px 16px;
-    background-color: #fff;
     background-opacity: 0.8;
     backdrop-filter: blur(40px);
     border-radius: 25px;
     margin: 0 auto;
     margin-top: 25px;
     width: fit-content;
+}
+.dot-container:not(.dark) {
+    background-color: #1e293b24;
+    box-shadow: 0 0 20px #bfe8fd11;
+}
+.dark .dot-container {
+    background-color: #f0f8fec0;
+    box-shadow: 0 0 20px #bfe8fd55;
 }
 
 .dot {
