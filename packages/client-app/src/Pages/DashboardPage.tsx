@@ -14,429 +14,71 @@ import {
     VerticalStackedBarChart,
     BarLineData,
 } from '@my-org/ui-library';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeContext } from '../App';
 import ReconciliationCard from '../components/DashboardPage/ReconciliationCard';
-
-// Define types for our chart data
-type DonutDataItem = {
-    label: string;
-    value: number;
-    color: string;
-};
-
-type TreeMapNode = {
-    id: string;
-    name: string;
-    value: number;
-    children?: TreeMapNode[];
-};
-
-export type StackedBarItem = {
-    label: string;
-    data: Record<string, number>;
-};
+import { fetchDonutData, fetchSemiDonutData, fetchTreeMapData, fetchMarketTreeMapData, fetchStackedBarData, fetchHorizontalStackedData, fetchBarLineData, fetchVerticalBarData, fetchHorizontalBarData, fetchVerticalGroupedBarData, fetchHorizontalGroupedBarData } from '../components/DashboardPage/fetchFunctions';
+import { DonutDataItem, TreeMapNode, StackedBarItem, VerticalBarItem } from '../components/DashboardPage/types';
 
 
-type VerticalBarItem = {
-    label: string;
-    value: number;
-};
-
-// Mock API functions to simulate data fetching
-const fetchDonutData = (): Promise<DonutDataItem[]> =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            resolve([
-                {
-                    label: 'Successful',
-                    value: Math.floor(Math.random() * 30000) + 20000,
-                    color: '#56b9b8',
-                },
-                {
-                    label: 'Failed',
-                    value: Math.floor(Math.random() * 500) + 100,
-                    color: '#ea8660',
-                },
-            ]);
-        }, 5000);
-    });
-
-const fetchSemiDonutData = (): Promise<DonutDataItem[]> =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            resolve([
-                {
-                    label: 'Successful Trades',
-                    value: Math.floor(Math.random() * 30) + 70, // 70-100% success rate
-                    color: 'orange',
-                },
-                {
-                    label: 'Failed Trades',
-                    value: Math.floor(Math.random() * 30), // 0-30% failure rate
-                    color: '#50c1c2',
-                },
-            ]);
-        }, 1200);
-    });
-
-const fetchTreeMapData = (): Promise<TreeMapNode> =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                id: 'portfolio',
-                name: 'Portfolio',
-                value: 1000,
-                children: [
-                    {
-                        id: 'equities',
-                        name: 'Equities',
-                        value: Math.floor(Math.random() * 200) + 350, // 350-550
-                        children: [
-                            {
-                                id: 'tech',
-                                name: 'Technology',
-                                value: Math.floor(Math.random() * 80) + 140, // 140-220
-                            },
-                            {
-                                id: 'health',
-                                name: 'Healthcare',
-                                value: Math.floor(Math.random() * 50) + 100, // 100-150
-                            },
-                        ],
-                    },
-                    {
-                        id: 'fixed-income',
-                        name: 'Fixed Income',
-                        value: Math.floor(Math.random() * 100) + 250, // 250-350
-                        children: [
-                            {
-                                id: 'treasury',
-                                name: 'Treasury',
-                                value: Math.floor(Math.random() * 50) + 100, // 100-150
-                            },
-                            {
-                                id: 'corporate',
-                                name: 'Corporate',
-                                value: Math.floor(Math.random() * 40) + 80, // 80-120
-                            },
-                        ],
-                    },
-                    {
-                        id: 'cash',
-                        name: 'Cash',
-                        value: Math.floor(Math.random() * 150) + 300, // 300-450
-                    },
-                ],
-            });
-        }, 2000);
-    });
-
-const fetchStackedBarData = (): Promise<StackedBarItem[]> =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            resolve([
-                {
-                    label: 'Not Priced',
-                    data: {
-                        notPriced: Math.floor(Math.random() * 100000000) + 2000,
-                    },
-                },
-                {
-                    label: 'Stale Priced sdf sdf  sdfsf ',
-                    data: {
-                        stalePriced:
-                            Math.floor(Math.random() * 100000000) + 2500,
-                    },
-                },
-                {
-                    label: 'Priced',
-                    data: {
-                        'priced:Auto':
-                            Math.floor(Math.random() * 2000000000) + 200,
-                        'priced:Manual':
-                            Math.floor(Math.random() * 500000000) + 30,
-                    },
-                },
-            ]);
-        }, 1800);
-    });
-
-const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            resolve([
-                ...new Array(1).fill(0).map(() => {
-                    const randomDate = new Date(
-                        2020 + Math.floor(Math.random() * 4),
-                        Math.floor(Math.random() * 12),
-                        Math.floor(Math.random() * 28) + 1,
-                    );
-                    const formattedDate = `${String(randomDate.getDate()).padStart(2, '0')}-${String(randomDate.getMonth() + 1).padStart(2, '0')}-${randomDate.getFullYear()}`;
-
-                    return {
-                        label: `${formattedDate}`,
-                        data: {
-                            futures:
-                                Math.floor(Math.random() * 100) + 0,
-                            options:
-                                Math.floor(Math.random() * 100) + 0,
-                            forwards:
-                                Math.floor(Math.random() * 100) + 0,
-                            fixedIncome:
-                                Math.floor(Math.random() * 100) + 0,
-                            others: Math.floor(Math.random() * 100) + 0,
-                        },
-                    };
-                }),
-            ]);
-        }, 1700);
-    });
-
-const fetchBarLineData = (): Promise<BarLineData> =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            const actionTypes = [
-                'Dividend (NNA) test this test',
-                'Dividend (NCA)',
-                'Dividend (NEA)',
-  //              'Stock Split (NCA)',
-  //              'Rights Issue (NCA)',
-  //              'Merger (NEA)',
-  //              'Tender Offer (NCA)',
-            ];
-
-            resolve({
-                xAxislabel: 'Corporate Action',
-                yAxisLeftLabel: 'Number of Actions',
-                yAxisRightLabel: 'Positions Impacted',
-                chartData: actionTypes.map((action, index) => ({
-                    xAxis: action,
-                    yAxisLeft: Math.floor(Math.random() * 300000000) + 15, // 15-45
-                    yAxisRight: Math.floor(Math.random() * 350000000) + 20, // 20-55
-                    barColor: index == 0 ? 'red' : null,
-                })),
-            });
-        }, 2200);
-    });
-
-const fetchVerticalBarData = (): Promise<BarLineData> =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            const actionTypes = [           
-                { label: 'Priced hahf  shs fsh s   sdh dsh   h ds fhsf sh', value: 123 },
-                { label: 'Priced', value: 2450 },
-                { label: 'Priced', value: 36700 },
-                { label: 'Priced', value: 48900 },
-                { label: 'Priced Epsilon', value: 511000000 },
-                { label: 'Priced Zeta', value: 633000000 },
-                { label: 'Priced Eta', value: 755000000 },
-                { label: 'Priced Theta', value: 877000000 },
-                { label: 'Priced Iota', value: 921000000 },
-                { label: 'Priced Kappa', value: 999000000 }
-            ]            
-            resolve({
-                xAxislabel: 'Corporate Action - no line',
-                yAxisLeftLabel: 'Number of Actions - no line',
-                yAxisRightLabel: 'Positions Impacted no line',
-                chartData: actionTypes.map((action, index) => ({
-                    xAxis: action.label,
-                    yAxisLeft: action.value, // 15-45
-                    yAxisRight: undefined,
-                    barColor: index == 0 ? 'red' : null,
-                })),
-            });
-        }, 1300);
-    });
-
-const fetchHorizontalBarData = (): Promise<VerticalBarItem[]> =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(
-                Array.from({ length: 5 }, (_, index) => ({
-                    label: `${index + 1} asdf adfasdf a`,
-                    value: Math.floor(Math.random() * 100000),
-                })),
-            );
-        }, 1600);
-    });
-
-const fetchVerticalGroupedBarData = (): Promise<StackedBarItem[]> =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            resolve([
-                ...new Array(10).fill(0).map((_, index) => ({
-                    label: `Q${index + 1} 2024`,
-                    data: {
-                        future: Math.floor(Math.random() * 10000000) + 20,
-                        options: Math.floor(Math.random() * 10000000) + 20,
-                        forwards: Math.floor(Math.random() * 10000000) + 20,
-                        fixedIncome: Math.floor(Math.random() * 10000000) + 20,
-                        others: Math.floor(Math.random() * 10000000) + 20,
-                    },
-                })),
-            ]);
-        }, 1900);
-    });
-
-const fetchHorizontalGroupedBarData = (): Promise<StackedBarItem[]> =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            resolve([
-                {
-                    label: 'Sales',
-                    data: {
-                        q1: Math.floor(Math.random() * 30000000) + 30, // 30-60
-                        q2: Math.floor(Math.random() * 30000000) + 40, // 40-70
-                        q3: Math.floor(Math.random() * 30000000) + 30, // 30-60
-                        q4: Math.floor(Math.random() * 30000000) + 60, // 60-90
-                    },
-                },
-                {
-                    label: 'Marketing',
-                    data: {
-                        q1: Math.floor(Math.random() * 20) + 25, // 25-45
-                        q2: Math.floor(Math.random() * 20) + 35, // 35-55
-                        q3: Math.floor(Math.random() * 20) + 45, // 45-65
-                        q4: Math.floor(Math.random() * 20) + 40, // 40-60
-                    },
-                },
-                {
-                    label: 'Operations',
-                    data: {
-                        q1: Math.floor(Math.random() * 20) + 40, // 40-60
-                        q2: Math.floor(Math.random() * 20) + 40, // 40-60
-                        q3: Math.floor(Math.random() * 20) + 40, // 40-60
-                        q4: Math.floor(Math.random() * 20) + 50, // 50-70
-                    },
-                },
-                {
-                    label: 'Finance',
-                    data: {
-                        q1: Math.floor(Math.random() * 15) + 25, // 25-40
-                        q2: Math.floor(Math.random() * 15) + 25, // 25-40
-                        q3: Math.floor(Math.random() * 15) + 30, // 30-45
-                        q4: Math.floor(Math.random() * 15) + 35, // 35-50
-                    },
-                },
-            ]);
-        }, 1400);
-    });
-
-const fetchMarketTreeMapData = (): Promise<TreeMapNode> =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                id: 'markets',
-                name: 'Global Markets',
-                value: 1000,
-                children: [
-                    {
-                        id: 'north-america',
-                        name: 'North America',
-                        value: Math.floor(Math.random() * 100) + 400, // 400-500
-                        children: [
-                            {
-                                id: 'us',
-                                name: 'United States',
-                                value: Math.floor(Math.random() * 50) + 300, // 300-350
-                            },
-                            {
-                                id: 'canada',
-                                name: 'Canada',
-                                value: Math.floor(Math.random() * 20) + 70, // 70-90
-                            },
-                            {
-                                id: 'mexico',
-                                name: 'Mexico',
-                                value: Math.floor(Math.random() * 10) + 15, // 15-25
-                            },
-                        ],
-                    },
-                    {
-                        id: 'europe',
-                        name: 'Europe',
-                        value: Math.floor(Math.random() * 50) + 300, // 300-350
-                        children: [
-                            {
-                                id: 'uk',
-                                name: 'United Kingdom',
-                                value: Math.floor(Math.random() * 30) + 85, // 85-115
-                            },
-                            {
-                                id: 'germany',
-                                name: 'Germany',
-                                value: Math.floor(Math.random() * 20) + 80, // 80-100
-                            },
-                            {
-                                id: 'france',
-                                name: 'France',
-                                value: Math.floor(Math.random() * 20) + 70, // 70-90
-                            },
-                            {
-                                id: 'others-eu',
-                                name: 'Others',
-                                value: Math.floor(Math.random() * 20) + 70, // 70-90
-                            },
-                        ],
-                    },
-                    {
-                        id: 'asia',
-                        name: 'Asia',
-                        value: Math.floor(Math.random() * 50) + 250, // 250-300
-                        children: [
-                            {
-                                id: 'china',
-                                name: 'China',
-                                value: Math.floor(Math.random() * 30) + 115, // 115-145
-                            },
-                            {
-                                id: 'japan',
-                                name: 'Japan',
-                                value: Math.floor(Math.random() * 20) + 80, // 80-100
-                            },
-                            {
-                                id: 'india',
-                                name: 'India',
-                                value: Math.floor(Math.random() * 15) + 40, // 40-55
-                            },
-                            {
-                                id: 'others-asia',
-                                name: 'Others',
-                                value: Math.floor(Math.random() * 10) + 25, // 25-35
-                            },
-                        ],
-                    },
-                    {
-                        id: 'rest-world',
-                        name: 'Rest of World',
-                        value: Math.floor(Math.random() * 30) + 85, // 85-115
-                        children: [
-                            {
-                                id: 'latam',
-                                name: 'Latin America',
-                                value: Math.floor(Math.random() * 15) + 35, // 35-50
-                            },
-                            {
-                                id: 'africa',
-                                name: 'Africa',
-                                value: Math.floor(Math.random() * 10) + 25, // 25-35
-                            },
-                            {
-                                id: 'oceania',
-                                name: 'Oceania',
-                                value: Math.floor(Math.random() * 10) + 20, // 20-30
-                            },
-                        ],
-                    },
-                ],
-            });
-        }, 2500);
-    });
+const CAROUSEL_PAGES = 3;
 
 function DashboardPage() {
     const { mode: activeMode, setMode: setActiveMode } =
         useContext(ThemeContext);
+
+    const [activePage, setActivePage] = useState(0);
+    const pagesContainerRef = useRef<HTMLDivElement>(null);
+    const scrollToPage = (pageIndex: number) => {
+        if (pagesContainerRef.current) {    
+            const pageWidth = pagesContainerRef.current.clientWidth;
+            const scrollPosition = pageWidth * pageIndex;
+            pagesContainerRef.current.scrollTo({
+                left: scrollPosition,
+                behavior: 'smooth',
+            });
+            setActivePage(pageIndex);
+        }
+    };
+
+    useEffect(() => {
+        const container = pagesContainerRef.current;
+        if (!container) return;
+        
+        let scrollTimer: NodeJS.Timeout | null = null;
+
+        const handleScroll = () => {
+            if (scrollTimer) {
+                clearTimeout(scrollTimer);
+            }
+            scrollTimer = setTimeout(() => {
+            
+                const scrollPosition = container.scrollLeft;
+                const pageWidth = container.clientWidth;
+                const newActivePage = Math.round(scrollPosition / pageWidth);
+                
+                if (newActivePage !== activePage) {
+                    setActivePage(newActivePage);
+                    container.scrollTo({
+                        left: newActivePage * pageWidth,
+                        behavior: 'smooth',
+                    });
+                } else {
+                    container.scrollTo({
+                        left: newActivePage * pageWidth,
+                        behavior: 'smooth',
+                    });
+                }
+            }, 1000);
+        };
+        
+        container.addEventListener('scroll', handleScroll);
+        
+        return () => {
+            container.removeEventListener('scroll', handleScroll);
+            if (scrollTimer) clearTimeout(scrollTimer);
+        };
+    }, [activePage]);
 
     // State for chart data with proper typing
     const [donutData, setDonutData] = useState<DonutDataItem[]>([]);
@@ -614,8 +256,11 @@ body:not(.dark) {
 }
 
 .main-container {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: row;
+    overflow-y: hidden;
+    overflow-x: auto;
+    align-items: start;
 }
 
 .container {
@@ -623,7 +268,12 @@ body:not(.dark) {
     border-radius: 12px;
     padding: 12px;
     backdrop-filter: blur(40px) saturate(1.5);
-    margin: auto;
+    flex: 0 0 100%;
+    height: 100%;
+    width: 100%;
+    min-width: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .container:not(.dark) {
@@ -647,6 +297,38 @@ body:not(.dark) {
         width: 100%;
     }
 }
+
+.dot-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #407abc;
+    cursor: pointer;
+    transition: all 0.250s ease-in-out;
+    outline:none;
+    border: 1px solid #fff;
+}
+.dot:hover {
+    background-color: #f57e52;
+    transform: scale(1.2);
+}
+.dot:active {
+    background-color: #f57e52;
+    transform: scale(0.8);
+}
+
+.dot.active {
+    background-color: #f57e52;
+    transform: scale(1.2);
+}
+
 `}
                 </style>
 
@@ -728,17 +410,24 @@ body:not(.dark) {
                 <div className="blur-circle bottom"></div>
             </>
 
-            <div className="main-container">
-                <div className="container">
+            <div className="main-container" ref={pagesContainerRef}>
+            {[...(new Array(CAROUSEL_PAGES).fill(0))].map((_, index) => (
+                <div className="container" key={index}>
                     {
-                        <Sortable className="my-cards" styles={{
-                            3: {
-                                gridColumn: 'span 1',
-                            },
-                            6: {
-                                gridColumn: 'span 1',
-                            }
-                        }}>
+                        <Sortable
+                            className="my-cards"
+                            styles={{
+                                3: {
+                                    gridColumn: 'span 1',
+                                },
+                                6: {
+                                    gridColumn: 'span 1',
+                                },
+                            }}
+                            sx={{
+                                gridTemplateColumns:
+                                    'repeat(3, minmax(0, 1fr))',
+                            }}>
                             <SortableCard height={400} width={'100%'}>
                                 <DonutChart
                                     data={donutData}
@@ -806,13 +495,13 @@ body:not(.dark) {
                                         align: 'left',
                                     }}
                                     chartProps={{
-                                      variant : "Bar and Line" 
-                                    }}                                       
+                                        variant: 'Bar and Line',
+                                    }}
                                     legendsProps={{
                                         position: Legends.Position.BOTTOM,
                                         eachLegendGap: 23,
-                                        scrollbarAfter: -1,  
-                                        legendsHeight:1,                                            
+                                        scrollbarAfter: -1,
+                                        legendsHeight: 1,
                                         doStrike: true,
                                         isVisible: true,
                                     }}
@@ -835,7 +524,7 @@ body:not(.dark) {
                                         gutterBottom: true,
                                     }}
                                     legendsProps={{
-                                        position: Legends.Position.TOP,                                                                           
+                                        position: Legends.Position.TOP,
                                         onClick: (data, legend, index) => {
                                             console.log(
                                                 `Clicked ${legend} at index ${index}`,
@@ -847,7 +536,6 @@ body:not(.dark) {
                                     tooltipProps={{}}
                                 />
                             </SortableCard>
-
 
                             {/* VerticalBarChart example */}
                             <SortableCard height={400} width={'300'}>
@@ -862,15 +550,15 @@ body:not(.dark) {
                                     ]}
                                     isLoading={dataLoading.verticalBar}
                                     chartProps={{
-                                      variant : "Vertical Bar" 
-                                    }}    
+                                        variant: 'Vertical Bar',
+                                    }}
                                     legendsProps={{
                                         showArrow: true,
                                         position: Legends.Position.BOTTOM,
                                         isVisible: true,
                                         eachLegendGap: 20,
                                         scrollbarAfter: -1,
-                                        legendsHeight:1, // 50% height incase of -1 and if left out 0 it will show all the legends without scrollbar
+                                        legendsHeight: 1, // 50% height incase of -1 and if left out 0 it will show all the legends without scrollbar
                                         onClick: (data, legend, index) => {
                                             console.log(
                                                 `Clicked ${legend} at index ${index}`,
@@ -1045,7 +733,15 @@ body:not(.dark) {
                         </Sortable>
                     }
                 </div>
+            ))}
             </div>
+
+            <div className="dot-container">
+                {[...(new Array(CAROUSEL_PAGES).fill(0))].map((_, index) => (
+                    <button key={index} className={`dot ${activePage === index ? 'active' : ''}`} onClick={() => scrollToPage(index)}></button>
+                ))}
+            </div>
+
         </ChartThemeProvider>
     );
 }
