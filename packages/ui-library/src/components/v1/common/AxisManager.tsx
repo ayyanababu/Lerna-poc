@@ -48,9 +48,14 @@ const YAxisComponent: React.FC<YAxisProps> = ({
   scale,
   isLoading,
   chart,
+  label,
   ...props
 }) => {
-  return <YAxis left={chart && chart.toUpperCase() === "BAR AND LINE"?15:0} scale={scale} isLoading={isLoading} {...props} />;
+  if (label){
+    return <YAxis left={15} label={label} scale={scale} isLoading={isLoading} {...props} />;
+  }else{
+    return <YAxis left={0} label={label} scale={scale} isLoading={isLoading} {...props} />;
+  }  
 };
 
 const Y1AxisComponent: React.FC<YAxisProps> = ({

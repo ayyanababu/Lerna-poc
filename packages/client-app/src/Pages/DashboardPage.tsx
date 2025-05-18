@@ -12,6 +12,7 @@ import {
     VerticalBarChart,
     VerticalGroupedBarChart,
     VerticalStackedBarChart,
+    BarLineData,
 } from '@my-org/ui-library';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { ThemeContext } from '../App';
@@ -36,18 +37,6 @@ export type StackedBarItem = {
     data: Record<string, number>;
 };
 
-type BarLineDataItem = {
-    xAxis: string;
-    yAxisLeft: number;
-    yAxisRight: number;
-};
-
-type BarLineData = {
-    xAxislabel: string;
-    yAxisLeftLabel: string;
-    yAxisRightLabel: string;
-    chartData: BarLineDataItem[];
-};
 
 type VerticalBarItem = {
     label: string;
@@ -231,10 +220,10 @@ const fetchBarLineData = (): Promise<BarLineData> =>
         }, 2200);
     });
 
-const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
+const fetchVerticalBarData = (): Promise<BarLineData> =>
     new Promise((resolve) => {
         setTimeout(() => {
-            resolve([
+            const actionTypes = [           
                 { label: 'Priced hahf  shs fsh s   sdh dsh   h ds fhsf sh', value: 123 },
                 { label: 'Priced', value: 2450 },
                 { label: 'Priced', value: 36700 },
@@ -245,8 +234,18 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
                 { label: 'Priced Theta', value: 877000000 },
                 { label: 'Priced Iota', value: 921000000 },
                 { label: 'Priced Kappa', value: 999000000 }
-              ]
-              );
+            ]            
+            resolve({
+                xAxislabel: 'Corporate Action - no line',
+                yAxisLeftLabel: 'Number of Actions - no line',
+                yAxisRightLabel: 'Positions Impacted no line',
+                chartData: actionTypes.map((action, index) => ({
+                    xAxis: action.label,
+                    yAxisLeft: action.value, // 15-45
+                    yAxisRight: undefined,
+                    barColor: index == 0 ? 'red' : null,
+                })),
+            });
         }, 1300);
     });
 
@@ -464,9 +463,13 @@ function DashboardPage() {
         yAxisRightLabel: 'Positions Impacted',
         chartData: [],
     });
-    const [verticalBarData, setVerticalBarData] = useState<VerticalBarItem[]>(
-        [],
-    );
+    const [verticalBarData, setVerticalBarData] = useState<BarLineData>({
+        xAxislabel: 'Corporate Action',
+        yAxisLeftLabel: 'Number of Actions',
+        yAxisRightLabel: 'Positions Impacted',
+        chartData: [],
+    });
+
     const [horizontalBarData, setHorizontalBarData] = useState<
         VerticalBarItem[]
     >([]);

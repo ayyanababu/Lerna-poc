@@ -1,4 +1,4 @@
-import { BarLineData } from "./types";
+import { BarLineData } from "../v1/common/Data.types";
 
 /**
  * Mock data for the HorizontalBarChart component

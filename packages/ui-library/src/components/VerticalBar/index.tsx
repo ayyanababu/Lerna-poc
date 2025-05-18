@@ -1,7 +1,7 @@
 import React,{useMemo} from 'react'
 import Bar from "../v1/Bar/"
 import mockVerticalBarChartData from "./mockdata";
-import { VerticalBarChartProps,DataPoint } from "./types";
+import { VerticalBarChartProps, BarLineData } from "./types";
 import useTheme from "../../hooks/useTheme";
 const DEFAULT_MAX_BAR_WIDTH = 16;
 
@@ -26,14 +26,15 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   showXAxis = false,
   showYAxis = false,
 }) => {
-   const data = useMemo<DataPoint[]>(
+   const data = useMemo<BarLineData[]>(
      () => (isLoading ? mockVerticalBarChartData : _data),
      [isLoading, _data],
    );
-
-   if (!isLoading && (!_data || _data.length === 0)) {
+console.log("cdata",data)
+  const { chartData } = data;
+  if (!isLoading && (!chartData || chartData.length === 0)) {
      return <div>No data to display.</div>;
-   }
+  }
 
    console.log("mock2",data)
    return(

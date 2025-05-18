@@ -8,20 +8,8 @@ import { LegendsProps } from "../Legends/types";
 import { XAxisProps } from "../XAxis/types";
 import { YAxisProps } from "../YAxis/types";
 import { ScaleBand, ScaleLinear } from "d3";
+import { BarLineData } from './Data.types'
 
-export interface BarLineDataPoint {
-  xAxis: string;
-  yAxisLeft: number;
-  yAxisRight: number;
-  barColor?: string;
-}
-
-export interface BarLineData {
-  xAxislabel: string;
-  yAxisLeftLabel: string;
-  yAxisRightLabel: string;
-  chartData: BarLineDataPoint[];
-}
 
 export interface LineRendererProps {
   /**
@@ -150,7 +138,7 @@ export interface LineRendererProps {
   y1AxisProps:Partial<YAxisProps>;
   xOffset?:number;
   yAxisRightLabel?:string;
-  hoveredLine:string | null | number;
+  hoveredLine:string | null | number | undefined;
   chartWidth:number;
   lineColor:string;
   hideTicks?:boolean;

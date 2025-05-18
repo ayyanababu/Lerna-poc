@@ -28,4 +28,5 @@ export interface LegendManagerProps {
   legendBoxHeight: number;
   calculatedLegendHeight: number;
   legendBoxWidth: number;
+  chart:string;
 }

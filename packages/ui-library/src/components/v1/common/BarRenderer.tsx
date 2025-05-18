@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import CustomBar from "../../CustomBar";
 import type { BarRendererProps } from "./BarRenderer.types";
-import { BarsList } from "./types";
+import {  BarLineDataItem, BarsList, DataPoint } from "./Data.types";
 
 const DEFAULT_BAR_RADIUS = 4;
 const ANIMATION_DURATION = 800; // animation duration in ms
@@ -42,8 +42,8 @@ const BarRenderer: React.FC<BarRendererProps> = ({
 
       let barX =
         barwidth < calculatedBarWidth
-          ? (xScale(d.xAxis ? d.xAxis : d.label) || 0) + (calculatedBarWidth - barwidth) / 2
-          : xScale(d.xAxis ? d.xAxis : d.label) || 0;
+          ? (xScale(d.xAxis) || 0) + (calculatedBarWidth - barwidth) / 2
+          : xScale(d.xAxis) || 0;
 
       if (index === 0) {
         barX -= baseAdjustWidth;
@@ -56,7 +56,7 @@ const BarRenderer: React.FC<BarRendererProps> = ({
       return {
         x: barX,
         width: barwidth,
-        label: d.xAxis ? d.xAxis : d.label,
+        label: d.xAxis,
       };
     });
   }, [filteredData, xScale, maxBarWidth, baseAdjustWidth]);
@@ -108,7 +108,8 @@ const BarRenderer: React.FC<BarRendererProps> = ({
   return (
     <>
       {filteredData.map((d, index) => {
-        const value = Number(d.yAxisLeft ? d.yAxisLeft : d.value);
+        let dataClicked:DataPoint = {label:d.xAxis,value:d.yAxisLeft}
+        const value = Number(d.yAxisLeft);
         if (Number.isNaN(value)) return null;
 
         const calculatedBarWidth = xScale.bandwidth();
@@ -117,8 +118,8 @@ const BarRenderer: React.FC<BarRendererProps> = ({
         // Calculate bar position
         let barX =
           barwidth < calculatedBarWidth
-            ? (xScale(d.xAxis ? d.xAxis : d.label) || 0) + (calculatedBarWidth - barwidth) / 2
-            : xScale(d.xAxis ? d.xAxis : d.label) || 0;
+            ? (xScale(d.xAxis) || 0) + (calculatedBarWidth - barwidth) / 2
+            : xScale(d.xAxis) || 0;
 
         if (index === 0) {
           barX -= baseAdjustWidth;
@@ -166,11 +167,11 @@ const BarRenderer: React.FC<BarRendererProps> = ({
           currentHeight > 0 ? currentHeight : 0
         );
 
-        const barColor = d.color || colorScale(index.toString());
+        const barColor = d.barColor || colorScale(index.toString());
 
         return (
           <CustomBar
-            key={`bar-${d.label}`}
+            key={`bar-${d.xAxis}`}
             x={barX}
             y={currentY}
             width={barwidth}
@@ -196,7 +197,7 @@ const BarRenderer: React.FC<BarRendererProps> = ({
             {...barProps}
             onClick={(event) => {
               if (barProps?.onClick) barProps.onClick(event);
-              if (onClick) onClick(event, d, index);
+              if (onClick) onClick(event, dataClicked, index);
             }}
           />
         );

@@ -21,6 +21,7 @@ const LegendManager: React.FC<LegendManagerProps> = ({
   legendBoxHeight,
   calculatedLegendHeight,
   legendBoxWidth,
+  chart
 }) => {
   // Only render the legend if it's visible in props
   if (!legendsProps?.isVisible) {
@@ -64,6 +65,7 @@ const LegendManager: React.FC<LegendManagerProps> = ({
             generatedLegendHeight={generatedLegendHeight}
             generateAxis={generateAxis}
             legendBoxWidth={legendBoxWidth}
+            chart={chart}
           />
         </svg>,
       )}

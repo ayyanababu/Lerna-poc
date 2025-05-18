@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { scaleBand, scaleLinear } from "@visx/scale";
 
-import { DataPoint } from "../components/v1/common/types";
+import { DataPoint } from "../components/v1/common/Data.types";
 
 // Define the interfaces based on what your component needs
 // These are pure TypeScript interfaces with no imports from d3

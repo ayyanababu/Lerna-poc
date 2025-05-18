@@ -29,6 +29,7 @@ function Legends({
   legendBoxWidth,
   hideLegendLableClick = true,
   showArrow = true,
+  chart
 }: LegendsProps) {
   const legends_ref = useRef<SVGGElement | null>(null);
 
@@ -119,7 +120,7 @@ function Legends({
       type Positions = Record<string, Position[]>;
       const positions: Positions = {};
       let start = 0;
-      let row = 0;
+      let row = 1;
       let addwidth = 0;
       let newwidth = 0;
       while (start < gs.length) {
@@ -127,7 +128,7 @@ function Legends({
           addwidth += (gs[start] as SVGGElement).getBBox().width - 20 + 8;
         } else {
           addwidth += (gs[start] as SVGGElement).getBBox().width + 8;
-        }
+        }        
         if (addwidth > legendBoxWidth) {
           row++;
           addwidth = 0;
@@ -158,7 +159,7 @@ function Legends({
               object: gs[start],
               row: row,
               x: newwidth,
-              y: (row-1) * eachLegendGap,
+              y: (row - 1) * eachLegendGap,
               cwidth:
                 newwidth +
                 (gs[start] as SVGGElement).getBoundingClientRect().width,

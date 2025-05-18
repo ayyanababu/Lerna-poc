@@ -59,6 +59,7 @@ export interface LegendsProps {
   legendBoxWidth?: number;
   hideLegendLableClick?: boolean;
   showArrow?: boolean;
+  chart:string;
 }
 
 export interface LegendItemProps {

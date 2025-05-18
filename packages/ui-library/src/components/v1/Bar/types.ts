@@ -7,14 +7,13 @@ import { TitleProps } from "../../Title/types";
 import { TooltipProps } from "../../Tooltip/types";
 import { XAxisProps } from "../../XAxis/types";
 import { YAxisProps } from "../../YAxis/types";
-import { DataPoint } from "../common/types";
 import { LegendsProps } from "../Legends/types";
 import { ChartProps } from "../Charts/types";
-import type { BarLineData } from "../common/LineRenderer.types";
+import { BarLineData, DataPoint } from "../common/Data.types";
 import useTheme from "../../../hooks/useTheme"; 
 
 export interface BarChartProps {
-  data: DataPoint[];
+  data: BarLineData[];
   type?:string;
   title?: string;
   margin?: { top: number; right: number; bottom: number; left: number };
@@ -43,6 +42,7 @@ export interface BarChartProps {
   theme:ReturnType<typeof useTheme>;
 }
 
+
 export type {BarLineData};
 
 export interface BarLineChartProps {
@@ -50,7 +50,6 @@ export interface BarLineChartProps {
    * Data for the chart
    */
   data: BarLineData;
-  mockdata:BarLineData;
 
 
   title?: string;

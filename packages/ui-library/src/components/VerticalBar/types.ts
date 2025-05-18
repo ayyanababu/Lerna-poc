@@ -7,22 +7,12 @@ import { TooltipProps } from "../Tooltip/types";
 import { XAxisProps } from "../XAxis/types";
 import { YAxisProps } from "../YAxis/types";
 import { ChartProps } from "../v1/Charts/types";
-import type { BarLineDataPoint } from "../v1/common/LineRenderer.types";
+import { DataPoint } from "../HorizontalBar/types";
+import { BarLineData } from '../v1/common/Data.types'
 
-
-export interface DataPoint {
-  label: string;
-  value: number;
-  color?: string;
-  xAxislabel?: string;
-  yAxisLeftLabel?: string;
-  yAxisRightLabel?: string;
-  chartData?: BarLineDataPoint[];
-}
 
 export interface VerticalBarChartProps {
-  data: DataPoint[];
-  mockdata:DataPoint[];
+  data: BarLineData;
   title?: string;
   margin?: { top: number; right: number; bottom: number; left: number };
   colors?: string[];
@@ -47,3 +37,5 @@ export interface VerticalBarChartProps {
   showTicks?:boolean;  
   chartProps?:Partial<ChartProps>;
 }
+
+export type {BarLineData};

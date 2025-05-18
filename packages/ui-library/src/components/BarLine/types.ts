@@ -10,20 +10,7 @@ import { XAxisProps } from "../XAxis/types";
 import { YAxisProps } from "../YAxis/types";
 import { ChartProps } from "../v1/Charts/types";
 import useTheme from "../../hooks/useTheme"; 
-
-export interface BarLineDataPoint {
-  xAxis: string;
-  yAxisLeft: number;
-  yAxisRight: number;
-  barColor?: string;
-}
-
-export interface BarLineData {
-  xAxislabel: string;
-  yAxisLeftLabel: string;
-  yAxisRightLabel: string;
-  chartData: BarLineDataPoint[];
-}
+import { BarLineData } from "../v1/common/Data.types";
 
 export interface BarLineChartProps {
   /**

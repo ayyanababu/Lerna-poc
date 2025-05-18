@@ -1,4 +1,4 @@
-import { DataPoint } from "../common/types";
+import { DataPoint } from "../common/Data.types";
 
 /**
  * Mock data for the VerticalBarChart component

@@ -22,10 +22,11 @@ import AxisManager from "../common/AxisManager";
 import BarRenderer from "../common/BarRenderer";
 import LineRenderer from "../common/LineRenderer";
 import LegendManager from "../common/LegendManager";
-import { BarLineDataPoint, BarsList, DataPoint } from "../common/types";
+import { BarLineDataItem, BarsList, DataPoint } from "../common/Data.types";
 //import mockVerticalBarChartData from "./mockdata";
 //import mockBarLineChartData from "../../BarLine/mockData";
 import {BarChartProps, BarLineData } from "./types";
+
 
 
 const defaultMargin = {
@@ -79,9 +80,9 @@ const Bar: React.FC<BarChartProps> = ({
 
  
   const [yAxisLabelWidth, setYAxisLabelWidth] = useState<number>(defaultMargin.left + TICK_LABEL_PADDING);
-  const [hoveredBar, setHoveredBar] = useState<number | null >(null);
-  const [hoveredBarOther, setHoveredBarOther] = useState<number | null>(null);
-  const [hoveredLine, setHoveredLine] = useState<number | null>(null);
+  const [hoveredBar, setHoveredBar] = useState<number | null | undefined >(null);
+  const [hoveredBarOther, setHoveredBarOther] = useState<number | null | undefined>(null);
+  const [hoveredLine, setHoveredLine] = useState<number | null | undefined>(null);
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
   const axis_bottom = useRef<SVGGElement | null>(null);
@@ -198,21 +199,35 @@ const Bar: React.FC<BarChartProps> = ({
   } = useTooltip<TooltipData[]>();
 
 
-  let filteredData:any[] = [];
+  let filteredData:BarLineDataItem[] = [];
+
+  const isBarLineData = (obj: unknown): obj is BarLineData => {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'chartData' in obj &&
+      Array.isArray((obj as any).chartData)
+    );
+  }
   
   switch (chartProps && chartProps?.variant && chartProps?.variant.toUpperCase()){
      case "VERTICAL BAR":
-       const typedData = data as DataPoint[];
-       filteredData = useMemo(() => {
-         return typedData.filter((_, index) => !hideIndex.includes(index));
-       }, [typedData, hideIndex]);
+        if (isBarLineData(data)) {
+            const { chartData } = data;
+            filteredData = useMemo(() => {
+              return chartData.filter((_, index:number) => !hideIndex.includes(index));
+            }, [chartData, hideIndex]);
+         }
+  //     filteredData = useMemo(() => {
+  //       return typedData.filter((_, index) => !hideIndex.includes(index));
+  //     }, [typedData, hideIndex]);
        break;
      case "BAR AND LINE":
-       if (data && typeof data === "object" && "chartData" in data) {
-         const newdata = data as BarLineData;
-         filteredData = useMemo(() => {
-           return newdata.chartData.filter((_, index) => !hideIndex.includes(index));
-         }, [data.chartData, hideIndex]);
+       if (isBarLineData(data)) {
+            const { chartData } = data;
+            filteredData = useMemo(() => {
+              return chartData.filter((_, index:number) => !hideIndex.includes(index));
+            }, [chartData, hideIndex]);
        }
        break; 
      case "VERTICAL STACKED BAR":
@@ -223,18 +238,22 @@ const Bar: React.FC<BarChartProps> = ({
 
   }
 
+  console.log("filt",filteredData);
 
   let xAxislabel = "";
   let yAxisLeftLabel = undefined;
   let yAxisRightLabel = undefined;
-  let chartData:  BarLineDataPoint[] = [];
+  let chartData:  BarLineDataItem[] = [];
 
-  if (data && typeof data === "object" && "chartData" in data && chartProps && chartProps?.variant && chartProps?.variant.toUpperCase() === "BAR AND LINE"){
-    const typedData = data as BarLineData;
-    xAxislabel = typedData.xAxislabel;
-    yAxisLeftLabel = typedData.yAxisLeftLabel;
-    yAxisRightLabel = typedData.yAxisRightLabel;
-    chartData = typedData.chartData;
+  if (data && typeof data === "object" && "chartData" in data){
+     if (isBarLineData(data)) {    
+       const typedData = data as BarLineData;
+       xAxislabel = typedData.xAxislabel;
+       yAxisLeftLabel = typedData.yAxisLeftLabel;
+       console.log("axislabel this",yAxisLeftLabel)
+       yAxisRightLabel = typedData.yAxisRightLabel;
+       chartData = typedData.chartData;
+     }   
   }
 
   const { xScale, yScale, y1Scale } = useChartScales({
@@ -264,16 +283,18 @@ const Bar: React.FC<BarChartProps> = ({
   console.log("maindata",data)
 
   const legendData = useMemo(() => {
-    if (yAxisLeftLabel !== undefined && yAxisRightLabel !== undefined) {
+   if (chartProps && chartProps?.variant && chartProps?.variant.toUpperCase() === "BAR AND LINE"){
       return [
         { label: yAxisLeftLabel, value: 0 },
         { label: yAxisRightLabel, value: 0 },
       ];
     } else {
-      return data.map((d) => ({
-        label: d.label || d.yAxisLeftLabel || '',
-        value: d.value,
-      }));
+      if (isBarLineData(data)) {          
+        return data.chartData.map((d:BarLineDataItem) => ({
+          label: d.xAxis,
+          value: d.yAxisLeft,
+        }));
+      }   
     }  
   }, [data, yAxisLeftLabel, yAxisRightLabel]);
 
@@ -297,11 +318,12 @@ const Bar: React.FC<BarChartProps> = ({
     (value: number, color: string, index: number) =>
       (event: React.MouseEvent) => {
         if (!isLoading) {
-          if (chartData && chartData[index]){
-            const { yAxisLeft, yAxisRight } = chartData[index];            
+           if (chartProps && chartProps?.variant && chartProps?.variant.toUpperCase() === "BAR AND LINE"){
+            const { yAxisLeft, yAxisRight } = chartData[index];    
+            console.log("colorsed",colors)        
             const toolTipdata = [
-              { label: yAxisLeftLabel, value: yAxisLeft, color: colors.bar },
-              { label: yAxisRightLabel, value: yAxisRight, color: colors.line },
+              { label: yAxisLeftLabel, value: yAxisLeft, color: color},
+              { label: yAxisRightLabel, value: yAxisRight, color: theme.colors.charts.line },
             ];
             showTooltip({
               tooltipData: toolTipdata,
@@ -322,7 +344,7 @@ const Bar: React.FC<BarChartProps> = ({
             showTooltip({
               tooltipData: [
                 {
-                  label: filteredData[index].label,
+                  label: filteredData[index].xAxis,
                   value,
                   color,
                 },
@@ -411,7 +433,7 @@ const Bar: React.FC<BarChartProps> = ({
       if (renderedStatus) {
         console.log(chartProps?.variant,"yes")
         if (chartSvgRef && chartSvgRef.current){
-          setLegendBoxWidth((chartSvgRef?.current?.querySelector("g") as SVGGElement).getBBox().width);
+          setLegendBoxWidth((chartSvgRef?.current?.querySelector("g") as SVGGElement).getBBox().width-(chartProps && chartProps?.variant && chartProps?.variant.toUpperCase() != "BAR AND LINE"?10:0));
         }  
         let moveY = 0;
         if (axis_bottom && axis_bottom.current) {
@@ -431,7 +453,13 @@ const Bar: React.FC<BarChartProps> = ({
         }
         if (axis_left && axis_left.current) {
           console.log("bbbox",axis_left.current.getBBox())
-          setLegendLeft(axis_left.current.getBBox().x - 8);
+          let lleft = -8;
+          if (chartProps && chartProps?.variant && chartProps?.variant.toUpperCase() != "BAR AND LINE"){
+            if (!yAxisLeftLabel){
+              lleft += 18
+            }  
+          }
+          setLegendLeft(axis_left.current.getBBox().x + lleft);
         }
       }
       let legendcalculatedHeight = 0;
@@ -595,33 +623,32 @@ const Bar: React.FC<BarChartProps> = ({
               transferBarList={transferBarList}
               chartProps={chartProps?.variant}
             />}
-          </g>
-          {showLine && chartProps && chartProps.variant && chartProps?.variant.toUpperCase() === "BAR AND LINE" ?
-            <g ref={line_chart}>
-             <LineRenderer
-               data={data}
-               xScale={typedXscale}
-               y1Scale={typedY1scale}
-               defaultOpacity={DEFAULT_OPACITY}
-               reducedOpacity={REDUCED_OPACITY} 
-               circleRadius={circleRadius}   
-               getAxisRight={getAxisRight}
-               {...y1AxisProps} 
-               hideIndex={hideChart}
-               setHideIndex={setHideChart}
-               xOffset={xOffset}
-               yAxisRightLabel={yAxisRightLabel}
-               isLoading={isLoading}
-               hoveredLine={hoveredLine}       
-               rightPosition={rightPositionYAxis}
-               lineColor={theme.colors.charts.bar[2]}
-               hideTicks={!showTicks}
-               hideAxisLine={!showYAxis}
-               label={yAxisRightLabel}   
-               chart={chartProps?.variant}      
-             />
-          </g> : ''}
-
+            {showLine && chartProps && chartProps.variant && chartProps?.variant.toUpperCase() === "BAR AND LINE" ?
+              <g ref={line_chart}>
+               <LineRenderer
+                 data={data}
+                 xScale={typedXscale}
+                 y1Scale={typedY1scale}
+                 defaultOpacity={DEFAULT_OPACITY}
+                 reducedOpacity={REDUCED_OPACITY} 
+                 circleRadius={circleRadius}   
+                 getAxisRight={getAxisRight}
+                 {...y1AxisProps} 
+                 hideIndex={hideChart}
+                 setHideIndex={setHideChart}
+                 xOffset={xOffset}
+                 yAxisRightLabel={yAxisRightLabel}
+                 isLoading={isLoading}
+                 hoveredLine={hoveredLine}       
+                 rightPosition={rightPositionYAxis}
+                 lineColor={theme.colors.charts.bar[2]}
+                 hideTicks={!showTicks}
+                 hideAxisLine={!showYAxis}
+                 label={yAxisRightLabel}   
+                 chart={chartProps?.variant}      
+               />
+            </g> : ''}
+          </g> 
           <g ref={legend_ref}>
             <LegendManager
               legendsProps={legendsProps}
@@ -642,6 +669,7 @@ const Bar: React.FC<BarChartProps> = ({
               legendBoxHeight={legendHeight}
               calculatedLegendHeight={calculatedLegendHeight}
               legendBoxWidth={legendBoxWidth}
+              chart={chartProps && chartProps.variant?chartProps.variant:''}
             />
           </g>
         </Group>

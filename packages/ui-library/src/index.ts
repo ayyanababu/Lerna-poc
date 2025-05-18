@@ -12,3 +12,4 @@ export { default as Title } from "./components/Title";
 export { default as TreeMapChart } from "./components/TreeMapChart";
 export { default as VerticalGroupedBarChart } from "./components/VerticalGroupedBarChart";
 export { ChartThemeProvider } from "./context/ChartThemeProvider";
+export type {BarLineData, BarLineDataItem} from "./components/v1/common/Data.types";

@@ -1,6 +1,6 @@
 import { AxisBottom } from "@visx/axis";
 
-import { BarsList } from "../common/types";
+import { BarsList } from "../common/Data.types";
 
 type AxisBottomProps = Parameters<typeof AxisBottom>[0];
 export interface XAxisProps extends AxisBottomProps {

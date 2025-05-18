@@ -1,15 +1,15 @@
 import { ScaleBand, ScaleLinear } from "d3";
 
 import { CustomBarProps } from "../../CustomBar/types";
-import { BarsList, DataPoint } from "./types";
+import { BarsList, DataPoint, BarLineDataItem } from "./Data.types";
 
 export interface BarRendererProps {
-  filteredData: DataPoint[];
+  filteredData: BarLineDataItem[];
   xScale: ScaleBand<string>;
   yScale: ScaleLinear<number, number>;
   colorScale: (index: string) => string;
-  hoveredBar: number | null | string;
-  hoveredBarOther: number | null | string;
+  hoveredBar: number | null | string | undefined;
+  hoveredBarOther: number | null | string | undefined;
   isLoading: boolean;
   maxBarWidth: number | undefined; 
   drawableChartHeight: number;
