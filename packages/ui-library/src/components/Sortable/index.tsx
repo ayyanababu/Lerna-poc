@@ -9,6 +9,8 @@ export default function SortableComponent({
   className,
   styles,
   sx,
+  onEnd,
+  onStart,
 }: SortableProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const childrenArray = useMemo(
@@ -24,7 +26,7 @@ export default function SortableComponent({
       handle: ".drag-handle",
       animation: 200,
       easing: "cubic-bezier(1, 0, 0, 1)",
-      delay: 2,
+      delay: 0,
       onStart: (evt) => {
         const draggedItem = evt.item;
         const draggedItemId = draggedItem.getAttribute("data-id");
@@ -34,13 +36,20 @@ export default function SortableComponent({
             child.classList.add("jiggle-animation");
           }
         });
+
+        if (onStart) {
+          onStart(evt);
+        }
       },
-      onEnd: () => {
+      onEnd: (evt) => {
         document.querySelectorAll(".drag-handle").forEach((child) => {
           child.classList.remove("jiggle-animation");
         });
+
+        if (onEnd) {
+          onEnd(evt);
+        }
       },
-      onUpdate: () => {},
       scrollSensitivity: 100,
       scrollSpeed: 10,
       scroll: true,
@@ -50,8 +59,6 @@ export default function SortableComponent({
       sortable.destroy();
     };
   }, []);
-
-  console.log("class", className);
 
   return (
     <Box

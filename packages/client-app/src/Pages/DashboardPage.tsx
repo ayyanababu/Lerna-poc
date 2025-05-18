@@ -41,44 +41,28 @@ function DashboardPage() {
         }
     };
 
-    useEffect(() => {
+    const onDragEnd = () => {
         const container = pagesContainerRef.current;
         if (!container) return;
-        
-        let scrollTimer: NodeJS.Timeout | null = null;
-
-        const handleScroll = () => {
-            if (scrollTimer) {
-                clearTimeout(scrollTimer);
-            }
-            scrollTimer = setTimeout(() => {
             
-                const scrollPosition = container.scrollLeft;
-                const pageWidth = container.clientWidth;
-                const newActivePage = Math.round(scrollPosition / pageWidth);
-                
-                if (newActivePage !== activePage) {
-                    setActivePage(newActivePage);
-                    container.scrollTo({
-                        left: newActivePage * pageWidth,
-                        behavior: 'smooth',
-                    });
-                } else {
-                    container.scrollTo({
-                        left: newActivePage * pageWidth,
-                        behavior: 'smooth',
-                    });
-                }
-            }, 1000);
-        };
+        const scrollPosition = container.scrollLeft;
+        const pageWidth = container.clientWidth;
+        const newActivePage = Math.round(scrollPosition / pageWidth);
         
-        container.addEventListener('scroll', handleScroll);
+        if (newActivePage !== activePage) {
+            setActivePage(newActivePage);
+            container.scrollTo({
+                left: newActivePage * pageWidth,
+                behavior: 'smooth',
+            });
+        } else {
+            container.scrollTo({
+                left: newActivePage * pageWidth,
+                behavior: 'smooth',
+            });
+        }
+    };
         
-        return () => {
-            container.removeEventListener('scroll', handleScroll);
-            if (scrollTimer) clearTimeout(scrollTimer);
-        };
-    }, [activePage]);
 
     // State for chart data with proper typing
     const [donutData, setDonutData] = useState<DonutDataItem[]>([]);
@@ -427,7 +411,9 @@ body:not(.dark) {
                             sx={{
                                 gridTemplateColumns:
                                     'repeat(3, minmax(0, 1fr))',
-                            }}>
+                            }}
+                            onEnd={onDragEnd}
+                            >
                             <SortableCard height={400} width={'100%'}>
                                 <DonutChart
                                     data={donutData}
