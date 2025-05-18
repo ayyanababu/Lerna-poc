@@ -283,10 +283,20 @@ body:not(.dark) {
 }
 
 .dot-container {
+    position: sticky;
+    bottom: 20px;
     display: flex;
     justify-content: center;
     gap: 10px;
     margin: 20px 0;
+    padding: 12px 16px;
+    background-color: #fff;
+    background-opacity: 0.8;
+    backdrop-filter: blur(40px);
+    border-radius: 25px;
+    margin: 0 auto;
+    margin-top: 25px;
+    width: fit-content;
 }
 
 .dot {
