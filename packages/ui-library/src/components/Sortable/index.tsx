@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Box } from "@mui/material";
 import Sortable from "sortablejs";
 
@@ -8,22 +8,19 @@ export default function SortableComponent({
   children,
   className,
   styles,
+  sx,
 }: SortableProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [state, setState] = useState<{ id: number }[]>([]);
   const childrenArray = useMemo(
     () => React.Children.toArray(children),
     [children],
   );
 
   useEffect(() => {
-    setState(childrenArray.map((_, index) => ({ id: index })));
-  }, [childrenArray]);
-
-  useEffect(() => {
     if (!containerRef.current) return () => {};
 
     const sortable = Sortable.create(containerRef.current, {
+      group: "shared",
       handle: ".drag-handle",
       animation: 200,
       easing: "cubic-bezier(1, 0, 0, 1)",
@@ -32,28 +29,21 @@ export default function SortableComponent({
         const draggedItem = evt.item;
         const draggedItemId = draggedItem.getAttribute("data-id");
 
-        if (containerRef.current) {
-          Array.from(containerRef.current.children).forEach((child) => {
-            if (child.getAttribute("data-id") !== draggedItemId) {
-              child.classList.add("jiggle-animation");
-            }
-          });
-        }
+        document.querySelectorAll(".drag-handle").forEach((child) => {
+          if (child.getAttribute("data-id") !== draggedItemId) {
+            child.classList.add("jiggle-animation");
+          }
+        });
       },
       onEnd: () => {
-        if (containerRef.current) {
-          Array.from(containerRef.current.children).forEach((child) => {
-            child.classList.remove("jiggle-animation");
-          });
-        }
+        document.querySelectorAll(".drag-handle").forEach((child) => {
+          child.classList.remove("jiggle-animation");
+        });
       },
-      onUpdate: () => {
-        const nodes = Array.from(containerRef.current?.children || []);
-        const newIds = nodes.map((node) =>
-          parseInt(node.getAttribute("data-id") || "0", 10),
-        );
-        setState(newIds.map((id) => ({ id })));
-      },
+      onUpdate: () => {},
+      scrollSensitivity: 100,
+      scrollSpeed: 10,
+      scroll: true,
     });
 
     return () => {
@@ -71,6 +61,7 @@ export default function SortableComponent({
         gap: "16px",
         display: "grid",
         gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+        transition: "all 0.3s ease-in-out",
         "& .sortable-ghost": {
           backgroundColor: "#8fc5ff",
           borderRadius: "8px",
@@ -80,33 +71,34 @@ export default function SortableComponent({
         },
         "@keyframes jiggle": {
           "0%": {
-            transform: "rotate(0deg)",
+            transform: "rotate(0deg) scale(0.95)",
           },
           "25%": {
-            transform: "rotate(-1deg)",
+            transform: "rotate(-1deg) scale(0.95)",
           },
           "75%": {
-            transform: "rotate(1deg)",
+            transform: "rotate(1deg) scale(0.95)",
           },
           "100%": {
-            transform: "rotate(0deg)",
+            transform: "rotate(0deg) scale(0.95)",
           },
         },
         "& .jiggle-animation": {
           animation: "jiggle 0.3s infinite ease-in-out",
         },
+        ...(sx || {}),
       }}
     >
-      {state.map((item) => (
+      {childrenArray.map((_, index) => (
         <div
-          key={item.id}
-          data-id={item.id}
+          key={index}
+          data-id={index}
           className="drag-handle"
           style={{
-            ...styles?.[item.id],
+            ...styles?.[index],
           }}
         >
-          {childrenArray[item.id]}
+          {childrenArray[index]}
         </div>
       ))}
     </Box>

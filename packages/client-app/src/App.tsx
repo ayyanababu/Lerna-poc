@@ -53,3 +53,10 @@ const App = () => {
     );
 };
 export default App;
+
+// import CarouselPage from "./Pages/CarouselPage";
+// export default function App () {
+//     return <>
+//     <CarouselPage/>
+//     </>
+// }
