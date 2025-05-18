@@ -55,9 +55,8 @@ export interface YAxisProps extends AxisLeftProps {
   wrapped?: (wrapped: boolean) => void;
   refreshAxis?: number;
   chartWidth?: number;
-  chart?:string|undefined;
-  showYAxis?:boolean;
+  chart?: string | undefined;
+  showYAxis?: boolean;
   isRightYAxis?: boolean;
-  textAnchor?: 'start' | 'end' | 'middle' | 'inherit';
+  textAnchor?: "start" | "end" | "middle" | "inherit";
 }
-

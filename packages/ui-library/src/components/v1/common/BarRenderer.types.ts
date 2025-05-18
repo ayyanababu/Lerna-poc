@@ -1,7 +1,7 @@
 import { ScaleBand, ScaleLinear } from "d3";
 
 import { CustomBarProps } from "../../CustomBar/types";
-import { BarsList, DataPoint, BarLineDataItem } from "./Data.types";
+import { BarLineDataItem, BarsList, DataPoint } from "./Data.types";
 
 export interface BarRendererProps {
   filteredData: BarLineDataItem[];
@@ -11,7 +11,7 @@ export interface BarRendererProps {
   hoveredBar: number | null | string | undefined;
   hoveredBarOther: number | null | string | undefined;
   isLoading: boolean;
-  maxBarWidth: number | undefined; 
+  maxBarWidth: number | undefined;
   drawableChartHeight: number;
   handleBarMouseMove: (
     value: number,
@@ -25,8 +25,7 @@ export interface BarRendererProps {
   barProps?: CustomBarProps;
   onClick?: (event: React.MouseEvent, data: DataPoint, index: number) => void;
   transferBarList: (barlist: BarsList[]) => void;
-  chartProps:string|undefined;
+  chartProps: string | undefined;
 }
 
-export type {BarsList};
-
+export type { BarsList };

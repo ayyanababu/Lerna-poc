@@ -17,7 +17,7 @@ export interface LegendManagerProps {
   hideIndex: number[];
   setHideIndex: Dispatch<SetStateAction<number[]>>;
   hovered: string | null;
-  setHovered: (label: string | number | null) => void
+  setHovered: (label: string | number | null) => void;
   isLoading: boolean;
   isLegendRendered: (status: boolean) => void;
   generatedLegendHeight: (height: number) => void;
@@ -28,5 +28,5 @@ export interface LegendManagerProps {
   legendBoxHeight: number;
   calculatedLegendHeight: number;
   legendBoxWidth: number;
-  chart:string;
+  chart: string;
 }

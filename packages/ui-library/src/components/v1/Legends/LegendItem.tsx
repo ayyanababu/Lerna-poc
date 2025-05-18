@@ -20,19 +20,13 @@ function LegendItem({
   hideValues = false,
   markerColor,
   onArrowClick,
-  eachLegendGap = 4, // Default gap between legends
-  showIcon,
   hideLegendLableClick = true,
   showArrow = true,
 }: LegendItemProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [strikeLineX2, setStrikeLineX2] = useState(0);
-  const [strikeLineY2, setStrikeLineY2] = useState(0);
-  const [iconPositionX, setIconPositionX] = useState(0);
   const [labelWidth, setLabelWidth] = useState(0);
   const textElementRef = useRef<SVGTextElement>(null);
 
-  const text_ref = useRef<SVGGElement>(null);
   const theme = useTheme();
 
   let displayText = "";
@@ -109,12 +103,7 @@ function LegendItem({
               ? ""
               : ` ${valueText ? "(" + formatNumberWithCommas(valueText) + ")" : ""}`)}
         </text>
-        <foreignObject 
-          x={iconX}
-          y="-2"
-          width={ICON_WIDTH}
-          height="16"
-        >
+        <foreignObject x={iconX} y="-2" width={ICON_WIDTH} height="16">
           {showArrow ? (
             <ArrowOutwardIcon
               sx={{

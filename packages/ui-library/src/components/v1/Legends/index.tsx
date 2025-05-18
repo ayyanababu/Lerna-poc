@@ -1,9 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 
 import LegendItem from "./LegendItem";
 import { LegendPosition, LegendsProps, LegendVariant } from "./types";
@@ -29,7 +24,7 @@ function Legends({
   legendBoxWidth,
   hideLegendLableClick = true,
   showArrow = true,
-  chart
+  chart,
 }: LegendsProps) {
   const legends_ref = useRef<SVGGElement | null>(null);
 
@@ -128,7 +123,7 @@ function Legends({
           addwidth += (gs[start] as SVGGElement).getBBox().width - 20 + 8;
         } else {
           addwidth += (gs[start] as SVGGElement).getBBox().width + 8;
-        }        
+        }
         if (addwidth > legendBoxWidth) {
           row++;
           addwidth = 0;
@@ -141,7 +136,7 @@ function Legends({
               object: gs[start],
               row: row,
               x: newwidth,
-              y: (row-1) * eachLegendGap,
+              y: (row - 1) * eachLegendGap,
               cwidth:
                 newwidth +
                 (gs[start] as SVGGElement).getBoundingClientRect().width,

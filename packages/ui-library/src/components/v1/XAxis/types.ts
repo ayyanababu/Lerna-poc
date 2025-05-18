@@ -57,7 +57,7 @@ export interface XAxisProps extends AxisBottomProps {
   refreshAxis: number;
   barsList?: BarsList[];
   chartWidth: number;
-  chart:string;
-  showXAxis?:boolean;
-  textAnchor?: 'start' | 'end' | 'middle' | 'inherit';
+  chart: string;
+  showXAxis?: boolean;
+  textAnchor?: "start" | "end" | "middle" | "inherit";
 }

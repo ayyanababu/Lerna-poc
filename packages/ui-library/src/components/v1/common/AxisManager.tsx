@@ -51,11 +51,27 @@ const YAxisComponent: React.FC<YAxisProps> = ({
   label,
   ...props
 }) => {
-  if (label){
-    return <YAxis left={15} label={label} scale={scale} isLoading={isLoading} {...props} />;
-  }else{
-    return <YAxis left={0} label={label} scale={scale} isLoading={isLoading} {...props} />;
-  }  
+  if (label) {
+    return (
+      <YAxis
+        left={15}
+        label={label}
+        scale={scale}
+        isLoading={isLoading}
+        {...props}
+      />
+    );
+  } else {
+    return (
+      <YAxis
+        left={0}
+        label={label}
+        scale={scale}
+        isLoading={isLoading}
+        {...props}
+      />
+    );
+  }
 };
 
 const Y1AxisComponent: React.FC<YAxisProps> = ({
@@ -70,7 +86,7 @@ const Y1AxisComponent: React.FC<YAxisProps> = ({
 const AxisManager = {
   XAxis: XAxisComponent,
   YAxis: YAxisComponent,
-  Y1Axis:Y1AxisComponent
+  Y1Axis: Y1AxisComponent,
 };
 
 export default AxisManager;

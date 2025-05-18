@@ -1,15 +1,14 @@
-import React,{SetStateAction} from "react";
-import { TooltipProps, GridProps } from "@mui/material";
-import { CSSProperties } from "react";
+import React, { CSSProperties, SetStateAction } from "react";
+import { GridProps, TooltipProps } from "@mui/material";
+import { ScaleBand, ScaleLinear } from "d3";
+
 import { CustomBarProps } from "../../CustomBar/types";
 import { TimestampProps } from "../../Timestamp/types";
 import { TitleProps } from "../../Title/types";
 import { LegendsProps } from "../Legends/types";
 import { XAxisProps } from "../XAxis/types";
 import { YAxisProps } from "../YAxis/types";
-import { ScaleBand, ScaleLinear } from "d3";
-import { BarLineData } from './Data.types'
-
+import { BarLineData } from "./Data.types";
 
 export interface LineRendererProps {
   /**
@@ -131,18 +130,18 @@ export interface LineRendererProps {
   y1Scale: ScaleLinear<number, number>;
   defaultOpacity: number;
   reducedOpacity: number;
-  circleRadius:number;
-  getAxisRight:(axisrightwidth:number)=>void;
+  circleRadius: number;
+  getAxisRight: (axisrightwidth: number) => void;
   setHideIndex?: React.Dispatch<SetStateAction<number[]>>;
-  hideIndex?:number[];
-  y1AxisProps:Partial<YAxisProps>;
-  xOffset?:number;
-  yAxisRightLabel?:string;
-  hoveredLine:string | null | number | undefined;
-  chartWidth:number;
-  lineColor:string;
-  hideTicks?:boolean;
-  hideAxisLine?:boolean
-  label?:string;
-  rightPosition:number;
+  hideIndex?: number[];
+  y1AxisProps: Partial<YAxisProps>;
+  xOffset?: number;
+  yAxisRightLabel?: string;
+  hoveredLine: string | null | number | undefined;
+  chartWidth: number;
+  lineColor: string;
+  hideTicks?: boolean;
+  hideAxisLine?: boolean;
+  label?: string;
+  rightPosition: number;
 }

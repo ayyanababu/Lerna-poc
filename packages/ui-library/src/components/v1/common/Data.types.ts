@@ -23,3 +23,8 @@ export interface BarsList {
   width: number;
   label: string;
 }
+
+export enum ChartVariant {
+  VerticalBar = "VERTICAL_BAR",
+  BarAndLine = "BAR_AND_LINE",
+}

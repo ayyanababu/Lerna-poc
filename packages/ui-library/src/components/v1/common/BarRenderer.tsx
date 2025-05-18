@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
+
 import CustomBar from "../../CustomBar";
 import type { BarRendererProps } from "./BarRenderer.types";
-import {  BarLineDataItem, BarsList, DataPoint } from "./Data.types";
+import { BarLineDataItem, BarsList, DataPoint } from "./Data.types";
 
 const DEFAULT_BAR_RADIUS = 4;
 const ANIMATION_DURATION = 800; // animation duration in ms
@@ -24,12 +25,12 @@ const BarRenderer: React.FC<BarRendererProps> = ({
   barProps,
   onClick,
   transferBarList,
-  chartProps
+  chartProps,
 }) => {
   // Function to calculate optimal bar width
   const getOptimalBarWidth = (calculatedWidth: number) =>
-    Math.min(calculatedWidth, maxBarWidth?maxBarWidth:0);
-    
+    Math.min(calculatedWidth, maxBarWidth ? maxBarWidth : 0);
+
   // Animation progress state (0 to 1)
   const [progress, setProgress] = useState(0);
   const [animationStarted, setAnimationStarted] = useState(false);
@@ -66,49 +67,49 @@ const BarRenderer: React.FC<BarRendererProps> = ({
       transferBarList(barsList);
     }
   }, [barsList, transferBarList]);
-  
+
   // Handle animation
   useEffect(() => {
     // Start animation after a delay
-    if (isLoading){
+    if (isLoading) {
       return;
     }
     const timer = setTimeout(() => {
       setAnimationStarted(true);
-      
+
       // Start time for the animation
-      let startTime:number | null = null;
-      
+      let startTime: number | null = null;
+
       // Animation frame function
-      const animate = (timestamp:number | null) => {
+      const animate = (timestamp: number | null) => {
         if (!startTime) startTime = timestamp;
-        
+
         // Calculate progress based on elapsed time
-        let elapsed:number = 0;
-        if (timestamp && startTime){
+        let elapsed: number = 0;
+        if (timestamp && startTime) {
           elapsed = timestamp - startTime;
-        }   
+        }
         const newProgress = Math.min(elapsed / ANIMATION_DURATION, 1);
-        
+
         setProgress(newProgress);
-        
+
         // Continue animation if not complete
         if (newProgress < 1) {
           requestAnimationFrame(animate);
         }
       };
-      
+
       // Start the animation
       requestAnimationFrame(animate);
     }, 1500);
-    
+
     return () => clearTimeout(timer);
   }, [isLoading]);
 
   return (
     <>
       {filteredData.map((d, index) => {
-        let dataClicked:DataPoint = {label:d.xAxis,value:d.yAxisLeft}
+        const dataClicked: DataPoint = { label: d.xAxis, value: d.yAxisLeft };
         const value = Number(d.yAxisLeft);
         if (Number.isNaN(value)) return null;
 
@@ -132,18 +133,24 @@ const BarRenderer: React.FC<BarRendererProps> = ({
         // Calculate final bar dimensions
         const finalBarHeight = drawableChartHeight - yScale(value);
         const finalBarY = yScale(value);
-        
+
         // Apply easing function for smoother animation (ease-out cubic)
-        const easeOutCubic = (x:number) => 1 - Math.pow(1 - x, 3);
+        const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
         const easedProgress = easeOutCubic(progress);
-        
+
         // Interpolate height and y position using custom linear interpolation
-        const linearInterpolate = (start:number, end:number, progress:number) => start + (end - start) * progress;
-        
-        const currentHeight = animationStarted ? 
-          linearInterpolate(0, finalBarHeight, easedProgress) : 0;
-        const currentY = animationStarted ? 
-          linearInterpolate(drawableChartHeight, finalBarY, easedProgress) : drawableChartHeight;
+        const linearInterpolate = (
+          start: number,
+          end: number,
+          progress: number,
+        ) => start + (end - start) * progress;
+
+        const currentHeight = animationStarted
+          ? linearInterpolate(0, finalBarHeight, easedProgress)
+          : 0;
+        const currentY = animationStarted
+          ? linearInterpolate(drawableChartHeight, finalBarY, easedProgress)
+          : drawableChartHeight;
 
         // Calculate visual properties
         let barOpacity = 1;
@@ -160,11 +167,11 @@ const BarRenderer: React.FC<BarRendererProps> = ({
               ? reducedOpacity
               : defaultOpacity;
         }
-        
+
         const radius = Math.min(
           DEFAULT_BAR_RADIUS,
           barwidth / 2,
-          currentHeight > 0 ? currentHeight : 0
+          currentHeight > 0 ? currentHeight : 0,
         );
 
         const barColor = d.barColor || colorScale(index.toString());

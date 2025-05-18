@@ -1,4 +1,4 @@
-import React, { useEffect,useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { AxisLeft, AxisRight } from "@visx/axis";
 
 import useTheme from "../../../hooks/useTheme";
@@ -41,17 +41,19 @@ function YAxis({
     return String(value);
   };
 
-  useEffect(()=>{
-    if (!isLoading && axis.current){
-       let xpos:number = Number(axis.current.querySelector("svg")?.getAttribute("x"));
-       if (isRightYAxis){
-         xpos -= 30;
-       }else{
-         xpos += 4;
-       }  
-       axis.current.querySelector("svg")?.setAttribute("x",String(xpos))
+  useEffect(() => {
+    if (!isLoading && axis.current) {
+      let xpos: number = Number(
+        axis.current.querySelector("svg")?.getAttribute("x"),
+      );
+      if (isRightYAxis) {
+        xpos -= 30;
+      } else {
+        xpos += 4;
+      }
+      axis.current.querySelector("svg")?.setAttribute("x", String(xpos));
     }
-  },[isLoading,axis])
+  }, [isLoading, axis]);
 
   const renderAxisLabel = (
     formattedValue: string | number | undefined,
@@ -109,27 +111,27 @@ function YAxis({
   }
 
   return (
-  <g id = "axis" ref={axis}>
-    <AxisComponent
-      scale={scale}
-      stroke={theme.colors.axis.line}
-      tickStroke={theme.colors.axis.line}
-      tickLabelProps={() => ({
-        textAnchor,
-        dy: "0.33em",
-        ...mergedTickLabelProps,
-      })}
-      hideAxisLine={!showAxisLine}
-      hideTicks={hideAllTicks || !showTicks}
-      numTicks={numTicks}
-      tickFormat={tickFormat}
-      tickComponent={({ formattedValue, ...tickProps }) =>
-        renderAxisLabel(formattedValue, tickProps)
-      }
-      labelProps={mergedLabelProps}
-      {...props}
-    />
-  </g>
+    <g id="axis" ref={axis}>
+      <AxisComponent
+        scale={scale}
+        stroke={theme.colors.axis.line}
+        tickStroke={theme.colors.axis.line}
+        tickLabelProps={() => ({
+          textAnchor,
+          dy: "0.33em",
+          ...mergedTickLabelProps,
+        })}
+        hideAxisLine={!showAxisLine}
+        hideTicks={hideAllTicks || !showTicks}
+        numTicks={numTicks}
+        tickFormat={tickFormat}
+        tickComponent={({ formattedValue, ...tickProps }) =>
+          renderAxisLabel(formattedValue, tickProps)
+        }
+        labelProps={mergedLabelProps}
+        {...props}
+      />
+    </g>
   );
 }
 

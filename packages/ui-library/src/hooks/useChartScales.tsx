@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { scaleBand, scaleLinear } from "@visx/scale";
 
-import { DataPoint } from "../components/v1/common/Data.types";
+import { BarLineDataItem } from "../components/v1/common/Data.types";
 
 // Define the interfaces based on what your component needs
 // These are pure TypeScript interfaces with no imports from d3
@@ -40,7 +40,7 @@ export interface ChartScales {
 }
 
 interface ChartScalesProps {
-  filteredData: DataPoint[];
+  filteredData: BarLineDataItem[];
   innerWidth: number;
   drawableChartHeight: number;
 }
@@ -51,35 +51,14 @@ const SCALE_PADDING = 1.02;
 const enhanceVisxBandScale = (
   scale: ReturnType<typeof scaleBand<string>>,
 ): BandScaleInterface => {
-  // Create the enhanced scale object with existing methods
   const enhanced = scale as unknown as BandScaleInterface;
 
-  // Add the missing methods
   enhanced.rangeRound = function (range: [number, number]) {
     scale.range(range);
     return enhanced;
   };
 
-  // enhanced.round = function (round: boolean) {
-  // ViSX scaleBand doesn't have a separate round method,
-  // but we can return the enhanced scale for chaining
-  //   return enhanced;
-  // };
-
-  // enhanced.padding = function (padding: number) {
-  // ViSX scaleBand accepts padding in the constructor,
-  // but we can return the enhanced scale for chaining
-  //   return enhanced;
-  //  };
-
-  //  enhanced.align = function (align: number) {
-  // ViSX scaleBand doesn't have an align method,
-  // but we can return the enhanced scale for chaining
-  //    return enhanced;
-  //  };
-
   enhanced.copy = function () {
-    // Return a new enhanced scale
     return enhanceVisxBandScale(scale);
   };
 
@@ -90,29 +69,13 @@ const enhanceVisxBandScale = (
 const enhanceVisxLinearScale = (
   scale: ReturnType<typeof scaleLinear<number>>,
 ): LinearScaleInterface => {
-  // Create the enhanced scale object with existing methods
   const enhanced = scale as unknown as LinearScaleInterface;
-
-  // Add the missing methods
-  //enhanced.interpolate = function (interpolator: any) {
-  // ViSX scaleLinear doesn't have an interpolate method,
-  // but we can return the enhanced scale for chaining
-  //   return enhanced;
-  // };
-
-  // enhanced.unknown = function (value: number) {
-  // ViSX scaleLinear doesn't have an unknown method,
-  // but we can return the enhanced scale for chaining
-  //   return enhanced;
-  // };
-
   enhanced.rangeRound = function (range: [number, number]) {
     scale.range(range);
     return enhanced;
   };
 
   enhanced.ticks = function (count?: number) {
-    // Simple implementation that returns n evenly spaced ticks
     const domain = scale.domain();
     const min = domain[0];
     const max = domain[1];
@@ -125,7 +88,6 @@ const enhanceVisxLinearScale = (
   };
 
   enhanced.copy = function () {
-    // Return a new enhanced scale
     return enhanceVisxLinearScale(scale);
   };
 
@@ -141,53 +103,48 @@ const useChartScales = ({
   innerWidth,
   drawableChartHeight,
 }: ChartScalesProps): ChartScales => {
+  console.log("#### chartscales", filteredData);
+
   const maxY1Value = useMemo(
+    () => Math.max(0, ...filteredData.map((d) => d.yAxisLeft)) * SCALE_PADDING,
+    [filteredData],
+  );
+
+  const maxY2Value = useMemo(
     () =>
-      Math.max(0, ...filteredData.map((d) => d.value?Number(d.value) : d.yAxisLeft?Number(d.yAxisLeft):0)) *
+      Math.max(0, ...filteredData.map((d) => d.yAxisRight ?? 0)) *
       SCALE_PADDING,
     [filteredData],
   );
-  console.log(maxY1Value);
-  console.log(filteredData)
-  const maxY2Value = useMemo(
-    () =>
-      Math.max(0, ...filteredData.map((d) => Number(d.yAxisRight) || 0)) *
-      SCALE_PADDING,
-    [filteredData],
-  );  
 
   // Create and enhance the xScale
   const xScale = useMemo(() => {
-    const scale = scaleBand<string>({
-      domain: filteredData.map((d) => String(d.label || d.xAxis)),
+    const band = scaleBand<string>({
+      domain: filteredData.map((d) => d.xAxis),
       range: [0, innerWidth],
       padding: 0.6,
       round: true,
     });
-
-    return enhanceVisxBandScale(scale);
+    return enhanceVisxBandScale(band);
   }, [filteredData, innerWidth]);
 
-  // Create and enhance the yScale
   const yScale = useMemo(() => {
-    const scale = scaleLinear<number>({
+    const lin = scaleLinear<number>({
       domain: [0, maxY1Value],
       range: [drawableChartHeight, 0],
       nice: true,
     });
-
-    return enhanceVisxLinearScale(scale);
+    return enhanceVisxLinearScale(lin);
   }, [drawableChartHeight, maxY1Value]);
 
   const y1Scale = useMemo(() => {
-    const scale = scaleLinear<number>({
+    const lin = scaleLinear<number>({
       domain: [0, maxY2Value],
       range: [drawableChartHeight, 0],
       nice: true,
     });
-
-    return enhanceVisxLinearScale(scale);
-  }, [drawableChartHeight, maxY2Value]);  
+    return enhanceVisxLinearScale(lin);
+  }, [drawableChartHeight, maxY2Value]);
 
   return { xScale, yScale, y1Scale };
 };

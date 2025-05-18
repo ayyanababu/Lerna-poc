@@ -21,13 +21,13 @@ const LegendManager: React.FC<LegendManagerProps> = ({
   legendBoxHeight,
   calculatedLegendHeight,
   legendBoxWidth,
-  chart
+  chart,
 }) => {
   // Only render the legend if it's visible in props
   if (!legendsProps?.isVisible) {
     return null;
   }
-  console.log("hoveringed",hovered);
+  console.log("hoveringed", hovered);
   return (
     <foreignObject
       x={`${legendLeft}`}
