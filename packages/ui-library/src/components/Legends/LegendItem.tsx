@@ -16,7 +16,7 @@ function LegendItem({
   isHoveredOther = false,
   isLoading = false,
   doStrike = false,
-  variant = LegendVariant.COMPACT,
+  variant = LegendVariant.TABULAR,
   onToggle,
   onMouseOver,
   onMouseLeave,
@@ -53,13 +53,104 @@ function LegendItem({
     <Box
       sx={{
         backgroundColor: markerColor,
-        borderRadius: "20px",
+        borderRadius: "4px",
         width: "12px",
         height: "12px",
+        flexShrink: 0
       }}
       onClick={() => onToggle?.()}
       className={isLoading ? shimmerClassName : ""}
     />
+  );
+
+  const renderTabular = () => (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: "4px",
+        flexDirection: "row",
+        "&:hover .arrow-icon": {
+          opacity: 1,
+        },
+        "&:focus-visible .arrow-icon": {
+          opacity: 1,
+        },
+        "&:focus .arrow-icon": {
+          opacity: 1,
+        },
+        "&:active .arrow-icon": {
+          opacity: 0.7,
+        },
+        borderBottom: `1px solid ${theme.colors.common.border}`,
+        paddingBottom: "8px",
+        ">*:first-child": {
+          marginTop: "1px",
+        },
+      }}
+    >
+      {renderMarker()}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: "4px",
+          alignItems: "start",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
+      >
+        <Typography
+          variant="caption"
+          sx={{
+            margin: 0,
+            textDecoration: doStrike && isHidden ? "line-through" : "none",
+            color: theme.colors.legend.text,
+            lineHeight: "normal",
+            letterSpacing: "0.4px",
+            paddingTop: "1px",
+          }}
+          onClick={() => onToggle?.()}
+          className={isLoading ? shimmerClassName : ""}
+        >
+          {displayText}
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            margin: 0,
+            textDecoration: doStrike && isHidden ? "line-through" : "none",
+            color: theme.colors.legend.text,
+            paddingTop: "1px",
+            fontFamily: "Roboto",
+            fontStyle: "normal",
+            lineHeight: "normal",
+            fontWeight: 500,
+            fontSize: "12px",
+            letterSpacing: "0.4px",
+          }}
+          onClick={() => onToggle?.()}
+          className={isLoading ? shimmerClassName : ""}
+        >
+          {!hideValues &&
+            (isLoading
+              ? "loadingloading"
+              : `${valueText ? formatNumberWithCommas(valueText) : ""}`)}
+        </Typography>
+      </Box>
+      <ArrowOutwardIcon
+        className="arrow-icon"
+        sx={{
+          height: "16px",
+          width: "16px",
+          color: theme.colors.legend.text,
+          opacity: 0,
+          transition: "opacity 0.250s ease-in-out",
+        }}
+        onClick={() => onArrowClick?.()}
+      />
+    </Box>
   );
 
   const renderCompactItem = () => (
@@ -101,7 +192,7 @@ function LegendItem({
         {!hideValues &&
           (isLoading
             ? "loadingloading"
-            : ` (${valueText?formatNumberWithCommas(valueText):''})`)}
+            : ` (${valueText ? formatNumberWithCommas(valueText) : ""})`)}
       </Typography>
       <ArrowOutwardIcon
         className="arrow-icon"
@@ -189,7 +280,13 @@ function LegendItem({
       onMouseLeave={onMouseLeave}
       sx={itemStyles}
     >
-      {variant === "compact" ? renderCompactItem() : renderExpandedItem()}
+      {
+        {
+          [LegendVariant.COMPACT]: renderCompactItem(),
+          [LegendVariant.EXPANDED]: renderExpandedItem(),
+          [LegendVariant.TABULAR]: renderTabular(),
+        }[variant]
+      }
     </Box>
   );
 }

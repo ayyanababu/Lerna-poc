@@ -8,6 +8,7 @@ import {
     Legends,
     Sortable,
     SortableCard,
+    Title,
     TreeMapChart,
     VerticalBarChart,
     VerticalGroupedBarChart,
@@ -16,6 +17,8 @@ import {
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { ThemeContext } from '../App';
 import ReconciliationCard from '../components/DashboardPage/ReconciliationCard';
+import { Box, Chip, Typography } from '@mui/material';
+import { InfoOutlineRounded } from '@mui/icons-material';
 
 // Define types for our chart data
 type DonutDataItem = {
@@ -188,14 +191,10 @@ const fetchHorizontalStackedData = (): Promise<StackedBarItem[]> =>
                     return {
                         label: `${formattedDate}`,
                         data: {
-                            futures:
-                                Math.floor(Math.random() * 100) + 0,
-                            options:
-                                Math.floor(Math.random() * 100) + 0,
-                            forwards:
-                                Math.floor(Math.random() * 100) + 0,
-                            fixedIncome:
-                                Math.floor(Math.random() * 100) + 0,
+                            futures: Math.floor(Math.random() * 100) + 0,
+                            options: Math.floor(Math.random() * 100) + 0,
+                            forwards: Math.floor(Math.random() * 100) + 0,
+                            fixedIncome: Math.floor(Math.random() * 100) + 0,
                             others: Math.floor(Math.random() * 100) + 0,
                         },
                     };
@@ -211,10 +210,10 @@ const fetchBarLineData = (): Promise<BarLineData> =>
                 'Dividend (NNA) test this test',
                 'Dividend (NCA)',
                 'Dividend (NEA)',
-  //              'Stock Split (NCA)',
-  //              'Rights Issue (NCA)',
-  //              'Merger (NEA)',
-  //              'Tender Offer (NCA)',
+                //              'Stock Split (NCA)',
+                //              'Rights Issue (NCA)',
+                //              'Merger (NEA)',
+                //              'Tender Offer (NCA)',
             ];
 
             resolve({
@@ -242,39 +241,39 @@ const fetchVerticalBarData = (): Promise<VerticalBarItem[]> =>
                 {
                     label: 'Priced',
                     value: 1000,
-                }, // 20-40     
+                }, // 20-40
                 {
                     label: 'Low Priced',
                     value: 100000,
-                }, // 20-40       
+                }, // 20-40
                 {
                     label: 'Priced ddd',
                     value: 1000,
-                }, // 20-40     
+                }, // 20-40
                 {
                     label: 'Priced adad',
                     value: 1000,
-                }, // 20-40     
+                }, // 20-40
                 {
                     label: 'Priced 12122',
                     value: 1000,
-                }, // 20-40     
+                }, // 20-40
                 {
                     label: 'Priced aasdd',
                     value: 1000,
-                }, // 20-40     
+                }, // 20-40
                 {
                     label: 'Priced ggg',
                     value: 1000,
-                }, // 20-40     
+                }, // 20-40
                 {
                     label: 'Priced sss',
                     value: 1000,
-                }, // 20-40     
+                }, // 20-40
                 {
                     label: 'Priced ttt',
                     value: 1000,
-                }, // 20-40                         
+                }, // 20-40
             ]);
         }, 1300);
     });
@@ -757,21 +756,91 @@ body:not(.dark) {
             <div className="main-container">
                 <div className="container">
                     {
-                        <Sortable className="my-cards" styles={{
-                            3: {
-                                gridColumn: 'span 1',
-                            },
-                            6: {
-                                gridColumn: 'span 1',
-                            }
-                        }}>
-                            <SortableCard height={400} width={'100%'}>
-                                <DonutChart
-                                    data={donutData}
-                                    type="full"
-                                    title="Transaction Capture"
-                                    isLoading={dataLoading.donut}
-                                />
+                        <Sortable
+                            className="my-cards"
+                            styles={{
+                                3: {
+                                    gridColumn: 'span 1',
+                                },
+                                6: {
+                                    gridColumn: 'span 1',
+                                },
+                            }}>
+                            <SortableCard height={329 } width={442 }>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '8px',
+                                        width: "100%",
+                                    }}>
+                                    <Title title="Run Metrics" />
+
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            gap: '8px',
+                                            width: '100%',
+                                            overflowX: 'auto',
+                                        }}>
+                                        {[
+                                            'P&L Metrics',
+                                            'TDP Metrics',
+                                        ].map((label, index) => (
+                                            <Chip
+                                                key={index}
+                                                label={label}
+                                                sx={{
+                                                    alignItems: 'center',
+                                                    fontWeight: 400,
+                                                    fontSize: '12px',
+                                                    lineHeight: '1.4',
+                                                    letterSpacing: '0.4px',
+                                                    padding: '0 8px',
+                                                }}
+                                                size="small"
+                                                variant={
+                                                    index === 0
+                                                        ? 'filled'
+                                                        : 'outlined'
+                                                }
+                                                color={
+                                                    index === 0
+                                                        ? 'primary'
+                                                        : 'default'
+                                                }
+                                            />
+                                        ))}
+                                    </Box>
+                                    
+                                    <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                        sx={{
+                                            fontSize: '12px',
+                                            lineHeight: '1.4',
+                                            letterSpacing: '0.4px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            marginTop: "2px"
+                                        }}
+                                    >
+                                       <InfoOutlineRounded sx={{
+                                            fontSize: '16px',
+                                            marginRight: '4px',
+                                       }}/> P&L Run Metrics for T-6 hours
+                                    </Typography>
+
+                                    <DonutChart
+                                        data={donutData}
+                                        type="full"
+                                        isLoading={dataLoading.donut}
+                                        legendsProps={{
+                                            position: Legends.Position.LEFT,
+                                            variant: Legends.Variant.TABULAR,
+                                        }}
+                                    />
+                                </div>
                             </SortableCard>
 
                             <SortableCard height={400} width={'100%'}>
@@ -840,7 +909,7 @@ body:not(.dark) {
                                     maxBarWidth={32}
                                 />
                             </SortableCard>
-                            
+
                             <SortableCard height={400} width={'100%'}>
                                 <DonutChart
                                     data={semiDonutData}
@@ -867,7 +936,6 @@ body:not(.dark) {
                                     tooltipProps={{}}
                                 />
                             </SortableCard>
-
 
                             {/* VerticalBarChart example */}
                             <SortableCard height={400} width={'100%'}>
