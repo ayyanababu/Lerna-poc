@@ -602,6 +602,350 @@ function DashboardPage() {
         }
     }, [activeMode]);
 
+    const paginatedData = {
+        page1: [
+            {
+                title: "Transaction Capture",
+                id: 0,
+                component: (
+                    <SortableCard height={400} width={'100%'}>
+                        <DonutChart
+                            data={donutData}
+                            type="full"
+                            title="Transaction Capture"
+                            isLoading={dataLoading.donut}
+                        />
+                    </SortableCard>
+                ),
+            },
+            {
+                title: "Transaction Capture",
+                id: 1,
+                component: (
+                    <SortableCard height={400} width={'100%'}>
+                        <DonutChart
+                            data={donutData}
+                            type="full"
+                            title="Transaction Capture"
+                            isLoading={dataLoading.donut}
+                        />
+                    </SortableCard>
+                ),
+            },
+            {
+                title: "Valuation (Stacked)",
+                id: 2,
+
+                component: (
+                    <SortableCard height={400} width={'100%'}>
+                        <VerticalStackedBarChart
+                            data={stackedBarData}
+                            groupKeys={[
+                                'notPriced',
+                                'stalePriced',
+                                'priced:Auto',
+                                'priced:Manual',
+                            ]}
+                            title="Valuation"
+                            colors={[
+                                '#a4266e',
+                                '#f57e52',
+                                '#4774b9',
+                                '#9ac7ea',
+                            ]}
+                            isLoading={dataLoading.stackedBar}
+                            showYAxis={false}
+                            showXAxis={false}
+                            maxBarWidth={230}
+                        />
+                    </SortableCard>
+                ),
+            },
+            {
+                title: "Expiry and Settlements",
+                id: 3,
+
+                component: (
+                    <SortableCard height={200} width={'100%'}>
+                        <HorizontalStackedBarChart
+                            data={horizontalStackedData}
+                            groupKeys={[
+                                'futures',
+                                'options',
+                                'forwards',
+                                'fixedIncome',
+                                'others',
+                            ]}
+                            title="Expiry and Settlements"
+                            colors={[
+                                '#a0c8e9',
+                                '#56b9b8',
+                                '#f2ce7a',
+                                '#4e79bb',
+                                '#9aa4b3',
+                            ]}
+                            isLoading={dataLoading.horizontalStacked}
+                            maxBarHeight={32}
+                            removeBothAxis
+                        />
+                    </SortableCard>
+                ),
+            },
+            {
+                title: "Monthly Trade Volume",
+                id: 4,
+
+                component: (
+                    <SortableCard height={400} width={'100%'}>
+                        <BarLineChart
+                            data={barLineData}
+                            title="Monthly Trade Volume"
+                            timestamp={new Date().toISOString()}
+                            isLoading={dataLoading.barLine}
+                            titleProps={{ variant: 'h6', align: 'left' }}
+                            legendsProps={{
+                                position: Legends.Position.BOTTOM,
+                                doStrike: true,
+                                isVisible: true,
+                            }}
+                            tooltipProps={{}}
+                            maxBarWidth={32}
+                        />
+                    </SortableCard>
+                ),
+            },
+        ],
+        page2: [
+            {
+                title: "Trade Success Rate",
+                id: 5,
+
+                component: (
+                    <SortableCard height={400} width={'100%'}>
+                        <DonutChart
+                            data={semiDonutData}
+                            type="semi"
+                            hideLabels
+                            title="Trade Success Rate"
+                            timestamp={new Date().toISOString()}
+                            colors={['orange', '#50c1c2']}
+                            isLoading={dataLoading.semiDonut}
+                            titleProps={{ variant: 'h6', gutterBottom: true }}
+                            legendsProps={{
+                                position: Legends.Position.TOP,
+                                onClick: (data, legend, index) => {
+                                    console.log(`Clicked ${legend} at index ${index}`, data);
+                                },
+                                doStrike: true,
+                            }}
+                            tooltipProps={{}}
+                        />
+                    </SortableCard>
+                ),
+            },
+            {
+                title: "Valuation (Vertical)",
+                id: 6,
+
+                component: (
+                    <SortableCard height={400} width={'100%'}>
+                        <VerticalBarChart
+                            data={verticalBarData}
+                            title="Valuation"
+                            colors={[
+                                '#AC48C6',
+                                '#E88661',
+                                '#9FC7E9',
+                                '#93a3bc',
+                            ]}
+                            isLoading={dataLoading.verticalBar}
+                            legendsProps={{
+                                position: Legends.Position.BOTTOM,
+                                isVisible: true,
+                            }}
+                            tooltipProps={{}}
+                        />
+                    </SortableCard>
+                ),
+            },
+            {
+                title: "Reconciliation",
+                id: 7,
+                component: <ReconciliationCard />,
+            },
+            {
+                title: "Trade Volume",
+                id: 8,
+                component: (
+                    <SortableCard height={400} width={'100%'}>
+                        <HorizontalBarChart
+                            data={horizontalBarData}
+                            isLoading={dataLoading.horizontalBar}
+                            titleProps={{
+                                variant: 'h6',
+                                align: 'left',
+                            }}
+                            maxBarHeight={160}
+                            title="Trade Volume"
+                            legendsProps={{
+                                position: Legends.Position.BOTTOM,
+                                doStrike: true,
+                                isVisible: true,
+                            }}
+                            tooltipProps={{}}
+                        />
+                    </SortableCard>
+                ),
+            },
+        ],
+        page3: [
+            {
+                title: "Quarterly Trade Distribution",
+                id: 9,
+                component: (
+                    <SortableCard height={400} width={'100%'}>
+                        <VerticalGroupedBarChart
+                            width={600}
+                            height={200}
+                            data={verticalGroupedBarData}
+                            groupKeys={[
+                                'future',
+                                'options',
+                                'forwards',
+                                'fixedIncome',
+                                'others',
+                            ]}
+                            type="grouped"
+                            margin={{
+                                top: 20,
+                                right: 30,
+                                bottom: 30,
+                                left: 40,
+                            }}
+                            title="Quarterly Trade Distribution"
+                            timestamp={new Date().toISOString()}
+                            colors={[
+                                '#9bc5ef',
+                                '#50c1c2',
+                                '#fad176',
+                                '#407abc',
+                                '#93a3bc',
+                            ]}
+                            isLoading={dataLoading.verticalGroupedBar}
+                            titleProps={{
+                                variant: 'h6',
+                                align: 'left',
+                            }}
+                            legendsProps={{
+                                onClick: (data, legend, index) => {
+                                    console.log(`Clicked ${legend} at index ${index}`, data);
+                                },
+                                doStrike: true,
+                            }}
+                            tooltipProps={{}}
+                        />
+                    </SortableCard>
+                ),
+            },
+            {
+                title: "Quarterly Department Performance",
+                id: 10,
+
+                component: (
+                    <SortableCard height={400} width={'100%'}>
+                        <HorizontalGroupedBarChart
+                            width={600}
+                            height={200}
+                            type="grouped"
+                            data={horizontalGroupedBarData}
+                            groupKeys={['q1', 'q2', 'q3', 'q4']}
+                            margin={{
+                                top: 20,
+                                right: 50,
+                                bottom: 30,
+                                left: 120,
+                            }}
+                            title="Quarterly Department Performance"
+                            timestamp={new Date().toISOString()}
+                            colors={[
+                                '#9bc5ef',
+                                '#50c1c2',
+                                '#fad176',
+                                '#407abc',
+                            ]}
+                            isLoading={dataLoading.horizontalGroupedBar}
+                            titleProps={{ variant: 'h6', align: 'left' }}
+                            legendsProps={{
+                                onClick: (data, legend, index) => {
+                                    console.log(`Clicked ${legend} at index ${index}`, data);
+                                },
+                                doStrike: true,
+                            }}
+                            tooltipProps={{}}
+                        />
+                    </SortableCard>
+                ),
+            },
+            {
+                title: "Investment Portfolio Allocation",
+                id: 11,
+
+                component: (
+                    <SortableCard height={400} width={'100%'}>
+                        <TreeMapChart
+                            data={treeMapData}
+                            title="Investment Portfolio Allocation"
+                            timestamp={new Date().toISOString()}
+                            colors={Array.from(
+                                { length: 500 },
+                                () => `hsl(${Math.random() * 360}, 100%, 45%)`
+                            )}
+                            isLoading={dataLoading.treeMap}
+                            titleProps={{ variant: 'h6', align: 'left' }}
+                            legendsProps={{
+                                position: Legends.Position.BOTTOM,
+                                doStrike: true,
+                            }}
+                            tooltipProps={{}}
+                            tilePadding={2}
+                            borderRadius={5}
+                        />
+                    </SortableCard>
+                ),
+            },
+            {
+                title: "Global Market Exposure",
+                id: 12,
+
+                component: (
+                    <SortableCard height={400} width={'100%'}>
+                        <TreeMapChart
+                            data={marketTreeMapData}
+                            title="Global Market Exposure"
+                            timestamp={new Date().toISOString()}
+                            colors={[
+                                '#407abc',
+                                '#50c1c2',
+                                '#fad176',
+                                '#93a3bc',
+                            ]}
+                            isLoading={dataLoading.marketTreeMap}
+                            titleProps={{ variant: 'h6', align: 'left' }}
+                            legendsProps={{
+                                position: Legends.Position.TOP,
+                                doStrike: true,
+                            }}
+                            tooltipProps={{}}
+                            showLabels={true}
+                            tilePadding={1}
+                        />
+                    </SortableCard>
+                ),
+            },
+        ],
+    };
+    
+
     return (
         <ChartThemeProvider themeMode={activeMode}>
             <>
@@ -756,299 +1100,16 @@ body:not(.dark) {
 
             <div className="main-container">
                 <div className="container">
-                    {
-                        <Sortable className="my-cards" styles={{
+                    {<Sortable className="my-cards" styles={{
                             3: {
                                 gridColumn: 'span 1',
                             },
                             6: {
                                 gridColumn: 'span 1',
                             }
-                        }}>
-                            <SortableCard height={400} width={'100%'}>
-                                <DonutChart
-                                    data={donutData}
-                                    type="full"
-                                    title="Transaction Capture"
-                                    isLoading={dataLoading.donut}
-                                />
-                            </SortableCard>
-
-                            <SortableCard height={400} width={'100%'}>
-                                <VerticalStackedBarChart
-                                    data={stackedBarData}
-                                    groupKeys={[
-                                        'notPriced',
-                                        'stalePriced',
-                                        'priced:Auto',
-                                        'priced:Manual',
-                                    ]}
-                                    title="Valuation"
-                                    colors={[
-                                        '#a4266e',
-                                        '#f57e52',
-                                        '#4774b9',
-                                        '#9ac7ea',
-                                    ]}
-                                    isLoading={dataLoading.stackedBar}
-                                    showYAxis={false}
-                                    showXAxis={false}
-                                    maxBarWidth={230}
-                                />
-                            </SortableCard>
-
-                            <SortableCard height={200} width={'100%'}>
-                                <HorizontalStackedBarChart
-                                    data={horizontalStackedData}
-                                    groupKeys={[
-                                        'futures',
-                                        'options',
-                                        'forwards',
-                                        'fixedIncome',
-                                        'others',
-                                    ]}
-                                    title="Expiry and Settlements"
-                                    colors={[
-                                        '#a0c8e9',
-                                        '#56b9b8',
-                                        '#f2ce7a',
-                                        '#4e79bb',
-                                        '#9aa4b3',
-                                    ]}
-                                    isLoading={dataLoading.horizontalStacked}
-                                    maxBarHeight={32}
-                                    removeBothAxis
-                                />
-                            </SortableCard>
-
-                            <SortableCard height={400} width={'100%'}>
-                                <BarLineChart
-                                    data={barLineData}
-                                    title="Monthly Trade Volume"
-                                    timestamp={new Date().toISOString()}
-                                    isLoading={dataLoading.barLine}
-                                    titleProps={{
-                                        variant: 'h6',
-                                        align: 'left',
-                                    }}
-                                    legendsProps={{
-                                        position: Legends.Position.BOTTOM,
-                                        doStrike: true,
-                                        isVisible: true,
-                                    }}
-                                    tooltipProps={{}}
-                                    maxBarWidth={32}
-                                />
-                            </SortableCard>
-                            
-                            <SortableCard height={400} width={'100%'}>
-                                <DonutChart
-                                    data={semiDonutData}
-                                    type="semi"
-                                    hideLabels
-                                    title="Trade Success Rate"
-                                    timestamp={new Date().toISOString()}
-                                    colors={['orange', '#50c1c2']}
-                                    isLoading={dataLoading.semiDonut}
-                                    titleProps={{
-                                        variant: 'h6',
-                                        gutterBottom: true,
-                                    }}
-                                    legendsProps={{
-                                        position: Legends.Position.TOP,
-                                        onClick: (data, legend, index) => {
-                                            console.log(
-                                                `Clicked ${legend} at index ${index}`,
-                                                data,
-                                            );
-                                        },
-                                        doStrike: true,
-                                    }}
-                                    tooltipProps={{}}
-                                />
-                            </SortableCard>
-
-
-                            {/* VerticalBarChart example */}
-                            <SortableCard height={400} width={'100%'}>
-                                <VerticalBarChart
-                                    data={verticalBarData}
-                                    title="Valuation"
-                                    colors={[
-                                        '#AC48C6',
-                                        '#E88661',
-                                        '#9FC7E9',
-                                        '#93a3bc',
-                                    ]}
-                                    isLoading={dataLoading.verticalBar}
-                                    legendsProps={{
-                                        position: Legends.Position.BOTTOM,
-                                        isVisible: true,
-                                    }}
-                                    tooltipProps={{}}
-                                />
-                            </SortableCard>
-
-                            <ReconciliationCard />
-
-                            {/* HorizontalBarChart example */}
-                            <SortableCard height={400} width={'100%'}>
-                                <HorizontalBarChart
-                                    data={horizontalBarData}
-                                    isLoading={dataLoading.horizontalBar}
-                                    titleProps={{
-                                        variant: 'h6',
-                                        align: 'left',
-                                    }}
-                                    maxBarHeight={160}
-                                    title={'Trade Volume'}
-                                    legendsProps={{
-                                        position: Legends.Position.BOTTOM,
-                                        doStrike: true,
-                                        isVisible: true,
-                                    }}
-                                    tooltipProps={{}}
-                                />
-                            </SortableCard>
-
-                            <SortableCard height={400} width={'100%'}>
-                                <VerticalGroupedBarChart
-                                    width={600}
-                                    height={200}
-                                    data={verticalGroupedBarData}
-                                    groupKeys={[
-                                        'future',
-                                        'options',
-                                        'forwards',
-                                        'fixedIncome',
-                                        'others',
-                                    ]}
-                                    type="grouped"
-                                    margin={{
-                                        top: 20,
-                                        right: 30,
-                                        bottom: 30,
-                                        left: 40,
-                                    }}
-                                    title="Quarterly Trade Distribution"
-                                    timestamp={new Date().toISOString()}
-                                    colors={[
-                                        '#9bc5ef',
-                                        '#50c1c2',
-                                        '#fad176',
-                                        '#407abc',
-                                        '#93a3bc',
-                                    ]}
-                                    isLoading={dataLoading.verticalGroupedBar}
-                                    titleProps={{
-                                        variant: 'h6',
-                                        align: 'left',
-                                    }}
-                                    legendsProps={{
-                                        onClick: (data, legend, index) => {
-                                            console.log(
-                                                `Clicked ${legend} at index ${index}`,
-                                                data,
-                                            );
-                                        },
-                                        doStrike: true,
-                                    }}
-                                    tooltipProps={{}}
-                                />
-                            </SortableCard>
-
-                            {/* HorizontalGroupedBarChart with grouped type */}
-                            <SortableCard height={400} width={'100%'}>
-                                <HorizontalGroupedBarChart
-                                    width={600}
-                                    height={200}
-                                    type="grouped"
-                                    data={horizontalGroupedBarData}
-                                    groupKeys={['q1', 'q2', 'q3', 'q4']}
-                                    margin={{
-                                        top: 20,
-                                        right: 50,
-                                        bottom: 30,
-                                        left: 120,
-                                    }}
-                                    title="Quarterly Department Performance"
-                                    timestamp={new Date().toISOString()}
-                                    colors={[
-                                        '#9bc5ef',
-                                        '#50c1c2',
-                                        '#fad176',
-                                        '#407abc',
-                                    ]}
-                                    isLoading={dataLoading.horizontalGroupedBar}
-                                    titleProps={{
-                                        variant: 'h6',
-                                        align: 'left',
-                                    }}
-                                    legendsProps={{
-                                        onClick: (data, legend, index) => {
-                                            console.log(
-                                                `Clicked ${legend} at index ${index}`,
-                                                data,
-                                            );
-                                        },
-                                        doStrike: true,
-                                    }}
-                                    tooltipProps={{}}
-                                />
-                            </SortableCard>
-
-                            <SortableCard height={400} width={'100%'}>
-                                <TreeMapChart
-                                    data={treeMapData}
-                                    title="Investment Portfolio Allocation"
-                                    timestamp={new Date().toISOString()}
-                                    colors={Array.from(
-                                        { length: 500 },
-                                        () =>
-                                            `hsl(${Math.random() * 360}, 100%, 45%)`,
-                                    )}
-                                    isLoading={dataLoading.treeMap}
-                                    titleProps={{
-                                        variant: 'h6',
-                                        align: 'left',
-                                    }}
-                                    legendsProps={{
-                                        position: Legends.Position.BOTTOM,
-                                        doStrike: true,
-                                    }}
-                                    tooltipProps={{}}
-                                    tilePadding={2}
-                                    borderRadius={5}
-                                />
-                            </SortableCard>
-
-                            {/* Second TreeMapChart example */}
-                            <SortableCard height={400} width={'100%'}>
-                                <TreeMapChart
-                                    data={marketTreeMapData}
-                                    title="Global Market Exposure"
-                                    timestamp={new Date().toISOString()}
-                                    colors={[
-                                        '#407abc',
-                                        '#50c1c2',
-                                        '#fad176',
-                                        '#93a3bc',
-                                    ]}
-                                    isLoading={dataLoading.marketTreeMap}
-                                    titleProps={{
-                                        variant: 'h6',
-                                        align: 'left',
-                                    }}
-                                    legendsProps={{
-                                        position: Legends.Position.TOP,
-                                        doStrike: true,
-                                    }}
-                                    tooltipProps={{}}
-                                    showLabels={true}
-                                    tilePadding={1}
-                                />
-                            </SortableCard>
-                        </Sortable>
+                        }}
+                        paginatedData={paginatedData}
+                        />
                     }
                 </div>
             </div>
