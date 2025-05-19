@@ -144,4 +144,10 @@ export interface LineRendererProps {
   hideAxisLine?: boolean;
   label?: string;
   rightPosition: number;
+  handleLineMouseMove: (
+    value: number | undefined,
+    color: string,
+    index: number,
+  ) => (event: React.MouseEvent) => void;
+  handleLineMouseLeave: () => void;  
 }

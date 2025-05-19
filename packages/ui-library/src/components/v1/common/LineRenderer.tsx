@@ -29,6 +29,8 @@ const LineRenderer: React.FC<LineRendererProps> = ({
   hideTicks,
   hideAxisLine,
   label,
+  handleLineMouseMove,
+  handleLineMouseLeave
 }) => {
   const axis_right = useRef<SVGGElement | null>(null);
 
@@ -188,6 +190,8 @@ const LineRenderer: React.FC<LineRendererProps> = ({
               ? reducedOpacity
               : defaultOpacity
           }
+          onMouseEnter={handleLineMouseMove(d.yAxisRight,lineColor,index)}          
+          onMouseLeave={handleLineMouseLeave}      
         />
       );
     });
@@ -220,7 +224,7 @@ const LineRenderer: React.FC<LineRendererProps> = ({
           x={(d) =>
             (xScale(d.xAxis) ?? 0) + circleRadius * 2 + (xOffset ? xOffset : 0)
           }
-          y={(d) => y1Scale(d.yAxisRight)}
+          y={(d) => y1Scale(d.yAxisRight?d.yAxisRight:0)}
           strokeWidth={2}
           strokeOpacity={
             hoveredLine && hoveredLine !== yAxisRightLabel
@@ -228,7 +232,7 @@ const LineRenderer: React.FC<LineRendererProps> = ({
               : defaultOpacity
           }
           stroke={isLoading ? `url(#${shimmerGradientId})` : lineColor}
-          shapeRendering="geometricPrecision"
+          shapeRendering="geometricPrecision"           
         />
 
         {/* Render circles with animated and staggered growth */}

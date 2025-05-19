@@ -45,7 +45,7 @@ const BASE_ADJUST_WIDTH = 8;
 const Bar: React.FC<UnifiedChartProps> = ({
   data,
   title,
-  colors = [],
+  colors,
   isLoading = false,
   titleProps,
   chartProps,
@@ -294,29 +294,31 @@ const Bar: React.FC<UnifiedChartProps> = ({
       chartProps?.variant.toUpperCase() === "BAR AND LINE"
     ) {
       return [
-        { label: yAxisLeftLabel, value: 0 },
-        { label: yAxisRightLabel, value: 0 },
+        { label: yAxisLeftLabel, value: 0, color:null},
+        { label: yAxisRightLabel, value: 0, color:theme.colors.charts.bar[2] },
       ];
     } else {
       if (isBarLineData(data)) {
-        return data.chartData.map((d: BarLineDataItem) => ({
+        return filteredData.map((d: BarLineDataItem) => ({
           label: d.xAxis,
           value: d.yAxisLeft,
+          color:d.barColor
         }));
       }
     }
   }, [data, yAxisLeftLabel, yAxisRightLabel]);
 
+
   const colorScale = useMemo(() => {
-    if (colors?.length) {
+    if (colors && !("bar" in colors) && colors?.length) {
       return scaleOrdinal<string, string>({
-        domain: filteredData.map((_, index) => index.toString()),
+        domain: filteredData.map((_, index) => filteredData[index].xAxis),
         range: colors,
       });
     }
 
     return scaleOrdinal<string, string>({
-      domain: filteredData.map((_, index) => index.toString()),
+      domain: filteredData.map((_, index) => filteredData[index].xAxis),
       range: theme.colors.charts.bar,
     });
   }, [colors, filteredData, theme.colors.charts.bar]);
@@ -330,13 +332,64 @@ const Bar: React.FC<UnifiedChartProps> = ({
             chartProps?.variant &&
             chartProps?.variant.toUpperCase() === "BAR AND LINE"
           ) {
-            const { yAxisLeft, yAxisRight } = chartData[index];
+            const { yAxisLeft, yAxisRight, xAxis } = chartData[index];
             const toolTipdata = [
-              { label: yAxisLeftLabel, value: yAxisLeft, color: color },
+              { label: yAxisLeftLabel, value: yAxisLeft, color: colorScale(yAxisLeftLabel?yAxisLeftLabel:'') },
               {
                 label: yAxisRightLabel,
                 value: yAxisRight,
-                color: theme.colors.charts.line,
+                color: theme.colors.charts.bar[2],
+              },
+            ];
+            showTooltip({
+              tooltipData: toolTipdata,
+              tooltipLeft: event.clientX,
+              tooltipTop: event.clientY,
+            });
+            if (event && event?.target) {
+              const element = event.target as HTMLElement;
+              const id = element.getAttribute("id")?.split("_")[1];
+              if (id) {
+                setHoveredBarId(id);
+              }
+            }
+            setHoveredBar(0);
+            setHoveredBarOther(index);
+          } else {
+            showTooltip({
+              tooltipData: [
+                {
+                  label: filteredData[index].xAxis,
+                  value,
+                  color,
+                },
+              ],
+              tooltipLeft: event.clientX,
+              tooltipTop: event.clientY,
+            });
+            setHoveredBar(index);
+          }
+        }
+      },
+    [isLoading, filteredData, showTooltip, setHoveredBar, setHoveredLine],
+  );
+
+
+  const handleLineMouseMove = useCallback(
+    (value: number | undefined, color: string, index: number) =>
+      (event: React.MouseEvent) => {
+        if (!isLoading) {
+          if (
+            chartProps &&
+            chartProps?.variant &&
+            chartProps?.variant.toUpperCase() === "BAR AND LINE"
+          ) {
+            const { yAxisLeft, yAxisRight, xAxis } = chartData[index];
+            const toolTipdata = [
+              {
+                label: yAxisRightLabel,
+                value: yAxisRight,
+                color: theme.colors.charts.bar[2],
               },
             ];
             showTooltip({
@@ -379,6 +432,14 @@ const Bar: React.FC<UnifiedChartProps> = ({
       setHoveredLine(null);
     }
   }, [isLoading, hideTooltip]);
+
+  const handleLineMouseLeave = useCallback(() => {
+    if (!isLoading) {
+      hideTooltip();
+      setHoveredBar(null);
+      setHoveredLine(null);
+    }
+  }, [isLoading, hideTooltip]);  
 
   const wrapped = useCallback(
     (isWrapped: boolean) => {
@@ -485,6 +546,8 @@ const Bar: React.FC<UnifiedChartProps> = ({
         ) {
           if (!yAxisLeftLabel) {
             lleft += 18;
+          }else{
+            lleft += 2;          
           }
         }
         setLegendLeft(axis_left.current.getBBox().x + lleft);
@@ -530,7 +593,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
 
   const {
     position = LegendPosition.BOTTOM,
-    hovered = hoveredBar !== null && hoveredBar > -1
+    hovered = hoveredBar && hoveredBar !== null && hoveredBar > -1
       ? legendData?.[hoveredBar]?.label
       : null,
     setHovered = (label: string | number | null) => {
@@ -696,6 +759,8 @@ const Bar: React.FC<UnifiedChartProps> = ({
                   hideAxisLine={!showYAxis}
                   label={yAxisRightLabel}
                   chart={chartProps?.variant}
+                  handleLineMouseMove={handleLineMouseMove}
+                  handleLineMouseLeave={handleLineMouseLeave}
                 />
               </g>
             ) : (

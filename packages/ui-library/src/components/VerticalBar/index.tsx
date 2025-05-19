@@ -11,7 +11,7 @@ const DEFAULT_MAX_BAR_WIDTH = 16;
 const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   data: _data,
   title,
-  colors = [],
+  colors,
   isLoading = false,
   titleProps,
   chartProps,

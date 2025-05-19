@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import LegendItem from "./LegendItem";
 import { LegendPosition, LegendsProps, LegendVariant } from "./types";
 
+
 function Legends({
   colorScale,
   data,
@@ -115,7 +116,8 @@ function Legends({
       type Positions = Record<string, Position[]>;
       const positions: Positions = {};
       let start = 0;
-      let row = 1;
+      let row = 0;
+      row = 1;
       let addwidth = 0;
       let newwidth = 0;
       while (start < gs.length) {
@@ -136,7 +138,7 @@ function Legends({
               object: gs[start],
               row: row,
               x: newwidth,
-              y: (row - 1) * eachLegendGap,
+              y: (chart.toUpperCase() === "BAR AND LINE"?(row - 1):(row - 2)) * eachLegendGap,
               cwidth:
                 newwidth +
                 (gs[start] as SVGGElement).getBoundingClientRect().width,
@@ -199,6 +201,9 @@ function Legends({
             text: label.label,
           };
           const isHoveredOther = hovered && !(hovered === lb.label);
+          console.log(data)
+          console.log("iiilabel",colorScale(label.label))
+          console.log(label.label)
           return (
             <LegendItem
               key={`legend-${label.label}-${label.value}`}

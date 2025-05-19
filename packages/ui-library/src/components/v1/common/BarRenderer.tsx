@@ -112,7 +112,6 @@ const BarRenderer: React.FC<BarRendererProps> = ({
         const dataClicked: DataPoint = { label: d.xAxis, value: d.yAxisLeft };
         const value = Number(d.yAxisLeft);
         if (Number.isNaN(value)) return null;
-
         const calculatedBarWidth = xScale.bandwidth();
         const barwidth = getOptimalBarWidth(calculatedBarWidth);
 
@@ -174,7 +173,7 @@ const BarRenderer: React.FC<BarRendererProps> = ({
           currentHeight > 0 ? currentHeight : 0,
         );
 
-        const barColor = d.barColor || colorScale(index.toString());
+        const barColor = d.barColor || colorScale(d.xAxis);
 
         return (
           <CustomBar
