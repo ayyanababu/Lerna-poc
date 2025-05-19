@@ -78,13 +78,24 @@ const LineRenderer: React.FC<LineRendererProps> = ({
       // Get the next point that we're animating toward
       const nextPoint = data.chartData[currentSegmentIndex + 1];
       const currentPoint = data.chartData[currentSegmentIndex];
-
+      let cyar:number = 0;
+      if (currentPoint && currentPoint.yAxisRight){
+        cyar = currentPoint.yAxisRight
+      }else{
+        cyar = 0;
+      }
+      let nyar:number|undefined = 0;
+      if (nextPoint && nextPoint.yAxisRight){
+        nyar = nextPoint.yAxisRight;
+      }
+      let yaxisright = cyar +
+          (nyar - cyar) * segmentProgress
       // Create interpolated point
       const interpolatedPoint = {
         ...currentPoint,
         yAxisRight:
-          currentPoint.yAxisRight +
-          (nextPoint.yAxisRight - currentPoint.yAxisRight) * segmentProgress,
+          cyar +
+          (nyar - cyar) * segmentProgress,
         xAxis: currentPoint.xAxis, // Keep x the same to avoid visual glitches
       };
 
@@ -137,7 +148,7 @@ const LineRenderer: React.FC<LineRendererProps> = ({
 
       // Start the animation
       requestAnimationFrame(animate);
-    }, 1500);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [isLoading]);
@@ -148,7 +159,7 @@ const LineRenderer: React.FC<LineRendererProps> = ({
     }
   }, [axis_right.current, isLoading, data, xScale]);
 
-  const renderCircles = () => {
+  const renderCircles = (circleRadius:number) => {
     if (!animationStarted || !data?.chartData?.length) {
       return null;
     }
@@ -183,7 +194,7 @@ const LineRenderer: React.FC<LineRendererProps> = ({
           cx={
             (xScale(d.xAxis) ?? 0) + circleRadius * 2 + (xOffset ? xOffset : 0)
           }
-          cy={y1Scale(d.yAxisRight)}
+          cy={y1Scale(d && d.yAxisRight?d.yAxisRight:0)}
           fill={isLoading ? `url(#${shimmerGradientId})` : lineColor}
           opacity={
             hoveredLine && hoveredLine !== yAxisRightLabel
@@ -236,7 +247,7 @@ const LineRenderer: React.FC<LineRendererProps> = ({
         />
 
         {/* Render circles with animated and staggered growth */}
-        {renderCircles()}
+        {renderCircles(currentRadius)}
       </>
     </Group>
   );

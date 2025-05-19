@@ -214,7 +214,7 @@ const fetchBarLineData = (): Promise<BarLineData> =>
                     xAxis: action,
                     yAxisLeft: Math.floor(Math.random() * 300000000) + 15, // 15-45
                     yAxisRight: Math.floor(Math.random() * 350000000) + 20, // 20-55
-                    barColor: index == 0 ? 'red' : null,
+                    barColor: index===0?"green":null,
                 })),
             });
         }, 2200);

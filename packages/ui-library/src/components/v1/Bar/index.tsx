@@ -104,6 +104,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
   const [rightPositionYAxis, setRightPositionYAxis] = useState<number>(0);
   const [, setHoveredBarId] = useState<string>("");
   const [moveforBarLineLegend, setmoveforBarLineLegend] = useState(0);
+  const [lineColor,setLineColor] = useState<string>("");
 
   const {
     drawableChartHeight,
@@ -295,7 +296,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
     ) {
       return [
         { label: yAxisLeftLabel, value: 0, color:null},
-        { label: yAxisRightLabel, value: 0, color:theme.colors.charts.bar[2] },
+        { label: yAxisRightLabel, value: 0, color:lineColor?lineColor:theme.colors.charts.line[0] },
       ];
     } else {
       if (isBarLineData(data)) {
@@ -306,17 +307,29 @@ const Bar: React.FC<UnifiedChartProps> = ({
         }));
       }
     }
-  }, [data, yAxisLeftLabel, yAxisRightLabel]);
+  }, [data, yAxisLeftLabel, yAxisRightLabel, lineColor]);
 
 
   const colorScale = useMemo(() => {
-    if (colors && !("bar" in colors) && colors?.length) {
+    if (colors && !("bar" in colors) && !("line" in colors) && colors?.length) {
       return scaleOrdinal<string, string>({
         domain: filteredData.map((_, index) => filteredData[index].xAxis),
         range: colors,
       });
     }
-
+    if (colors && ("line" in colors)){
+      setLineColor(colors.line);
+    }
+    if (colors && ("bar" in colors)) {
+      console.log('bared',colors.bar)
+      return scaleOrdinal<string, string>({
+        domain: filteredData.map((_, index) => filteredData[index].xAxis),
+        range: [colors.bar],
+      });
+    }
+    if (colors && !("line" in colors) && !("bar" in colors)){
+      setLineColor(theme.colors.charts.line[0]);
+    }    
     return scaleOrdinal<string, string>({
       domain: filteredData.map((_, index) => filteredData[index].xAxis),
       range: theme.colors.charts.bar,
@@ -338,7 +351,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
               {
                 label: yAxisRightLabel,
                 value: yAxisRight,
-                color: theme.colors.charts.bar[2],
+                color: lineColor?lineColor:theme.colors.charts.line[0],
               },
             ];
             showTooltip({
@@ -371,7 +384,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
           }
         }
       },
-    [isLoading, filteredData, showTooltip, setHoveredBar, setHoveredLine],
+    [isLoading, filteredData, showTooltip, setHoveredBar, setHoveredLine, lineColor],
   );
 
 
@@ -389,7 +402,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
               {
                 label: yAxisRightLabel,
                 value: yAxisRight,
-                color: theme.colors.charts.bar[2],
+                color: lineColor?lineColor:theme.colors.charts.line[0],
               },
             ];
             showTooltip({
@@ -422,7 +435,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
           }
         }
       },
-    [isLoading, filteredData, showTooltip, setHoveredBar, setHoveredLine],
+    [isLoading, filteredData, showTooltip, setHoveredBar, setHoveredLine, lineColor],
   );
 
   const handleBarMouseLeave = useCallback(() => {
@@ -754,7 +767,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
                   isLoading={isLoading}
                   hoveredLine={hoveredLine}
                   rightPosition={rightPositionYAxis}
-                  lineColor={theme.colors.charts.bar[2]}
+                  lineColor={lineColor}
                   hideTicks={!showTicks}
                   hideAxisLine={!showYAxis}
                   label={yAxisRightLabel}

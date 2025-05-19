@@ -21,7 +21,7 @@ const LegendManager: React.FC<LegendManagerProps> = ({
   legendBoxHeight,
   calculatedLegendHeight,
   legendBoxWidth,
-  chart,
+  chart
 }) => {
   // Only render the legend if it's visible in props
   if (!legendsProps?.isVisible) {

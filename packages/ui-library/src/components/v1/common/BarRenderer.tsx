@@ -101,7 +101,7 @@ const BarRenderer: React.FC<BarRendererProps> = ({
 
       // Start the animation
       requestAnimationFrame(animate);
-    }, 1500);
+    }, 50);
 
     return () => clearTimeout(timer);
   }, [isLoading]);
@@ -146,10 +146,10 @@ const BarRenderer: React.FC<BarRendererProps> = ({
 
         const currentHeight = animationStarted
           ? linearInterpolate(0, finalBarHeight, easedProgress)
-          : 0;
+          : (isLoading?finalBarHeight:0);
         const currentY = animationStarted
           ? linearInterpolate(drawableChartHeight, finalBarY, easedProgress)
-          : drawableChartHeight;
+          : (isLoading?finalBarY:drawableChartHeight) ;
 
         // Calculate visual properties
         let barOpacity = 1;

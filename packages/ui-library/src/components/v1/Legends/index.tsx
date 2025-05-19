@@ -25,7 +25,7 @@ function Legends({
   legendBoxWidth,
   hideLegendLableClick = true,
   showArrow = true,
-  chart,
+  chart
 }: LegendsProps) {
   const legends_ref = useRef<SVGGElement | null>(null);
 
@@ -138,7 +138,7 @@ function Legends({
               object: gs[start],
               row: row,
               x: newwidth,
-              y: (chart.toUpperCase() === "BAR AND LINE"?(row - 1):(row - 2)) * eachLegendGap,
+              y: (chart.toUpperCase() === "BAR AND LINE"?(row - 1):(legendBoxWidth > 300?(row-1):(row - 2))) * eachLegendGap,
               cwidth:
                 newwidth +
                 (gs[start] as SVGGElement).getBoundingClientRect().width,
