@@ -149,5 +149,5 @@ export interface LineRendererProps {
     color: string,
     index: number,
   ) => (event: React.MouseEvent) => void;
-  handleLineMouseLeave: () => void;  
+  handleLineMouseLeave: () => void;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import React, {
   useCallback,
   useEffect,
@@ -104,7 +105,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
   const [rightPositionYAxis, setRightPositionYAxis] = useState<number>(0);
   const [, setHoveredBarId] = useState<string>("");
   const [moveforBarLineLegend, setmoveforBarLineLegend] = useState(0);
-  const [lineColor,setLineColor] = useState<string>("");
+  const [lineColor, setLineColor] = useState<string>("");
 
   const {
     drawableChartHeight,
@@ -295,20 +296,24 @@ const Bar: React.FC<UnifiedChartProps> = ({
       chartProps?.variant.toUpperCase() === "BAR AND LINE"
     ) {
       return [
-        { label: yAxisLeftLabel, value: 0, color:null},
-        { label: yAxisRightLabel, value: 0, color:lineColor?lineColor:theme.colors.charts.line[0] },
+        { label: yAxisLeftLabel, value: 0, color: null },
+        {
+          label: yAxisRightLabel,
+          value: 0,
+          color: lineColor ? lineColor : theme.colors.charts.line[0],
+        },
       ];
-    } else {
-      if (isBarLineData(data)) {
-        return filteredData.map((d: BarLineDataItem) => ({
-          label: d.xAxis,
-          value: d.yAxisLeft,
-          color:d.barColor
-        }));
-      }
+    } else if (isBarLineData(data)) {
+      return filteredData.map((d: BarLineDataItem) => ({
+        label: d.xAxis,
+        value: d.yAxisLeft,
+        color: d.barColor,
+      }));
     }
-  }, [data, yAxisLeftLabel, yAxisRightLabel, lineColor]);
 
+    // Fallback to an empty array to ensure consistent return
+    return [];
+  }, [data, yAxisLeftLabel, yAxisRightLabel, lineColor]);
 
   const colorScale = useMemo(() => {
     if (colors && !("bar" in colors) && !("line" in colors) && colors?.length) {
@@ -317,19 +322,19 @@ const Bar: React.FC<UnifiedChartProps> = ({
         range: colors,
       });
     }
-    if (colors && ("line" in colors)){
+    if (colors && "line" in colors) {
       setLineColor(colors.line);
     }
-    if (colors && ("bar" in colors)) {
-      console.log('bared',colors.bar)
+    if (colors && "bar" in colors) {
+      console.log("bared", colors.bar);
       return scaleOrdinal<string, string>({
         domain: filteredData.map((_, index) => filteredData[index].xAxis),
         range: [colors.bar],
       });
     }
-    if (colors && !("line" in colors) && !("bar" in colors)){
+    if (colors && !("line" in colors) && !("bar" in colors)) {
       setLineColor(theme.colors.charts.line[0]);
-    }    
+    }
     return scaleOrdinal<string, string>({
       domain: filteredData.map((_, index) => filteredData[index].xAxis),
       range: theme.colors.charts.bar,
@@ -345,13 +350,17 @@ const Bar: React.FC<UnifiedChartProps> = ({
             chartProps?.variant &&
             chartProps?.variant.toUpperCase() === "BAR AND LINE"
           ) {
-            const { yAxisLeft, yAxisRight, xAxis } = chartData[index];
+            const { yAxisLeft, yAxisRight } = chartData[index];
             const toolTipdata = [
-              { label: yAxisLeftLabel, value: yAxisLeft, color: colorScale(yAxisLeftLabel?yAxisLeftLabel:'') },
               {
-                label: yAxisRightLabel,
-                value: yAxisRight,
-                color: lineColor?lineColor:theme.colors.charts.line[0],
+                label: yAxisLeftLabel ?? "",
+                value: yAxisLeft ?? 0,
+                color: colorScale(yAxisLeftLabel ? yAxisLeftLabel : ""),
+              },
+              {
+                label: yAxisRightLabel ?? "",
+                value: yAxisRight ?? 0,
+                color: lineColor ? lineColor : theme.colors.charts.line[0],
               },
             ];
             showTooltip({
@@ -384,9 +393,15 @@ const Bar: React.FC<UnifiedChartProps> = ({
           }
         }
       },
-    [isLoading, filteredData, showTooltip, setHoveredBar, setHoveredLine, lineColor],
+    [
+      isLoading,
+      filteredData,
+      showTooltip,
+      setHoveredBar,
+      setHoveredLine,
+      lineColor,
+    ],
   );
-
 
   const handleLineMouseMove = useCallback(
     (value: number | undefined, color: string, index: number) =>
@@ -397,12 +412,12 @@ const Bar: React.FC<UnifiedChartProps> = ({
             chartProps?.variant &&
             chartProps?.variant.toUpperCase() === "BAR AND LINE"
           ) {
-            const { yAxisLeft, yAxisRight, xAxis } = chartData[index];
+            const { yAxisRight } = chartData[index];
             const toolTipdata = [
               {
-                label: yAxisRightLabel,
-                value: yAxisRight,
-                color: lineColor?lineColor:theme.colors.charts.line[0],
+                label: yAxisRightLabel ?? "",
+                value: yAxisRight ?? 0,
+                color: lineColor ? lineColor : theme.colors.charts.line[0],
               },
             ];
             showTooltip({
@@ -424,7 +439,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
               tooltipData: [
                 {
                   label: filteredData[index].xAxis,
-                  value,
+                  value: value ?? 0,
                   color,
                 },
               ],
@@ -435,7 +450,14 @@ const Bar: React.FC<UnifiedChartProps> = ({
           }
         }
       },
-    [isLoading, filteredData, showTooltip, setHoveredBar, setHoveredLine, lineColor],
+    [
+      isLoading,
+      filteredData,
+      showTooltip,
+      setHoveredBar,
+      setHoveredLine,
+      lineColor,
+    ],
   );
 
   const handleBarMouseLeave = useCallback(() => {
@@ -452,7 +474,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
       setHoveredBar(null);
       setHoveredLine(null);
     }
-  }, [isLoading, hideTooltip]);  
+  }, [isLoading, hideTooltip]);
 
   const wrapped = useCallback(
     (isWrapped: boolean) => {
@@ -559,8 +581,8 @@ const Bar: React.FC<UnifiedChartProps> = ({
         ) {
           if (!yAxisLeftLabel) {
             lleft += 18;
-          }else{
-            lleft += 2;          
+          } else {
+            lleft += 2;
           }
         }
         setLegendLeft(axis_left.current.getBBox().x + lleft);

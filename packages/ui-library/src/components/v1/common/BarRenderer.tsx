@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 
 import CustomBar from "../../CustomBar";
 import type { BarRendererProps } from "./BarRenderer.types";
-import { BarLineDataItem, BarsList, DataPoint } from "./Data.types";
+import { BarsList, DataPoint } from "./Data.types";
 
 const DEFAULT_BAR_RADIUS = 4;
 const ANIMATION_DURATION = 800; // animation duration in ms
@@ -76,15 +76,10 @@ const BarRenderer: React.FC<BarRendererProps> = ({
     }
     const timer = setTimeout(() => {
       setAnimationStarted(true);
-
-      // Start time for the animation
       let startTime: number | null = null;
-
-      // Animation frame function
       const animate = (timestamp: number | null) => {
         if (!startTime) startTime = timestamp;
 
-        // Calculate progress based on elapsed time
         let elapsed: number = 0;
         if (timestamp && startTime) {
           elapsed = timestamp - startTime;
@@ -93,17 +88,17 @@ const BarRenderer: React.FC<BarRendererProps> = ({
 
         setProgress(newProgress);
 
-        // Continue animation if not complete
         if (newProgress < 1) {
           requestAnimationFrame(animate);
         }
       };
-
-      // Start the animation
       requestAnimationFrame(animate);
     }, 50);
 
-    return () => clearTimeout(timer);
+    // eslint-disable-next-line consistent-return
+    return () => {
+      clearTimeout(timer);
+    };
   }, [isLoading]);
 
   return (
@@ -138,18 +133,30 @@ const BarRenderer: React.FC<BarRendererProps> = ({
         const easedProgress = easeOutCubic(progress);
 
         // Interpolate height and y position using custom linear interpolation
-        const linearInterpolate = (
-          start: number,
-          end: number,
-          progress: number,
-        ) => start + (end - start) * progress;
+        const linearInterpolate = (start: number, end: number, t: number) =>
+          start + (end - start) * t;
 
-        const currentHeight = animationStarted
-          ? linearInterpolate(0, finalBarHeight, easedProgress)
-          : (isLoading?finalBarHeight:0);
-        const currentY = animationStarted
-          ? linearInterpolate(drawableChartHeight, finalBarY, easedProgress)
-          : (isLoading?finalBarY:drawableChartHeight) ;
+        let currentHeight;
+        if (animationStarted) {
+          currentHeight = linearInterpolate(0, finalBarHeight, easedProgress);
+        } else if (isLoading) {
+          currentHeight = finalBarHeight;
+        } else {
+          currentHeight = 0;
+        }
+
+        let currentY;
+        if (animationStarted) {
+          currentY = linearInterpolate(
+            drawableChartHeight,
+            finalBarY,
+            easedProgress,
+          );
+        } else if (isLoading) {
+          currentY = finalBarY;
+        } else {
+          currentY = drawableChartHeight;
+        }
 
         // Calculate visual properties
         let barOpacity = 1;

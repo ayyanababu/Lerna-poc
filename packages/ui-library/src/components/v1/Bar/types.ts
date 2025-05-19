@@ -49,7 +49,7 @@ export interface BaseChartProps {
  * Uses a simple array of bar-colors.
  */
 export interface VerticalBarChartProps extends BaseChartProps {
-  variant: "VERTICAL_BAR";
+  variant: "VERTICAL BAR";
   colors?: string[];
 }
 
@@ -59,7 +59,7 @@ export interface VerticalBarChartProps extends BaseChartProps {
  * and also supports optional width/height/timestamp.
  */
 export interface BarLineChartProps extends BaseChartProps {
-  variant: "BAR_AND_LINE";
+  variant: "BAR AND LINE";
   colors?: { bar: string; line: string };
   width?: number;
   height?: number;

@@ -35,9 +35,12 @@ export function formatNumberWithCommas(value: number | string): string {
 }
 
 export function capitalizeWord(value: string): string {
-  if(value == null){
-    return '';
+  if (value == null) {
+    return "";
   }
 
-  return value.split(' ').map(word => capitalize(word)).join(' ');
+  return value
+    .split(" ")
+    .map((word) => capitalize(word))
+    .join(" ");
 }

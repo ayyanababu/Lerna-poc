@@ -35,13 +35,10 @@ const useChartDimensions = ({
     null,
   );
 
-
   // Set initial drawable chart height
   useEffect(() => {
     setDrawableChartHeight(height - defaultMargin.top - defaultMargin.bottom);
   }, [height, defaultMargin]);
-
-  
 
   return {
     drawableChartHeight,
