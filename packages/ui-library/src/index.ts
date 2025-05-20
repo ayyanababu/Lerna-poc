@@ -3,13 +3,16 @@ export { default as DonutChart } from "./components/Donut";
 export { default as HorizontalBarChart } from "./components/HorizontalBar";
 export { default as HorizontalGroupedBarChart } from "./components/HorizontalGroupedBarChart";
 export { default as Legends } from "./components/Legends";
-export { default as VerticalBarChart } from "./components/VerticalBar";
 export { default as Sortable } from "./components/Sortable";
 export { default as SortableCard } from "./components/SortableCard";
 export { default as HorizontalStackedBarChart } from "./components/StackedBar/Horizontal";
 export { default as VerticalStackedBarChart } from "./components/StackedBar/Vertical";
 export { default as Title } from "./components/Title";
 export { default as TreeMapChart } from "./components/TreeMapChart";
+export type {
+  BarLineData,
+  BarLineDataItem,
+} from "./components/v1/common/Data.types";
+export { default as VerticalBarChart } from "./components/VerticalBar";
 export { default as VerticalGroupedBarChart } from "./components/VerticalGroupedBarChart";
 export { ChartThemeProvider } from "./context/ChartThemeProvider";
-export type {BarLineData, BarLineDataItem} from "./components/v1/common/Data.types";

@@ -24,7 +24,7 @@ const CustomBar = ({
     return <path {...pathProps} fill={barFill} {...props} />;
   }
 
-  return <Bar {...props} rx={rx} ry={ry} fill={barFill} style-{...style} />;
+  return <Bar {...props} rx={rx} ry={ry} fill={barFill} style- {...style} />;
 };
 
 export default CustomBar;

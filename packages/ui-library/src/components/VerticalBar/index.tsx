@@ -62,7 +62,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       showXAxis={showXAxis}
       showYAxis={showYAxis}
       chartProps={chartProps}
-      variant={"VERTICAL_BAR"}
+      variant={"VERTICAL BAR"}
       onArrowClick={onArrowClick}
     />
   );

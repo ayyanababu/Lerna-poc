@@ -25,7 +25,7 @@ function Legends({
   legendBoxWidth,
   hideLegendLableClick = true,
   showArrow = true,
-  chart
+  chart,
 }: LegendsProps) {
   const legends_ref = useRef<SVGGElement | null>(null);
   const positionStyles = useMemo(() => {
@@ -133,11 +133,21 @@ function Legends({
             positions[row] = [];
           }
           if (eachLegendGap) {
+            let rowOffset;
+            if (
+              chart && chart.toUpperCase() === "BAR AND LINE" ||
+              legendBoxWidth > 300
+            ) {
+              rowOffset = row - 1;
+            } else {
+              rowOffset = row - 2;
+            }
+
             positions[row].push({
               object: gs[start],
               row: row,
               x: newwidth,
-              y: (variant.toUpperCase() === "BAR_AND_LINE"?(row - 1):(legendBoxWidth > 300?(row-1):(row - 2))) * eachLegendGap,
+              y: (variant.toUpperCase() === "BAR AND LINE"?(row - 1):(legendBoxWidth > 300?(row-1):(row - 2))) * eachLegendGap,
               cwidth:
                 newwidth +
                 (gs[start] as SVGGElement).getBoundingClientRect().width,

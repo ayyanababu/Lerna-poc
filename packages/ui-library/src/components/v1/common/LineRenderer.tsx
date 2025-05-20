@@ -20,8 +20,6 @@ const LineRenderer: React.FC<LineRendererProps> = ({
   y1AxisProps,
   getAxisRight,
   xOffset,
-  hideIndex,
-  setHideIndex,
   isLoading,
   yAxisRightLabel,
   hoveredLine,
@@ -60,10 +58,6 @@ const LineRenderer: React.FC<LineRendererProps> = ({
       return progress > 0.5 ? data.chartData : [];
     }
 
-    // Create a smoothly interpolated path by including all points
-    // but adjusting the final point's position
-    const result = [...data.chartData];
-
     // Find the segment where the animation should currently be
     const totalDistance = data.chartData.length - 1; // Total segments
     const currentSegmentPosition = easedProgress * totalDistance;
@@ -81,24 +75,21 @@ const LineRenderer: React.FC<LineRendererProps> = ({
       // Get the next point that we're animating toward
       const nextPoint = data.chartData[currentSegmentIndex + 1];
       const currentPoint = data.chartData[currentSegmentIndex];
-      let cyar:number = 0;
-      if (currentPoint && currentPoint.yAxisRight){
-        cyar = currentPoint.yAxisRight
-      }else{
+      let cyar: number = 0;
+      if (currentPoint && currentPoint.yAxisRight) {
+        cyar = currentPoint.yAxisRight;
+      } else {
         cyar = 0;
       }
-      let nyar:number|undefined = 0;
-      if (nextPoint && nextPoint.yAxisRight){
+      let nyar: number | undefined = 0;
+      if (nextPoint && nextPoint.yAxisRight) {
         nyar = nextPoint.yAxisRight;
       }
-      let yaxisright = cyar +
-          (nyar - cyar) * segmentProgress
+      // const yaxisright = cyar + (nyar - cyar) * segmentProgress;
       // Create interpolated point
       const interpolatedPoint = {
         ...currentPoint,
-        yAxisRight:
-          cyar +
-          (nyar - cyar) * segmentProgress,
+        yAxisRight: cyar + (nyar - cyar) * segmentProgress,
         xAxis: currentPoint.xAxis, // Keep x the same to avoid visual glitches
       };
 
@@ -162,7 +153,8 @@ const LineRenderer: React.FC<LineRendererProps> = ({
     }
   }, [axis_right.current, isLoading, data, xScale]);
 
-  const renderCircles = (circleRadius:number) => {
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const renderCircles = (circleRadius: number) => {
     if (!animationStarted || !data?.chartData?.length) {
       return null;
     }
@@ -197,7 +189,7 @@ const LineRenderer: React.FC<LineRendererProps> = ({
           cx={
             (xScale(d.xAxis) ?? 0) + circleRadius * 2 + (xOffset ? xOffset : 0)
           }
-          cy={y1Scale(d && d.yAxisRight?d.yAxisRight:0)}
+          cy={y1Scale(d && d.yAxisRight ? d.yAxisRight : 0)}
           fill={isLoading ? `url(#${shimmerGradientId})` : lineColor}
           opacity={
             hoveredLine && hoveredLine !== yAxisRightLabel
@@ -241,7 +233,7 @@ const LineRenderer: React.FC<LineRendererProps> = ({
           x={(d) =>
             (xScale(d.xAxis) ?? 0) + circleRadius * 2 + (xOffset ? xOffset : 0)
           }
-          y={(d) => y1Scale(d.yAxisRight?d.yAxisRight:0)}
+          y={(d) => y1Scale(d.yAxisRight ? d.yAxisRight : 0)}
           strokeWidth={2}
           strokeOpacity={
             hoveredLine && hoveredLine !== yAxisRightLabel
