@@ -21,12 +21,15 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   gridProps,
   timestampProps,
   barProps,
+  onClick,
   maxBarWidth = DEFAULT_MAX_BAR_WIDTH,
   showTicks = false,
   showGrid = true,
   showXAxis = false,
   showYAxis = false,
-  chartProps,
+  onLineClick,
+  onPointClick,
+  onArrowClick
 }) => {
   const theme = useTheme();
 
@@ -46,7 +49,6 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   return (
     <Bar
       data={data}
-      mockdata={mockBarLineChartData}
       title={title}
       colors={barColors}
       isLoading={isLoading}
@@ -64,7 +66,11 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
       showXAxis={showXAxis}
       showYAxis={showYAxis}
       theme={theme}
-      chartProps={chartProps}
+      onClick={onClick}
+      variant={"BAR_AND_LINE"}
+      onLineClick={onLineClick}
+      onPointClick={onPointClick}
+      onArrowClick={onArrowClick}
     />
   );
 };

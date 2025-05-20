@@ -1,8 +1,8 @@
 import { WithBoundingRectsProps } from "@visx/bounds";
 
 export interface TooltipData {
-  label: string;
-  value: number | string;
+  label: string | undefined;
+  value: number | string | undefined;
   color?: string;
 }
 

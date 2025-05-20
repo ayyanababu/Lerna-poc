@@ -319,7 +319,6 @@ function XAxis({
     scale.domain().forEach((dmn) => {
       domainCheck.push({ name: dmn, status: false });
     });
-    console.log(barsList);
     barsList?.forEach((barw, index) => {
       if (index === barsList.length - 1) {
         const x: number = barw.x;

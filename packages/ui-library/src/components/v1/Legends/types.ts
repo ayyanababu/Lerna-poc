@@ -1,5 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { scaleOrdinal } from "@visx/scale";
+import { LegendDataItem } from "../common/LegendManager.types";
+import { DataPoint } from "../common/Data.types";
 
 export enum LegendVariant {
   COMPACT = "compact",
@@ -21,18 +23,13 @@ export type LegendPositionType =
   | "left"
   | "right";
 
-export type LegendItem = {
-  label: string;
-  value: number;
-  color?: string;
-};
 
-export type LegendData = LegendItem[];
+export type LegendData = LegendDataItem[];
 
 export interface LegendLabel {
-  text: string;
+  text: string | undefined;
   value?: string;
-  datum: string;
+  datum: string | undefined;
   index: number;
 }
 
@@ -41,10 +38,10 @@ export interface LegendsProps {
   data?: LegendData;
   hideIndex?: number[];
   setHideIndex?: Dispatch<SetStateAction<number[]>>;
-  hovered?: string | null;
+  hovered?: string | null | number | undefined;
   setHovered?: (label: string | number | null) => void;
   position?: LegendPositionType;
-  onClick?: (data: LegendData, legend: string, index: number) => void;
+  onArrowClick?: (event: React.MouseEvent<SVGSVGElement, MouseEvent>,data: DataPoint, legend: string | undefined, index: number) => void;
   isLoading?: boolean;
   doStrike?: boolean;
   isVisible?: boolean;
@@ -59,7 +56,7 @@ export interface LegendsProps {
   legendBoxWidth?: number;
   hideLegendLableClick?: boolean;
   showArrow?: boolean;
-  chart: string;
+  chart?: string | undefined;
 }
 
 export interface LegendItemProps {
@@ -75,7 +72,7 @@ export interface LegendItemProps {
   onMouseOver?: () => void;
   onMouseLeave?: () => void;
   hideValues?: boolean;
-  onArrowClick?: () => void;
+  onArrowClick?: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
   markerColor: string;
   eachLegendGap?: number;
   generateAxis?: (selectedLegends: number[]) => void;

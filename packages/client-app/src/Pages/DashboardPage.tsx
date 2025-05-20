@@ -805,14 +805,29 @@ body:not(.dark) {
                                         variant: 'h6',
                                         align: 'left',
                                     }}
-                                    chartProps={{
-                                      variant : "Bar and Line" 
-                                    }}                                       
+                                    onClick = {(e,data,index) => {
+                                       console.log(e);
+                                       console.log(data);
+                                       console.log(index);
+                                    }}     
+                                    onLineClick = {(e,data,index) => {
+                                       console.log(e);
+                                       console.log(data);
+                                       console.log(index);
+                                    }}        
+                                    onPointClick = {(e,data,index) => {
+                                       console.log(e);
+                                       console.log(data);
+                                       console.log(index);
+                                    }}           
+                                    onArrowClick = {(e,data,legend,index) => {
+                                       console.log(e);
+                                       console.log(data);
+                                       console.log(legend);
+                                       console.log(index);
+                                    }}                                                                                                                                 
                                     legendsProps={{
-                                        position: Legends.Position.BOTTOM,
-                                        eachLegendGap: 23,
-                                        scrollbarAfter: -1,  
-                                        legendsHeight:1,                                            
+                                        position: Legends.Position.BOTTOM,                                          
                                         doStrike: true,
                                         isVisible: true,
                                     }}
@@ -861,16 +876,21 @@ body:not(.dark) {
                                         '#93a3bc',
                                     ]}
                                     isLoading={dataLoading.verticalBar}
-                                    chartProps={{
-                                      variant : "Vertical Bar" 
-                                    }}    
+                                    onClick = {(e,data,index) => {
+                                       console.log(e);
+                                       console.log(data);
+                                       console.log(index);
+                                    }}
+                                    onArrowClick = {(e,data,legend,index) => {
+                                       console.log(e);
+                                       console.log(data);
+                                       console.log(legend)
+                                       console.log(index);
+                                    }}                                     
                                     legendsProps={{
                                         showArrow: true,
                                         position: Legends.Position.BOTTOM,
                                         isVisible: true,
-                                        eachLegendGap: 20,
-                                        scrollbarAfter: -1,
-                                        legendsHeight:1, // 50% height incase of -1 and if left out 0 it will show all the legends without scrollbar
                                         onClick: (data, legend, index) => {
                                             console.log(
                                                 `Clicked ${legend} at index ${index}`,

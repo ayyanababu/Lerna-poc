@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 
 import CustomBar from "../../CustomBar";
 import type { BarRendererProps } from "./BarRenderer.types";
-import { BarLineDataItem, BarsList, DataPoint } from "./Data.types";
+import { BarsList, DataPoint } from "./Data.types";
 
 const DEFAULT_BAR_RADIUS = 4;
 const ANIMATION_DURATION = 800; // animation duration in ms
@@ -153,7 +153,7 @@ const BarRenderer: React.FC<BarRendererProps> = ({
 
         // Calculate visual properties
         let barOpacity = 1;
-        if (chartProps?.toUpperCase() === "BAR AND LINE") {
+        if (chartProps?.toUpperCase() === "BAR_AND_LINE") {
           const isHovered = hoveredBarOther === index;
           barOpacity =
             hoveredBar !== null && hoveredBar !== -1 && !isHovered
@@ -177,7 +177,7 @@ const BarRenderer: React.FC<BarRendererProps> = ({
 
         return (
           <CustomBar
-            key={`bar-${d.xAxis}`}
+            key={`bar-${d.xAxis}-${index}`}
             x={barX}
             y={currentY}
             width={barwidth}

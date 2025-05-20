@@ -2,13 +2,14 @@ import React, { CSSProperties, SetStateAction } from "react";
 import { GridProps, TooltipProps } from "@mui/material";
 import { ScaleBand, ScaleLinear } from "d3";
 
+
 import { CustomBarProps } from "../../CustomBar/types";
 import { TimestampProps } from "../../Timestamp/types";
 import { TitleProps } from "../../Title/types";
 import { LegendsProps } from "../Legends/types";
 import { XAxisProps } from "../XAxis/types";
 import { YAxisProps } from "../YAxis/types";
-import { BarLineData } from "./Data.types";
+import { BarLineData, DataPoint } from "./Data.types";
 
 export interface LineRendererProps {
   /**
@@ -127,7 +128,7 @@ export interface LineRendererProps {
   showXAxis?: boolean;
 
   xScale: ScaleBand<string>;
-  y1Scale: ScaleLinear<number, number>;
+  y1Scale: ScaleLinear<number,number>;
   defaultOpacity: number;
   reducedOpacity: number;
   circleRadius: number;
@@ -150,4 +151,6 @@ export interface LineRendererProps {
     index: number,
   ) => (event: React.MouseEvent) => void;
   handleLineMouseLeave: () => void;  
+  onLineClick?: (event: React.MouseEvent<Element>, data: BarLineData, index: number) => void;
+  onPointClick?: (event: React.MouseEvent, data: DataPoint, index: number) => void;
 }

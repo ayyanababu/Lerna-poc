@@ -82,8 +82,11 @@ function LegendItem({
     />
   );
 
-  const iconX = MARKER_SIZE + MARKER_GAP + labelWidth + ICON_GAP;
+  const handleArrowClick = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+     onArrowClick?.(event);
+  };  
 
+  const iconX = MARKER_SIZE + MARKER_GAP + labelWidth + ICON_GAP;
   const renderText = () => (
     <>
       <g onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
@@ -114,7 +117,7 @@ function LegendItem({
                 transition: "opacity 0.25s ease-in-out",
               }}
               className="arrow-icon"
-              onClick={() => onArrowClick?.()}
+              onClick={(event: React.MouseEvent<SVGSVGElement, MouseEvent>) => onArrowClick?.(event)}
             />
           ) : (
             <div style={{ width: ICON_WIDTH, height: 16 }} />

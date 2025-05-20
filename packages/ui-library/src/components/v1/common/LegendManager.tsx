@@ -21,13 +21,14 @@ const LegendManager: React.FC<LegendManagerProps> = ({
   legendBoxHeight,
   calculatedLegendHeight,
   legendBoxWidth,
-  chart
+  chart,
+  eachLegendGap,
+  onArrowClick
 }) => {
   // Only render the legend if it's visible in props
   if (!legendsProps?.isVisible) {
     return null;
   }
-  console.log("hoveringed", hovered);
   return (
     <foreignObject
       x={`${legendLeft}`}
@@ -60,12 +61,13 @@ const LegendManager: React.FC<LegendManagerProps> = ({
             isLoading={isLoading}
             setHovered={setHovered}
             isLegendRendered={isLegendRendered}
-            eachLegendGap={legendsProps?.eachLegendGap}
             scrollbarAfter={legendsProps?.scrollbarAfter}
             generatedLegendHeight={generatedLegendHeight}
             generateAxis={generateAxis}
             legendBoxWidth={legendBoxWidth}
             chart={chart}
+            eachLegendGap={eachLegendGap}
+            onArrowClick={onArrowClick}
           />
         </svg>,
       )}

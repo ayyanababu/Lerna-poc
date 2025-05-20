@@ -6,6 +6,7 @@ import { LinePath } from "@visx/shape";
 import { shimmerGradientId } from "../../Shimmer/SvgShimmer";
 import AxisManager from "../common/AxisManager";
 import type { LineRendererProps } from "./LineRenderer.types";
+import { DataPoint,BarLineData } from "./Data.types";
 
 const ANIMATION_DURATION = 800; // animation duration in ms
 
@@ -30,7 +31,9 @@ const LineRenderer: React.FC<LineRendererProps> = ({
   hideAxisLine,
   label,
   handleLineMouseMove,
-  handleLineMouseLeave
+  handleLineMouseLeave,
+  onLineClick,
+  onPointClick
 }) => {
   const axis_right = useRef<SVGGElement | null>(null);
 
@@ -177,6 +180,7 @@ const LineRenderer: React.FC<LineRendererProps> = ({
     return data.chartData.slice(0, currentSegmentIndex + 1).map((d, index) => {
       // Calculate per-circle animation for a staggered effect
       const circleDelay = 0.1; // Delay between circle animations (in progress units)
+      const dataClicked: DataPoint = { label: d.xAxis, value: d.yAxisLeft };      
       const circleProgress = Math.min(
         1,
         Math.max(
@@ -186,7 +190,6 @@ const LineRenderer: React.FC<LineRendererProps> = ({
       );
       const circleEasedProgress = easeOutCubic(circleProgress);
       const pointRadius = circleRadius * circleEasedProgress;
-
       return (
         <circle
           key={`circle-${index}`}
@@ -202,7 +205,10 @@ const LineRenderer: React.FC<LineRendererProps> = ({
               : defaultOpacity
           }
           onMouseEnter={handleLineMouseMove(d.yAxisRight,lineColor,index)}          
-          onMouseLeave={handleLineMouseLeave}      
+          onMouseLeave={handleLineMouseLeave}   
+          onClick={(event) => {
+            if (onPointClick) onPointClick(event, dataClicked, index);
+          }}               
         />
       );
     });
@@ -211,7 +217,7 @@ const LineRenderer: React.FC<LineRendererProps> = ({
   // Get the animated data
   const animatedData = getAnimatedPathData();
   const currentRadius = getCurrentRadius();
-
+  const dataClicked:BarLineData = data;
   return (
     <Group>
       <>
@@ -243,7 +249,10 @@ const LineRenderer: React.FC<LineRendererProps> = ({
               : defaultOpacity
           }
           stroke={isLoading ? `url(#${shimmerGradientId})` : lineColor}
-          shapeRendering="geometricPrecision"           
+          shapeRendering="geometricPrecision" 
+          onClick={(event) => {
+            if (onLineClick) onLineClick(event, dataClicked, 0);
+          }}              
         />
 
         {/* Render circles with animated and staggered growth */}

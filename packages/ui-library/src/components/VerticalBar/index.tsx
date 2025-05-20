@@ -28,19 +28,18 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   showGrid = true,
   showXAxis = false,
   showYAxis = false,
+  onArrowClick
 }) => {
   const theme = useTheme();
   const data = useMemo<BarLineData>(
     () => (isLoading ? mockVerticalBarChartData : _data),
     [isLoading, _data],
   );
-  console.log("cdata", data);
   const { chartData } = data;
   if (!isLoading && (!chartData || chartData.length === 0)) {
     return <div>No data to display.</div>;
   }
 
-  console.log("mock2", data);
   return (
     <Bar
       data={data}
@@ -63,6 +62,8 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       showXAxis={showXAxis}
       showYAxis={showYAxis}
       chartProps={chartProps}
+      variant={"VERTICAL_BAR"}
+      onArrowClick={onArrowClick}
     />
   );
 };

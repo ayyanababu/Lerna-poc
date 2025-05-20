@@ -1,12 +1,12 @@
 import { Dispatch, SetStateAction } from "react";
 import { scaleOrdinal } from "@visx/scale";
-
 import { LegendPosition, LegendsProps } from "../Legends/types";
+import { DataPoint } from "./Data.types";
 
 export interface LegendDataItem {
-  label: string;
+  label: string | undefined;
   value: number;
-  color?: string;
+  color?: string | null;
 }
 
 export interface LegendManagerProps {
@@ -16,7 +16,7 @@ export interface LegendManagerProps {
   colorScale?: ReturnType<typeof scaleOrdinal<string, string>>;
   hideIndex: number[];
   setHideIndex: Dispatch<SetStateAction<number[]>>;
-  hovered: string | null;
+  hovered: string | null | number | undefined;
   setHovered: (label: string | number | null) => void;
   isLoading: boolean;
   isLegendRendered: (status: boolean) => void;
@@ -28,5 +28,7 @@ export interface LegendManagerProps {
   legendBoxHeight: number;
   calculatedLegendHeight: number;
   legendBoxWidth: number;
-  chart: string;
+  chart?: string | undefined;
+  eachLegendGap:number | undefined;
+  onArrowClick?: (event: React.MouseEvent, data: DataPoint, legend:string | undefined, index: number) => void;  
 }

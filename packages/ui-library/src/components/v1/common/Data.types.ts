@@ -13,8 +13,8 @@ export interface BarLineData {
 }
 
 export interface DataPoint {
-  label: string;
-  value: number;
+  label: string | undefined;
+  value: number | undefined;
   color?: string;
 }
 
