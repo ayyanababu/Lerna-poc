@@ -6,13 +6,17 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { AxisScale } from "@visx/axis";
 import { Group } from "@visx/group";
 import { useParentSize } from "@visx/responsive";
 import { scaleOrdinal } from "@visx/scale";
 import { useTooltip } from "@visx/tooltip";
+import { ScaleLinear } from "d3-scale"; // Importing the correct type for linear scales
 
 import useChartDimensions from "../../../hooks/useChartDimensions";
-import useChartScales from "../../../hooks/useChartScales";
+import useChartScales, {
+  LinearScaleInterface,
+} from "../../../hooks/useChartScales";
 import useTheme from "../../../hooks/useTheme";
 import ChartWrapper from "../../ChartWrapper";
 import Grid from "../../Grid";
@@ -749,7 +753,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
 
             <g ref={axis_bottom}>
               <AxisManager.XAxis
-                scale={typedXscale}
+                scale={typedXscale as unknown as AxisScale}
                 top={drawableChartHeight}
                 isLoading={isLoading}
                 availableWidth={innerWidth}
@@ -799,7 +803,11 @@ const Bar: React.FC<UnifiedChartProps> = ({
                   reducedOpacity={REDUCED_OPACITY}
                   circleRadius={circleRadius}
                   getAxisRight={getAxisRight}
-                  y1AxisProps={y1AxisProps}
+                  y1AxisProps={{
+                    scale:
+                      (y1AxisProps?.scale as LinearScaleInterface) ??
+                      (typedY1scale as LinearScaleInterface),
+                  }}
                   chartWidth={innerWidth}
                   hideIndex={hideChart}
                   setHideIndex={setHideChart}

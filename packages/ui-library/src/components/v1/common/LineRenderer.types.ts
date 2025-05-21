@@ -137,7 +137,7 @@ export interface LineRendererProps {
   getAxisRight: (axisrightwidth: number) => void;
   setHideIndex?: React.Dispatch<SetStateAction<number[]>>;
   hideIndex?: number[];
-  y1AxisProps: Partial<YAxisProps>;
+  y1AxisProps?: YAxisProps;
   xOffset?: number;
   yAxisRightLabel?: string;
   hoveredLine: string | null | number | undefined;

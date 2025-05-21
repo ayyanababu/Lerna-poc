@@ -239,7 +239,7 @@ const fetchVerticalBarData = (): Promise<BarLineData> =>
             ]
             resolve({
                 xAxislabel: 'Corporate Action - no line',
-                yAxisLeftLabel: 'Number of Actions - no line',
+                yAxisLeftLabel: '',
                 yAxisRightLabel: 'Positions Impacted no line',
                 chartData: actionTypes.map((action, index) => ({
                     xAxis: action.label,

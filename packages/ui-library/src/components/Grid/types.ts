@@ -1,3 +1,5 @@
+import { ScaleBand, ScaleLinear } from "d3-scale";
+
 import {
   BandScaleInterface,
   LinearScaleInterface,
@@ -17,12 +19,12 @@ export interface GridProps {
   /**
    * Scale for horizontal grid lines
    */
-  xScale?: BandScaleInterface;
+  xScale?: ScaleLinear<number, number> | ScaleBand<string>;
 
   /**
    * Scale for vertical grid lines
    */
-  yScale?: LinearScaleInterface;
+  yScale?: ScaleLinear<number, number>;
 
   /**
    * Number of ticks for grid lines
