@@ -1,8 +1,10 @@
 import React, { CSSProperties, SetStateAction } from "react";
 import { GridProps, TooltipProps } from "@mui/material";
-import { ScaleBand, ScaleLinear } from "d3";
 
-
+import {
+  BandScaleInterface,
+  LinearScaleInterface,
+} from "../../../hooks/useChartScales";
 import { CustomBarProps } from "../../CustomBar/types";
 import { TimestampProps } from "../../Timestamp/types";
 import { TitleProps } from "../../Title/types";
@@ -127,8 +129,8 @@ export interface LineRendererProps {
    */
   showXAxis?: boolean;
 
-  xScale: ScaleBand<string>;
-  y1Scale: ScaleLinear<number,number>;
+  xScale: BandScaleInterface;
+  y1Scale: LinearScaleInterface;
   defaultOpacity: number;
   reducedOpacity: number;
   circleRadius: number;
@@ -150,7 +152,16 @@ export interface LineRendererProps {
     color: string,
     index: number,
   ) => (event: React.MouseEvent) => void;
-  handleLineMouseLeave: () => void;  
-  onLineClick?: (event: React.MouseEvent<Element>, data: BarLineData, index: number) => void;
-  onPointClick?: (event: React.MouseEvent, data: DataPoint, index: number) => void;
+  handleLineMouseLeave: () => void;
+  onLineClick?: (
+    event: React.MouseEvent<Element>,
+    data: BarLineData,
+    index: number,
+  ) => void;
+  onPointClick?: (
+    event: React.MouseEvent,
+    data: DataPoint,
+    index: number,
+  ) => void;
+  chart?: string;
 }

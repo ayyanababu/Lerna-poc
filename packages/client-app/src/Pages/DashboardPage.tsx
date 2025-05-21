@@ -17,6 +17,8 @@ import {
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { ThemeContext } from '../App';
 import ReconciliationCard from '../components/DashboardPage/ReconciliationCard';
+import { index } from 'd3';
+import { data, legend } from 'framer-motion/client';
 
 // Define types for our chart data
 type DonutDataItem = {
@@ -223,7 +225,7 @@ const fetchBarLineData = (): Promise<BarLineData> =>
 const fetchVerticalBarData = (): Promise<BarLineData> =>
     new Promise((resolve) => {
         setTimeout(() => {
-            const actionTypes = [           
+            const actionTypes = [
                 { label: 'Priced hahf  shs fsh s   sdh dsh   h ds fhsf sh', value: 123 },
                 { label: 'Priced', value: 2450 },
                 { label: 'Priced', value: 36700 },
@@ -234,7 +236,7 @@ const fetchVerticalBarData = (): Promise<BarLineData> =>
                 { label: 'Priced Theta', value: 877000000 },
                 { label: 'Priced Iota', value: 921000000 },
                 { label: 'Priced Kappa', value: 999000000 }
-            ]            
+            ]
             resolve({
                 xAxislabel: 'Corporate Action - no line',
                 yAxisLeftLabel: 'Number of Actions - no line',
@@ -809,25 +811,19 @@ body:not(.dark) {
                                        console.log(e);
                                        console.log(data);
                                        console.log(index);
-                                    }}     
+                                    }}
                                     onLineClick = {(e,data,index) => {
                                        console.log(e);
                                        console.log(data);
                                        console.log(index);
-                                    }}        
+                                    }}
                                     onPointClick = {(e,data,index) => {
                                        console.log(e);
                                        console.log(data);
                                        console.log(index);
-                                    }}           
-                                    onArrowClick = {(e,data,legend,index) => {
-                                       console.log(e);
-                                       console.log(data);
-                                       console.log(legend);
-                                       console.log(index);
-                                    }}                                                                                                                                 
+                                    }}
                                     legendsProps={{
-                                        position: Legends.Position.BOTTOM,                                          
+                                        position: Legends.Position.BOTTOM,
                                         doStrike: true,
                                         isVisible: true,
                                     }}
@@ -850,7 +846,7 @@ body:not(.dark) {
                                         gutterBottom: true,
                                     }}
                                     legendsProps={{
-                                        position: Legends.Position.TOP,                                                                           
+                                        position: Legends.Position.TOP,
                                         onClick: (data, legend, index) => {
                                             console.log(
                                                 `Clicked ${legend} at index ${index}`,
@@ -886,17 +882,11 @@ body:not(.dark) {
                                        console.log(data);
                                        console.log(legend)
                                        console.log(index);
-                                    }}                                     
+                                    }}
                                     legendsProps={{
                                         showArrow: true,
                                         position: Legends.Position.BOTTOM,
                                         isVisible: true,
-                                        onClick: (data, legend, index) => {
-                                            console.log(
-                                                `Clicked ${legend} at index ${index}`,
-                                                data,
-                                            );
-                                        },
                                     }}
                                     tooltipProps={{}}
                                 />

@@ -16,7 +16,7 @@ import useChartScales from "../../../hooks/useChartScales";
 import useTheme from "../../../hooks/useTheme";
 import ChartWrapper from "../../ChartWrapper";
 import Grid from "../../Grid";
-import { LegendPosition,LegendItem } from "../../Legends/types";
+import { LegendPosition } from "../../Legends/types";
 import SvgShimmer from "../../Shimmer/SvgShimmer";
 import { TooltipData } from "../../Tooltip/types";
 import AxisManager from "../common/AxisManager";
@@ -30,7 +30,6 @@ import {
 import LegendManager from "../common/LegendManager";
 import LineRenderer from "../common/LineRenderer";
 import { UnifiedChartProps } from "./types";
-import {scaleBand, scaleLinear } from '@visx/scale';
 
 const defaultMargin = {
   top: 5,
@@ -67,7 +66,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
   showYAxis = false,
   onLineClick,
   onPointClick,
-  onArrowClick
+  onArrowClick,
 }) => {
   const { theme } = useTheme();
   let {
@@ -136,10 +135,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
   });
 
   useEffect(() => {
-    if (
-      variant &&
-      variant.toUpperCase() === "BAR AND LINE"
-    ) {
+    if (variant && variant.toUpperCase() === "BAR AND LINE") {
       if (hideChart.includes(0)) {
         setShowBar(false);
       } else {
@@ -185,7 +181,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
   useEffect(() => {
     if (legendsProps) {
       let { legendsHeight, scrollbarAfter } = legendsProps;
-      if (!legendsHeight){
+      if (!legendsHeight) {
         legendsHeight = 1;
       }
       if (
@@ -277,10 +273,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
   let circleRadius = 0;
   let xOffset = 0;
 
-  if (
-    variant &&
-    variant.toUpperCase() === "BAR AND LINE"
-  ) {
+  if (variant && variant.toUpperCase() === "BAR AND LINE") {
     const defaultBarWidth = xScale.bandwidth();
     const actualBarWidth = Math.min(
       defaultBarWidth,
@@ -294,10 +287,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
   }
 
   const legendData = useMemo(() => {
-    if (
-      variant &&
-      variant.toUpperCase() === "BAR AND LINE"
-    ) {
+    if (variant && variant.toUpperCase() === "BAR AND LINE") {
       return [
         { label: yAxisLeftLabel, value: 0, color: null },
         {
@@ -328,7 +318,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
     if (colors && "line" in colors) {
       setLineColor(colors.line);
     }
-    if (colors && ("bar" in colors)) {
+    if (colors && "bar" in colors) {
       return scaleOrdinal<string, string>({
         domain: filteredData.map((_, index) => filteredData[index].xAxis),
         range: [colors.bar],
@@ -347,10 +337,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
     (value: number, color: string, index: number) =>
       (event: React.MouseEvent) => {
         if (!isLoading) {
-          if (
-            variant &&
-            variant.toUpperCase() === "BAR AND LINE"
-          ) {
+          if (variant && variant.toUpperCase() === "BAR AND LINE") {
             const { yAxisLeft, yAxisRight } = chartData[index];
             const toolTipdata = [
               {
@@ -408,10 +395,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
     (value: number | undefined, color: string, index: number) =>
       (event: React.MouseEvent) => {
         if (!isLoading) {
-          if (
-            variant &&
-            variant.toUpperCase() === "BAR AND LINE"
-          ) {
+          if (variant && variant.toUpperCase() === "BAR AND LINE") {
             const { yAxisRight } = chartData[index];
             const toolTipdata = [
               {
@@ -524,12 +508,12 @@ const Bar: React.FC<UnifiedChartProps> = ({
       //          return;
       //        }
       let { scrollbarAfter, eachLegendGap } = legendsProps;
-      if (!scrollbarAfter){
+      if (!scrollbarAfter) {
         scrollbarAfter = -1;
       }
-      if (!eachLegendGap){
+      if (!eachLegendGap) {
         eachLegendGap = 20;
-      }      
+      }
       if (
         typeof scrollbarAfter === "number" &&
         typeof eachLegendGap === "number"
@@ -555,10 +539,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
         setLegendBoxWidth(
           (chartSvgRef?.current?.querySelector("g") as SVGGElement).getBBox()
             .width -
-            (variant &&
-             variant.toUpperCase() != "BAR AND LINE"
-              ? 10
-              : 0),
+            (variant && variant.toUpperCase() != "BAR AND LINE" ? 10 : 0),
         );
       }
       let moveY = 0;
@@ -578,18 +559,17 @@ const Bar: React.FC<UnifiedChartProps> = ({
         setTopLegendPosition(moveY + 10);
       }
       if (axis_left && axis_left.current) {
-        let lleft = -8;
-        if (
-          variant &&
-          variant.toUpperCase() != "BAR AND LINE"
-        ) {
-          if (!yAxisLeftLabel) {
-            lleft += 18;
-          } else {
-            lleft += 2;
-          }
-        }
-        setLegendLeft(axis_left.current.getBBox().x + lleft);
+        // let lleft = -8;
+        // if (variant && variant.toUpperCase() != "BAR AND LINE") {
+        //   if (!yAxisLeftLabel) {
+        //     lleft += 18;
+        //   } else {
+        //     lleft += 2;
+        //   }
+        // }
+        const CONST_LEGEND_NUDGE = -6;
+        setLegendLeft(axis_left.current.getBBox().x + CONST_LEGEND_NUDGE);
+        // setLegendLeft(axis_left.current.getBBox().x);
       }
     }
     let legendcalculatedHeight = 0;
@@ -689,7 +669,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
       ) => {
         onLineClick(event as React.MouseEvent<SVGGElement>, clickdata, index);
       }
-    : undefined;  
+    : undefined;
 
   const wrappedonPointClick = onPointClick
     ? (
@@ -699,18 +679,23 @@ const Bar: React.FC<UnifiedChartProps> = ({
       ) => {
         onPointClick(event as React.MouseEvent<SVGGElement>, clickdata, index);
       }
-    : undefined;     
-    
+    : undefined;
+
   const wrappedonArrowClick = onArrowClick
     ? (
         event: React.MouseEvent<Element>,
         clickdata: DataPoint,
-        legend:string | undefined,
+        legend: string | undefined,
         index: number,
       ) => {
-        onArrowClick(event as React.MouseEvent<SVGGElement>, clickdata, legend, index);
+        onArrowClick(
+          event as React.MouseEvent<SVGGElement>,
+          clickdata,
+          legend,
+          index,
+        );
       }
-    : undefined;   
+    : undefined;
 
   return (
     <ChartWrapper
@@ -740,6 +725,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
           <g ref={overall_chart}>
             <g ref={axis_left}>
               <AxisManager.YAxis
+                {...yAxisProps}
                 scale={typedYscale}
                 isLoading={isLoading}
                 hideTicks={!showTicks}
@@ -747,7 +733,6 @@ const Bar: React.FC<UnifiedChartProps> = ({
                 label={yAxisLeftLabel}
                 showYAxis={showYAxis}
                 chart={variant}
-                {...yAxisProps}
               />
             </g>
 
@@ -803,9 +788,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
                 chartProps={variant}
               />
             )}
-            {showLine &&
-            variant &&
-            variant.toUpperCase() === "BAR AND LINE" ? (
+            {showLine && variant && variant.toUpperCase() === "BAR AND LINE" ? (
               <g ref={line_chart}>
                 <LineRenderer
                   data={data}
@@ -815,7 +798,8 @@ const Bar: React.FC<UnifiedChartProps> = ({
                   reducedOpacity={REDUCED_OPACITY}
                   circleRadius={circleRadius}
                   getAxisRight={getAxisRight}
-                  {...y1AxisProps}
+                  y1AxisProps={y1AxisProps}
+                  chartWidth={innerWidth}
                   hideIndex={hideChart}
                   setHideIndex={setHideChart}
                   xOffset={xOffset}
@@ -859,7 +843,12 @@ const Bar: React.FC<UnifiedChartProps> = ({
               calculatedLegendHeight={calculatedLegendHeight}
               legendBoxWidth={legendBoxWidth}
               chart={variant ? variant : ""}
-              eachLegendGap={legendsProps && typeof legendsProps.eachLegendGap !== "undefined"?legendsProps.eachLegendGap:20}
+              eachLegendGap={
+                legendsProps &&
+                typeof legendsProps.eachLegendGap !== "undefined"
+                  ? legendsProps.eachLegendGap
+                  : 20
+              }
               onArrowClick={wrappedonArrowClick}
             />
           </g>

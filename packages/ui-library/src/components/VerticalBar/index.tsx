@@ -14,7 +14,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   colors,
   isLoading = false,
   titleProps,
-  chartProps,
   legendsProps,
   tooltipProps,
   xAxisProps,
@@ -28,7 +27,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   showGrid = true,
   showXAxis = false,
   showYAxis = false,
-  onArrowClick
+  onArrowClick,
 }) => {
   const theme = useTheme();
   const data = useMemo<BarLineData>(
@@ -61,7 +60,6 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       showTicks={showTicks}
       showXAxis={showXAxis}
       showYAxis={showYAxis}
-      chartProps={chartProps}
       variant={"VERTICAL BAR"}
       onArrowClick={onArrowClick}
     />
