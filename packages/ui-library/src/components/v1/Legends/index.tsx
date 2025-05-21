@@ -137,7 +137,7 @@ function Legends({
             let legendRowOffset: number;
             if (
               chart && chart.toUpperCase() === "BAR AND LINE" ||
-              legendBoxWidth > 400
+              legendBoxWidth > 300
             ) {
               legendRowOffset = row - 1;
             } else {
@@ -193,10 +193,11 @@ function Legends({
 
   useEffect(()=>{
     if (legends_ref && legends_ref.current){
-      if (legends_ref?.current?.querySelectorAll("#legends").length === data.length)
+      if (legends_ref?.current?.querySelectorAll("#legends").length === data.length){
         wrapLegendsText();
+      }  
     }
-  },[legends_ref,isLegendRendered,data,legends_ref && legends_ref.current && legends_ref?.current?.querySelectorAll("#legends").length]);
+  },[legends_ref,isLegendRendered,data]);
 
   return (
     <g ref={legends_ref} transform={positionStyles}>

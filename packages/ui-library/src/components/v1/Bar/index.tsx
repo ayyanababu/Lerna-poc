@@ -488,7 +488,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
 
         let moveY = 0;
         if (overallChart && overallChart.current) {
-          moveY = overallChart.current.getBBox().height;
+          moveY = overallChart.current.getBBox().y+overallChart.current.getBBox().height;
           setTopLegendPosition(moveY - defaultMargin.bottom);
         }
       }
@@ -567,7 +567,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
         } else {
           moveY = +axisBottomBBox.y + axisBottomBBox.height;
         }
-        setTopLegendPosition(moveY + 10);
+        setTopLegendPosition(moveY - defaultMargin.bottom + 5);
       }
       if (axisLeft && axisLeft.current) {
         let lleft = -8;
@@ -596,7 +596,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
       defaultMargin.top -
       defaultMargin.bottom -
       legendcalculatedHeight -
-      axisbottomheight;
+      axisbottomheight - 10
     setDrawableChartHeight(hgt);
   };
 

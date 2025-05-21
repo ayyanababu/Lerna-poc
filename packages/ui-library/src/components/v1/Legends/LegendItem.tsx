@@ -121,7 +121,7 @@ function LegendItem({
               }}
               className="arrow-icon"
               onClick={(event: React.MouseEvent<SVGSVGElement, MouseEvent>) =>
-                onArrowClick?.(event)
+                //legendProps.onClick?.(event)
               }
             />
           ) : (

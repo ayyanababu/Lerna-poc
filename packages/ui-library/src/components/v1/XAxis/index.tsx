@@ -120,7 +120,7 @@ function XAxis({
               };
               const isOverLapping = us.some(
                 (r: { x1: number; x2: number }) =>
-                  !(rect.x2 >= r.x1 && rect.x2 <= r.x2),
+                  (rect.x2 >= r.x1 && rect.x2 <= r.x2),
               );
               if (isOverLapping) {
                 isOverlappings = isOverLapping;
@@ -128,7 +128,7 @@ function XAxis({
             }
           });
         });
-        if (isOverlappings) {
+        if (isOverlappings || nodeList.length === 1) {
           setIsOverlapping(true);
         } else {
           setIsOverlapping(false);
@@ -221,7 +221,7 @@ function XAxis({
     );
     const estimatedMaxLabelWidth = maxLabelLength * averageWidthPerChar;
 
-    if (scaleLabels.length <= 1) {
+    if (scaleLabels.length < 1) {
       return {
         angle: 0,
         evenPositionsMap: null,

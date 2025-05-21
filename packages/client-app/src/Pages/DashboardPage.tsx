@@ -17,8 +17,7 @@ import {
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { ThemeContext } from '../App';
 import ReconciliationCard from '../components/DashboardPage/ReconciliationCard';
-import { index } from 'd3';
-import { data, legend } from 'framer-motion/client';
+
 
 // Define types for our chart data
 type DonutDataItem = {
@@ -238,9 +237,9 @@ const fetchVerticalBarData = (): Promise<BarLineData> =>
                 { label: 'Priced Kappa', value: 999000000 }
             ]
             resolve({
-                xAxislabel: 'Corporate Action - no line',
+                xAxislabel: '',
                 yAxisLeftLabel: '',
-                yAxisRightLabel: 'Positions Impacted no line',
+                yAxisRightLabel: '',
                 chartData: actionTypes.map((action, index) => ({
                     xAxis: action.label,
                     yAxisLeft: action.value, // 15-45
