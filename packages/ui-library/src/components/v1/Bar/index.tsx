@@ -271,7 +271,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
   });
 
   const typedXscale = xScale;
-  const typedYscale = yScale;
+  const typedYscale = yScale as ScaleLinear<number, number, never>;
   const typedY1scale = y1Scale;
 
   let circleRadius = 0;
@@ -540,7 +540,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
   // [legendsProps],
   // );
 
-  const isLegendRendered = useCallback((renderedStatus: boolean) => {
+  const isLegendRendered = (renderedStatus: boolean) => {
     if (renderedStatus) {
       if (chartSvgRef && chartSvgRef.current) {
         setLegendBoxWidth(
@@ -594,7 +594,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
       legendcalculatedHeight -
       axisbottomheight;
     setDrawableChartHeight(hgt);
-  });
+  };
 
   const generateAxis = useCallback((selectedLegends: number[]) => {
     setRefreshAxis(selectedLegends.length);

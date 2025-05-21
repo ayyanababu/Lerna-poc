@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { AxisLeft, AxisRight } from "@visx/axis";
+import { AxisLeft, AxisRight, AxisScale } from "@visx/axis";
 
 import useTheme from "../../../hooks/useTheme";
 import { formatNumberWithSuffix, isNumeric } from "../../../utils/number";
@@ -113,7 +113,7 @@ function YAxis({
   return (
     <g id="axis" ref={axis}>
       <AxisComponent
-        scale={scale}
+        scale={scale as any as AxisScale}
         stroke={theme.colors.axis.line}
         tickStroke={theme.colors.axis.line}
         tickLabelProps={() => ({
