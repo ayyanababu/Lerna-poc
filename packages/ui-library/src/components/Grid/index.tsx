@@ -12,7 +12,7 @@ const Grid: React.FC<GridProps> = ({
   showHorizontal = false,
   showVertical = false,
   opacity = 0.3,
-  variant = "line",
+  variant = "dashed",
 }) => {
   const { theme } = useTheme();
   const dashArray = variant === "dashed" ? "2,2" : undefined;

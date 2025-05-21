@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import LegendItem from "./LegendItem";
-import { LegendPosition, LegendsProps, LegendVariant } from "./types";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
+
 import { DataPoint } from "../common/Data.types";
 import { LegendDataItem } from "../common/LegendManager.types";
+import LegendItem from "./LegendItem";
+import { LegendPosition, LegendsProps, LegendVariant } from "./types";
 
 function Legends({
   colorScale,
@@ -25,11 +26,8 @@ function Legends({
   legendBoxWidth,
   hideLegendLableClick = true,
   showArrow = true,
-  chart,
 }: LegendsProps) {
   const legends_ref = useRef<SVGGElement | null>(null);
-  const [isLegendRenderingComplete,setisLegendRenderingComplete] = useState(false);
-  
   const positionStyles = useMemo(() => {
     switch (position) {
       case "left":
@@ -60,7 +58,7 @@ function Legends({
     ) {
       generatedLegendHeight(legends_ref.current.getBBox().height + 10);
     }
-  }, [data,  eachLegendGap, isLegendRendered]);
+  }, [data, generatedLegendHeight, eachLegendGap, isLegendRendered]);
 
   const handleToggleItem = useCallback(
     (index: number) => {
@@ -135,16 +133,6 @@ function Legends({
             positions[row] = [];
           }
           if (eachLegendGap) {
-            // let rowOffset;
-            // if (
-            //   (chart && chart.toUpperCase() === "BAR AND LINE") ||
-            //   legendBoxWidth > 300
-            // ) {
-            //   rowOffset = row - 1;
-            // } else {
-            //   rowOffset = row - 2;
-            // }
-
             let legendRowOffset: number;
             if (
               variant.toUpperCase() === "BAR AND LINE" ||
@@ -200,24 +188,16 @@ function Legends({
         generatedLegendHeight(legends_ref.current.getBBox().height + 10);
       }
     }
-    isLegendRendered && isLegendRendered(true);
   };
-
-  useEffect(()=>{
-    if (legends_ref && legends_ref.current && legends_ref.current.querySelectorAll("#legends").length === data.length ){
-      wrapLegendsText();
-    }else{
-      isLegendRendered && isLegendRendered(false);     
-    }   
-  },[legends_ref.current,legends_ref && legends_ref.current && legends_ref.current.querySelectorAll("#legends").length,data,isLegendRendered]);
 
   return (
     <g ref={legends_ref} transform={positionStyles}>
       <>
-        {data.map((label:LegendDataItem, index:number) => {
-     //     if (index === data.length - 1 && isLegendRendered) {
-     //       setisLegendRenderingComplete(true);
-     //     }
+        {data.map((label: LegendDataItem, index: number) => {
+          if (index === data.length - 1 && isLegendRendered) {
+            wrapLegendsText();
+            isLegendRendered(true);
+          }
           if (index > data.length - 1) {
             return null;
           }
@@ -236,9 +216,9 @@ function Legends({
           const isHoveredOther = hovered && !(hovered === lb.label);
           return (
             <LegendItem
+              id={`legend-${label.label}-${label.value}`}
               key={`legend-${label.label}-${label.value}`}
               label={lb}
-              id={"legends"}
               index={index}
               data={data}
               isHidden={isHidden}
