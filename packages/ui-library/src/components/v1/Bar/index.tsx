@@ -112,6 +112,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
   const [moveforBarLineLegend, setmoveforBarLineLegend] = useState(0);
   const [lineColor, setLineColor] = useState<string>("");
 
+
   const {
     drawableChartHeight,
     setDrawableChartHeight,
@@ -538,15 +539,20 @@ const Bar: React.FC<UnifiedChartProps> = ({
   // [legendsProps],
   // );
 
-  const isLegendRendered = (renderedStatus: boolean) => {
-    if (renderedStatus) {
+  useEffect(()=>{
       if (chartSvgRef && chartSvgRef.current) {
         setLegendBoxWidth(
-          (chartSvgRef?.current?.querySelector("g") as SVGGElement).getBBox()
-            .width -
-            (variant && variant.toUpperCase() != "BAR AND LINE" ? 10 : 0),
+          (chartSvgRef?.current.parentElement as HTMLDivElement).offsetWidth -
+            (variant &&
+             variant.toUpperCase() != "BAR AND LINE"
+              ? 10
+              : 0),
         );
       }
+  },[chartSvgRef.current,chartSvgRef?.current?.querySelector("g")])
+
+  const isLegendRendered = (renderedStatus: boolean) => {
+    if (renderedStatus) {
       let moveY = 0;
       if (axisBottom && axisBottom.current) {
         const axisBottomBBox = axisBottom.current.getBBox();
