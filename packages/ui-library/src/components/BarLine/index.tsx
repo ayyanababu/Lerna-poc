@@ -29,7 +29,7 @@ const BarLineChart: React.FC<BarLineChartProps> = ({
   showYAxis = false,
   onLineClick,
   onPointClick,
-  onArrowClick
+  onArrowClick,
 }) => {
   const theme = useTheme();
 

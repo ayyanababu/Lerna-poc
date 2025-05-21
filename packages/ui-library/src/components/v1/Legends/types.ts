@@ -1,7 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
 import { scaleOrdinal } from "@visx/scale";
-import { LegendDataItem } from "../common/LegendManager.types";
+
 import { DataPoint } from "../common/Data.types";
+import { LegendDataItem } from "../common/LegendManager.types";
 
 export enum LegendVariant {
   COMPACT = "compact",
@@ -23,7 +24,6 @@ export type LegendPositionType =
   | "left"
   | "right";
 
-
 export type LegendData = LegendDataItem[];
 
 export interface LegendLabel {
@@ -41,7 +41,12 @@ export interface LegendsProps {
   hovered?: string | null | number | undefined;
   setHovered?: (label: string | number | null) => void;
   position?: LegendPositionType;
-  onArrowClick?: (event: React.MouseEvent<SVGSVGElement, MouseEvent>,data: DataPoint, legend: string | undefined, index: number) => void;
+  onArrowClick?: (
+    event: React.MouseEvent<SVGSVGElement, MouseEvent>,
+    data: DataPoint,
+    legend: string | undefined,
+    index: number,
+  ) => void;
   isLoading?: boolean;
   doStrike?: boolean;
   isVisible?: boolean;

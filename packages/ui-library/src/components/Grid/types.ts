@@ -1,4 +1,9 @@
-import { ScaleLinear } from "@visx/vendor/d3-scale";
+import { ScaleBand, ScaleLinear } from "d3-scale";
+
+import {
+  BandScaleInterface,
+  LinearScaleInterface,
+} from "../../hooks/useChartScales";
 
 export interface GridProps {
   /**
@@ -14,7 +19,7 @@ export interface GridProps {
   /**
    * Scale for horizontal grid lines
    */
-  xScale?: ScaleLinear<number, number>;
+  xScale?: ScaleLinear<number, number> | ScaleBand<string>;
 
   /**
    * Scale for vertical grid lines

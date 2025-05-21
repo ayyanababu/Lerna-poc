@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import LegendItem from "./LegendItem";
 import { LegendPosition, LegendsProps, LegendVariant } from "./types";
-import { LegendDataItem } from "../common/LegendManager.types";
 import { DataPoint } from "../common/Data.types";
+import { LegendDataItem } from "../common/LegendManager.types";
 
 function Legends({
   colorScale,
@@ -135,21 +135,26 @@ function Legends({
             positions[row] = [];
           }
           if (eachLegendGap) {
-            let rowOffset;
             if (
-              chart && chart.toUpperCase() === "BAR AND LINE" ||
-              legendBoxWidth > 300
+              !(chart && chart.toUpperCase() === "BAR AND LINE") &&
+              legendBoxWidth <= 300
             ) {
-              rowOffset = row - 1;
-            } else {
-              rowOffset = row - 2;
+              row -= 2;
             }
 
             positions[row].push({
               object: gs[start],
               row: row,
               x: newwidth,
-              y: rowOffset * eachLegendGap,
+              y: (() => {
+                if (variant.toUpperCase() === "BAR AND LINE") {
+                  return (row - 1) * eachLegendGap;
+                } else if (legendBoxWidth > 300) {
+                  return (row - 1) * eachLegendGap;
+                } else {
+                  return (row - 2) * eachLegendGap;
+                }
+              })(),
               cwidth:
                 newwidth +
                 (gs[start] as SVGGElement).getBoundingClientRect().width,
@@ -211,7 +216,10 @@ function Legends({
           if (index > data.length - 1) {
             return null;
           }
-          const dataClicked:DataPoint = { label: label.label, value: label.value };
+          const dataClicked: DataPoint = {
+            label: label.label,
+            value: label.value,
+          };
           const isHidden = hideIndex?.includes(index);
           const lb = {
             index: index,
@@ -234,13 +242,18 @@ function Legends({
               doStrike={doStrike}
               variant={variant}
               onToggle={() => handleToggleItem(lb.index)}
-              onMouseOver={() => handleMouseOver(lb && lb.text ? lb.text : '')}
+              onMouseOver={() => handleMouseOver(lb && lb.text ? lb.text : "")}
               onMouseLeave={handleMouseLeave}
               hideValues={hideValues}
-              markerColor={label.color || colorScale(label && label.label ?label.label:'')}
-              onArrowClick={(event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+              markerColor={
+                label.color ||
+                colorScale(label && label.label ? label.label : "")
+              }
+              onArrowClick={(
+                event: React.MouseEvent<SVGSVGElement, MouseEvent>,
+              ) => {
                 if (onArrowClick && data) {
-                  onArrowClick(event,dataClicked, lb.text, index);
+                  onArrowClick(event, dataClicked, lb.text, index);
                 }
               }}
               eachLegendGap={eachLegendGap}

@@ -10,16 +10,14 @@ interface ChartDimensionsProps {
     left: number;
   };
   chartSvgRef: RefObject<SVGSVGElement>;
-  axis_bottom: RefObject<SVGGElement>;
-  legend_ref: RefObject<SVGGElement>;
-  overall_chart: RefObject<SVGGElement>;
+  axisBottom: RefObject<SVGGElement>;
+  legendRef: RefObject<SVGGElement>;
+  overallChart: RefObject<SVGGElement>;
 }
 
 const useChartDimensions = ({
-  width,
   height,
   defaultMargin,
-  chartSvgRef,
 }: ChartDimensionsProps) => {
   const [drawableChartHeight, setDrawableChartHeight] = useState<number>(0);
   const [legendTopPosition, setTopLegendPosition] = useState<number>(0);

@@ -1,12 +1,14 @@
-import { ScaleBand, ScaleLinear } from "d3";
-
+import {
+  BandScaleInterface,
+  LinearScaleInterface,
+} from "../../../hooks/useChartScales";
 import { CustomBarProps } from "../../CustomBar/types";
 import { BarLineDataItem, BarsList, DataPoint } from "./Data.types";
 
 export interface BarRendererProps {
   filteredData: BarLineDataItem[];
-  xScale: ScaleBand<string>;
-  yScale: ScaleLinear<number, number>;
+  xScale: BandScaleInterface;
+  yScale: LinearScaleInterface;
   colorScale: (index: string) => string;
   hoveredBar: number | null | string | undefined;
   hoveredBarOther: number | null | string | undefined;

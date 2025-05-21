@@ -1,5 +1,6 @@
-import { AxisBottom } from "@visx/axis";
+import { AxisBottom, AxisScale } from "@visx/axis";
 
+// import { BandScaleInterface } from "../../../hooks/useChartScales";
 import { BarsList } from "../common/Data.types";
 
 type AxisBottomProps = Parameters<typeof AxisBottom>[0];
@@ -60,4 +61,5 @@ export interface XAxisProps extends AxisBottomProps {
   chart: string;
   showXAxis?: boolean;
   textAnchor?: "start" | "end" | "middle" | "inherit";
+  scale: AxisScale;
 }

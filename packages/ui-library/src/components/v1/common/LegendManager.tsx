@@ -23,7 +23,7 @@ const LegendManager: React.FC<LegendManagerProps> = ({
   legendBoxWidth,
   chart,
   eachLegendGap,
-  onArrowClick
+  onArrowClick,
 }) => {
   // Only render the legend if it's visible in props
   if (!legendsProps?.isVisible) {

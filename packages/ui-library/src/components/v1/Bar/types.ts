@@ -40,10 +40,23 @@ export interface BaseChartProps {
   ) => void;
   theme: ReturnType<typeof useTheme>;
   style?: CSSProperties;
-  variant:string;
-  onLineClick?: (event: React.MouseEvent, data: BarLineData, index: number) => void;
-  onPointClick?: (event: React.MouseEvent, data: DataPoint, index: number) => void;  
-  onArrowClick?: (event: React.MouseEvent, data: DataPoint, legend: string | undefined,index: number) => void;  
+  variant: string;
+  onLineClick?: (
+    event: React.MouseEvent,
+    data: BarLineData,
+    index: number,
+  ) => void;
+  onPointClick?: (
+    event: React.MouseEvent,
+    data: DataPoint,
+    index: number,
+  ) => void;
+  onArrowClick?: (
+    event: React.MouseEvent,
+    data: DataPoint,
+    legend: string | undefined,
+    index: number,
+  ) => void;
 }
 
 /**

@@ -1,8 +1,10 @@
 import { AxisLeft } from "@visx/axis";
 
+import { LinearScaleInterface } from "../../../hooks/useChartScales";
+
 type AxisLeftProps = Parameters<typeof AxisLeft>[0];
 
-export interface YAxisProps extends AxisLeftProps {
+export interface YAxisProps extends Omit<AxisLeftProps, "scale"> {
   /**
    * Whether to show ticks
    */
@@ -59,4 +61,5 @@ export interface YAxisProps extends AxisLeftProps {
   showYAxis?: boolean;
   isRightYAxis?: boolean;
   textAnchor?: "start" | "end" | "middle" | "inherit";
+  scale: LinearScaleInterface;
 }

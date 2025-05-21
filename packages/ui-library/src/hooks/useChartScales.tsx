@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { scaleBand, scaleLinear } from '@visx/scale';
+import { scaleBand, scaleLinear } from "@visx/scale";
 
 import { BarLineDataItem } from "../components/v1/common/Data.types";
 
@@ -98,12 +98,11 @@ const enhanceVisxLinearScale = (
  * Custom hook for creating chart scales using visx
  * Enhanced with the necessary methods for compatibility
  */
-  const useChartScales = ({
-    filteredData,
-    innerWidth,
-    drawableChartHeight,  
-  }: ChartScalesProps): ChartScales => {
-
+const useChartScales = ({
+  filteredData,
+  innerWidth,
+  drawableChartHeight,
+}: ChartScalesProps): ChartScales => {
   const maxY1Value = useMemo(
     () => Math.max(0, ...filteredData.map((d) => d.yAxisLeft)) * SCALE_PADDING,
     [filteredData],
@@ -116,7 +115,6 @@ const enhanceVisxLinearScale = (
     [filteredData],
   );
 
-
   // Create and enhance the xScale
   const xScale = useMemo(() => {
     const band = scaleBand<string>({
@@ -124,7 +122,7 @@ const enhanceVisxLinearScale = (
       range: [0, innerWidth],
       padding: 0.6,
       round: true,
-    }) 
+    });
     return enhanceVisxBandScale(band);
   }, [filteredData, innerWidth]);
 
@@ -133,7 +131,7 @@ const enhanceVisxLinearScale = (
       domain: [0, maxY1Value],
       range: [drawableChartHeight, 0],
       nice: true,
-    })
+    });
     return enhanceVisxLinearScale(lin);
   }, [drawableChartHeight, maxY1Value]);
 
@@ -142,7 +140,7 @@ const enhanceVisxLinearScale = (
       domain: [0, maxY2Value],
       range: [drawableChartHeight, 0],
       nice: true,
-    })
+    });
     return enhanceVisxLinearScale(lin);
   }, [drawableChartHeight, maxY2Value]);
 
