@@ -26,6 +26,7 @@ function Legends({
   legendBoxWidth,
   hideLegendLableClick = true,
   showArrow = true,
+  chart
 }: LegendsProps) {
   const legends_ref = useRef<SVGGElement | null>(null);
   const positionStyles = useMemo(() => {
@@ -135,19 +136,18 @@ function Legends({
           if (eachLegendGap) {
             let legendRowOffset: number;
             if (
-              variant.toUpperCase() === "BAR AND LINE" ||
-              legendBoxWidth > 300
+              chart && chart.toUpperCase() === "BAR AND LINE" ||
+              legendBoxWidth > 400
             ) {
               legendRowOffset = row - 1;
             } else {
               legendRowOffset = row - 2;
             }
-
             positions[row].push({
               object: gs[start],
               row,
               x: newwidth,
-              y: legendRowOffset * eachLegendGap,
+              y: legendRowOffset * eachLegendGap,              
               cwidth:
                 newwidth +
                 (gs[start] as SVGGElement).getBoundingClientRect().width,
@@ -188,16 +188,24 @@ function Legends({
         generatedLegendHeight(legends_ref.current.getBBox().height + 10);
       }
     }
+    isLegendRendered && isLegendRendered(true);
   };
+
+  useEffect(()=>{
+    if (legends_ref && legends_ref.current){
+      if (legends_ref?.current?.querySelectorAll("#legends").length === data.length)
+        wrapLegendsText();
+    }
+  },[legends_ref,isLegendRendered,data,legends_ref && legends_ref.current && legends_ref?.current?.querySelectorAll("#legends").length]);
 
   return (
     <g ref={legends_ref} transform={positionStyles}>
       <>
         {data.map((label: LegendDataItem, index: number) => {
-          if (index === data.length - 1 && isLegendRendered) {
-            wrapLegendsText();
-            isLegendRendered(true);
-          }
+   //       if (index === data.length - 1 && isLegendRendered) {
+   //         wrapLegendsText();
+   //         isLegendRendered(true);
+   //       }
           if (index > data.length - 1) {
             return null;
           }
@@ -216,7 +224,7 @@ function Legends({
           const isHoveredOther = hovered && !(hovered === lb.label);
           return (
             <LegendItem
-              id={`legend-${label.label}-${label.value}`}
+              id={"legends"}
               key={`legend-${label.label}-${label.value}`}
               label={lb}
               index={index}
