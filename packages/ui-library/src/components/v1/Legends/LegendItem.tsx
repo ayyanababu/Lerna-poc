@@ -22,6 +22,7 @@ function LegendItem({
   onArrowClick,
   hideLegendLableClick = true,
   showArrow = true,
+  id
 }: LegendItemProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [labelWidth, setLabelWidth] = useState(0);
@@ -128,7 +129,7 @@ function LegendItem({
   );
 
   return (
-    <g
+    <g id = {id}
       transform={`translate(0, ${index * 14})`}
       className="legendItems"
       style={{

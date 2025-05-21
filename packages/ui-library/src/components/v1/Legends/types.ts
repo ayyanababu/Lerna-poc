@@ -79,4 +79,5 @@ export interface LegendItemProps {
   showArrow?: boolean;
   showIcon?: boolean;
   hideLegendLableClick?: boolean;
+  id:string;
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import LegendItem from "./LegendItem";
 import { LegendPosition, LegendsProps, LegendVariant } from "./types";
 import { LegendDataItem } from "../common/LegendManager.types";
@@ -28,6 +28,8 @@ function Legends({
   chart,
 }: LegendsProps) {
   const legends_ref = useRef<SVGGElement | null>(null);
+  const [isLegendRenderingComplete,setisLegendRenderingComplete] = useState(false);
+  
   const positionStyles = useMemo(() => {
     switch (position) {
       case "left":
@@ -58,7 +60,7 @@ function Legends({
     ) {
       generatedLegendHeight(legends_ref.current.getBBox().height + 10);
     }
-  }, [data, generatedLegendHeight, eachLegendGap, isLegendRendered]);
+  }, [data,  eachLegendGap, isLegendRendered]);
 
   const handleToggleItem = useCallback(
     (index: number) => {
@@ -147,7 +149,7 @@ function Legends({
               object: gs[start],
               row: row,
               x: newwidth,
-              y: (variant.toUpperCase() === "BAR AND LINE"?(row - 1):(legendBoxWidth > 300?(row-1):(row - 2))) * eachLegendGap,
+              y: rowOffset * eachLegendGap,
               cwidth:
                 newwidth +
                 (gs[start] as SVGGElement).getBoundingClientRect().width,
@@ -188,16 +190,24 @@ function Legends({
         generatedLegendHeight(legends_ref.current.getBBox().height + 10);
       }
     }
+    isLegendRendered && isLegendRendered(true);
   };
+
+  useEffect(()=>{
+    if (legends_ref && legends_ref.current && legends_ref.current.querySelectorAll("#legends").length === data.length ){
+      wrapLegendsText();
+    }else{
+      isLegendRendered && isLegendRendered(false);     
+    }   
+  },[legends_ref.current,legends_ref && legends_ref.current && legends_ref.current.querySelectorAll("#legends").length,data,isLegendRendered]);
 
   return (
     <g ref={legends_ref} transform={positionStyles}>
       <>
         {data.map((label:LegendDataItem, index:number) => {
-          if (index === data.length - 1 && isLegendRendered) {
-            wrapLegendsText();
-            isLegendRendered(true);
-          }
+     //     if (index === data.length - 1 && isLegendRendered) {
+     //       setisLegendRenderingComplete(true);
+     //     }
           if (index > data.length - 1) {
             return null;
           }
@@ -215,6 +225,7 @@ function Legends({
             <LegendItem
               key={`legend-${label.label}-${label.value}`}
               label={lb}
+              id={"legends"}
               index={index}
               data={data}
               isHidden={isHidden}
