@@ -120,8 +120,8 @@ function LegendItem({
                 transition: "opacity 0.25s ease-in-out",
               }}
               className="arrow-icon"
-              onClick={(event: React.MouseEvent<SVGSVGElement, MouseEvent>) =>
-                //legendProps.onClick?.(event)
+              onClick= {(event: React.MouseEvent<SVGSVGElement, MouseEvent>) =>
+                onArrowClick && onArrowClick.(event)
               }
             />
           ) : (
