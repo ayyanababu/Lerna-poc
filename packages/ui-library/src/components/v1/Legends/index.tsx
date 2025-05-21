@@ -134,26 +134,31 @@ function Legends({
             positions[row] = [];
           }
           if (eachLegendGap) {
+            // let rowOffset;
+            // if (
+            //   (chart && chart.toUpperCase() === "BAR AND LINE") ||
+            //   legendBoxWidth > 300
+            // ) {
+            //   rowOffset = row - 1;
+            // } else {
+            //   rowOffset = row - 2;
+            // }
+
+            let legendRowOffset: number;
             if (
-              !(chart && chart.toUpperCase() === "BAR AND LINE") &&
-              legendBoxWidth <= 300
+              variant.toUpperCase() === "BAR AND LINE" ||
+              legendBoxWidth > 300
             ) {
-              row -= 2;
+              legendRowOffset = row - 1;
+            } else {
+              legendRowOffset = row - 2;
             }
 
             positions[row].push({
               object: gs[start],
-              row: row,
+              row,
               x: newwidth,
-              y: (() => {
-                if (variant.toUpperCase() === "BAR AND LINE") {
-                  return (row - 1) * eachLegendGap;
-                } else if (legendBoxWidth > 300) {
-                  return (row - 1) * eachLegendGap;
-                } else {
-                  return (row - 2) * eachLegendGap;
-                }
-              })(),
+              y: legendRowOffset * eachLegendGap,
               cwidth:
                 newwidth +
                 (gs[start] as SVGGElement).getBoundingClientRect().width,

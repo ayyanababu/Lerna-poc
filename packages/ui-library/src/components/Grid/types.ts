@@ -1,9 +1,9 @@
 import { ScaleBand, ScaleLinear } from "d3-scale";
 
-import {
-  BandScaleInterface,
-  LinearScaleInterface,
-} from "../../hooks/useChartScales";
+// import {
+//   BandScaleInterface,
+//   LinearScaleInterface,
+// } from "../../hooks/useChartScales";
 
 export interface GridProps {
   /**
@@ -56,4 +56,5 @@ export interface GridProps {
    * @default false
    */
   isLoading?: boolean;
+  variant?: "dashed" | "solid";
 }

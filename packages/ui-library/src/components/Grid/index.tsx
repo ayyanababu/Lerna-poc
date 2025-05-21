@@ -9,24 +9,13 @@ const Grid: React.FC<GridProps> = ({
   xScale,
   yScale,
   numTicks = 5,
-  showHorizontal = true,
+  showHorizontal = false,
   showVertical = false,
   opacity = 0.3,
-  isVisible,
-  isLoading = false,
+  variant = "line",
 }) => {
-  const { theme, activeMode } = useTheme();
-
-  const customVisible = useMemo(() => {
-    if (["undefined", "null"].includes(`${isVisible}`)) {
-      return activeMode === "light";
-    }
-    return isVisible;
-  }, [isVisible, activeMode]);
-
-  if (!customVisible || isLoading) {
-    return null;
-  }
+  const { theme } = useTheme();
+  const dashArray = variant === "dashed" ? "2,2" : undefined;
 
   return (
     <g>
@@ -41,7 +30,7 @@ const Grid: React.FC<GridProps> = ({
               y1={yScale(tick)}
               y2={yScale(tick)}
               stroke={theme.colors.axis.grid}
-              strokeDasharray="2,2"
+              {...(dashArray ? { strokeDasharray: dashArray } : {})}
               opacity={opacity}
             />
           ))}
@@ -62,7 +51,7 @@ const Grid: React.FC<GridProps> = ({
                     y1={0}
                     y2={height}
                     stroke={theme.colors.axis.grid}
-                    strokeDasharray="2,2"
+                    {...(dashArray ? { strokeDasharray: dashArray } : {})}
                     opacity={opacity}
                   />
                 ))
@@ -76,7 +65,7 @@ const Grid: React.FC<GridProps> = ({
                     y1={0}
                     y2={height}
                     stroke={theme.colors.axis.grid}
-                    strokeDasharray="2,2"
+                    {...(dashArray ? { strokeDasharray: dashArray } : {})}
                     opacity={opacity}
                   />
                 ))}
