@@ -73,11 +73,9 @@ const Bar: React.FC<UnifiedChartProps> = ({
   onArrowClick,
 }) => {
   const { theme } = useTheme();
-  let {
-    parentRef,
-    width = 100,
-    height = 100,
-  } = useParentSize({ debounceTime: 150 });
+  const { parentRef } = useParentSize({ debounceTime: 150 });
+
+  let { width = 100, height = 100 } = useParentSize({ debounceTime: 150 });
 
   if (!width) {
     width = parentRef?.current?.offsetWidth ?? 0;
@@ -98,11 +96,11 @@ const Bar: React.FC<UnifiedChartProps> = ({
   );
   const [hideIndex, setHideIndex] = useState<number[]>([]);
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
-  const axis_bottom = useRef<SVGGElement | null>(null);
-  const axis_left = useRef<SVGGElement | null>(null);
-  const overall_chart = useRef<SVGGElement | null>(null);
-  const legend_ref = useRef<SVGGElement | null>(null);
-  const line_chart = useRef<SVGGElement | null>(null);
+  const axisBottom = useRef<SVGGElement | null>(null);
+  const axisLeft = useRef<SVGGElement | null>(null);
+  const overallChart = useRef<SVGGElement | null>(null);
+  const legendRef = useRef<SVGGElement | null>(null);
+  const lineChart = useRef<SVGGElement | null>(null);
   const [refreshAxis, setRefreshAxis] = useState<number>(0);
   const [barList, setBarList] = useState<BarsList[]>([]);
   const [innerWidth, setInnerWidth] = useState<number>(0);
@@ -133,9 +131,9 @@ const Bar: React.FC<UnifiedChartProps> = ({
     height,
     defaultMargin,
     chartSvgRef,
-    axis_bottom,
-    legend_ref,
-    overall_chart,
+    axisBottom,
+    legendRef,
+    overallChart,
   });
 
   useEffect(() => {
@@ -180,7 +178,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
           ? yAxisLabelWidth
           : defaultMargin.left),
     );
-  }, [width, chartSvgRef, axis_left, axis_bottom]);
+  }, [width, chartSvgRef, axisLeft, axisBottom]);
 
   useEffect(() => {
     if (legendsProps) {
@@ -205,7 +203,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
     }
   }, [
     chartSvgRef,
-    axis_bottom.current,
+    axisBottom.current,
     adjustedChartHeight,
     calculatedLegendHeight,
   ]);
@@ -466,17 +464,17 @@ const Bar: React.FC<UnifiedChartProps> = ({
 
   const wrapped = useCallback(
     (isWrapped: boolean) => {
-      if (isWrapped && chartSvgRef.current && axis_bottom.current) {
+      if (isWrapped && chartSvgRef.current && axisBottom.current) {
         let legendheight = 0;
-        if (legend_ref && legend_ref.current) {
-          const currentLegend = legend_ref.current as SVGGElement;
+        if (legendRef && legendRef.current) {
+          const currentLegend = legendRef.current as SVGGElement;
           if (currentLegend) {
             legendheight = currentLegend.getBBox().height;
           }
         }
         let axisheight = 0;
-        if (axis_bottom && axis_bottom.current) {
-          axisheight = axis_bottom.current.getBBox().height;
+        if (axisBottom && axisBottom.current) {
+          axisheight = axisBottom.current.getBBox().height;
         }
         const hgt =
           height -
@@ -488,16 +486,16 @@ const Bar: React.FC<UnifiedChartProps> = ({
         setDrawableChartHeight(hgt);
 
         let moveY = 0;
-        if (overall_chart && overall_chart.current) {
-          moveY = overall_chart.current.getBBox().height;
+        if (overallChart && overallChart.current) {
+          moveY = overallChart.current.getBBox().height;
           setTopLegendPosition(moveY - defaultMargin.bottom);
         }
       }
     },
     [
       chartSvgRef,
-      axis_bottom,
-      legend_ref,
+      axisBottom,
+      legendRef,
       height,
       setDrawableChartHeight,
       setTopLegendPosition,
@@ -550,10 +548,10 @@ const Bar: React.FC<UnifiedChartProps> = ({
         );
       }
       let moveY = 0;
-      if (axis_bottom && axis_bottom.current) {
-        const axisBottomBBox = axis_bottom.current.getBBox();
-        if (axis_bottom && axis_bottom.current.getAttribute("transform")) {
-          const transform = axis_bottom.current.getAttribute("transform");
+      if (axisBottom && axisBottom.current) {
+        const axisBottomBBox = axisBottom.current.getBBox();
+        if (axisBottom && axisBottom.current.getAttribute("transform")) {
+          const transform = axisBottom.current.getAttribute("transform");
           if (transform) {
             const translateY = parseFloat(
               transform.split("translate(")[1].split(",")[1],
@@ -565,7 +563,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
         }
         setTopLegendPosition(moveY + 10);
       }
-      if (axis_left && axis_left.current) {
+      if (axisLeft && axisLeft.current) {
         let lleft = -8;
         if (variant && variant.toUpperCase() != "BAR AND LINE") {
           if (!yAxisLeftLabel) {
@@ -574,18 +572,18 @@ const Bar: React.FC<UnifiedChartProps> = ({
             lleft += 2;
           }
         }
-        setLegendLeft(axis_left.current.getBBox().x + lleft);
+        setLegendLeft(axisLeft.current.getBBox().x + lleft);
       }
     }
     let legendcalculatedHeight = 0;
-    if (legend_ref && legend_ref.current && legendsProps?.isVisible) {
-      if (legend_ref && legend_ref.current) {
-        legendcalculatedHeight = legend_ref.current.getBBox().height;
+    if (legendRef && legendRef.current && legendsProps?.isVisible) {
+      if (legendRef && legendRef.current) {
+        legendcalculatedHeight = legendRef.current.getBBox().height;
       }
     }
     let axisbottomheight: number = 0;
-    if (axis_bottom && axis_bottom.current) {
-      axisbottomheight = (axis_bottom.current as SVGGElement).getBBox().height;
+    if (axisBottom && axisBottom.current) {
+      axisbottomheight = (axisBottom.current as SVGGElement).getBBox().height;
     }
     const hgt =
       height -
@@ -727,8 +725,8 @@ const Bar: React.FC<UnifiedChartProps> = ({
               : defaultMargin.left
           }
         >
-          <g ref={overall_chart}>
-            <g ref={axis_left}>
+          <g ref={overallChart}>
+            <g ref={axisLeft}>
               <AxisManager.YAxis
                 {...yAxisProps}
                 scale={typedYscale}
@@ -751,7 +749,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
               />
             )}
 
-            <g ref={axis_bottom}>
+            <g ref={axisBottom}>
               <AxisManager.XAxis
                 scale={typedXscale as unknown as AxisScale}
                 top={drawableChartHeight}
@@ -794,7 +792,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
               />
             )}
             {showLine && variant && variant.toUpperCase() === "BAR AND LINE" ? (
-              <g ref={line_chart}>
+              <g ref={lineChart}>
                 <LineRenderer
                   data={data}
                   xScale={typedXscale}
@@ -831,7 +829,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
               ""
             )}
           </g>
-          <g ref={legend_ref}>
+          <g ref={legendRef}>
             <LegendManager
               legendsProps={legendsProps}
               position={position}

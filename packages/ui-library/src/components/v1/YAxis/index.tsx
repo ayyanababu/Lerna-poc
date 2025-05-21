@@ -113,7 +113,7 @@ function YAxis({
   return (
     <g id="axis" ref={axis}>
       <AxisComponent
-        scale={scale as any as AxisScale}
+        scale={scale as AxisScale}
         stroke={theme.colors.axis.line}
         tickStroke={theme.colors.axis.line}
         tickLabelProps={() => ({
