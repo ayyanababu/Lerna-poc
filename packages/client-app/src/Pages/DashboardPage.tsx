@@ -19,6 +19,10 @@ import { ThemeContext } from '../App';
 import ReconciliationCard from '../components/DashboardPage/ReconciliationCard';
 import { fetchDonutData, fetchSemiDonutData, fetchTreeMapData, fetchMarketTreeMapData, fetchStackedBarData, fetchHorizontalStackedData, fetchBarLineData, fetchVerticalBarData, fetchHorizontalBarData, fetchVerticalGroupedBarData, fetchHorizontalGroupedBarData } from '../components/DashboardPage/fetchFunctions';
 import { DonutDataItem, TreeMapNode, StackedBarItem, VerticalBarItem } from '../components/DashboardPage/types';
+import Box from '@mui/material/Box';
+import { IconButton } from '@mui/material';
+import darkGrey from '../themeUtils/colors/darkGrey';
+import PageDots from '../components/PageDots';
 
 
 const CAROUSEL_PAGES = 3;
@@ -280,54 +284,6 @@ body:not(.dark) {
         height: 350px;
         width: 100%;
     }
-}
-
-.dot-container {
-    position: sticky;
-    bottom: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 20px 0;
-    padding: 12px 16px;
-    background-opacity: 0.8;
-    backdrop-filter: blur(40px);
-    border-radius: 25px;
-    margin: 0 auto;
-    margin-top: 25px;
-    width: fit-content;
-}
-.dot-container:not(.dark) {
-    background-color: #1e293b24;
-    box-shadow: 0 0 20px #bfe8fd11;
-}
-.dark .dot-container {
-    background-color: #f0f8fec0;
-    box-shadow: 0 0 20px #bfe8fd55;
-}
-
-.dot {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background-color: #407abc;
-    cursor: pointer;
-    transition: all 0.250s ease-in-out;
-    outline:none;
-    border: 1px solid #fff;
-}
-.dot:hover {
-    background-color: #f57e52;
-    transform: scale(1.2);
-}
-.dot:active {
-    background-color: #f57e52;
-    transform: scale(0.8);
-}
-
-.dot.active {
-    background-color: #f57e52;
-    transform: scale(1.2);
 }
 
 `}
@@ -647,11 +603,11 @@ body:not(.dark) {
             ))}
             </div>
 
-            <div className="dot-container">
-                {[...(new Array(CAROUSEL_PAGES).fill(0))].map((_, index) => (
-                    <button key={index} className={`dot ${activePage === index ? 'active' : ''}`} onClick={() => scrollToPage(index)}></button>
-                ))}
-            </div>
+            <PageDots
+                totalPages={CAROUSEL_PAGES}
+                activePage={activePage}
+                scrollToPage={scrollToPage}
+            />
 
         </ChartThemeProvider>
     );
