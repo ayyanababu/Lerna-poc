@@ -501,39 +501,42 @@ const Bar: React.FC<UnifiedChartProps> = ({
     ],
   );
 
-  const generatedLegendHeight = (calculatedlegendHeight: number) => {
-    if (legendsProps) {
-      setCalculatedLegendHeight(calculatedlegendHeight);
-      //        if (legendHeight > 0) {
-      //          return;
-      //        }
-      let { scrollbarAfter, eachLegendGap } = legendsProps;
-      if (!scrollbarAfter) {
-        scrollbarAfter = -1;
-      }
-      if (!eachLegendGap) {
-        eachLegendGap = 20;
-      }
-      if (
-        typeof scrollbarAfter === "number" &&
-        typeof eachLegendGap === "number"
-      ) {
-        if (scrollbarAfter < 0) {
-          setLegendHeight(calculatedlegendHeight);
+  const generatedLegendHeight = useCallback(
+    (calculatedlegendHeight: number) => {
+      if (legendsProps) {
+        setCalculatedLegendHeight(calculatedlegendHeight);
+        //        if (legendHeight > 0) {
+        //          return;
+        //        }
+        let { scrollbarAfter, eachLegendGap } = legendsProps;
+        if (!scrollbarAfter) {
+          scrollbarAfter = -1;
+        }
+        if (!eachLegendGap) {
+          eachLegendGap = 23;
+        }
+        if (
+          typeof scrollbarAfter === "number" &&
+          typeof eachLegendGap === "number"
+        ) {
+          if (scrollbarAfter < 0) {
+            setLegendHeight(calculatedlegendHeight);
+          } else {
+            setLegendHeight(scrollbarAfter * eachLegendGap);
+          }
         } else {
-          setLegendHeight(scrollbarAfter * eachLegendGap);
-        }
-      } else {
-        if (scrollbarAfter && scrollbarAfter < 0) {
-          setLegendHeight(calculatedlegendHeight);
+          if (scrollbarAfter && scrollbarAfter < 0) {
+            setLegendHeight(calculatedlegendHeight);
+          }
         }
       }
-    }
-  };
+    },
+    [],
+  );
   // [legendsProps],
   // );
 
-  const isLegendRendered = (renderedStatus: boolean) => {
+  const isLegendRendered = useCallback((renderedStatus: boolean) => {
     if (renderedStatus) {
       if (chartSvgRef && chartSvgRef.current) {
         setLegendBoxWidth(
@@ -559,17 +562,15 @@ const Bar: React.FC<UnifiedChartProps> = ({
         setTopLegendPosition(moveY + 10);
       }
       if (axis_left && axis_left.current) {
-        // let lleft = -8;
-        // if (variant && variant.toUpperCase() != "BAR AND LINE") {
-        //   if (!yAxisLeftLabel) {
-        //     lleft += 18;
-        //   } else {
-        //     lleft += 2;
-        //   }
-        // }
-        const CONST_LEGEND_NUDGE = -6;
-        setLegendLeft(axis_left.current.getBBox().x + CONST_LEGEND_NUDGE);
-        // setLegendLeft(axis_left.current.getBBox().x);
+        let lleft = -8;
+        if (variant && variant.toUpperCase() != "BAR AND LINE") {
+          if (!yAxisLeftLabel) {
+            lleft += 2;
+          } else {
+            lleft += 2;
+          }
+        }
+        setLegendLeft(axis_left.current.getBBox().x + lleft);
       }
     }
     let legendcalculatedHeight = 0;
@@ -589,16 +590,16 @@ const Bar: React.FC<UnifiedChartProps> = ({
       legendcalculatedHeight -
       axisbottomheight;
     setDrawableChartHeight(hgt);
-  };
+  });
 
   const generateAxis = useCallback((selectedLegends: number[]) => {
     setRefreshAxis(selectedLegends.length);
   }, []);
 
-  const transferBarList = (barsList: BarsList[]) => {
+  const transferBarList = useCallback((barsList: BarsList[]) => {
     setBarList(barsList);
     setRefreshAxis(barList.length);
-  };
+  }, []);
 
   const wrappedOnClick = onClick
     ? (
