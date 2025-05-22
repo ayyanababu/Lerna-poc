@@ -619,7 +619,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
       defaultMargin.bottom -
       legendcalculatedHeight -
       axisbottomheight - ((!timestampProps || (timestampProps && !timestampProps.timestamp))?40:20)
-    setDrawableChartHeight(hgt);
+    setDrawableChartHeight(hgt - 16);
   };
 
   const generateAxis = useCallback((selectedLegends: number[]) => {
@@ -857,7 +857,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
               ""
             )}
           </g>
-          <g ref={legendRef}>
+          <g ref={legendRef} transform={`translate(0,16)`}>
             <LegendManager
               legendsProps={legendsProps}
               position={position}
