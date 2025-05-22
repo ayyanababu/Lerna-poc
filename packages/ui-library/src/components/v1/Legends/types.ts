@@ -34,6 +34,7 @@ export interface LegendLabel {
 }
 
 export interface LegendsProps {
+  legendsProps?: LegendsProps;
   colorScale?: ReturnType<typeof scaleOrdinal<string, string>>;
   data?: LegendData;
   hideIndex?: number[];
@@ -41,6 +42,11 @@ export interface LegendsProps {
   hovered?: string | null | number | undefined;
   setHovered?: (label: string | number | null) => void;
   position?: LegendPositionType;
+  onClick?:(
+    data: DataPoint,
+    legend: string | undefined,
+    index: number,
+  ) => void;
   onArrowClick?: (
     event: React.MouseEvent<SVGSVGElement, MouseEvent>,
     data: DataPoint,
@@ -65,6 +71,7 @@ export interface LegendsProps {
 }
 
 export interface LegendItemProps {
+  legendsProps?: LegendsProps;
   label?: LegendLabel;
   index?: number;
   data?: LegendData;

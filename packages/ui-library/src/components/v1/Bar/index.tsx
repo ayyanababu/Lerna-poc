@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useRef,
   useState,
+  useLayoutEffect
 } from "react";
 import { AxisScale } from "@visx/axis";
 import { Group } from "@visx/group";
@@ -111,7 +112,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
   const [, setHoveredBarId] = useState<string>("");
   const [moveforBarLineLegend, setmoveforBarLineLegend] = useState(0);
   const [lineColor, setLineColor] = useState<string>("");
-
+  const [newCalculatedHeight,setCalculatedHeight] = useState(height)
 
   const {
     drawableChartHeight,
@@ -477,8 +478,12 @@ const Bar: React.FC<UnifiedChartProps> = ({
         if (axisBottom && axisBottom.current) {
           axisheight = axisBottom.current.getBBox().height;
         }
+        let newcalculatedheight = height;
+        if ((!timestampProps || (timestampProps && !timestampProps.timestamp)) && chartSvgRef && chartSvgRef.current){
+          newcalculatedheight = (chartSvgRef.current?.parentElement as HTMLDivElement).offsetHeight
+        }        
         const hgt =
-          height -
+          newcalculatedheight -
           defaultMargin.top -
           defaultMargin.bottom -
           legendheight -
@@ -504,7 +509,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
     ],
   );
 
-  const generatedLegendHeight = useCallback(
+  const generatedLegendHeight = 
     (calculatedlegendHeight: number) => {
       if (legendsProps) {
         setCalculatedLegendHeight(calculatedlegendHeight);
@@ -533,9 +538,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
           }
         }
       }
-    },
-    [],
-  );
+    }
   // [legendsProps],
   // );
 
@@ -567,7 +570,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
         } else {
           moveY = +axisBottomBBox.y + axisBottomBBox.height;
         }
-        setTopLegendPosition(moveY - defaultMargin.bottom + 5);
+        setTopLegendPosition(moveY  + 5);
       }
       if (axisLeft && axisLeft.current) {
         let lleft = -8;
@@ -591,12 +594,31 @@ const Bar: React.FC<UnifiedChartProps> = ({
     if (axisBottom && axisBottom.current) {
       axisbottomheight = (axisBottom.current as SVGGElement).getBBox().height;
     }
+    let newcalculatedheight = height;
+    if ((!timestampProps || (timestampProps && !timestampProps.timestamp)) && chartSvgRef && chartSvgRef.current){
+      if (chartSvgRef.current?.parentElement){
+         if (chartSvgRef.current?.parentElement.parentElement){
+           if (chartSvgRef.current?.parentElement.parentElement.parentElement){
+               if (chartSvgRef.current?.parentElement.parentElement.parentElement.parentElement){
+                  newcalculatedheight = (chartSvgRef.current?.parentElement.parentElement.parentElement.parentElement as HTMLDivElement).offsetHeight
+               } 
+           }
+         }
+       }                       
+//       newcalculatedheight = (chartSvgRef.current?.parentElement.parentElement.parentElement.parentElement as HTMLDivElement).offsetHeight
+//       console.log("parent element",(chartSvgRef.current?.parentElement.parentElement.parentElement.parentElement as HTMLDivElement).offsetHeight)
+    }
+    let top = defaultMargin.top;
+    if (chartSvgRef && chartSvgRef.current){   
+      top = chartSvgRef.current.getBBox().x;
+    }   
+    setCalculatedHeight(newcalculatedheight - defaultMargin.top);
     const hgt =
-      height -
-      defaultMargin.top -
+      newcalculatedheight  -
+      top -
       defaultMargin.bottom -
       legendcalculatedHeight -
-      axisbottomheight - 10
+      axisbottomheight - ((!timestampProps || (timestampProps && !timestampProps.timestamp))?40:20)
     setDrawableChartHeight(hgt);
   };
 
@@ -721,7 +743,7 @@ const Bar: React.FC<UnifiedChartProps> = ({
       }}
       timestampProps={{ isLoading, ...timestampProps }}
     >
-      <svg ref={chartSvgRef} width="100%" height="100%">
+      <svg ref={chartSvgRef} width="100%" height={newCalculatedHeight}>
         {isLoading && <SvgShimmer />}
         <Group
           top={defaultMargin.top}

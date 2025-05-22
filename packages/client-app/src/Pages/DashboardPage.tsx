@@ -800,7 +800,7 @@ body:not(.dark) {
                                 <BarLineChart
                                     data={barLineData}
                                     title="Monthly Trade Volume"
-                                    timestamp={new Date().toISOString()}
+                                    timestampProps={{timestamp:""}}
                                     isLoading={dataLoading.barLine}
                                     titleProps={{
                                         variant: 'h6',
@@ -885,7 +885,7 @@ body:not(.dark) {
                                     legendsProps={{
                                         showArrow: true,
                                         position: Legends.Position.BOTTOM,
-                                        isVisible: true,
+                                        isVisible: true,                                     
                                     }}
                                     tooltipProps={{}}
                                 />

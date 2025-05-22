@@ -30,17 +30,17 @@ export interface BaseChartProps {
   barProps?: Partial<CustomBarProps>;
   maxBarWidth?: number;
   showGrid?: boolean;
-  showXAxis: boolean;
-  showYAxis: boolean;
-  showTicks: boolean;
+  showXAxis?: boolean;
+  showYAxis?: boolean;
+  showTicks?: boolean;
   onClick?: (
     event: React.MouseEvent<SVGGElement, MouseEvent>,
     data: DataPoint,
     index: number,
   ) => void;
-  theme: ReturnType<typeof useTheme>;
+  theme?: ReturnType<typeof useTheme>;
   style?: CSSProperties;
-  variant: string;
+  variant?: string;
   onLineClick?: (
     event: React.MouseEvent,
     data: BarLineData,

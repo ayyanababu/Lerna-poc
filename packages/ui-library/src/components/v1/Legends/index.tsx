@@ -4,7 +4,7 @@ import { DataPoint } from "../common/Data.types";
 import { LegendDataItem } from "../common/LegendManager.types";
 import LegendItem from "./LegendItem";
 import { LegendPosition, LegendsProps, LegendVariant } from "./types";
-
+let stoprecurring = 0
 function Legends({
   colorScale,
   data,
@@ -59,7 +59,7 @@ function Legends({
     ) {
       generatedLegendHeight(legends_ref.current.getBBox().height + 10);
     }
-  }, [data, generatedLegendHeight, eachLegendGap, isLegendRendered]);
+  }, [data, eachLegendGap, isLegendRendered]);
 
   const handleToggleItem = useCallback(
     (index: number) => {
@@ -175,6 +175,9 @@ function Legends({
           }
         }
         start++;
+        if (generatedLegendHeight) {
+           generatedLegendHeight(legends_ref.current.getBBox().height + 10);
+        }
       }
       Object.keys(positions).forEach((positionkey: string) => {
         positions[positionkey].forEach((rowitem) => {
@@ -184,20 +187,18 @@ function Legends({
           );
         });
       });
-      if (generatedLegendHeight) {
-        generatedLegendHeight(legends_ref.current.getBBox().height + 10);
-      }
     }
-    isLegendRendered && isLegendRendered(true);
+     isLegendRendered && isLegendRendered(true);
   };
 
   useEffect(()=>{
-    if (legends_ref && legends_ref.current){
+    if (legends_ref && legends_ref.current && stoprecurring < 35){
       if (legends_ref?.current?.querySelectorAll("#legends").length === data.length){
         wrapLegendsText();
-      }  
+        stoprecurring++; 
+      } 
     }
-  },[legends_ref,isLegendRendered,data]);
+  },[legends_ref,data,legends_ref?.current?.querySelectorAll("#legends").length,isLegendRendered]);
 
   return (
     <g ref={legends_ref} transform={positionStyles}>
